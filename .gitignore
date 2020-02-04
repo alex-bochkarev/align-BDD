@@ -1,0 +1,6 @@
+__pycache__
+.\#*
+.Rhistory
+.RData
+instances/raw/reduced/*.bdd
+instances/raw/nonreduced/*.bdd
