@@ -95,8 +95,8 @@ if __name__ == "__main__":
             else:
                 inst_accepted = True
 
-        bdd_A.save(out_dir+"A{}.bdd".format(inst_id))
-        bdd_B.save(out_dir+"B{}.bdd".format(inst_id))
+        bdd_A.save(out_dir+"/A{}.bdd".format(inst_id))
+        bdd_B.save(out_dir+"/B{}.bdd".format(inst_id))
 
         print("{},{},{},{},{}".format(inst_id,count_inversions(bdd_A.vars, bdd_B.vars), bdd_A.is_reduced(), bdd_B.is_reduced(), trials))
         sys.stdout.flush() # otherwise we are risking not to have anyting on job kill...

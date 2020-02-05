@@ -28,16 +28,10 @@ if __name__ == "__main__":
     # create an exact instance
     parser = ap.ArgumentParser(description="Performs scalability test. (c) A. Bochkarev, Clemson University, 2020",
                                formatter_class=ap.ArgumentDefaultsHelpFormatter)
-    parser.add_argument("-v","--no_variables",action="store", dest="V",
-                        help="number of variables per instance (0 for the 'short' set, see the source for details)",
-                        type=int, default=0)
-    parser.add_argument("-k","--no_insts",action="store", dest="K",
-                        help="number of instances per instance size",
-                        type=int, default=10)
-    parser.add_argument("-p", "--prob_exp", dest="p",help="tree expansion probability parameter",
-                        action="store", type=float, default=0.6)
     parser.add_argument("-H","--header", help="print column headers only and exit",action="store_true")
-    parser.add_argument("-t","--tmpdir", dest="out_dir", help="temporary output directory")
+    parser.add_argument("-d","--dir", dest="inst_dir", help="temporary output directory")
+    parser.add_argument("-l","--list_inst", dest="inst_list", help="list of instance IDs (filename)")
+
     args = parser.parse_args()
 
     if args.header:
@@ -46,41 +40,15 @@ if __name__ == "__main__":
 
     inst_profiles = set()
     inst_id = 0
-    if args.V <= 0:
-        Ns = Ns_short
-    else:
-        Ns = [args.V]
 
-    K = args.K
-    p = args.p
+with open(args.inst_list,"r") as inst_list:
+    for inst_id in inst_list:
+        inst_id = int(inst_id.rstrip())
+        A = exact.BDD(); B = exact.BDD()
+        A.load(args.inst_dir+"/A{}.bdd".format(inst_id))
+        B.load(args.inst_dir+"/B{}.bdd".format(inst_id))
 
-for N in Ns:
-    for k in range(K):
-        inst_accepted = False
-        trials = 0
-        t0 = time()
-        while not inst_accepted:
-            # this loop is needed to ensure instances are unique
-            trials += 1
-            A = exact.BDD.random(N=N,p=p)
-            B = exact.BDD.random(N=N,p=p)
-            B.rename_vars(dict(zip([i for i in range(1,N+1)],np.random.permutation([i for i in range(1,N+1)]))))
-            # A.make_reduced()
-            # B.make_reduced()
-
-            # check if the instance is unique / never seen before
-            prof_A = A.profile()
-            prof_B = B.profile()
-            if not ( ( (prof_A,prof_B) in inst_profiles ) or ( (prof_B, prof_A) in inst_profiles )):
-                inst_profiles.add((prof_A,prof_B))
-                inst_accepted = True
-
-        A.save(args.out_dir+"A{}.bdd".format(inst_id))
-        B.save(args.out_dir+"B{}.bdd".format(inst_id))
-
-        t1 = time()
-        log(inst_id, N, "trials",trials)
-        log(inst_id, N,"orig_gen_time",t1 - t0)
+        N = len(A.vars)
 
         # generate corresponding varseq-instances
         t0 = time()

@@ -22,7 +22,7 @@ SOLVE=./solve_inst.py
 BBLOG=./log_bb.py
 PP=./post_processing
 SCAL=./scal_test.py
-SCAL_N=0 10 12 13 14 15 17 18 19 20 21 22 23 24
+SCAL_N=5 6 7 8 9 10 12 13 14 15 17 18
 SCAL_K=5
 SCAL_P=0.7
 
@@ -72,8 +72,9 @@ $(LOGS)/BB_bounds_R.log: $(INST)/reduced/instances.list $(BBLOG)
 
 $(LOGS)/scal_N%.log: $(SCAL)
 	mkdir -p $(INST)/sc$* && \
-	python $(SCAL) -v $* -k $(SCAL_K) -p $(SCAL_P) -t $(INST)/sc$*/ > $@
-# FIXME: DRY -- use ./gen_BDD_pair.py here as well
+	python ./gen_BDD_pair.py -n $(SCAL_K) -v $* -p $(SCAL_P) -U $(INST)/sc$* > $(INST)/sc$*/gen.log && \
+	basename -a -s .bdd $(INST)/sc$*/A*.bdd | sed 's/A//' > $(INST)/sc$*/inst.list && \
+	python $(SCAL) -l $(INST)/sc$*/inst.list -d $(INST)/sc$*/ > $@
 
 $(LOGS)/scalability.log: $(SCAL) $(SCAL_FILES)
 	python $(SCAL) --header > $@ && \
