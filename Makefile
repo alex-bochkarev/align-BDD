@@ -9,7 +9,6 @@
 # TODO add random seed / other means for the dataset reproducibilty
 # TODO add flexible calculation root directory
 # TODO add parallel instances processing (if not yet)
-# TODO make summary/stats figures for the dataset (# nodes per layer)
 # TODO remove instances.list after the calculation
 
 ######################################################################
@@ -46,7 +45,8 @@ N=10# number of variables per instance
 ######################################################################
 ## calculated vars/parameters
 SCAL_FILES=$(addsuffix .log, $(addprefix $(LOGS)/scal_N,$(SCAL_N)))
-LW_FILES=$(addsuffix .log, $(addprefix $(LOGS)/lwidths_p,$(LW_Ps)))
+LW_FILES_R=$(addsuffix .log, $(addprefix $(LOGS)/lwidths_Rp,$(LW_Ps)))
+LW_FILES_N=$(addsuffix .log, $(addprefix $(LOGS)/lwidths_Np,$(LW_Ps)))
 
 DTE=$(shell date +%F)
 
@@ -61,8 +61,8 @@ figures: $(FIGS)/fig_guessing_R.eps $(FIGS)/fig_BB_gaps_R.eps $(FIGS)/fig_firepl
 ######################################################################
 ## Figure recipes
 
-$(FIGS)/fig%_R.eps: $(LOGS)/solved_R.log $(PP)/fig%.R
-	Rscript $(PP)/fig$*.R -i $< -o $@
+#$(FIGS)/fig%_R.eps: $(LOGS)/solved_R.log $(PP)/fig%.R
+#	Rscript $(PP)/fig$*.R -i $< -o $@
 
 $(FIGS)/fig_BB_%_R.eps: $(LOGS)/BB_bounds_R.log $(PP)/fig_BB_%.R
 	Rscript $(PP)/fig_BB_$*.R -i $< -o $@
@@ -70,7 +70,11 @@ $(FIGS)/fig_BB_%_R.eps: $(LOGS)/BB_bounds_R.log $(PP)/fig_BB_%.R
 $(FIGS)/fig_scal.eps: $(LOGS)/scalability.log $(PP)/fig_scal.R
 	Rscript $(PP)/fig_scal.R -i $< -o $@
 
-$(FIGS)/fig_summary_R.eps: $(LOGS)/lwidths_R.log $(PP)/fig_summary.R
+$(FIGS)/fig_summary_R.eps: DS_FLAG=R
+$(FIGS)/fig_summary_N.eps: DS_FLAG=N
+
+$(FIGS)/fig_summary_%.eps: $(LOGS)/lwidths_%.log $(PP)/fig_summary.R
+	@echo Recipe for FigSumR content
 	Rscript $(PP)/fig_summary.R -i $< -o $@
 
 ## Generating and solving instances
@@ -109,15 +113,16 @@ $(LOGS)/scalability.log: $(SCAL) $(SCAL_FILES)
 ## end of scalability experiment
 
 ## random dataset stats
-$(LOGS)/lwidths_p%.log: $(STATS)
-	mkdir -p $(INST)/ds_stats/p$* && \
-	python ./gen_BDD_pair.py -n $(LW_n) -v $(LW_N) -p $* -RU $(INST)/ds_stats/p$* > /dev/null && \
-	ls $(INST)/ds_stats/p$*/*.bdd > $(INST)/ds_stats/p$*/lwidths_p$*.list && \
-	python $(STATS) -s $* $(INST)/ds_stats/p$*/lwidths_p$*.list > $@ && \
-	rm -rf $(INST)/ds_stats/p$*
+$(LOGS)/lwidths_Np%.log $(LOGS)/lwidths_Rp%.log: $(STATS)
+	mkdir -p $(INST)/ds_stats/$(DS_FLAG)p$* && \
+	python ./gen_BDD_pair.py -n $(LW_n) -v $(LW_N) -p $* -$(DS_FLAG)U $(INST)/ds_stats/$(DS_FLAG)p$* > /dev/null && \
+	ls $(INST)/ds_stats/$(DS_FLAG)p$*/*.bdd > $(INST)/ds_stats/$(DS_FLAG)p$*/lwidths_$(DS_FLAG)p$*.list && \
+	python $(STATS) -s $* $(INST)/ds_stats/$(DS_FLAG)p$*/lwidths_$(DS_FLAG)p$*.list > $@ && \
+	rm -rf $(INST)/ds_stats/$(DS_FLAG)p$*
 
-$(LOGS)/lwidths_R.log: $(LW_FILES)
-	tail -qn +2 $(LOGS)/lwidths_p*.log > $@ && \
+.SECONDEXPANSION:
+$(LOGS)/lwidths_%.log: $$(LW_FILES_%)
+	tail -qn +2 $(LOGS)/lwidths_$(DS_FLAG)p*.log > $@ && \
 	rm -rf $(INST)/ds_stats
 ## end of random dataset stats
 

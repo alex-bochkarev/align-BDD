@@ -49,9 +49,12 @@ if __name__ == "__main__":
                         type=int,default=1)
     parser.add_argument("-p", "--prob_exp", dest="p",help="tree expansion probability parameter",
                         action="store", type=float, default=0.6)
-    parser.add_argument("-R","--reduced", help="generate reduced instances",action="store_true")
     parser.add_argument("-U","--unique", help="generate unique instances",action="store_true")
     parser.add_argument("out_dir", help="output directory")
+
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument("-R","--reduced", help="generate reduced instances",action="store_true")
+    group.add_argument("-N","--nonreduced", help="generate reduced instances",action="store_true")
 
     args = parser.parse_args()
 
