@@ -54,15 +54,16 @@ DTE=$(shell date +%F)
 
 ######################################################################
 ## High-level recipes
+.SECONDARY:
 
 all: #instances/dataset_R.tar.gz
-figures: $(FIGS)/fig_guessing_R.eps $(FIGS)/fig_BB_gaps_R.eps $(FIGS)/fig_fireplace_R.eps $(FIGS)/fig_obj_hist_R.eps $(FIGS)/fig_obj_int_R.eps $(FIGS)/fig_scal.eps
+figures: $(FIGS)/fig_sol_guessing_R.eps $(FIGS)/fig_sol_BB_gaps_R.eps $(FIGS)/fig_sol_fireplace_R.eps $(FIGS)/fig_sol_obj_hist_R.eps $(FIGS)/fig_sol_obj_int_R.eps $(FIGS)/fig_scal.eps
 
 ######################################################################
 ## Figure recipes
 
-#$(FIGS)/fig%_R.eps: $(LOGS)/solved_R.log $(PP)/fig%.R
-#	Rscript $(PP)/fig$*.R -i $< -o $@
+$(FIGS)/fig_sol_%_R.eps: $(LOGS)/solved_R.log $(PP)/fig%.R
+	Rscript $(PP)/fig$*.R -i $< -o $@
 
 $(FIGS)/fig_BB_%_R.eps: $(LOGS)/BB_bounds_R.log $(PP)/fig_BB_%.R
 	Rscript $(PP)/fig_BB_$*.R -i $< -o $@
@@ -74,7 +75,6 @@ $(FIGS)/fig_summary_R.eps: DS_FLAG=R
 $(FIGS)/fig_summary_N.eps: DS_FLAG=N
 
 $(FIGS)/fig_summary_%.eps: $(LOGS)/lwidths_%.log $(PP)/fig_summary.R
-	@echo Recipe for FigSumR content
 	Rscript $(PP)/fig_summary.R -i $< -o $@
 
 ## Generating and solving instances
@@ -113,17 +113,23 @@ $(LOGS)/scalability.log: $(SCAL) $(SCAL_FILES)
 ## end of scalability experiment
 
 ## random dataset stats
-$(LOGS)/lwidths_Np%.log $(LOGS)/lwidths_Rp%.log: $(STATS)
-	mkdir -p $(INST)/ds_stats/$(DS_FLAG)p$* && \
+GEN_LW_LOGS =	mkdir -p $(INST)/ds_stats/$(DS_FLAG)p$* && \
 	python ./gen_BDD_pair.py -n $(LW_n) -v $(LW_N) -p $* -$(DS_FLAG)U $(INST)/ds_stats/$(DS_FLAG)p$* > /dev/null && \
 	ls $(INST)/ds_stats/$(DS_FLAG)p$*/*.bdd > $(INST)/ds_stats/$(DS_FLAG)p$*/lwidths_$(DS_FLAG)p$*.list && \
 	python $(STATS) -s $* $(INST)/ds_stats/$(DS_FLAG)p$*/lwidths_$(DS_FLAG)p$*.list > $@ && \
 	rm -rf $(INST)/ds_stats/$(DS_FLAG)p$*
 
+$(LOGS)/lwidths_Np%.log: $(STATS)
+	$(GEN_LW_LOGS)
+
+$(LOGS)/lwidths_Rp%.log: $(STATS)
+	$(GEN_LW_LOGS)
+
 .SECONDEXPANSION:
 $(LOGS)/lwidths_%.log: $$(LW_FILES_%)
-	tail -qn +2 $(LOGS)/lwidths_$(DS_FLAG)p*.log > $@ && \
-	rm -rf $(INST)/ds_stats
+	ls $(LOGS)/lwidths_$(DS_FLAG)p*.log && \
+	tail -qn +2 $(LOGS)/lwidths_$(DS_FLAG)p*.log > $@
+
 ## end of random dataset stats
 
 ######################################################################
@@ -138,6 +144,7 @@ clean-raw-inst:
 	rm -f $(INST)/reduced/*.list
 	rm -f $(INST)/nonreduced/*.bdd
 	rm -f $(INST)/nonreduced/*.list
+	rm -rf $(INST)/ds_stats
 	rm -f $(INST)/*.bdd
 
 clean-inst:
