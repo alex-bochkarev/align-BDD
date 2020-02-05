@@ -54,7 +54,7 @@ DTE=$(shell date +%F)
 
 ######################################################################
 ## High-level recipes
-.SECONDARY:
+.SECONDARY: # keep all the intermediary logfiles (will not work o/w)
 
 all: #instances/dataset_R.tar.gz
 figures: $(FIGS)/fig_sol_guessing_R.eps $(FIGS)/fig_sol_BB_gaps_R.eps $(FIGS)/fig_sol_fireplace_R.eps $(FIGS)/fig_sol_obj_hist_R.eps $(FIGS)/fig_sol_obj_int_R.eps $(FIGS)/fig_scal.eps
@@ -62,8 +62,8 @@ figures: $(FIGS)/fig_sol_guessing_R.eps $(FIGS)/fig_sol_BB_gaps_R.eps $(FIGS)/fi
 ######################################################################
 ## Figure recipes
 
-$(FIGS)/fig_sol_%_R.eps: $(LOGS)/solved_R.log $(PP)/fig%.R
-	Rscript $(PP)/fig$*.R -i $< -o $@
+$(FIGS)/fig_sol_%_R.eps: $(LOGS)/solved_R.log $(PP)/fig_%.R
+	Rscript $(PP)/fig_$*.R -i $< -o $@
 
 $(FIGS)/fig_BB_%_R.eps: $(LOGS)/BB_bounds_R.log $(PP)/fig_BB_%.R
 	Rscript $(PP)/fig_BB_$*.R -i $< -o $@
