@@ -1,8 +1,8 @@
 """
 "Scalability" test:
 Aux script: time-tracks some instances of different size:
-- generate (unique) original and simplified problems;
-- solve simplified problem: heuristics, BB, brute-force;
+- open an instance;
+- solve the simplified problem: heuristics, BB;
 - solve exact problem: heuristics from the simplified prob, sifting;
 
 (c) A. Bochkarev, Clemson University, 2020
@@ -24,8 +24,6 @@ start_id = 0
 Ns_short = [5,6,7,8] # 9,10,11,12,13,14,15]
 
 if __name__ == "__main__":
-
-    # create an exact instance
     parser = ap.ArgumentParser(description="Performs scalability test. (c) A. Bochkarev, Clemson University, 2020",
                                formatter_class=ap.ArgumentDefaultsHelpFormatter)
     parser.add_argument("-H","--header", help="print column headers only and exit",action="store_true")

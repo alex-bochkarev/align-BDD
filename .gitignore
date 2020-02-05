@@ -4,3 +4,4 @@ __pycache__
 .RData
 instances/raw/reduced/*.bdd
 instances/raw/nonreduced/*.bdd
+instances/raw/*.bdd
