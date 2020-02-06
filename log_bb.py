@@ -23,8 +23,13 @@ if __name__ == "__main__":
     parser.add_argument("-d","--dir", dest="inst_dir", help="directory to take instances from",default="./instances/raw/reduced/")
     parser.add_argument("-i","--input_list", dest="inst_list", help="list of instance IDs to process",default="./instances/raw/reduced/instances.list")
     parser.add_argument("-o","--out_file", dest="logfile", help="output log file name",default="./BB_bounds.log")
+    parser.add_argument("-H", "--header", action="store_true", dest="header", help="show header only and exit")
 
     args = parser.parse_args()
+    if args.header:
+        log("instance","num_type","step","LB","UB",comment="comment")
+        exit(0)
+
     inst_dir = args.inst_dir
 
     if not os.path.isdir(inst_dir):

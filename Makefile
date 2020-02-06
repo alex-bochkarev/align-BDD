@@ -13,20 +13,20 @@
 
 ######################################################################
 ## Files and directories
-INST=./instances/raw
-LOGS=./run_logs
+PREF=./
+INST=$(PREF)instances/raw
+LOGS=$(PREF)run_logs
+ARC=./data_archive
 FIGS=./figures
-OUT=./experiments
 SOLVE=./solve_inst.py
 BBLOG=./log_bb.py
 PP=./post_processing
 SCAL=./scal_test.py
 STATS=./gen_lsizes_stats.py
 STATS_LIST_R=./instances/raw/reduced/stats.list
-
 ######################################################################
 ## Numerical parameters
-PAR_SOL=8
+PAR_SOL=16
 
 ### random dataset stats
 LW_n=50
@@ -53,6 +53,9 @@ MAX_I=$(shell expr $(PAR_SOL) - 1 )
 SOL_FILES_R = $(addsuffix .log, $(addprefix $(LOGS)/part.solved_R., $(shell seq -f %02g 0 $(MAX_I))))
 SOL_FILES_N = $(addsuffix .log, $(addprefix $(LOGS)/part.solved_N., $(shell seq -f %02g 0 $(MAX_I))))
 
+BB_FILES_R = $(addsuffix .log, $(addprefix $(LOGS)/part.BB_bounds_R., $(shell seq -f %02g 0 $(MAX_I))))
+BB_FILES_N = $(addsuffix .log, $(addprefix $(LOGS)/part.BB_bounds_N., $(shell seq -f %02g 0 $(MAX_I))))
+
 DTE=$(shell date +%F)
 
 .PHONY: all figures clean-raw-inst clean-insts
@@ -61,8 +64,9 @@ DTE=$(shell date +%F)
 ## High-level recipes
 .SECONDARY: # keep all the intermediary logfiles (will not work o/w)
 
-all: #instances/dataset_R.tar.gz
-figures: $(FIGS)/fig_sol_guessing_N.eps $(FIGS)/fig_BB_gaps_N.eps $(FIGS)/fig_sol_fireplace_N.eps $(FIGS)/fig_sol_obj_hist_N.eps $(FIGS)/fig_sol_obj_int_N.eps $(FIGS)/fig_scal.eps $(FIGS)/fig_sol_obj_hist_R.eps
+all:
+
+figures: $(FIGS)/fig_sol_guessing_N.eps $(FIGS)/fig_BB_gaps_N.eps $(FIGS)/fig_sol_fireplace_N.eps $(FIGS)/fig_sol_obj_hist_N.eps $(FIGS)/fig_sol_obj_int_N.eps $(FIGS)/fig_scal.eps
 
 ######################################################################
 ## Figure recipes
@@ -94,7 +98,7 @@ $(FIGS)/fig_summary_%.eps: $(LOGS)/lwidths_%.log $(PP)/fig_summary.R
 $(INST)/%/instances.list:
 	@echo Preparing the $*-instances dataset...
 	mkdir -p $(INST)/$* && \
-	if [ -f $(INST)/dataset_$*.tar.gz ]; then tar -zxmf $(INST)/dataset_$*.tar.gz; \
+	if [ -f $(ARC)/dataset_$*.tar.gz ]; then tar -zxmf $(ARC)/dataset_$*.tar.gz; \
 	else \
 	python ./gen_BDD_pair.py -n $n -v $N -p $p -$*U $(INST)/$*/ > $(LOGS)/$(DTE)_gen_$(N)var_R.log; fi && \
 	ls $(INST)/$*/A*.bdd | grep -Po "$(INST)/$*/A\\K[^\\.]*" > $@ &&\
@@ -114,8 +118,15 @@ $(LOGS)/part.solved_R.%.log: $(INST)/R/instances.list $(SOLVE)
 $(LOGS)/part.solved_N.%.log: $(INST)/N/instances.list $(SOLVE)
 	python $(SOLVE) -i $<.$* -o $@ -d $(INST)/N/
 
-$(LOGS)/BB_bounds_%.log: $(INST)/%/instances.list $(BBLOG)
-	python $(BBLOG) -d $(INST)/$*/ -i $< -o $@
+$(LOGS)/BB_bounds_%.log: $$(BB_FILES_%)
+	python $(BBLOG) --header > $@ && \
+	tail -qn +2 $(BB_FILES_$*) >> $@
+
+$(LOGS)/part.BB_bounds_R.%.log: $(INST)/R/instances.list $(SOLVE)
+	python $(BBLOG) -i $<.$* -o $@ -d $(INST)/R/
+
+$(LOGS)/part.BB_bounds_N.%.log: $(INST)/N/instances.list $(SOLVE)
+	python $(BBLOG) -i $<.$* -o $@ -d $(INST)/N/
 
 ## scalability experiment
 $(LOGS)/scal_$(SCAL_R)%.log: $(SCAL)
@@ -127,7 +138,7 @@ $(LOGS)/scal_$(SCAL_R)%.log: $(SCAL)
 $(LOGS)/scalability.log: $(SCAL) $(SCAL_FILES)
 	python $(SCAL) --header > $@ && \
 	cat $(SCAL_FILES) >> $@ && \
-	tar --remove-files -czf $(INST)/scalability_p$(SCAL_P)$(SCAL_R)x$(SCAL_K).tar.gz $(INST)/sc* && \
+	tar --remove-files -czf $(ARC)/scalability_p$(SCAL_P)$(SCAL_R)x$(SCAL_K).tar.gz $(INST)/sc* && \
 	rm -rf $(INST)/sc$* && \
 	rm $(LOGS)/scal_N*.log
 ## end of scalability experiment
@@ -154,8 +165,16 @@ $(LOGS)/lwidths_%.log: $$(LW_FILES_%)
 
 ######################################################################
 # auxiliary recipes
+
+$(ARC)/dataset_%.tar.gz:
+	mkdir -p $(ARC) && \
+	tar -czf $@ $(INST)/$*/*
+
 check_src:
 	egrep -nr --color 'TODO|FIXME|BUG|NOTE'
+
+install_R_pkg:
+	Rscript ./aux/R_install_packages.R
 
 # clean recipes
 clean-raw-inst:
@@ -167,9 +186,9 @@ clean-raw-inst:
 	rm -rf $(INST)/ds_stats
 	rm -f $(INST)/*.bdd
 
-clean-inst:
+clean-archive:
 	@echo Cleaning up instance archives...
-	rm -f $(INST)/*.tar.gz
+	rm -f $(ARC)/*.tar.gz
 
 clean-logs:
 	@echo Cleaning up log files...
@@ -179,4 +198,4 @@ clean-figures:
 	@echo Cleaning up figures...
 	rm -f $(FIGS)/*.eps
 
-clean: clean-raw-inst clean-inst clean-logs clean-figures
+clean: clean-raw-inst clean-logs clean-figures
