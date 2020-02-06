@@ -7,15 +7,13 @@
 
 # Makefile todo-list:
 # TODO add random seed / other means for the dataset reproducibilty
-# TODO add flexible calculation root directory
-# TODO add parallel instances processing (if not yet)
 # TODO remove instances.list after the calculation
 
 ######################################################################
 ## Files and directories
 PREF=./
-INST=$(PREF)instances/raw
-LOGS=$(PREF)run_logs
+INST=$(PREF)/instances/raw
+LOGS=$(PREF)/run_logs
 ARC=./data_archive
 FIGS=./figures
 SOLVE=./solve_inst.py
@@ -23,7 +21,6 @@ BBLOG=./log_bb.py
 PP=./post_processing
 SCAL=./scal_test.py
 STATS=./gen_lsizes_stats.py
-STATS_LIST_R=./instances/raw/reduced/stats.list
 ######################################################################
 ## Numerical parameters
 PAR_SOL=16
@@ -36,11 +33,11 @@ LW_Ps=0.3 0.5 0.7
 ### dataset generation parameters:
 p=0.6# dataset generation parameter
 n=100# number of instances
-N=10# number of variables per instance
+N=15# number of variables per instance
 
 ### scalability figure
-SCAL_N=5 6 7 8 9 10 12 13 14 15 16 17 18 19 20
-SCAL_K=5
+SCAL_N=5 6 7 8 9 10 12 13 14 15 16 17 18 19 20 22 25 28 30
+SCAL_K=10
 SCAL_P=$(p)
 SCAL_R=N
 ######################################################################
@@ -66,7 +63,13 @@ DTE=$(shell date +%F)
 
 all:
 
-figures: $(FIGS)/fig_sol_guessing_N.eps $(FIGS)/fig_BB_gaps_N.eps $(FIGS)/fig_sol_fireplace_N.eps $(FIGS)/fig_sol_obj_hist_N.eps $(FIGS)/fig_sol_obj_int_N.eps $(FIGS)/fig_scal.eps
+figures: $(FIGS)/fig_sol_guessing_N.eps $(FIGS)/fig_BB_gaps_N.eps $(FIGS)/fig_sol_fireplace_N.eps $(FIGS)/fig_sol_obj_hist_N.eps $(FIGS)/fig_sol_obj_int_N.eps
+
+scalfig: $(FIGS)/fig_scal.eps
+
+summary_figs: $(FIGS)/fig_summary_R.eps $(FIGS)/fig_summary_N.eps
+
+figures_R: $(FIGS)/fig_sol_guessing_R.eps $(FIGS)/fig_BB_gaps_R.eps $(FIGS)/fig_sol_fireplace_R.eps $(FIGS)/fig_sol_obj_hist_R.eps $(FIGS)/fig_sol_obj_int_R.eps
 
 ######################################################################
 ## Figure recipes
@@ -166,15 +169,19 @@ $(LOGS)/lwidths_%.log: $$(LW_FILES_%)
 ######################################################################
 # auxiliary recipes
 
-$(ARC)/dataset_%.tar.gz:
-	mkdir -p $(ARC) && \
-	tar -czf $@ $(INST)/$*/*
+prep_dirs:
+	mkdir -p $(INST)/R $(INST)/N
+	mkdir -p $(LOGS)
 
 check_src:
 	egrep -nr --color 'TODO|FIXME|BUG|NOTE'
 
 install_R_pkg:
 	Rscript ./aux/R_install_packages.R
+
+move_logs:
+	@echo moving logs away from $(LOGS) to $(ARC)
+	tar --remove-files -czf $(ARC)/$(DTE)-logs.tar.gz $(LOGS)/*
 
 # clean recipes
 clean-raw-inst:
@@ -198,4 +205,5 @@ clean-figures:
 	@echo Cleaning up figures...
 	rm -f $(FIGS)/*.eps
 
-clean: clean-raw-inst clean-logs clean-figures
+clean: clean-raw-inst clean-logs clean-figures clean-archive
+clean-tmp: clean-raw-inst clean-logs

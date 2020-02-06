@@ -1,0 +1,118 @@
+Cleaning up raw instances in /local_scratch/pbs.8027011.pbs02//instances/raw...
+rm -f /local_scratch/pbs.8027011.pbs02//instances/raw/R/*.bdd
+Cleaning up log files...
+rm -f /local_scratch/pbs.8027011.pbs02//run_logs/*.log
+Cleaning up figures...
+rm -f ./figures/*.eps
+Cleaning up instance archives...
+rm -f ./data_archive/*.tar.gz
+rm -f /local_scratch/pbs.8027011.pbs02//instances/raw/R/*.list*
+rm -f /local_scratch/pbs.8027011.pbs02//instances/raw/N/*.bdd
+rm -f /local_scratch/pbs.8027011.pbs02//instances/raw/N/*.list*
+rm -rf /local_scratch/pbs.8027011.pbs02//instances/raw/ds_stats
+rm -f /local_scratch/pbs.8027011.pbs02//instances/raw/*.bdd
+mkdir -p /local_scratch/pbs.8027011.pbs02//instances/raw/R /local_scratch/pbs.8027011.pbs02//instances/raw/N
+mkdir -p /local_scratch/pbs.8027011.pbs02//run_logs
+mkdir -p /local_scratch/pbs.8027011.pbs02//instances/raw/ds_stats/Rp0.3 && python ./gen_BDD_pair.py -n 50 -v 15 -p 0.3 -RU /local_scratch/pbs.8027011.pbs02//instances/raw/ds_stats/Rp0.3 > /dev/null && ls /local_scratch/pbs.8027011.pbs02//instances/raw/ds_stats/Rp0.3/*.bdd > /local_scratch/pbs.8027011.pbs02//instances/raw/ds_stats/Rp0.3/lwidths_Rp0.3.list && python ./gen_lsizes_stats.py -s 0.3 /local_scratch/pbs.8027011.pbs02//instances/raw/ds_stats/Rp0.3/lwidths_Rp0.3.list > /local_scratch/pbs.8027011.pbs02//run_logs/lwidths_Rp0.3.log && rm -rf /local_scratch/pbs.8027011.pbs02//instances/raw/ds_stats/Rp0.3
+mkdir -p /local_scratch/pbs.8027011.pbs02//instances/raw/ds_stats/Rp0.5 && python ./gen_BDD_pair.py -n 50 -v 15 -p 0.5 -RU /local_scratch/pbs.8027011.pbs02//instances/raw/ds_stats/Rp0.5 > /dev/null && ls /local_scratch/pbs.8027011.pbs02//instances/raw/ds_stats/Rp0.5/*.bdd > /local_scratch/pbs.8027011.pbs02//instances/raw/ds_stats/Rp0.5/lwidths_Rp0.5.list && python ./gen_lsizes_stats.py -s 0.5 /local_scratch/pbs.8027011.pbs02//instances/raw/ds_stats/Rp0.5/lwidths_Rp0.5.list > /local_scratch/pbs.8027011.pbs02//run_logs/lwidths_Rp0.5.log && rm -rf /local_scratch/pbs.8027011.pbs02//instances/raw/ds_stats/Rp0.5
+mkdir -p /local_scratch/pbs.8027011.pbs02//instances/raw/ds_stats/Rp0.7 && python ./gen_BDD_pair.py -n 50 -v 15 -p 0.7 -RU /local_scratch/pbs.8027011.pbs02//instances/raw/ds_stats/Rp0.7 > /dev/null && ls /local_scratch/pbs.8027011.pbs02//instances/raw/ds_stats/Rp0.7/*.bdd > /local_scratch/pbs.8027011.pbs02//instances/raw/ds_stats/Rp0.7/lwidths_Rp0.7.list && python ./gen_lsizes_stats.py -s 0.7 /local_scratch/pbs.8027011.pbs02//instances/raw/ds_stats/Rp0.7/lwidths_Rp0.7.list > /local_scratch/pbs.8027011.pbs02//run_logs/lwidths_Rp0.7.log && rm -rf /local_scratch/pbs.8027011.pbs02//instances/raw/ds_stats/Rp0.7
+mkdir -p /local_scratch/pbs.8027011.pbs02//instances/raw/ds_stats/Np0.3 && python ./gen_BDD_pair.py -n 50 -v 15 -p 0.3 -NU /local_scratch/pbs.8027011.pbs02//instances/raw/ds_stats/Np0.3 > /dev/null && ls /local_scratch/pbs.8027011.pbs02//instances/raw/ds_stats/Np0.3/*.bdd > /local_scratch/pbs.8027011.pbs02//instances/raw/ds_stats/Np0.3/lwidths_Np0.3.list && python ./gen_lsizes_stats.py -s 0.3 /local_scratch/pbs.8027011.pbs02//instances/raw/ds_stats/Np0.3/lwidths_Np0.3.list > /local_scratch/pbs.8027011.pbs02//run_logs/lwidths_Np0.3.log && rm -rf /local_scratch/pbs.8027011.pbs02//instances/raw/ds_stats/Np0.3
+mkdir -p /local_scratch/pbs.8027011.pbs02//instances/raw/ds_stats/Np0.5 && python ./gen_BDD_pair.py -n 50 -v 15 -p 0.5 -NU /local_scratch/pbs.8027011.pbs02//instances/raw/ds_stats/Np0.5 > /dev/null && ls /local_scratch/pbs.8027011.pbs02//instances/raw/ds_stats/Np0.5/*.bdd > /local_scratch/pbs.8027011.pbs02//instances/raw/ds_stats/Np0.5/lwidths_Np0.5.list && python ./gen_lsizes_stats.py -s 0.5 /local_scratch/pbs.8027011.pbs02//instances/raw/ds_stats/Np0.5/lwidths_Np0.5.list > /local_scratch/pbs.8027011.pbs02//run_logs/lwidths_Np0.5.log && rm -rf /local_scratch/pbs.8027011.pbs02//instances/raw/ds_stats/Np0.5
+mkdir -p /local_scratch/pbs.8027011.pbs02//instances/raw/ds_stats/Np0.7 && python ./gen_BDD_pair.py -n 50 -v 15 -p 0.7 -NU /local_scratch/pbs.8027011.pbs02//instances/raw/ds_stats/Np0.7 > /dev/null && ls /local_scratch/pbs.8027011.pbs02//instances/raw/ds_stats/Np0.7/*.bdd > /local_scratch/pbs.8027011.pbs02//instances/raw/ds_stats/Np0.7/lwidths_Np0.7.list && python ./gen_lsizes_stats.py -s 0.7 /local_scratch/pbs.8027011.pbs02//instances/raw/ds_stats/Np0.7/lwidths_Np0.7.list > /local_scratch/pbs.8027011.pbs02//run_logs/lwidths_Np0.7.log && rm -rf /local_scratch/pbs.8027011.pbs02//instances/raw/ds_stats/Np0.7
+ls /local_scratch/pbs.8027011.pbs02//run_logs/lwidths_Rp*.log && \
+tail -qn +2 /local_scratch/pbs.8027011.pbs02//run_logs/lwidths_Rp*.log > /local_scratch/pbs.8027011.pbs02//run_logs/lwidths_R.log
+/local_scratch/pbs.8027011.pbs02//run_logs/lwidths_Rp0.3.log
+/local_scratch/pbs.8027011.pbs02//run_logs/lwidths_Rp0.5.log
+/local_scratch/pbs.8027011.pbs02//run_logs/lwidths_Rp0.7.log
+Rscript ./post_processing/fig_summary.R -i /local_scratch/pbs.8027011.pbs02//run_logs/lwidths_R.log -o figures/fig_summary_R.eps
+ls /local_scratch/pbs.8027011.pbs02//run_logs/lwidths_Np*.log && \
+tail -qn +2 /local_scratch/pbs.8027011.pbs02//run_logs/lwidths_Np*.log > /local_scratch/pbs.8027011.pbs02//run_logs/lwidths_N.log
+/local_scratch/pbs.8027011.pbs02//run_logs/lwidths_Np0.3.log
+/local_scratch/pbs.8027011.pbs02//run_logs/lwidths_Np0.5.log
+/local_scratch/pbs.8027011.pbs02//run_logs/lwidths_Np0.7.log
+Rscript ./post_processing/fig_summary.R -i /local_scratch/pbs.8027011.pbs02//run_logs/lwidths_N.log -o figures/fig_summary_N.eps
+making the scalability figure
+mkdir -p .//instances/raw/sc5 && \
+python ./gen_BDD_pair.py -n 10 -v 5 -p 0.6 -UN .//instances/raw/sc5 > .//instances/raw/sc5/gen.log && \
+basename -a -s .bdd .//instances/raw/sc5/A*.bdd | sed 's/A//' > .//instances/raw/sc5/inst.list && \
+python ./scal_test.py -l .//instances/raw/sc5/inst.list -d .//instances/raw/sc5/ > run_logs/scal_N5.log
+mkdir -p .//instances/raw/sc6 && \
+python ./gen_BDD_pair.py -n 10 -v 6 -p 0.6 -UN .//instances/raw/sc6 > .//instances/raw/sc6/gen.log && \
+basename -a -s .bdd .//instances/raw/sc6/A*.bdd | sed 's/A//' > .//instances/raw/sc6/inst.list && \
+python ./scal_test.py -l .//instances/raw/sc6/inst.list -d .//instances/raw/sc6/ > run_logs/scal_N6.log
+mkdir -p .//instances/raw/sc7 && \
+python ./gen_BDD_pair.py -n 10 -v 7 -p 0.6 -UN .//instances/raw/sc7 > .//instances/raw/sc7/gen.log && \
+basename -a -s .bdd .//instances/raw/sc7/A*.bdd | sed 's/A//' > .//instances/raw/sc7/inst.list && \
+python ./scal_test.py -l .//instances/raw/sc7/inst.list -d .//instances/raw/sc7/ > run_logs/scal_N7.log
+mkdir -p .//instances/raw/sc8 && \
+python ./gen_BDD_pair.py -n 10 -v 8 -p 0.6 -UN .//instances/raw/sc8 > .//instances/raw/sc8/gen.log && \
+basename -a -s .bdd .//instances/raw/sc8/A*.bdd | sed 's/A//' > .//instances/raw/sc8/inst.list && \
+python ./scal_test.py -l .//instances/raw/sc8/inst.list -d .//instances/raw/sc8/ > run_logs/scal_N8.log
+mkdir -p .//instances/raw/sc9 && \
+python ./gen_BDD_pair.py -n 10 -v 9 -p 0.6 -UN .//instances/raw/sc9 > .//instances/raw/sc9/gen.log && \
+basename -a -s .bdd .//instances/raw/sc9/A*.bdd | sed 's/A//' > .//instances/raw/sc9/inst.list && \
+python ./scal_test.py -l .//instances/raw/sc9/inst.list -d .//instances/raw/sc9/ > run_logs/scal_N9.log
+mkdir -p .//instances/raw/sc10 && \
+python ./gen_BDD_pair.py -n 10 -v 10 -p 0.6 -UN .//instances/raw/sc10 > .//instances/raw/sc10/gen.log && \
+basename -a -s .bdd .//instances/raw/sc10/A*.bdd | sed 's/A//' > .//instances/raw/sc10/inst.list && \
+python ./scal_test.py -l .//instances/raw/sc10/inst.list -d .//instances/raw/sc10/ > run_logs/scal_N10.log
+mkdir -p .//instances/raw/sc12 && \
+python ./gen_BDD_pair.py -n 10 -v 12 -p 0.6 -UN .//instances/raw/sc12 > .//instances/raw/sc12/gen.log && \
+basename -a -s .bdd .//instances/raw/sc12/A*.bdd | sed 's/A//' > .//instances/raw/sc12/inst.list && \
+python ./scal_test.py -l .//instances/raw/sc12/inst.list -d .//instances/raw/sc12/ > run_logs/scal_N12.log
+mkdir -p .//instances/raw/sc13 && \
+python ./gen_BDD_pair.py -n 10 -v 13 -p 0.6 -UN .//instances/raw/sc13 > .//instances/raw/sc13/gen.log && \
+basename -a -s .bdd .//instances/raw/sc13/A*.bdd | sed 's/A//' > .//instances/raw/sc13/inst.list && \
+python ./scal_test.py -l .//instances/raw/sc13/inst.list -d .//instances/raw/sc13/ > run_logs/scal_N13.log
+mkdir -p .//instances/raw/sc14 && \
+python ./gen_BDD_pair.py -n 10 -v 14 -p 0.6 -UN .//instances/raw/sc14 > .//instances/raw/sc14/gen.log && \
+basename -a -s .bdd .//instances/raw/sc14/A*.bdd | sed 's/A//' > .//instances/raw/sc14/inst.list && \
+python ./scal_test.py -l .//instances/raw/sc14/inst.list -d .//instances/raw/sc14/ > run_logs/scal_N14.log
+mkdir -p .//instances/raw/sc15 && \
+python ./gen_BDD_pair.py -n 10 -v 15 -p 0.6 -UN .//instances/raw/sc15 > .//instances/raw/sc15/gen.log && \
+basename -a -s .bdd .//instances/raw/sc15/A*.bdd | sed 's/A//' > .//instances/raw/sc15/inst.list && \
+python ./scal_test.py -l .//instances/raw/sc15/inst.list -d .//instances/raw/sc15/ > run_logs/scal_N15.log
+mkdir -p .//instances/raw/sc16 && \
+python ./gen_BDD_pair.py -n 10 -v 16 -p 0.6 -UN .//instances/raw/sc16 > .//instances/raw/sc16/gen.log && \
+basename -a -s .bdd .//instances/raw/sc16/A*.bdd | sed 's/A//' > .//instances/raw/sc16/inst.list && \
+python ./scal_test.py -l .//instances/raw/sc16/inst.list -d .//instances/raw/sc16/ > run_logs/scal_N16.log
+mkdir -p .//instances/raw/sc17 && \
+python ./gen_BDD_pair.py -n 10 -v 17 -p 0.6 -UN .//instances/raw/sc17 > .//instances/raw/sc17/gen.log && \
+basename -a -s .bdd .//instances/raw/sc17/A*.bdd | sed 's/A//' > .//instances/raw/sc17/inst.list && \
+python ./scal_test.py -l .//instances/raw/sc17/inst.list -d .//instances/raw/sc17/ > run_logs/scal_N17.log
+mkdir -p .//instances/raw/sc18 && \
+python ./gen_BDD_pair.py -n 10 -v 18 -p 0.6 -UN .//instances/raw/sc18 > .//instances/raw/sc18/gen.log && \
+basename -a -s .bdd .//instances/raw/sc18/A*.bdd | sed 's/A//' > .//instances/raw/sc18/inst.list && \
+python ./scal_test.py -l .//instances/raw/sc18/inst.list -d .//instances/raw/sc18/ > run_logs/scal_N18.log
+mkdir -p .//instances/raw/sc19 && \
+python ./gen_BDD_pair.py -n 10 -v 19 -p 0.6 -UN .//instances/raw/sc19 > .//instances/raw/sc19/gen.log && \
+basename -a -s .bdd .//instances/raw/sc19/A*.bdd | sed 's/A//' > .//instances/raw/sc19/inst.list && \
+python ./scal_test.py -l .//instances/raw/sc19/inst.list -d .//instances/raw/sc19/ > run_logs/scal_N19.log
+mkdir -p .//instances/raw/sc20 && \
+python ./gen_BDD_pair.py -n 10 -v 20 -p 0.6 -UN .//instances/raw/sc20 > .//instances/raw/sc20/gen.log && \
+basename -a -s .bdd .//instances/raw/sc20/A*.bdd | sed 's/A//' > .//instances/raw/sc20/inst.list && \
+python ./scal_test.py -l .//instances/raw/sc20/inst.list -d .//instances/raw/sc20/ > run_logs/scal_N20.log
+mkdir -p .//instances/raw/sc22 && \
+python ./gen_BDD_pair.py -n 10 -v 22 -p 0.6 -UN .//instances/raw/sc22 > .//instances/raw/sc22/gen.log && \
+basename -a -s .bdd .//instances/raw/sc22/A*.bdd | sed 's/A//' > .//instances/raw/sc22/inst.list && \
+python ./scal_test.py -l .//instances/raw/sc22/inst.list -d .//instances/raw/sc22/ > run_logs/scal_N22.log
+mkdir -p .//instances/raw/sc25 && \
+python ./gen_BDD_pair.py -n 10 -v 25 -p 0.6 -UN .//instances/raw/sc25 > .//instances/raw/sc25/gen.log && \
+basename -a -s .bdd .//instances/raw/sc25/A*.bdd | sed 's/A//' > .//instances/raw/sc25/inst.list && \
+python ./scal_test.py -l .//instances/raw/sc25/inst.list -d .//instances/raw/sc25/ > run_logs/scal_N25.log
+ 
+ 
++------------------------------------------+ 
+| PALMETTO CLUSTER PBS RESOURCES REQUESTED | 
++------------------------------------------+ 
+ 
+mem=15gb,ncpus=16,walltime=01:00:00
+ 
+ 
++-------------------------------------+ 
+| PALMETTO CLUSTER PBS RESOURCES USED | 
++-------------------------------------+ 
+ 
+cpupercent=787,cput=01:13:02,mem=2390072kb,ncpus=16,vmem=8845188kb,walltime=01:00:38
+ 
+ 

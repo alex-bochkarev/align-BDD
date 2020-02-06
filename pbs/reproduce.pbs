@@ -1,0 +1,42 @@
+#PBS -N BDDR
+#PBS -l select=1:ncpus=16:mem=15gb,walltime=01:00:00
+#PBS -M abochka@clemson.edu
+#PBS -m abe
+
+# boilerplate things
+STARTMSG="START: global makefile run"
+ENDMSG="END: done with the global makefile run"
+
+module add anaconda3/5.1.0
+source activate ab-local
+module add R/3.6.0
+tg=/home/abochka/bin/tgsend.sh
+tgi=/home/abochka/bin/tgsend_img.sh
+tgs=/home/abochka/bin/tgsend_st.sh
+
+cd /home/abochka/BDD/align-BDD
+
+echo $STARTMSG | $tg > /dev/null
+make -j16 clean PREF=$TMPDIR/
+make -j16 prep_dirs PREF=$TMPDIR/
+echo making main figures... | $tg > /dev/null
+make -j16 figures PREF=$TMPDIR/ > make.log 2>&1
+echo making dataset summary figs... | $tg > /dev/null
+make -j16 summary_figs PREF=$TMPDIR/
+echo making the scalability figure | $tg > /dev/null
+make scalfig
+echo moving logfiles... | $tg > /dev/null
+make -j16 move_logs PREF=$TMPDIR/
+echo cleaning... | $tg > /dev/null
+
+make -j16 clean-tmp PREF=$TMPDIR/
+
+echo $ENDMSG | $tg > /dev/null
+echo showing resulting images: | $tg
+cd figures
+ls | $tg > /dev/null
+for file in $(ls); do
+    $tgi $file > /dev/null
+done
+# deactivate the env
+source deactivate ab-local
