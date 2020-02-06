@@ -24,7 +24,13 @@ if __name__ == "__main__":
     parser.add_argument("-i", "--in", action="store", dest="inst_list", help="filename for instances list to process")
     parser.add_argument("-o", "--out", action="store", dest="logfile", help="filename for the log")
     parser.add_argument("-d", "--directory", action="store", dest="inst_dir", help="directory with instances")
+    parser.add_argument("-H", "--header", action="store_true", dest="header", help="show header only and exit")
     args = parser.parse_args()
+
+    if args.header:
+        log("instance","num_type","value",comment="comment")
+        exit(0)
+
     inst_dir = args.inst_dir
 
     with open(args.inst_list,"r") as inst_list:

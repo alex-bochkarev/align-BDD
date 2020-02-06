@@ -26,12 +26,7 @@ STATS_LIST_R=./instances/raw/reduced/stats.list
 
 ######################################################################
 ## Numerical parameters
-
-### scalability figure
-SCAL_N=5 6 7 8 9 10 12 13 14 15 16 17 18 19 20
-SCAL_K=5
-SCAL_P=0.7
-SCAL_R=N
+PAR_SOL=8
 
 ### random dataset stats
 LW_n=50
@@ -43,11 +38,20 @@ p=0.6# dataset generation parameter
 n=100# number of instances
 N=10# number of variables per instance
 
+### scalability figure
+SCAL_N=5 6 7 8 9 10 12 13 14 15 16 17 18 19 20
+SCAL_K=5
+SCAL_P=$(p)
+SCAL_R=N
 ######################################################################
 ## calculated vars/parameters
 SCAL_FILES=$(addsuffix .log, $(addprefix $(LOGS)/scal_$(SCAL_R),$(SCAL_N)))
 LW_FILES_R=$(addsuffix .log, $(addprefix $(LOGS)/lwidths_Rp,$(LW_Ps)))
 LW_FILES_N=$(addsuffix .log, $(addprefix $(LOGS)/lwidths_Np,$(LW_Ps)))
+
+MAX_I=$(shell expr $(PAR_SOL) - 1 )
+SOL_FILES_R = $(addsuffix .log, $(addprefix $(LOGS)/part.solved_R., $(shell seq -f %02g 0 $(MAX_I))))
+SOL_FILES_N = $(addsuffix .log, $(addprefix $(LOGS)/part.solved_N., $(shell seq -f %02g 0 $(MAX_I))))
 
 DTE=$(shell date +%F)
 
@@ -93,13 +97,22 @@ $(INST)/%/instances.list:
 	if [ -f $(INST)/dataset_$*.tar.gz ]; then tar -zxmf $(INST)/dataset_$*.tar.gz; \
 	else \
 	python ./gen_BDD_pair.py -n $n -v $N -p $p -$*U $(INST)/$*/ > $(LOGS)/$(DTE)_gen_$(N)var_R.log; fi && \
-	ls $(INST)/$*/A*.bdd | grep -Po "$(INST)/$*/A\\K[^\\.]*" > $@
+	ls $(INST)/$*/A*.bdd | grep -Po "$(INST)/$*/A\\K[^\\.]*" > $@ &&\
+	split -d -nl/$(PAR_SOL) $@ $(INST)/$*/instances.list.
 
 ######################################################################
 ## Main calculations (creating .log-files)
+.SECONDEXPANSION:
+$(LOGS)/solved_%.log: $$(SOL_FILES_%)
+	python $(SOLVE) --header > $@ && \
+	tail -qn +2 $(SOL_FILES_$*) >> $@
 
-$(LOGS)/solved_%.log: $(INST)/%/instances.list $(SOLVE)
-	python $(SOLVE) -i $< -o $@ -d $(INST)/$*/
+
+$(LOGS)/part.solved_R.%.log: $(INST)/R/instances.list $(SOLVE)
+	python $(SOLVE) -i $<.$* -o $@ -d $(INST)/R/
+
+$(LOGS)/part.solved_N.%.log: $(INST)/N/instances.list $(SOLVE)
+	python $(SOLVE) -i $<.$* -o $@ -d $(INST)/N/
 
 $(LOGS)/BB_bounds_%.log: $(INST)/%/instances.list $(BBLOG)
 	python $(BBLOG) -d $(INST)/$*/ -i $< -o $@
@@ -148,9 +161,9 @@ check_src:
 clean-raw-inst:
 	@echo Cleaning up raw instances in $(INST)...
 	rm -f $(INST)/R/*.bdd
-	rm -f $(INST)/R/*.list
+	rm -f $(INST)/R/*.list*
 	rm -f $(INST)/N/*.bdd
-	rm -f $(INST)/N/*.list
+	rm -f $(INST)/N/*.list*
 	rm -rf $(INST)/ds_stats
 	rm -f $(INST)/*.bdd
 

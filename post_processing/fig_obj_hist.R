@@ -117,7 +117,7 @@ plt_dens =
     ## styling
     labs(fill="Heuristic used:", color="Heuristic used:")+
     scale_y_continuous(
-        "Density (share of instances) for the corresponding objective values",
+        "Density (share of instances)",
         ##        limits = c(1,2),
         ## breaks = seq(0.5, 5.0, by=0.5),
         ## minor_breaks = seq(0,5.0,by=0.1),
