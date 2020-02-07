@@ -17,29 +17,8 @@ library(optparse)
 X_QUANTILE=0.98 # quantile to filter for the histogram(Ox axis)
 ORIG_BASE_COL = "orig_gsifts1p_obj" # col to divide by
 
-# Heuristics to show ()
+# Heuristics to show (codes)
 SHOW_HEU = c("all")
-    ## c("orig_from_simpl_red_order_obj_rel_orig",
-    ##          "orig_from_simpl_order_obj_rel_orig",
-    ##          ## "orig_exact_gsifts_obj_rel_orig",
-    ##          "orig_g2sifts_obj_rel_orig",
-    ##          "orig_gsifts_obj_rel_orig",
-    ##          "orig_gswaps_obj_rel_orig",
-    ##          "orig_true_minAB_obj_rel_orig",
-    ##          ## "orig_toA_obj_rel_orig",
-    ##          ## "orig_toB_obj_rel_orig",
-    ##          ## "orig_toRandom_obj_rel_orig",
-    ##          "orig_from_simpl_red_order_time",
-    ##          "orig_from_simpl_order_time" ,
-    ##          ## "orig_exact_gsifts_time",
-    ##          "orig_g2sifts_time" ,
-    ##          "orig_gsifts_time" ,
-    ##          "orig_gswaps_time",
-    ##          "orig_true_minAB_time"
-    ##          ## "orig_toA_time",
-    ##          ## "orig_toB_time",
-    ##          ## "orig_toRandom_time"
-    ##          )
 
 ######################################################################
 ## unpack the command line arguments
@@ -64,8 +43,8 @@ df = read.csv(opt$input, stringsAsFactors = FALSE)
 
 df_legend = filter(df, num_type=="legend")
 df = filter(df, num_type != "legend")
-
 df$value = as.numeric(df$value)
+
 df_wide = pivot_wider(df,
                         id_cols = "instance",
                         names_from = "num_type",
@@ -78,26 +57,6 @@ time_cols = grep(".+time$",colnames(df_wide),value = TRUE)
 for (col in orig_obj_cols){
     df_wide[[paste(col,"rel",sep="_")]] = df_wide[[col]] / df_wide[[ORIG_BASE_COL]]
 }
-
-# FIXME: make proper times in the solve-instance.py
-## df_wide = df_wide %>%
-##     mutate(
-##         orig_from_simpl_order_time = simpl_bb_time + orig_from_simpl_checking_time / 8,
-##         orig_from_simpl_red_order_time = orig_from_simpl_red_checking_time +
-##             simpl_bb_time,
-##         orig_g2sifts_time = simpl_heu_g2sifts_time + orig_from_simpl_checking_time / 8,
-##         orig_gsifts_time = simpl_heu_gsifts_time + orig_from_simpl_checking_time / 8,
-##         orig_gswaps_time = simpl_heu_gswaps_time + orig_from_simpl_checking_time / 8,
-##         orig_toA_time = orig_from_simpl_checking_time / 8,
-##         orig_toB_time = orig_from_simpl_checking_time / 8,
-##         orig_toRandom_time = orig_from_simpl_checking_time / 8
-##     )
-
-## df_wide = df_wide %>%
-##     mutate(
-##         orig_true_minAB_obj_rel_orig = pmin(orig_toA_obj, orig_toB_obj) / orig_exact_gsifts_obj,
-##         orig_true_minAB_time = orig_from_simpl_checking_time / 4
-##     )
 
 df_rel = pivot_longer(df_wide,
                       cols = -c("instance"),
@@ -116,7 +75,9 @@ df_rel$entry_type = ifelse(df_rel$num_type %in% time_cols,"time","obj")
 
 df_rel = df_rel %>%
     mutate(
-        heuristic = ifelse(entry_type == "obj", substring(num_type, 1, nchar(num_type)-nchar("_obj_rel")), substring(num_type, 1, nchar(num_type)-nchar("_time")))
+        heuristic = ifelse(entry_type == "obj",
+                           substring(num_type, 1, nchar(num_type)-nchar("_obj_rel")),
+                           substring(num_type, 1, nchar(num_type)-nchar("_time")))
     )
 
 df_time_o = pivot_wider(select(df_rel,-num_type),names_from = "entry_type",values_from = "value")
@@ -136,7 +97,7 @@ plt_dens =
     guides(fill=guide_legend(title="Heuristic:"), color = guide_legend(title="Heuristic:"))+
 #    ggtitle("Objective values distribution for different heuristics (original problem, 15vars 100k dataset, non-reduced instances)")+
     geom_vline(xintercept = 1.0, size=0.5, color="red", linetype="dashed")+
-    annotate("text",x=1.0, y=4.2,label = "100% = exact greedy sifts heuristic", color="red")+
+    annotate("text",x=1.0, y=4.2,label = "100% = greedy BDD sifts", color="red")+
     ## styling
     labs(fill="Heuristic used:", color="Heuristic used:")+
     scale_y_continuous(
