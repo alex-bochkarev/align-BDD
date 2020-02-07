@@ -1,0 +1,29 @@
+mkdir -p /local_scratch/pbs.8027074.pbs02//instances/raw/R /local_scratch/pbs.8027074.pbs02//instances/raw/N
+mkdir -p /local_scratch/pbs.8027074.pbs02//run_logs
+moving logs away from /local_scratch/pbs.8027074.pbs02//run_logs to ./data_archive
+tar --remove-files -czf ./data_archive/2020-02-06-logs.tar.gz /local_scratch/pbs.8027074.pbs02//run_logs/*
+Cleaning up raw instances in /local_scratch/pbs.8027074.pbs02//instances/raw...
+rm -f /local_scratch/pbs.8027074.pbs02//instances/raw/R/*.bdd
+rm -f /local_scratch/pbs.8027074.pbs02//instances/raw/R/*.list*
+rm -f /local_scratch/pbs.8027074.pbs02//instances/raw/N/*.bdd
+rm -f /local_scratch/pbs.8027074.pbs02//instances/raw/N/*.list*
+rm -rf /local_scratch/pbs.8027074.pbs02//instances/raw/ds_stats
+rm -f /local_scratch/pbs.8027074.pbs02//instances/raw/*.bdd
+Cleaning up log files...
+rm -f /local_scratch/pbs.8027074.pbs02//run_logs/*.log
+{"ok":true,"result":{"message_id":735,"from":{"id":931364299,"is_bot":true,"first_name":"Wintermute","username":"ab_wintermute_bot"},"chat":{"id":122533105,"first_name":"Alex","last_name":"Bochkarev","username":"abochka","type":"private"},"date":1581020399,"text":"showing resulting images:"}} 
+ 
++------------------------------------------+ 
+| PALMETTO CLUSTER PBS RESOURCES REQUESTED | 
++------------------------------------------+ 
+ 
+mem=15gb,ncpus=1,walltime=12:00:00
+ 
+ 
++-------------------------------------+ 
+| PALMETTO CLUSTER PBS RESOURCES USED | 
++-------------------------------------+ 
+ 
+cpupercent=100,cput=07:45:26,mem=8449292kb,ncpus=1,vmem=9274380kb,walltime=07:45:50
+ 
+ 

@@ -1,0 +1,11 @@
+Traceback (most recent call last):
+  File "./scal_test.py", line 62, in <module>
+    log(inst_id, N, "BBsearch_time", t1-t0)
+  File "/home/abochka/BDD/align-BDD/experiments/misc.py", line 18, in log
+    outfile.flush()
+OSError: [Errno 116] Stale file handle
+make: *** [run_logs/scal_N28.log] Error 1
+tar: Removing leading `/' from member names
+tar: /local_scratch/pbs.8027074.pbs02//run_logs/*: Cannot stat: No such file or directory
+tar: Exiting with failure status due to previous errors
+make: *** [move_logs] Error 2

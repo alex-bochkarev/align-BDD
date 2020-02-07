@@ -1,0 +1,34 @@
+#PBS -N R_NR
+#PBS -l select=1:ncpus=16:mem=16gb,walltime=21:00:00
+#PBS -M abochka@clemson.edu
+#PBS -m abe
+
+# boilerplate things
+STARTMSG="Making reduced obj-hist figure..."
+ENDMSG="done with the reduced obj-hist figure"
+
+module add anaconda3/5.1.0
+source activate ab-local
+module add R/3.6.0
+tg=/home/abochka/bin/tgsend.sh
+tgi=/home/abochka/bin/tgsend_img.sh
+tgs=/home/abochka/bin/tgsend_st.sh
+
+cd /home/abochka/BDD/align-BDD
+
+echo $STARTMSG | $tg > /dev/null
+make -j16 clean
+make -j16 prep_dirs PREF=$TMPDIR/
+make -j16 figures/fig_sol_obj_hist_N.eps figures/fig_sol_obj_hist_R.eps PREF=$TMPDIR/ > make_R.log 2>&1
+echo moving logfiles... | $tg > /dev/null
+make -j16 move_logs PREF=$TMPDIR/
+echo cleaning... | $tg > /dev/null
+make -j16 clean-tmp PREF=$TMPDIR/
+echo $ENDMSG | $tg > /dev/null
+echo showing resulting images: | $tg
+cd figures
+convert fig_sol_obj_hist_R.eps red_fig.png
+$tgi red_fig.png
+rm red_fig.png
+# deactivate the env
+source deactivate ab-local

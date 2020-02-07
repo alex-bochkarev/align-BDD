@@ -32,11 +32,11 @@ LW_Ps=0.3 0.5 0.7
 
 ### dataset generation parameters:
 p=0.6# dataset generation parameter
-n=100# number of instances
+n=10000# number of instances
 N=15# number of variables per instance
 
 ### scalability figure
-SCAL_N=5 6 7 8 9 10 12 13 14 15 16 17 18 19 20 22 25 28 30
+SCAL_N=5 6 7 8 9 10 12 13 14 15 16 17 18 19 20 22 25 28
 SCAL_K=10
 SCAL_P=$(p)
 SCAL_R=N
@@ -104,9 +104,12 @@ $(INST)/%/instances.list:
 	if [ -f $(ARC)/dataset_$*.tar.gz ]; then tar -zxmf $(ARC)/dataset_$*.tar.gz; \
 	else \
 	python ./gen_BDD_pair.py -n $n -v $N -p $p -$*U $(INST)/$*/ > $(LOGS)/$(DTE)_gen_$(N)var_R.log; fi && \
-	ls $(INST)/$*/A*.bdd | grep -Po "$(INST)/$*/A\\K[^\\.]*" > $@ &&\
+	ls $(INST)/$* | grep -Po "A\\K[^\\.]*" > $@ && \
 	split -d -nl/$(PAR_SOL) $@ $(INST)/$*/instances.list.
 
+# was: ls $(INST)/$*/A*.bdd | grep -Po "$(INST)/$*/A\\K[^\\.]*" > $@ &&\
+# basename -a `ls $(INST)/$*/A*.bdd` | sed -n -e's/^A//p' | sed -n -e's/\.bdd//p' > $@ && \
+# 
 ######################################################################
 ## Main calculations (creating .log-files)
 .SECONDEXPANSION:

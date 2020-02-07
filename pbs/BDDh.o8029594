@@ -1,0 +1,72 @@
+mkdir -p /local_scratch/pbs.8029594.pbs02//instances/raw/R /local_scratch/pbs.8029594.pbs02//instances/raw/N
+mkdir -p /local_scratch/pbs.8029594.pbs02//run_logs
+ 
+ 
++------------------------------------------+ 
+| PALMETTO CLUSTER PBS RESOURCES REQUESTED | 
++------------------------------------------+ 
+ 
+mem=16gb,ncpus=16,walltime=21:00:00
+ 
+ 
++-------------------------------------+ 
+| PALMETTO CLUSTER PBS RESOURCES USED | 
++-------------------------------------+ 
+ 
+cpupercent=1610,cput=02:13:43,mem=2478920kb,ncpus=16,vmem=9460188kb,walltime=00:15:23
+ 
+ 
+mkdir -p /local_scratch/pbs.8029594.pbs02//instances/raw/R /local_scratch/pbs.8029594.pbs02//instances/raw/N
+mkdir -p /local_scratch/pbs.8029594.pbs02//run_logs
+ 
+ 
++------------------------------------------+ 
+| PALMETTO CLUSTER PBS RESOURCES REQUESTED | 
++------------------------------------------+ 
+ 
+mem=16gb,ncpus=16,walltime=21:00:00
+ 
+ 
++-------------------------------------+ 
+| PALMETTO CLUSTER PBS RESOURCES USED | 
++-------------------------------------+ 
+ 
+cpupercent=0,cput=00:00:00,mem=0kb,ncpus=16,vmem=0kb,walltime=00:00:02
+ 
+ 
+mkdir -p /local_scratch/pbs.8029594.pbs02//instances/raw/R /local_scratch/pbs.8029594.pbs02//instances/raw/N
+mkdir -p /local_scratch/pbs.8029594.pbs02//run_logs
+ 
+ 
++------------------------------------------+ 
+| PALMETTO CLUSTER PBS RESOURCES REQUESTED | 
++------------------------------------------+ 
+ 
+mem=16gb,ncpus=16,walltime=21:00:00
+ 
+ 
++-------------------------------------+ 
+| PALMETTO CLUSTER PBS RESOURCES USED | 
++-------------------------------------+ 
+ 
+cpupercent=1608,cput=05:22:29,mem=2497316kb,ncpus=16,vmem=9479036kb,walltime=00:26:58
+ 
+ 
+mkdir -p /local_scratch/pbs.8029594.pbs02//instances/raw/R /local_scratch/pbs.8029594.pbs02//instances/raw/N
+mkdir -p /local_scratch/pbs.8029594.pbs02//run_logs
+ 
+ 
++------------------------------------------+ 
+| PALMETTO CLUSTER PBS RESOURCES REQUESTED | 
++------------------------------------------+ 
+ 
+mem=16gb,ncpus=16,walltime=21:00:00
+ 
+ 
++-------------------------------------+ 
+| PALMETTO CLUSTER PBS RESOURCES USED | 
++-------------------------------------+ 
+ 
+cpupercent=95,cput=00:03:52,mem=96816kb,ncpus=16,vmem=829604kb,walltime=00:04:04
+ 
+ 

@@ -1,0 +1,34 @@
+Cleaning up raw instances in /local_scratch/pbs.8027180.pbs02//instances/raw...
+rm -f /local_scratch/pbs.8027180.pbs02//instances/raw/R/*.bdd
+rm -f /local_scratch/pbs.8027180.pbs02//instances/raw/R/*.list*
+rm -f /local_scratch/pbs.8027180.pbs02//instances/raw/N/*.bdd
+rm -f /local_scratch/pbs.8027180.pbs02//instances/raw/N/*.list*
+rm -rf /local_scratch/pbs.8027180.pbs02//instances/raw/ds_stats
+rm -f /local_scratch/pbs.8027180.pbs02//instances/raw/*.bdd
+mkdir -p /local_scratch/pbs.8027180.pbs02//instances/raw/R /local_scratch/pbs.8027180.pbs02//instances/raw/N
+mkdir -p /local_scratch/pbs.8027180.pbs02//run_logs
+make: Nothing to be done for `summary_figs'.
+moving logs away from /local_scratch/pbs.8027180.pbs02//run_logs to ./data_archive
+tar --remove-files -czf ./data_archive/2020-02-06-logs.tar.gz /local_scratch/pbs.8027180.pbs02//run_logs/*
+Cleaning up raw instances in /local_scratch/pbs.8027180.pbs02//instances/raw...
+rm -f /local_scratch/pbs.8027180.pbs02//instances/raw/R/*.bdd
+Cleaning up log files...
+rm -f /local_scratch/pbs.8027180.pbs02//run_logs/*.log
+rm -f /local_scratch/pbs.8027180.pbs02//instances/raw/R/*.list*
+rm -f /local_scratch/pbs.8027180.pbs02//instances/raw/N/*.bdd
+{"ok":true,"result":{"message_id":723,"from":{"id":931364299,"is_bot":true,"first_name":"Wintermute","username":"ab_wintermute_bot"},"chat":{"id":122533105,"first_name":"Alex","last_name":"Bochkarev","username":"abochka","type":"private"},"date":1580998960,"text":"showing resulting images:"}}{"ok":false,"error_code":400,"description":"Bad Request: IMAGE_PROCESS_FAILED"}{"ok":false,"error_code":400,"description":"Bad Request: IMAGE_PROCESS_FAILED"}{"ok":false,"error_code":400,"description":"Bad Request: IMAGE_PROCESS_FAILED"} 
+ 
++------------------------------------------+ 
+| PALMETTO CLUSTER PBS RESOURCES REQUESTED | 
++------------------------------------------+ 
+ 
+mem=16gb,ncpus=16,walltime=21:00:00
+ 
+ 
++-------------------------------------+ 
+| PALMETTO CLUSTER PBS RESOURCES USED | 
++-------------------------------------+ 
+ 
+cpupercent=101,cput=00:12:10,mem=342236kb,ncpus=16,vmem=1074856kb,walltime=00:12:19
+ 
+ 
