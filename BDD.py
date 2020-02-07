@@ -271,16 +271,21 @@ class BDD(object):
             while pos > self.p(var):
                 self.swap_up(self.p(var)+1)
 
-    def gsifts(self, with_whom):
+    def gsifts(self, with_whom,start_order=None):
         """
         Runs a simplistic implementation of Rudell'93
         sifting alorithm extension to minimize |A|+|B|
 
-        Note: it is in-place! no BDD copy is created
+        starts with aligning to self or start_order (if given)
         """
 
-        ## align with_whom to self
         N = len(self.layers)-1
+        if start_order is None:
+            start_order = self.vars
+        else:
+            for i in range(N):
+                self.sift(start_order[i],i)
+
         for i in range(N):
             with_whom.sift(self.vars[i],i)
 
@@ -530,8 +535,11 @@ class BDD(object):
         """shows the diagram (a .dot, compiled to PDF)"""
         self.dump_gv(layerCapt).view("showfunc.dot", directory=dir, cleanup=True)
 
-    def align_to(self, vars_order):
-        aligned = copy.deepcopy(self);
+    def align_to(self, vars_order, inplace=False):
+        if inplace:
+            aligned = self
+        else:
+            aligned = copy.deepcopy(self);
 
         for i in range(len(vars_order)):
             aligned.sift(vars_order[i],i)

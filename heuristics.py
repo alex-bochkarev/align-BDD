@@ -7,15 +7,17 @@ abochka@clemson.edu
 """
 import sys
 import requests # needed for Telegram
+import numpy as np
 
 import opt_parser as als
 import varseq as vs
 from glob import glob
-from copy import deepcopy
+from copy import deepcopy, copy
 
 # for debugging // profiling
 import cProfile
 import pstats
+
 
 def tg_sendtext(bot_message):
     bot_token = '<token>'
@@ -24,70 +26,68 @@ def tg_sendtext(bot_message):
     response = requests.get(send_text)
     return response.json()
 
-# IDEA: implement a more careful steps counter within classes?
+def toA(A,B):
+    Bp = B.align_to(A)
+    return [A.size()+Bp.size(),A.layer_var]
+
+def toB(A,B):
+    return toA(B,A)
 
 # min { toA, toB}
 def minAB(A,B):
-    Ap = A.align_to(B)
-    Bp = B.align_to(A)
+    sA,vA = toA(A,B)
+    sB,vB = toA(B,A)
 
-    toA = A.size() + Bp.size()
-    toB = Ap.size() + B.size()
-    if  toA < toB:
-        return [A.layer_var, toA, 2*len(A)]
+    if sA<=sB:
+        return sA,vA
     else:
-        return [B.layer_var, toB, 2*len(B)]
+        return sB,vB
 
-# gr swaps
-def greedy_swaps(A,B):
+def simpl_greedy_swaps(A,B):
     """finds a good alignment target with greedy swaps
 
     Makes swaps while it can improve the objective
     (picking the best improvement at each step)
     """
-    T, cur_size, _ = minAB(A,B)
+    cur_size, T = minAB(A,B)
     T = vs.VarSeq(T,[1 for i in range(len(T))])
     improvement_possible = True
-
-    no_of_ops = 0
 
     while improvement_possible:
         improvement_possible = False
         Tp = deepcopy(T)
-        no_of_ops += len(Tp)
 
         for i in range(len(T)-1):
             a = T.layer_var[i];
             Ap = A.align_to(T.slide(a,i-1))
             Bp = B.align_to(T.slide(a,i-1))
 
-            no_of_ops += 2*len(A)
-
             if Ap.size() + Bp.size() < cur_size:
                 cur_size = Ap.size() + Bp.size()
                 Tp = T.slide(a,i-1)
-                no_of_ops += 1
                 improvement_possible = True
         T = Tp
 
-    return [T, A.align_to(T).size() + B.align_to(T).size(), no_of_ops]
+    return [A.align_to(T).size() + B.align_to(T).size(),T]
 
 # gr sifts
-def greedy_sifts(A,B):
+def simpl_greedy_sifts(A,B,passes=-1):
     """finds a good alignment target with greedy sifts
 
     Makes sifts while it can improve the objective
-    (picking the best improvement at each step)
+    or for a given number of passes,
+    picking the best improvement at each step.
+    (one pass = examining all the variables)
     """
-    T, cur_size, _= minAB(A,B)
+    cur_size, T = minAB(A,B)
     T = vs.VarSeq(T,[1 for i in range(len(T))])
     improvement_possible = True
-    no_of_ops = 0
+    pass_no = 0
 
     while improvement_possible:
         improvement_possible = False
+        pass_no += 1
         Tp = deepcopy(T)
-        no_of_ops += len(Tp)
 
         for i in range(len(T)):
             a = T.layer_var[i]
@@ -95,34 +95,39 @@ def greedy_sifts(A,B):
                 Ap = A.align_to(T.slide(a,j))
                 Bp = B.align_to(T.slide(a,j))
 
-                no_of_ops += 2*abs(i-j) + 2*len(A)
-
                 if Ap.size() + Bp.size() < cur_size:
                     cur_size = Ap.size() + Bp.size()
                     Tp = T.slide(a,j)
-                    no_of_ops += abs(i-j)
                     improvement_possible = True
         T = Tp
+        if pass_no == passes:
+            break
 
-    return [T, A.align_to(T).size() + B.align_to(T).size(),no_of_ops]
+    return [A.align_to(T).size() + B.align_to(T).size(),T]
 
-# gr 2sifts
-# TODO: speed up / way too slow to use
-def greedy_2sifts(A,B):
+def simpl_gsifts_1p(A,B):
+    return simpl_greedy_sifts(A,B,passes=1)
+
+def simpl_gsifts_2p(A,B):
+    return simpl_greedy_sifts(A,B,passes=2)
+
+def simpl_greedy_2sifts(A,B, passes=-1):
     """finds a good alignment target with greedy pairs of sifts
 
-    Makes sifts while it can improve the objective
-    (picking the best improvement at each step)
+    Makes sifts while it can improve the objective,
+    or for a given number of passes,
+    picking the best improvement at each step.
+    (one pass = examining all the variables.)
     """
-    T, cur_size, _ = minAB(A,B)
+    cur_size, T = minAB(A,B)
     T = vs.VarSeq(T,[1 for i in range(len(T))])
     improvement_possible = True
-    no_of_ops = 0
+    pass_no = 0
 
     while improvement_possible:
         improvement_possible = False
+        pass_no += 1
         Tp = deepcopy(T)
-        no_of_ops += len(Tp)
 
         for i1 in range(len(T)):
             a1 = T.layer_var[i1]
@@ -132,16 +137,22 @@ def greedy_2sifts(A,B):
                     for j2 in range(len(T)):
                         Ap = A.align_to(T.slide(a1,j1).slide(a2,j2))
                         Bp = B.align_to(T.slide(a1,j1).slide(a2,j2))
-                        no_of_ops += 2*len(A)
 
                         if Ap.size() + Bp.size() < cur_size:
                             cur_size = Ap.size() + Bp.size()
                             Tp = T.slide(a1,j1).slide(a2,j2)
-                            no_of_ops += abs(i1-j1)+abs(i2-j2)
                             improvement_possible = True
         T = Tp
+        if pass_no == passes:
+            break
 
-    return [T, A.align_to(T).size() + B.align_to(T).size(),no_of_ops]
+    return [A.align_to(T).size() + B.align_to(T).size(),T]
+
+def simpl_g2sifts_1p(A,B):
+    return simpl_greedy_2sifts(A,B,1)
+
+def simpl_g2sifts_2p(A,B):
+    return simpl_greedy_2sifts(A,B,2)
 
 ######################################################################
 ## an optimized version
@@ -189,7 +200,7 @@ def fast_greedy_sifts(A,B):
     Makes sifts while it can improve the objective
     (picking the best improvement at each step)
     """
-    T, cur_size, _= minAB(A,B)
+    cur_size, T = minAB(A,B)
     improvement_possible = True
     no_of_ops = 0
 
@@ -222,7 +233,7 @@ def fast_greedy_2sifts(A,B):
     Makes sifts while it can improve the objective
     (picking the best improvement at each step)
     """
-    T, cur_size, _ = minAB(A,B)
+    cur_size, T  = minAB(A,B)
     improvement_possible = True
     no_of_ops = 0
 
@@ -252,85 +263,73 @@ def fast_greedy_2sifts(A,B):
 
     return [T, A.align_to(T).size() + B.align_to(T).size(),no_of_ops]
 
-######################################################################
-# TODO: smart last-el greedy
-def smart_last_elem(A,B):
-    cur_last_pos = len(A)-1
 
-    Ap = deepcopy(A)
-    Bp = deepcopy(B)
-    A_set = set()
-    B_set = set()
+# heuristics = [
+#     minAB,
+#     greedy_swaps,
+#     greedy_sifts,
+#     greedy_2sifts
+# ]
 
-    no_of_ops = 0
+# heu_description = [
+#     "minAB",
+#     "gswaps",
+#     "gsifts",
+#     "g2sifts",
+#     "smart_last_elem"
+# ]
 
-    for n in range(len(A)-1,0,-1):
-        # n is the current ``last'' position to choose a var for
-        cur_cost = -1
-        i_cand = -1
-        max_Bpos_seen = -1
+def orig_simpl(A,B,simpl):
+    Ap = deepcopy(A); Bp = deepcopy(B)
+    Ap.align_to(simpl["simpl_BB"][2])
+    Bp.align_to(simpl["simpl_BB"][2])
+    return [Ap.size()+Bp.size(),simpl["simpl_BB"][1], simpl["simpl_BB"][2]]
 
-        for i in range(n,-1,-1):
-            if Bp.p[Ap.layer_var[i]] < max_Bpos_seen or Ap.layer_var[i] in A_set or Ap.layer_var[i] in B_set:
-                no_of_ops += 1
-                continue # this var is ``dominated'' -- can't be the last one
+def orig_gsifts1p(A,B,simpl):
+    Ap = deepcopy(A);Bp = deepcopy(B)
+    Ap.gsifts(Bp)
+    return [Ap.size()+Bp.size(),0, Ap.vars]
 
-            cand_cost = Ap.S(Ap.layer_var[i],n)+Bp.S(Ap.layer_var[i],n)
-            no_of_ops += abs(i-n)*2
-            if cand_cost < cur_cost or cur_cost==-1:
-                cur_cost = cand_cost
-                i_cand = i
+def orig_bestAB(A,B,simpl):
+    Ap = deepcopy(A); Bp = deepcopy(B)
+    Ap.align_to(B.vars,inplace=True)
+    Bp.align_to(A.vars,inplace=True)
+    if Ap.size()+B.size() <= A.size()+Bp.size():
+        return [Ap.size()+B.size(),0,Ap.vars]
+    else:
+        return [A.size()+Bp.size(),0,Bp.vars]
 
-            if Bp.p[Ap.layer_var[i]] > max_Bpos_seen:
-                max_Bpos_seen = Bp.p[Ap.layer_var[i]]
+def orig_5random(A,B,simpl):
+    best_size = -1
+    for i in range(5):
+        Ap = deepcopy(A);
+        Bp = deepcopy(B);
+        o = np.random.permutation(A.vars)
+        Ap.align_to(o,inplace=True)
+        Bp.align_to(o,inplace=True)
+        if best_size<0 or Ap.size()+Bp.size()<best_size:
+            best_size = Ap.size()+Bp.size()
+            best_o = copy(A.vars)
+    return [best_size, 0, best_o]
 
-        A_covered = set(Ap.layer_var[i_cand:n])
-        B_covered = set(Bp.layer_var[Bp.p[Ap.layer_var[i_cand]]:n])
-
-        j_A = i_cand
-        j_B = Bp.p[ Ap.layer_var[i_cand] ]
-
-        Ap = Ap.slide(Ap.layer_var[i_cand],n); Bp = Bp.slide(Ap.layer_var[i_cand],n)
-        no_of_ops += abs(i_cand - n) + abs(Bp.p[Ap.layer_var[i_cand]] - n)
-
-        # now, reshuffle the covered elements
-        # O(N) procedure
-
-        if len(A_covered)>1:
-            for i in range(n):
-                no_of_ops += 1
-                if Bp.layer_var[i] in A_covered:
-                    Ap.layer_var[j_A] = Bp.layer_var[i]
-                    Ap.p[Bp.layer_var[i]] = j_A
-                    j_A += 1
-
-                if Ap.layer_var[i] in B_covered:
-                    Bp.layer_var[j_B] = Ap.layer_var[i]
-                    Bp.p [ Ap.layer_var[i] ] = j_B
-                    j_B += 1
-
-        A_set.update(A_covered)
-        B_set.update(A_covered)
-
-    return [Ap.layer_var, Ap.size()+Bp.size(),no_of_ops]
-
-heuristics = [
-    minAB,
-    greedy_swaps,
-    greedy_sifts,
-    greedy_2sifts,
-    smart_last_elem
+# heuristic structure
+# CODE - FUNC - LEGEND
+SIMPL_HEU = [
+    ["simpl_toA",toA, "align to A"],
+    ["simpl_toB",toB, "align to B"],
+    ["simpl_minAB",minAB, "best of S_A and S_B"],
+    ["simpl_gswaps",simpl_greedy_swaps,"greedy swaps"],
+    ["simpl_gsifts_1p",simpl_gsifts_1p,"greedy sifts (1 pass)"],
+    ["simpl_gsifts_2p",simpl_gsifts_2p,"greedy sifts (2 passes)"]
+    # ["simpl_g2sifts_1p",simpl_g2sifts_1p,"greedy 2-sifts (1 pass)"]
 ]
 
-heu_description = [
-    "minAB",
-    "gswaps",
-    "gsifts",
-    "g2sifts",
-    "smart_last_elem"
+ORIG_HEU = [
+    ["orig_simpl",orig_simpl,"simplified problem"],
+    ["orig_gsifts1p",orig_gsifts1p,"greedy BDD sifts (1 pass)"],
+    ["orig_bestAB",orig_bestAB,"best of A and B"],
+    ["orig_5random",orig_5random,"best of 5 random orders"]
 ]
-
-
 if __name__ == "__main__":
     if len(sys.argv) != 2:
         print("USAGE: {} <inst_directory>/".format(sys.argv[0]))
@@ -373,3 +372,4 @@ if __name__ == "__main__":
 
     ps.dump_stats("./run_profile.dmp")
     tg_sendtext("LOCAL (heuristics): done. {} files processed".format(n))
+

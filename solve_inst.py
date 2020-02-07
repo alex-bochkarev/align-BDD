@@ -29,6 +29,11 @@ if __name__ == "__main__":
 
     if args.header:
         log("instance","num_type","value",comment="comment")
+        # needed for the legend
+        for heuristic in heu.SIMPL_HEU:
+            log("-1,legend",heuristic[0], comment=heuristic[2])
+        for heuristic in heu.ORIG_HEU:
+            log("-1,legend",heuristic[0], comment=heuristic[2])
         exit(0)
 
     inst_dir = args.inst_dir
@@ -36,6 +41,8 @@ if __name__ == "__main__":
     with open(args.inst_list,"r") as inst_list:
         with open(args.logfile,"w") as logf:
             log("instance","num_type","value",outfile=logf, comment="comment")
+
+            # process instances
             for inst_id in inst_list:
                 inst_id = inst_id.rstrip()
                 if inst_id == "":
@@ -60,41 +67,24 @@ if __name__ == "__main__":
 
                 simpl_obj = b.Ap_cand.size() + b.Bp_cand.size()
                 t1 = time()
-                log(inst_id, "simpl_bb_time",t1 - t0,outfile=logf)
-                log(inst_id, "simpl_obj",simpl_obj,outfile=logf)
+                simpl_time = t1 - t0
+                log(inst_id, "simpl_BB_time",simpl_time,outfile=logf)
+                log(inst_id, "simpl_BB_obj",simpl_obj,outfile=logf)
 
                 # testing heuristics for the simplified problem
                 ## simple ones: toA, toB, toRandom
-                t0 = time()
-                order_minAB,size,no_of_ops = heu.minAB(vs_A,vs_B)
+                v = []; s = []; t=[]
+                for heuristic in heu.SIMPL_HEU:
+                    t0 = time()
+                    sh,vh = heuristic[1](vs_A,vs_B)
+                    t1 = time()
+                    th = t1-t0
+                    log(inst_id, heuristic[0]+"_time",th,outfile=logf)
+                    log(inst_id, heuristic[0]+"_obj",sh,outfile=logf)
+                    v.append(vh); s.append(sh); t.append(th)
 
-                rnd_obj = list(np.random.permutation(vs_A.layer_var))
-                s_objR =vs_A.align_to(rnd_obj).size() + vs_B.align_to(rnd_obj).size()
-                t1 = time()
-
-                log(inst_id, "simpl_qheu_time",t1-t0,outfile=logf)
-                log(inst_id, "simpl_toAB_obj",size,outfile=logf)
-                log(inst_id, "simpl_toR_obj",s_objR,outfile=logf)
-
-                ## more complicated ones
-                t0 = time()
-                order_gswaps, so_gswaps, no_of_ops = heu.greedy_swaps(vs_A,vs_B)
-                t1 = time()
-                log(inst_id, "simpl_heu_gswaps_time",t1-t0,outfile=logf)
-                log(inst_id, "simpl_heu_gswaps_obj",so_gswaps,outfile=logf)
-
-                t0 = time()
-                order_gsifts, so_gsifts, no_of_ops = heu.fast_greedy_sifts(vs_A,vs_B)
-                t1 = time()
-                log(inst_id, "simpl_heu_gsifts_time",t1-t0,outfile=logf)
-                log(inst_id, "simpl_heu_gsifts_obj",so_gsifts,outfile=logf)
-
-                t0 = time()
-                order_g2sifts, so_g2sifts, no_of_ops = heu.fast_greedy_2sifts(vs_A,vs_B)
-                t1 = time()
-                log(inst_id, "simpl_heu_g2sifts_time",t1-t0,outfile=logf)
-                log(inst_id, "simpl_heu_g2sifts_obj",so_g2sifts,outfile=logf)
-
+                simpl_results = dict(zip([c[0] for c in heu.SIMPL_HEU], [s,t,v]))
+                simpl_results.update({"simpl_BB":[b.Ap_cand.size()+b.Bp_cand.size(), simpl_time, b.Ap_cand.layer_var]})
                 ######################################################
                 # The original problem
                 t0 = time()
@@ -103,71 +93,78 @@ if __name__ == "__main__":
                 bdd_Ba = bdd_B.align_to(o)
                 oo_simpl_order = bdd_Aa.size() + bdd_Ba.size()
 
-                true_objA = bdd_A.size() + bdd_B.align_to(bdd_A.vars).size()
-                true_objB = bdd_A.align_to(bdd_B.vars).size()+bdd_B.size()
-                rnd_obj = np.random.permutation(bdd_A.vars)
-                true_objR = bdd_A.align_to(rnd_obj).size()+bdd_B.align_to(rnd_obj).size()
+                for heuristic in heu.ORIG_HEU:
+                    t0 = time()
+                    s,t_add,v = heuristic[1](bdd_A,bdd_B,simpl_results)
+                    t1 = time()
+                    log(inst_id, heuristic[0]+"_time",t_add+(t1-t0),outfile=logf)
+                    log(inst_id, heuristic[0]+"_obj",s,outfile=logf)
 
-                # inspired by simplified heuristics
-                order_gswaps = order_gswaps.layer_var
-                order_gsifts = order_gsifts
-                order_g2sifts = order_g2sifts
+                #     true_objA = bdd_A.size() + bdd_B.align_to(bdd_A.vars).size()
+                # true_objB = bdd_A.align_to(bdd_B.vars).size()+bdd_B.size()
+                # rnd_obj = np.random.permutation(bdd_A.vars)
+                # true_objR = bdd_A.align_to(rnd_obj).size()+bdd_B.align_to(rnd_obj).size()
 
-                orig_obj_minAB = bdd_A.align_to(order_minAB).size() + bdd_B.align_to(order_minAB).size()
-                orig_obj_gswaps = bdd_A.align_to(order_gswaps).size() + bdd_B.align_to(order_gswaps).size()
-                orig_obj_gsifts = bdd_A.align_to(order_gsifts).size() + bdd_B.align_to(order_gsifts).size()
-                orig_obj_g2sifts = bdd_A.align_to(order_g2sifts).size() + bdd_B.align_to(order_g2sifts).size()
-                t1 = time()
+                # # inspired by simplified heuristics
+                # order_gswaps = order_gswaps.layer_var
+                # order_gsifts = order_gsifts
+                # order_g2sifts = order_g2sifts
 
-                log(inst_id, "orig_from_simpl_checking_time",t1 - t0,outfile=logf)
-                log(inst_id, "orig_from_simpl_order_obj",oo_simpl_order,outfile=logf)
-                log(inst_id,"orig_toA_obj",true_objA,outfile=logf)
-                log(inst_id,"orig_toB_obj",true_objB,outfile=logf)
-                log(inst_id,"orig_toRandom_obj",true_objR,outfile=logf)
+                # orig_obj_minAB = bdd_A.align_to(order_minAB).size() + bdd_B.align_to(order_minAB).size()
+                # orig_obj_gswaps = bdd_A.align_to(order_gswaps).size() + bdd_B.align_to(order_gswaps).size()
+                # orig_obj_gsifts = bdd_A.align_to(order_gsifts).size() + bdd_B.align_to(order_gsifts).size()
+                # orig_obj_g2sifts = bdd_A.align_to(order_g2sifts).size() + bdd_B.align_to(order_g2sifts).size()
+                # t1 = time()
 
-                log(inst_id, "orig_minAB_obj",orig_obj_minAB,outfile=logf)
-                log(inst_id, "orig_gswaps_obj",orig_obj_gswaps,outfile=logf)
-                log(inst_id, "orig_gsifts_obj",orig_obj_gsifts,outfile=logf)
-                log(inst_id, "orig_g2sifts_obj",orig_obj_g2sifts,outfile=logf)
+                # log(inst_id, "orig_from_simpl_checking_time",t1 - t0,outfile=logf)
+                # log(inst_id, "orig_from_simpl_order_obj",oo_simpl_order,outfile=logf)
+                # log(inst_id,"orig_toA_obj",true_objA,outfile=logf)
+                # log(inst_id,"orig_toB_obj",true_objB,outfile=logf)
+                # log(inst_id,"orig_toRandom_obj",true_objR,outfile=logf)
 
-                ## original-problem heuristics
-                t0 = time()
+                # log(inst_id, "orig_minAB_obj",orig_obj_minAB,outfile=logf)
+                # log(inst_id, "orig_gswaps_obj",orig_obj_gswaps,outfile=logf)
+                # log(inst_id, "orig_gsifts_obj",orig_obj_gsifts,outfile=logf)
+                # log(inst_id, "orig_g2sifts_obj",orig_obj_g2sifts,outfile=logf)
 
-                Ap = deepcopy(bdd_A)
-                Bp = deepcopy(bdd_B)
-                bdd_A.gsifts(bdd_B)
-                Bp.gsifts(Ap)
-                oo_orig_gsifts = min(bdd_A.size() + bdd_B.size(),Ap.size()+Bp.size())
-                t1 = time()
-                log(inst_id, "orig_exact_gsifts_obj",oo_orig_gsifts,outfile=logf)
-                log(inst_id, "orig_exact_gsifts_time",t1 - t0,outfile=logf)
+                # ## original-problem heuristics
+                # t0 = time()
 
-                #--- reduction-related operations
-                bdd_A = exact.BDD(); bdd_A.load(fnameA)
-                bdd_B = exact.BDD(); bdd_B.load(fnameB)
-                t0 = time()
-                bdd_A.make_reduced()
-                bdd_B.make_reduced()
-                vs_A = simpl.VarSeq(bdd_A.vars, [len(l) for l in bdd_A.layers[:-1]])
-                vs_B = simpl.VarSeq(bdd_B.vars, [len(l) for l in bdd_B.layers[:-1]])
+                # Ap = deepcopy(bdd_A)
+                # Bp = deepcopy(bdd_B)
+                # bdd_A.gsifts(bdd_B)
+                # Bp.gsifts(Ap)
+                # oo_orig_gsifts = min(bdd_A.size() + bdd_B.size(),Ap.size()+Bp.size())
+                # t1 = time()
+                # log(inst_id, "orig_exact_gsifts_obj",oo_orig_gsifts,outfile=logf)
+                # log(inst_id, "orig_exact_gsifts_time",t1 - t0,outfile=logf)
 
-                # find opts for varseq instance with BB-search
-                b = bb.BBSearch(vs_A,vs_B)
-                status = b.search()
-                t1 = time()
-                log(inst_id,"simpl_red_opt_status",1-int(status=="optimal"),outfile=logf, comment=status)
+                # #--- reduction-related operations
+                # bdd_A = exact.BDD(); bdd_A.load(fnameA)
+                # bdd_B = exact.BDD(); bdd_B.load(fnameB)
+                # t0 = time()
+                # bdd_A.make_reduced()
+                # bdd_B.make_reduced()
+                # vs_A = simpl.VarSeq(bdd_A.vars, [len(l) for l in bdd_A.layers[:-1]])
+                # vs_B = simpl.VarSeq(bdd_B.vars, [len(l) for l in bdd_B.layers[:-1]])
 
-                simpl_obj = b.Ap_cand.size() + b.Bp_cand.size()
-                log(inst_id, "simpl_red_bb_time",t1 - t0,outfile=logf)
-                log(inst_id, "simpl_red_obj",simpl_obj,outfile=logf)
+                # # find opts for varseq instance with BB-search
+                # b = bb.BBSearch(vs_A,vs_B)
+                # status = b.search()
+                # t1 = time()
+                # log(inst_id,"simpl_red_opt_status",1-int(status=="optimal"),outfile=logf, comment=status)
 
-                # working with the original problem objective values
-                t0 = time()
-                o = b.Ap_cand.layer_var # optimal order found by the BBSearch
-                bdd_Aa = bdd_A.align_to(o)
-                bdd_Ba = bdd_B.align_to(o)
-                orig_from_simpl_red_obj = bdd_Aa.size() + bdd_Ba.size()
-                t1 = time()
+                # simpl_obj = b.Ap_cand.size() + b.Bp_cand.size()
+                # log(inst_id, "simpl_red_bb_time",t1 - t0,outfile=logf)
+                # log(inst_id, "simpl_red_obj",simpl_obj,outfile=logf)
 
-                log(inst_id, "orig_from_simpl_red_checking_time",t1 - t0,outfile=logf)
-                log(inst_id, "orig_from_simpl_red_order_obj",orig_from_simpl_red_obj,outfile=logf)
+                # # working with the original problem objective values
+                # t0 = time()
+                # o = b.Ap_cand.layer_var # optimal order found by the BBSearch
+                # bdd_Aa = bdd_A.align_to(o)
+                # bdd_Ba = bdd_B.align_to(o)
+                # orig_from_simpl_red_obj = bdd_Aa.size() + bdd_Ba.size()
+                # t1 = time()
+
+                # log(inst_id, "orig_from_simpl_red_checking_time",t1 - t0,outfile=logf)
+                # log(inst_id, "orig_from_simpl_red_order_obj",orig_from_simpl_red_obj,outfile=logf)

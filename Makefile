@@ -23,7 +23,7 @@ SCAL=./scal_test.py
 STATS=./gen_lsizes_stats.py
 ######################################################################
 ## Numerical parameters
-PAR_SOL=16
+PAR_SOL=8
 
 ### random dataset stats
 LW_n=50
@@ -32,7 +32,7 @@ LW_Ps=0.3 0.5 0.7
 
 ### dataset generation parameters:
 p=0.6# dataset generation parameter
-n=10000# number of instances
+n=500# number of instances
 N=15# number of variables per instance
 
 ### scalability figure
@@ -70,6 +70,9 @@ scalfig: $(FIGS)/fig_scal.eps
 summary_figs: $(FIGS)/fig_summary_R.eps $(FIGS)/fig_summary_N.eps
 
 figures_R: $(FIGS)/fig_sol_guessing_R.eps $(FIGS)/fig_BB_gaps_R.eps $(FIGS)/fig_sol_fireplace_R.eps $(FIGS)/fig_sol_obj_hist_R.eps $(FIGS)/fig_sol_obj_int_R.eps
+
+hists: $(FIGS)/fig_sol_obj_hist_R.eps $(FIGS)/fig_sol_obj_hist_N.eps
+	touch hists
 
 ######################################################################
 ## Figure recipes
