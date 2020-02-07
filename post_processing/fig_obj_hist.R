@@ -13,11 +13,11 @@ library(stringr)
 library(latex2exp)
 library(optparse)
 
-# Internal parameters for the figure
+## Internal parameters for the figure
 X_QUANTILE=0.98 # quantile to filter for the histogram(Ox axis)
 ORIG_BASE_COL = "orig_gsifts1p_obj" # col to divide by
 
-# Heuristics to show (codes)
+## Heuristics to show (codes)
 SHOW_HEU = c("all")
 
 ######################################################################
@@ -41,7 +41,7 @@ if (is.null(opt$input) | is.null(opt$out)){
 ## parse the input file
 df = read.csv(opt$input, stringsAsFactors = FALSE)
 
-df_legend = filter(df, num_type=="legend")
+df_legend = select(filter(df, num_type=="legend"), value,comment)
 df = filter(df, num_type != "legend")
 df$value = as.numeric(df$value)
 
@@ -102,12 +102,8 @@ plt_dens =
     labs(fill="Heuristic used:", color="Heuristic used:")+
     scale_y_continuous(
         "Density (share of instances)",
-        ##        limits = c(1,2),
-        ## breaks = seq(0.5, 5.0, by=0.5),
-        ## minor_breaks = seq(0,5.0,by=0.1),
         labels = scales::number_format(accuracy = 0.5)
     )+
-    ## coord_cartesian(xlim = c(min(df_time_o$obj),max(df_time_o$obj)))+
     scale_x_continuous(
         "Objective value, relative to the result of exact-sifts heuristic (taken as 100%)",
         labels = scales::percent,
@@ -115,37 +111,6 @@ plt_dens =
         minor_breaks = seq(xmin,xmax,length.out=21),
         limits = c(xmin,xmax)
     )+
-#    coord_cartesian(xlim=c(xmin,xmax))+
-    ## scale_fill_manual(values = c(
-    ##                       "orig_from_simpl_order" = "red",
-    ##                       "orig_from_simpl_red_order" = "blue",
-    ##                       "orig_g2sifts" = "yellow",
-    ##                       "orig_gsifts" = "darkgreen",
-    ##                       "orig_gswaps" = "pink",
-    ##                       "orig_true_minAB" = "lightblue"
-    ##                   ),labels = c(
-    ##                         "orig_from_simpl_order" = "Simplified -> Branch&Bound",
-    ##                         "orig_from_simpl_red_order" = "Layer-reduction -> Simplified -> Branch&Bound",
-    ##                         "orig_g2sifts" = "Simplified -> Greedy sift pairs",
-    ##                         "orig_gsifts" = "Simplified -> Greedy sifts",
-    ##                         "orig_gswaps" = "Simplified -> Greedy swaps",
-    ##                         "orig_true_minAB" = latex_label
-    ##                   ))+
-    ## scale_color_manual(values = c(
-    ##                        "orig_from_simpl_order" = "red",
-    ##                        "orig_from_simpl_red_order" = "blue",
-    ##                        "orig_g2sifts" = "yellow",
-    ##                        "orig_gsifts" = "darkgreen",
-    ##                        "orig_gswaps" = "pink",
-    ##                        "orig_true_minAB" = "lightblue"
-    ##                    ),labels = c(
-    ##                         "orig_from_simpl_order" = "Simplified -> Branch&Bound",
-    ##                         "orig_from_simpl_red_order" = "Layer-reduction -> Simplified -> Branch&Bound",
-    ##                         "orig_g2sifts" = "Simplified -> Greedy sift pairs",
-    ##                         "orig_gsifts" = "Simplified -> Greedy sifts",
-    ##                         "orig_gswaps" = "Simplified -> Greedy swaps",
-    ##                         "orig_true_minAB" = latex_label
-    ##                   ))+
     theme(
         legend.position = c(0.6, 0.8),
         legend.direction = "vertical",

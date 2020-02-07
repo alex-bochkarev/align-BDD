@@ -13,6 +13,14 @@ library(stringr)
 library(latex2exp)
 library(optparse)
 
+## Internal parameters for the figure
+ORIG_BASE_COL = "simpl_BB_obj" # col to divide by
+Nticks = 20
+Y_QUANTILE=0.75
+
+## Heuristics to show (codes)
+SHOW_HEU = c("all")
+
 ######################################################################
 ## unpack the command line arguments
 option_list = list(
@@ -35,86 +43,71 @@ if (is.null(opt$input) | is.null(opt$out)){
 
 df = read.csv(opt$input, stringsAsFactors = FALSE)
 
+df_legend = select(filter(df, num_type=="legend"), value,comment)
+df = filter(df, num_type != "legend")
+df$value = as.numeric(df$value)
+
 df_wide = pivot_wider(df,
                       id_cols = "instance",
                       names_from = "num_type",
                       values_from = "value"
                       )
 
+simpl_obj_cols = grep("^simpl.*_obj$",colnames(df_wide),value = TRUE)
+time_cols = grep(".+time$",colnames(df_wide),value = TRUE)
 ######################################################################
 ## draw the figure
-simpl_colnames = grep("^simpl.*_obj$",colnames(df_wide),value = TRUE)
 
-for (col in simpl_colnames){
-    df_wide[[paste(col,"rel_sim",sep="_")]] = df_wide[[col]] / df_wide[["simpl_obj"]]
+for (col in simpl_obj_cols){
+    df_wide[[paste(col,"rel",sep="_")]] = df_wide[[col]] / df_wide[[ORIG_BASE_COL]]
 }
 
-df_rel_sim = pivot_longer(df_wide,
+df_rel = pivot_longer(df_wide,
                       cols = -c("instance"),
                       names_to = "num_type",
                       values_to = "value"
                       )
 
-df_rel_sim = filter(df_rel_sim, num_type %in% c(
-                                                  "simpl_heu_g2sifts_obj_rel_sim",
-                                                  "simpl_heu_gsifts_obj_rel_sim",
-                                                  "simpl_heu_gswaps_obj_rel_sim",
-                                                  "simpl_heu_g2sifts_time",
-                                                  "simpl_heu_gsifts_time",
-                                                  "simpl_heu_gswaps_time",
-                                                  "simpl_bb_time"
-                                        ))
+if (SHOW_HEU[1] == "all"){
+    SHOW_HEU = c(grep("^simpl.*_obj_rel$",colnames(df_wide),value = TRUE),
+                 grep("^simpl.*_time$",colnames(df_wide),value = TRUE))
+}
 
-df_rel_sim$entry_type = ifelse(df_rel_sim$num_type %in% grep(".+time$",colnames(df_wide),value = TRUE),"time","obj")
+df_rel = filter(df_rel, num_type %in% SHOW_HEU)
 
-df_rel_sim = df_rel_sim %>%
+df_rel$entry_type = ifelse(df_rel$num_type %in% time_cols,"time","obj")
+
+df_rel = df_rel %>%
     mutate(
-        heuristic = ifelse(entry_type == "obj", substring(num_type, 1, nchar(num_type)-12), substring(num_type, 1, nchar(num_type)-5))
+        heuristic = ifelse(entry_type == "obj",
+                           substring(num_type, 1, nchar(num_type)-nchar("_obj_rel")),
+                           substring(num_type, 1, nchar(num_type)-nchar("_time")))
     )
 
-df_time = pivot_wider(select(df_rel_sim,-num_type),names_from = "entry_type",values_from = "value")
-df_time$obj = ifelse(df_time$heuristic == "simpl_bb",1.0, df_time$obj)
+df_time_o = pivot_wider(select(df_rel,-num_type),names_from = "entry_type",values_from = "value")
+df_time_o = merge(x=df_time_o, y=df_legend, by.x = "heuristic", by.y = "value")
 
+ymin = 1.0
+ymax = quantile(df_time_o$obj, Y_QUANTILE)
+xmin = 0
+xmax = max(df_time_o$time)
 plt_zoomed =
-    ggplot(filter(df_time, heuristic != "simpl_heu_gswaps"),
-       aes(x=time, y =obj , shape=heuristic,color=heuristic))+
+    ggplot(df_time_o,aes(x=time, y=obj , shape=comment,color=comment))+
     geom_point(alpha=0.4, size=4)+
     scale_y_continuous(
         "Objective value (percent of the exact min)",
-        limits = c(1,1.10),
+        limits = c(ymin,ymax),
         labels = scales::percent
     )+
     scale_x_continuous(
         "Calculation (wall-clock) time per instance, sec.",
         labels = scales::number_format(accuracy = 0.1),
-        breaks = seq(0,max(df_time$time),length.out = 20)
+        breaks = seq(xmin,xmax,length.out = Nticks)
     )+
     guides(
         color=guide_legend(title="Heuristic / method:"),
         shape=guide_legend(title="Heuristic / method:")
         )+
-    scale_color_manual(values = c(
-                          "simpl_bb" = "red",
-                          "simpl_heu_gsifts" = "blue",
-                          "simpl_heu_g2sifts" = "green"
-                      ),
-                      labels = c(
-                          "simpl_bb" = "branch-and-bound",
-                          "simpl_heu_gsifts" = "greedy sifts",
-                          "simpl_heu_g2sifts" = "greedy sift pairs"
-                      ),
-                      )+
-    scale_shape_manual(values = c(
-                           "simpl_bb" = "triangle",
-                           "simpl_heu_gsifts" = "cross",
-                           "simpl_heu_g2sifts" = "circle"
-                       ),
-                       labels = c(
-                           "simpl_bb" = "branch-and-bound",
-                           "simpl_heu_gsifts" = "greedy sifts",
-                           "simpl_heu_g2sifts" = "greedy sift pairs"
-                       ),
-                       )+
     theme(
         legend.position = c(0.8, 0.8),
         legend.direction = "vertical",

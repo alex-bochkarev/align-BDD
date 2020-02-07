@@ -315,8 +315,8 @@ def orig_5random(A,B,simpl):
 # heuristic structure
 # CODE - FUNC - LEGEND
 SIMPL_HEU = [
-    ["simpl_toA",toA, "align to A"],
-    ["simpl_toB",toB, "align to B"],
+    # ["simpl_toA",toA, "align to A"],
+    # ["simpl_toB",toB, "align to B"],
     ["simpl_minAB",minAB, "best of S_A and S_B"],
     ["simpl_gswaps",simpl_greedy_swaps,"greedy swaps"],
     ["simpl_gsifts_1p",simpl_gsifts_1p,"greedy sifts (1 pass)"],
