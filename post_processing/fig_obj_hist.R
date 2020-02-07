@@ -13,6 +13,9 @@ library(stringr)
 library(latex2exp)
 library(optparse)
 
+# Internal parameters for the figure
+X_QUANTILE=0.98
+
 ######################################################################
 ## unpack the command line arguments
 option_list = list(
@@ -106,11 +109,16 @@ df_time_o = pivot_wider(select(df_rel_orig,-num_type),names_from = "entry_type",
 
 ######################################################################
 ## draw the figure
+# X_QUANTILE = 0.98
+xmin = min(df_time_o$obj)
+xmax = quantile(df_time_o$obj,X_QUANTILE)
+latex_label = parse(text = TeX("try $S_A$, $S_B$, choose the best one"))
+
 plt_dens =
     ggplot(df_time_o, aes(x=obj , fill=heuristic, color=heuristic))+
     geom_histogram(aes(y=..density..), alpha=0.4,binwidth = 0.01,position = "identity")+
     geom_density(alpha=0.1,size=1.5)+
-    ## guides(fill=guide_legend(title="Heuristic code:"), color = FALSE)+
+    guides(fill=guide_legend(title="Heuristic code:"), color = guide_legend(title="Heuristic code:"))+
 #    ggtitle("Objective values distribution for different heuristics (original problem, 15vars 100k dataset, non-reduced instances)")+
     geom_vline(xintercept = 1.0, size=0.5, color="red", linetype="dashed")+
     annotate("text",x=1.0, y=4.2,label = "100% = exact greedy sifts heuristic", color="red")+
@@ -127,9 +135,11 @@ plt_dens =
     scale_x_continuous(
         "Objective value, relative to the result of exact-sifts heuristic (taken as 100%)",
         labels = scales::percent,
-        breaks = seq(min(df_time_o$obj),max(df_time_o$obj),length.out=11),
-        minor_breaks = seq(min(df_time_o$obj),max(df_time_o$obj),length.out=21)
+        breaks = seq(xmin,xmax,length.out=11),
+        minor_breaks = seq(xmin,xmax,length.out=21),
+        limits = c(xmin,xmax)
     )+
+#    coord_cartesian(xlim=c(xmin,xmax))+
     scale_fill_manual(values = c(
                           "orig_from_simpl_order" = "red",
                           "orig_from_simpl_red_order" = "blue",
@@ -138,12 +148,12 @@ plt_dens =
                           "orig_gswaps" = "pink",
                           "orig_true_minAB" = "lightblue"
                       ),labels = c(
-                            "orig_from_simpl_order" = "Simplified -> Branch&Bound ",
+                            "orig_from_simpl_order" = "Simplified -> Branch&Bound",
                             "orig_from_simpl_red_order" = "Layer-reduction -> Simplified -> Branch&Bound",
-                            "orig_g2sifts" = "Simplified -> Greedy sift pairs ",
-                            "orig_gsifts" = "Simplified -> Greedy sifts ",
-                            "orig_gswaps" = "Simplified -> Greedy swaps ",
-                            "orig_true_minAB" = parse(text = TeX("try $S_A$, $S_B$, choose the best one"))
+                            "orig_g2sifts" = "Simplified -> Greedy sift pairs",
+                            "orig_gsifts" = "Simplified -> Greedy sifts",
+                            "orig_gswaps" = "Simplified -> Greedy swaps",
+                            "orig_true_minAB" = latex_label
                       ))+
     scale_color_manual(values = c(
                            "orig_from_simpl_order" = "red",
@@ -153,14 +163,13 @@ plt_dens =
                            "orig_gswaps" = "pink",
                            "orig_true_minAB" = "lightblue"
                        ),labels = c(
-                            "orig_from_simpl_order" = "Simplified -> Branch&Bound ",
+                            "orig_from_simpl_order" = "Simplified -> Branch&Bound",
                             "orig_from_simpl_red_order" = "Layer-reduction -> Simplified -> Branch&Bound",
-                            "orig_g2sifts" = "Simplified -> Greedy sift pairs ",
-                            "orig_gsifts" = "Simplified -> Greedy sifts ",
-                            "orig_gswaps" = "Simplified -> Greedy swaps ",
-                            "orig_true_minAB" = parse(text = TeX("try $S_A$, $S_B$, choose the best one"))
-                      ),
-                      )+
+                            "orig_g2sifts" = "Simplified -> Greedy sift pairs",
+                            "orig_gsifts" = "Simplified -> Greedy sifts",
+                            "orig_gswaps" = "Simplified -> Greedy swaps",
+                            "orig_true_minAB" = latex_label
+                      ))+
     theme(
         legend.position = c(0.6, 0.8),
         legend.direction = "vertical",
@@ -174,84 +183,10 @@ plt_dens =
         panel.background = element_blank(),
         panel.grid.major = element_line(size = 0.5, linetype = 'solid',
                                         colour = "lightgrey"),
-        panel.grid.minor.x = element_line(size=0.25,linetype = 'solid', colour = "lightgrey"),
-        panel.grid.minor.y = element_line(size=0.25,linetype = 'solid', colour = "lightgrey")
+        panel.grid.minor.x = element_line(size=0.5,linetype = 'solid', colour = "lightgrey"),
+        panel.grid.minor.y = element_line(size=0.5,linetype = 'solid', colour = "lightgrey")
           )
     ## end of styling
 
-ggsave(opt$out,plt_dens, device = cairo_ps, width = 16, height = 10)
+gsave(opt$out,plt_dens, device = cairo_ps, width = 16, height = 10)
 
-## ## integrated figure
-## pfrom = 0.50
-## Nticks = 70
-## opt_percent = seq(from = pfrom, to = opt_xl,length.out = Nticks)
-## int_15var = data.frame(opt_perc = opt_percent,
-##                        orig_share = sapply(opt_percent, function(p){
-##                            return(sum(df_wide$orig_from_simpl_order_obj_rel_orig <= p) / nrow(df_wide))
-##                        }),
-##                        orig_red_share = sapply(opt_percent, function(p){
-##                            return(sum(df_wide$orig_from_simpl_red_order_obj_rel_orig <= p) / nrow(df_wide))
-##                        }),
-
-##                        orig_g2sifts_share = sapply(opt_percent, function(p){
-##                            return(sum(df_wide$orig_g2sifts_obj_rel_orig <= p) / nrow(df_wide))
-##                        }),
-##                        orig_gsifts_share = sapply(opt_percent, function(p){
-##                            return(sum(df_wide$orig_gsifts_obj_rel_orig <= p) / nrow(df_wide))
-##                        }),
-##                        orig_gswaps_share = sapply(opt_percent, function(p){
-##                            return(sum(df_wide$orig_gswaps_obj_rel_orig <= p) / nrow(df_wide))
-##                        }),
-##                        toMinAB_share =sapply(opt_percent, function(p){
-##                            return(sum(df_wide$orig_true_minAB_obj_rel_orig <= p) / nrow(df_wide))
-##                        })
-##                        )
-
-## int15_m = pivot_longer(int_15var, names_to = "heuristic", values_to = "shares",cols = -c("opt_perc"))
-## str(int15_m)
-
-## labels_df = data.frame(
-##     heuristic = c("orig_share",
-##                   "orig_red_share",
-##                   "orig_g2sifts_share",
-##                   "orig_gsifts_share",
-##                   "orig_gswaps_share",
-##                   "toMinAB_share"),
-##     labels = c("Simplified problem (BB, no reduction)",
-##                "Simplified problem (BB, prior reduction)",
-##                "Simplified problem (greedy 2-sifts)",
-##                "Simplified problem (greedy sifts)",
-##                "Simplified problem (greedy swaps)",
-##                "Best of {to A, to B} (original problem)"),
-##     stringsAsFactors = FALSE
-## )
-
-## int15_m = merge(x = int15_m, y = labels_df, by.x = "heuristic", by.y = "heuristic")
-
-## plt_integrated =
-##     ggplot(int15_m)+
-##     aes(x=opt_perc,y=shares,color=labels, linetype=labels, shape = labels)+
-##     geom_line()+
-##     geom_point()+
-##     theme_light()+
-##     theme(
-##         panel.grid.major = element_line(size = 0.5, linetype = 'solid',
-##                                         colour = "darkgrey"),
-##         axis.text.x = element_text(angle=90,hjust=1),
-##         legend.position = c(0.8,0.3)
-##         )+
-##     scale_x_continuous(
-##         "Objective value, relative to the greedy sifts heuristic for the original problem (taken as 100%)",
-##         breaks = seq(pfrom,opt_xl,length.out = Nticks),
-##         limits = c(pfrom,opt_xl),
-##         labels = scales::percent
-##     )+
-##     scale_y_continuous(
-##         "Share of instances with heuristic performance no worse than the objective along the Ox axis",
-##         breaks = seq(0,1.00,length.out = 50),
-##         labels = scales::number_format(accuracy = 0.01)
-##     )+
-##     ggtitle("Heuristics quality for the original problem (integral): 100k 15-vars non-reduced instances")+
-##     labs(color = "Target variable order", linetype = "Target variable order", shape = "Target variable order")
-
-## ggsave(paste(out_dir, "fig_orig_perf_15v_integr_obj.png",sep=""),plt_integrated, width = 10, height = 10)

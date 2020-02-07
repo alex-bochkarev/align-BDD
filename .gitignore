@@ -5,3 +5,4 @@ __pycache__
 instances/raw/R/*.bdd
 instances/raw/N/*.bdd
 instances/raw/*.bdd
+tmp
