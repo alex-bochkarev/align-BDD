@@ -11,6 +11,11 @@ library(tidyr)
 library(latex2exp)
 library(optparse)
 
+## Internal parameters for the figure
+SIMPL_BASE_COL = "simpl_BB_obj" # exact solution
+## Heuristics to show (codes)
+SHOW_HEU = c("all")
+
 ######################################################################
 ## unpack the command line arguments
 option_list = list(
@@ -35,56 +40,58 @@ if (is.null(opt$input) | is.null(opt$out)){
 
 df = read.csv(opt$input, stringsAsFactors = FALSE)
 
+df_legend = select(filter(df, num_type=="legend"), value,comment)
+df = filter(df, num_type != "legend")
+df$value = as.numeric(df$value)
+
 df_wide = pivot_wider(df,
                       id_cols = "instance",
                       names_from = "num_type",
                       values_from = "value"
                       )
 
-simpl_colnames = grep("^simpl.*_obj$",colnames(df_wide),value = TRUE)
+simpl_obj_cols = grep("^simpl.*_obj$",colnames(df_wide),value = TRUE)
+time_cols = grep(".+time$",colnames(df_wide),value = TRUE)
 
-guessing_power = data.frame(heuristic = grep(".*obj$",simpl_colnames,value = TRUE),stringsAsFactors = FALSE)
+if (SHOW_HEU[1] == "all"){
+    SHOW_HEU = c(grep("^simpl.*_obj$",simpl_obj_cols,value = TRUE))
+}
+
+guessing_power = data.frame(heuristic = grep(".*obj$",SHOW_HEU,value = TRUE),stringsAsFactors = FALSE)
+
 guessing_power$exact_guesses = sapply(guessing_power$heuristic, function(h){
-    sum(df_wide[[h]] == df_wide[[ "simpl_obj" ]])
+    sum(df_wide[[h]] == df_wide[[ SIMPL_BASE_COL ]])
 })
 
 guessing_power$good_guesses = sapply(guessing_power$heuristic, function(h){
-    sum(df_wide[[h]] <= df_wide[["simpl_obj"]]*opt$allowance)
+    sum(df_wide[[h]] <= df_wide[[ SIMPL_BASE_COL ]]*opt$allowance)
 })
 
 guessing_power = pivot_longer(guessing_power, cols = c("good_guesses","exact_guesses"), values_to = "no_insts", names_to = "guess_type")
 
+guessing_power = guessing_power %>%
+    mutate(
+        heuristic = substring(heuristic, 1, nchar(heuristic)-nchar("_obj"))
+    )
+
+guessing_power = merge(x=guessing_power, y=df_legend, by.x = "heuristic", by.y = "value")
+
 ######################################################################
 ## draw the figure
 plt =
-    ggplot(filter(guessing_power, heuristic %in% c(
-                                                 "simpl_obj",
-                                                 "simpl_heu_gswaps_obj",
-                                                 "simpl_heu_gsifts_obj",
-                                                 "simpl_heu_g2sifts_obj",
-                                                 "simpl_toAB_obj",
-                                                 "simpl_toR_obj"
-                                                 )),
-           aes(x=heuristic, y =no_insts, fill=guess_type))+
+    ggplot(guessing_power,
+           aes(x=comment, y =no_insts, fill=guess_type))+
     geom_bar(stat = "identity",position="dodge")+
     geom_text(aes(label=no_insts),vjust=-0.25, position = position_dodge(width = 0.9), size=7)+
     geom_hline(yintercept = nrow(df_wide), color="red",linetype="dotted", size=2)+
-    labs(y="Number of instances", x="Heuristic",fill="Solution quality:")+
-    scale_x_discrete(labels=c(
-                         "simpl_obj" = "Branch & bound",
-                         "simpl_heu_gswaps_obj" = "G. swaps",
-                         "simpl_heu_gsifts_obj" = "G. sifts",
-                         "simpl_heu_g2sifts_obj" = "G. sift pairs",
-                         "simpl_toAB_obj" = parse(text = TeX("Best of $S_A$, $S_B$")),
-                         "simpl_toR_obj" = "Random order"
-                     ))+
+    labs(y="Number of instances", x="Heuristic",fill="Objective value:")+
     scale_fill_manual(values = c(
                           "exact_guesses" = "blue",
                           "good_guesses" = "lightblue"
                       ),
                       labels = c(
-                          "exact_guesses" = "an optimum",
-                          "good_guesses" = "within 10% of optimum"
+                          "exact_guesses" = "optimal",
+                          "good_guesses" = paste("up to",opt$allowance,"of the optimum",sep=" ")
                       ),
                       )+
     theme(

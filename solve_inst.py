@@ -34,6 +34,7 @@ if __name__ == "__main__":
             log("-1,legend",heuristic[0], comment=heuristic[2])
         for heuristic in heu.ORIG_HEU:
             log("-1,legend",heuristic[0], comment=heuristic[2])
+        log("-1,legend,simpl_BB", comment="branch-and-bound")
         exit(0)
 
     inst_dir = args.inst_dir
@@ -99,72 +100,3 @@ if __name__ == "__main__":
                     t1 = time()
                     log(inst_id, heuristic[0]+"_time",t_add+(t1-t0),outfile=logf)
                     log(inst_id, heuristic[0]+"_obj",s,outfile=logf)
-
-                #     true_objA = bdd_A.size() + bdd_B.align_to(bdd_A.vars).size()
-                # true_objB = bdd_A.align_to(bdd_B.vars).size()+bdd_B.size()
-                # rnd_obj = np.random.permutation(bdd_A.vars)
-                # true_objR = bdd_A.align_to(rnd_obj).size()+bdd_B.align_to(rnd_obj).size()
-
-                # # inspired by simplified heuristics
-                # order_gswaps = order_gswaps.layer_var
-                # order_gsifts = order_gsifts
-                # order_g2sifts = order_g2sifts
-
-                # orig_obj_minAB = bdd_A.align_to(order_minAB).size() + bdd_B.align_to(order_minAB).size()
-                # orig_obj_gswaps = bdd_A.align_to(order_gswaps).size() + bdd_B.align_to(order_gswaps).size()
-                # orig_obj_gsifts = bdd_A.align_to(order_gsifts).size() + bdd_B.align_to(order_gsifts).size()
-                # orig_obj_g2sifts = bdd_A.align_to(order_g2sifts).size() + bdd_B.align_to(order_g2sifts).size()
-                # t1 = time()
-
-                # log(inst_id, "orig_from_simpl_checking_time",t1 - t0,outfile=logf)
-                # log(inst_id, "orig_from_simpl_order_obj",oo_simpl_order,outfile=logf)
-                # log(inst_id,"orig_toA_obj",true_objA,outfile=logf)
-                # log(inst_id,"orig_toB_obj",true_objB,outfile=logf)
-                # log(inst_id,"orig_toRandom_obj",true_objR,outfile=logf)
-
-                # log(inst_id, "orig_minAB_obj",orig_obj_minAB,outfile=logf)
-                # log(inst_id, "orig_gswaps_obj",orig_obj_gswaps,outfile=logf)
-                # log(inst_id, "orig_gsifts_obj",orig_obj_gsifts,outfile=logf)
-                # log(inst_id, "orig_g2sifts_obj",orig_obj_g2sifts,outfile=logf)
-
-                # ## original-problem heuristics
-                # t0 = time()
-
-                # Ap = deepcopy(bdd_A)
-                # Bp = deepcopy(bdd_B)
-                # bdd_A.gsifts(bdd_B)
-                # Bp.gsifts(Ap)
-                # oo_orig_gsifts = min(bdd_A.size() + bdd_B.size(),Ap.size()+Bp.size())
-                # t1 = time()
-                # log(inst_id, "orig_exact_gsifts_obj",oo_orig_gsifts,outfile=logf)
-                # log(inst_id, "orig_exact_gsifts_time",t1 - t0,outfile=logf)
-
-                # #--- reduction-related operations
-                # bdd_A = exact.BDD(); bdd_A.load(fnameA)
-                # bdd_B = exact.BDD(); bdd_B.load(fnameB)
-                # t0 = time()
-                # bdd_A.make_reduced()
-                # bdd_B.make_reduced()
-                # vs_A = simpl.VarSeq(bdd_A.vars, [len(l) for l in bdd_A.layers[:-1]])
-                # vs_B = simpl.VarSeq(bdd_B.vars, [len(l) for l in bdd_B.layers[:-1]])
-
-                # # find opts for varseq instance with BB-search
-                # b = bb.BBSearch(vs_A,vs_B)
-                # status = b.search()
-                # t1 = time()
-                # log(inst_id,"simpl_red_opt_status",1-int(status=="optimal"),outfile=logf, comment=status)
-
-                # simpl_obj = b.Ap_cand.size() + b.Bp_cand.size()
-                # log(inst_id, "simpl_red_bb_time",t1 - t0,outfile=logf)
-                # log(inst_id, "simpl_red_obj",simpl_obj,outfile=logf)
-
-                # # working with the original problem objective values
-                # t0 = time()
-                # o = b.Ap_cand.layer_var # optimal order found by the BBSearch
-                # bdd_Aa = bdd_A.align_to(o)
-                # bdd_Ba = bdd_B.align_to(o)
-                # orig_from_simpl_red_obj = bdd_Aa.size() + bdd_Ba.size()
-                # t1 = time()
-
-                # log(inst_id, "orig_from_simpl_red_checking_time",t1 - t0,outfile=logf)
-                # log(inst_id, "orig_from_simpl_red_order_obj",orig_from_simpl_red_obj,outfile=logf)

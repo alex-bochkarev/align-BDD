@@ -111,6 +111,20 @@ def simpl_gsifts_1p(A,B):
 def simpl_gsifts_2p(A,B):
     return simpl_greedy_sifts(A,B,passes=2)
 
+def simpl_gsifts_3p(A,B):
+    return simpl_greedy_sifts(A,B,passes=3)
+
+def simpl_5random(A,B):
+    best_size = -1
+    for i in range(5):
+        o = np.random.permutation(A.layer_var)
+        Ap = A.align_to(o)
+        Bp = B.align_to(o)
+        if best_size<0 or Ap.size()+Bp.size()<best_size:
+            best_size = Ap.size()+Bp.size()
+            best_o = copy(Ap.layer_var)
+    return [best_size, best_o]
+
 def simpl_greedy_2sifts(A,B, passes=-1):
     """finds a good alignment target with greedy pairs of sifts
 
@@ -309,7 +323,7 @@ def orig_5random(A,B,simpl):
         Bp.align_to(o,inplace=True)
         if best_size<0 or Ap.size()+Bp.size()<best_size:
             best_size = Ap.size()+Bp.size()
-            best_o = copy(A.vars)
+            best_o = copy(Ap.vars)
     return [best_size, 0, best_o]
 
 # heuristic structure
@@ -317,10 +331,12 @@ def orig_5random(A,B,simpl):
 SIMPL_HEU = [
     # ["simpl_toA",toA, "align to A"],
     # ["simpl_toB",toB, "align to B"],
-    ["simpl_minAB",minAB, "best of S_A and S_B"],
+    ["simpl_minAB",minAB, "best of A and B"],
     ["simpl_gswaps",simpl_greedy_swaps,"greedy swaps"],
+    ["simpl_5random",simpl_5random,"best of 5 random orders"],
     ["simpl_gsifts_1p",simpl_gsifts_1p,"greedy sifts (1 pass)"],
-    ["simpl_gsifts_2p",simpl_gsifts_2p,"greedy sifts (2 passes)"]
+    ["simpl_gsifts_2p",simpl_gsifts_2p,"greedy sifts (2 passes)"],
+    ["simpl_gsifts_3p",simpl_gsifts_3p,"greedy sifts (3 passes)"]
     # ["simpl_g2sifts_1p",simpl_g2sifts_1p,"greedy 2-sifts (1 pass)"]
 ]
 

@@ -16,7 +16,7 @@ library(optparse)
 ## Internal parameters for the figure
 ORIG_BASE_COL = "simpl_BB_obj" # col to divide by
 Nticks = 20
-Y_QUANTILE=0.75
+Y_QUANTILE=0.95 # show "2-sigmas"
 
 ## Heuristics to show (codes)
 SHOW_HEU = c("all")
@@ -93,7 +93,7 @@ xmin = 0
 xmax = max(df_time_o$time)
 plt_zoomed =
     ggplot(df_time_o,aes(x=time, y=obj , shape=comment,color=comment))+
-    geom_point(alpha=0.4, size=4)+
+    geom_point(alpha=0.6, size=4)+
     scale_y_continuous(
         "Objective value (percent of the exact min)",
         limits = c(ymin,ymax),
@@ -104,6 +104,7 @@ plt_zoomed =
         labels = scales::number_format(accuracy = 0.1),
         breaks = seq(xmin,xmax,length.out = Nticks)
     )+
+    scale_shape_manual(values=1:length(unique(df_time_o$comment)))+
     guides(
         color=guide_legend(title="Heuristic / method:"),
         shape=guide_legend(title="Heuristic / method:")
