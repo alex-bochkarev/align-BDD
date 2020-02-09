@@ -1,5 +1,5 @@
 #PBS -N BDDR
-#PBS -l select=1:ncpus=16:mem=16gb,walltime=21:00:00
+#PBS -l select=1:ncpus=16:mem=16gb,walltime=36:00:00
 #PBS -M abochka@clemson.edu
 #PBS -m abe
 
@@ -17,22 +17,13 @@ tgs=/home/abochka/bin/tgsend_st.sh
 cd /home/abochka/BDD/align-BDD
 
 echo $STARTMSG | $tg > /dev/null
-make -j16 clean-raw-inst PREF=$TMPDIR/
+make -j16 clean PREF=$TMPDIR/
 make -j16 prep_dirs PREF=$TMPDIR/
-echo making main figures... | $tg > /dev/null
+
+echo "Making main figures..." | $tg > /dev/null
 make -j16 figures PREF=$TMPDIR/ > make.log 2>&1
-echo making dataset summary figs... | $tg > /dev/null
-make -j16 summary_figs PREF=$TMPDIR/
-#echo making the scalability figure | $tg > /dev/null
-#make scalfig
-echo moving logfiles... | $tg > /dev/null
-make -j16 move_logs PREF=$TMPDIR/
-echo cleaning... | $tg > /dev/null
 
-make -j16 clean-tmp PREF=$TMPDIR/
-
-echo $ENDMSG | $tg > /dev/null
-echo showing resulting images: | $tg
+echo "done. Showing the resulting $(ls figures | wc -l) images:" | $tg
 cd figures
 ls | $tg > /dev/null
 for file in $(ls); do
@@ -40,5 +31,17 @@ for file in $(ls); do
     $tgi $file.png
     rm $file.png
 done
+
+echo "Moving logfiles..." | $tg > /dev/null
+make -j16 move_logs PREF=$TMPDIR/
+echo "Cleaning..". | $tg > /dev/null
+make -j16 clean-tmp PREF=$TMPDIR/
+echo "Main calculation done." | $tg > /dev/null
+echo "Making dataset summary figs..." | $tg > /dev/null
+make -j16 summary_figs PREF=$TMPDIR/
+#echo making the scalability figure | $tg > /dev/null
+#make scalfig
+
+echo $ENDMSG | $tg > /dev/null
 # deactivate the env
 source deactivate ab-local

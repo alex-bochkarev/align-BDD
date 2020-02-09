@@ -23,16 +23,16 @@ SCAL=./scal_test.py
 STATS=./gen_lsizes_stats.py
 ######################################################################
 ## Numerical parameters
-PAR_SOL=8
+PAR_SOL=16
 
 ### random dataset stats
-LW_n=50
+LW_n=10000
 LW_N=15
-LW_Ps=0.3 0.5 0.7
+LW_Ps=0.3 0.6 0.8
 
 ### dataset generation parameters:
 p=0.6# dataset generation parameter
-n=500# number of instances
+n=50000# number of instances
 N=15# number of variables per instance
 
 ### scalability figure
@@ -63,7 +63,7 @@ DTE=$(shell date +%F)
 
 all:
 
-figures: $(FIGS)/fig_sol_guessing_N.eps $(FIGS)/fig_BB_gaps_N.eps $(FIGS)/fig_sol_fireplace_N.eps $(FIGS)/fig_sol_obj_hist_N.eps $(FIGS)/fig_sol_obj_int_N.eps
+figures: $(FIGS)/fig_sol_guessing_N.eps $(FIGS)/fig_sol_guessing_R.eps $(FIGS)/fig_BB_gaps_N.eps $(FIGS)/fig_BB_gaps_R.eps $(FIGS)/fig_sol_fireplace_N.eps $(FIGS)/fig_sol_fireplace_R.eps $(FIGS)/fig_sol_obj_int_N.eps $(FIGS)/fig_sol_obj_int_R.eps hists
 
 scalfig: $(FIGS)/fig_scal.eps
 
