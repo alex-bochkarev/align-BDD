@@ -32,7 +32,7 @@ LW_Ps=0.3 0.6 0.8
 
 ### dataset generation parameters:
 p=0.6# dataset generation parameter
-n=50000# number of instances
+n=25000# number of instances
 N=15# number of variables per instance
 
 ### scalability figure
@@ -55,7 +55,7 @@ BB_FILES_N = $(addsuffix .log, $(addprefix $(LOGS)/part.BB_bounds_N., $(shell se
 
 DTE=$(shell date +%F)
 
-.PHONY: all figures clean-raw-inst clean-insts
+.PHONY: all figures clean-raw-inst clean-insts move-logs
 
 ######################################################################
 ## High-level recipes
@@ -68,6 +68,7 @@ figures: $(FIGS)/fig_sol_guessing_N.eps $(FIGS)/fig_sol_guessing_R.eps $(FIGS)/f
 scalfig: $(FIGS)/fig_scal.eps
 
 summary_figs: $(FIGS)/fig_summary_R.eps $(FIGS)/fig_summary_N.eps
+	touch summary_figs
 
 figures_R: $(FIGS)/fig_sol_guessing_R.eps $(FIGS)/fig_BB_gaps_R.eps $(FIGS)/fig_sol_fireplace_R.eps $(FIGS)/fig_sol_obj_hist_R.eps $(FIGS)/fig_sol_obj_int_R.eps
 
@@ -185,9 +186,10 @@ check_src:
 install_R_pkg:
 	Rscript ./aux/R_install_packages.R
 
-move_logs:
+move-logs:
 	@echo moving logs away from $(LOGS) to $(ARC)
 	tar --remove-files -czf $(ARC)/$(DTE)-logs.tar.gz $(LOGS)/*
+	touch move_logs
 
 # clean recipes
 clean-raw-inst:

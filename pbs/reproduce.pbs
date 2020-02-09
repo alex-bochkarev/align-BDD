@@ -4,7 +4,7 @@
 #PBS -m abe
 
 # boilerplate things
-STARTMSG="START: global makefile run"
+STARTMSG="START: global makefile run (updated BDD sifts -- now best of A, B)"
 ENDMSG="END: done with the global makefile run"
 
 module add anaconda3/5.1.0

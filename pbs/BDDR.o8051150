@@ -1,0 +1,62 @@
+Cleaning up raw instances in /local_scratch/pbs.8051150.pbs02//instances/raw...
+rm -f /local_scratch/pbs.8051150.pbs02//instances/raw/R/*.bdd
+Cleaning up log files...
+rm -f /local_scratch/pbs.8051150.pbs02//run_logs/*.log
+Cleaning up figures...
+rm -f ./figures/*.eps
+Cleaning up instance archives...
+rm -f ./data_archive/*.tar.gz
+rm -f /local_scratch/pbs.8051150.pbs02//instances/raw/R/*.list*
+rm -f /local_scratch/pbs.8051150.pbs02//instances/raw/N/*.bdd
+rm -f /local_scratch/pbs.8051150.pbs02//instances/raw/N/*.list*
+rm -rf /local_scratch/pbs.8051150.pbs02//instances/raw/ds_stats
+rm -f /local_scratch/pbs.8051150.pbs02//instances/raw/*.bdd
+mkdir -p /local_scratch/pbs.8051150.pbs02//instances/raw/R /local_scratch/pbs.8051150.pbs02//instances/raw/N
+mkdir -p /local_scratch/pbs.8051150.pbs02//run_logs
+ 
+ 
++------------------------------------------+ 
+| PALMETTO CLUSTER PBS RESOURCES REQUESTED | 
++------------------------------------------+ 
+ 
+mem=16gb,ncpus=16,walltime=36:00:00
+ 
+ 
++-------------------------------------+ 
+| PALMETTO CLUSTER PBS RESOURCES USED | 
++-------------------------------------+ 
+ 
+cpupercent=1615,cput=03:47:42,mem=2416336kb,ncpus=16,vmem=9394500kb,walltime=00:15:30
+ 
+ 
+Cleaning up raw instances in /local_scratch/pbs.8051150.pbs02//instances/raw...
+rm -f /local_scratch/pbs.8051150.pbs02//instances/raw/R/*.bdd
+Cleaning up log files...
+Cleaning up figures...
+rm -f /local_scratch/pbs.8051150.pbs02//run_logs/*.log
+Cleaning up instance archives...
+rm -f ./figures/*.eps
+rm -f ./data_archive/*.tar.gz
+rm -f /local_scratch/pbs.8051150.pbs02//instances/raw/R/*.list*
+rm -f /local_scratch/pbs.8051150.pbs02//instances/raw/N/*.bdd
+rm -f /local_scratch/pbs.8051150.pbs02//instances/raw/N/*.list*
+rm -rf /local_scratch/pbs.8051150.pbs02//instances/raw/ds_stats
+rm -f /local_scratch/pbs.8051150.pbs02//instances/raw/*.bdd
+mkdir -p /local_scratch/pbs.8051150.pbs02//instances/raw/R /local_scratch/pbs.8051150.pbs02//instances/raw/N
+mkdir -p /local_scratch/pbs.8051150.pbs02//run_logs
+{"ok":true,"result":{"message_id":783,"from":{"id":931364299,"is_bot":true,"first_name":"Wintermute","username":"ab_wintermute_bot"},"chat":{"id":122533105,"first_name":"Alex","last_name":"Bochkarev","username":"abochka","type":"private"},"date":1581275578,"text":"done. Showing the resulting 8 images:"}}{"ok":true,"result":{"message_id":785,"from":{"id":931364299,"is_bot":true,"first_name":"Wintermute","username":"ab_wintermute_bot"},"chat":{"id":122533105,"first_name":"Alex","last_name":"Bochkarev","username":"abochka","type":"private"},"date":1581275580,"photo":[{"file_id":"AgACAgIAAxkDAAIDEV5AWbxVZgIZBEQPkqQeAXimxUJ2AAJzrTEbJpEBSkA51XwkhL8ZccXCDwAEAQADAgADbQADn24DAAEYBA","file_unique_id":"AQADccXCDwAEn24DAAE","file_size":16322,"width":320,"height":200},{"file_id":"AgACAgIAAxkDAAIDEV5AWbxVZgIZBEQPkqQeAXimxUJ2AAJzrTEbJpEBSkA51XwkhL8ZccXCDwAEAQADAgADeAADoG4DAAEYBA","file_unique_id":"AQADccXCDwAEoG4DAAE","file_size":82029,"width":800,"height":500},{"file_id":"AgACAgIAAxkDAAIDEV5AWbxVZgIZBEQPkqQeAXimxUJ2AAJzrTEbJpEBSkA51XwkhL8ZccXCDwAEAQADAgADeQADnW4DAAEYBA","file_unique_id":"AQADccXCDwAEnW4DAAE","file_size":143349,"width":1152,"height":720}],"caption":"fig_BB_gaps_N.eps.png"}}{"ok":true,"result":{"message_id":786,"from":{"id":931364299,"is_bot":true,"first_name":"Wintermute","username":"ab_wintermute_bot"},"chat":{"id":122533105,"first_name":"Alex","last_name":"Bochkarev","username":"abochka","type":"private"},"date":1581275582,"photo":[{"file_id":"AgACAgIAAxkDAAIDEl5AWb7ghz91A3LLaD25_TWqWghMAAJ0rTEbJpEBSkqCrsVTGjmS8wLBDgAEAQADAgADbQAD7bACAAEYBA","file_unique_id":"AQAD8wLBDgAE7bACAAE","file_size":16583,"width":320,"height":200},{"file_id":"AgACAgIAAxkDAAIDEl5AWb7ghz91A3LLaD25_TWqWghMAAJ0rTEbJpEBSkqCrsVTGjmS8wLBDgAEAQADAgADeAAD7rACAAEYBA","file_unique_id":"AQAD8wLBDgAE7rACAAE","file_size":82736,"width":800,"height":500},{"file_id":"AgACAgIAAxkDAAIDEl5AWb7ghz91A3LLaD25_TWqWghMAAJ0rTEbJpEBSkqCrsVTGjmS8wLBDgAEAQADAgADeQAD67ACAAEYBA","file_unique_id":"AQAD8wLBDgAE67ACAAE","file_size":144657,"width":1152,"height":720}],"caption":"fig_BB_gaps_R.eps.png"}}{"ok":true,"result":{"message_id":787,"from":{"id":931364299,"is_bot":true,"first_name":"Wintermute","username":"ab_wintermute_bot"},"chat":{"id":122533105,"first_name":"Alex","last_name":"Bochkarev","username":"abochka","type":"private"},"date":1581275585,"photo":[{"file_id":"AgACAgIAAxkDAAIDE15AWcF-TXzGKUjpBmI95GOMVYONAAJ1rTEbJpEBSpzbXPaDiffi1GPBDwAEAQADAgADbQADBkwEAAEYBA","file_unique_id":"AQAD1GPBDwAEBkwEAAE","file_size":12754,"width":320,"height":200},{"file_id":"AgACAgIAAxkDAAIDE15AWcF-TXzGKUjpBmI95GOMVYONAAJ1rTEbJpEBSpzbXPaDiffi1GPBDwAEAQADAgADeAADB0wEAAEYBA","file_unique_id":"AQAD1GPBDwAEB0wEAAE","file_size":56109,"width":800,"height":500},{"file_id":"AgACAgIAAxkDAAIDE15AWcF-TXzGKUjpBmI95GOMVYONAAJ1rTEbJpEBSpzbXPaDiffi1GPBDwAEAQADAgADeQADBEwEAAEYBA","file_unique_id":"AQAD1GPBDwAEBEwEAAE","file_size":91467,"width":1152,"height":720}],"caption":"fig_sol_fireplace_N.eps.png"}}{"ok":true,"result":{"message_id":788,"from":{"id":931364299,"is_bot":true,"first_name":"Wintermute","username":"ab_wintermute_bot"},"chat":{"id":122533105,"first_name":"Alex","last_name":"Bochkarev","username":"abochka","type":"private"},"date":1581275588,"photo":[{"file_id":"AgACAgIAAxkDAAIDFF5AWcSRxQiKtw1jnyarpvA5Cy1rAAJ2rTEbJpEBSkDvIdokVnlP6CTBDgAEAQADAgADbQADwbQCAAEYBA","file_unique_id":"AQAD6CTBDgAEwbQCAAE","file_size":13365,"width":320,"height":200},{"file_id":"AgACAgIAAxkDAAIDFF5AWcSRxQiKtw1jnyarpvA5Cy1rAAJ2rTEbJpEBSkDvIdokVnlP6CTBDgAEAQADAgADeAADwrQCAAEYBA","file_unique_id":"AQAD6CTBDgAEwrQCAAE","file_size":57397,"width":800,"height":500},{"file_id":"AgACAgIAAxkDAAIDFF5AWcSRxQiKtw1jnyarpvA5Cy1rAAJ2rTEbJpEBSkDvIdokVnlP6CTBDgAEAQADAgADeQADv7QCAAEYBA","file_unique_id":"AQAD6CTBDgAEv7QCAAE","file_size":93118,"width":1152,"height":720}],"caption":"fig_sol_fireplace_R.eps.png"}}{"ok":true,"result":{"message_id":789,"from":{"id":931364299,"is_bot":true,"first_name":"Wintermute","username":"ab_wintermute_bot"},"chat":{"id":122533105,"first_name":"Alex","last_name":"Bochkarev","username":"abochka","type":"private"},"date":1581275589,"photo":[{"file_id":"AgACAgIAAxkDAAIDFV5AWcWOBDZFsa1DcVAtvJ_hIRifAAJ3rTEbJpEBSrH5UchEmD33JpjCDwAEAQADAgADbQADWUcEAAEYBA","file_unique_id":"AQADJpjCDwAEWUcEAAE","file_size":11158,"width":320,"height":200},{"file_id":"AgACAgIAAxkDAAIDFV5AWcWOBDZFsa1DcVAtvJ_hIRifAAJ3rTEbJpEBSrH5UchEmD33JpjCDwAEAQADAgADeAADWkcEAAEYBA","file_unique_id":"AQADJpjCDwAEWkcEAAE","file_size":37205,"width":800,"height":500},{"file_id":"AgACAgIAAxkDAAIDFV5AWcWOBDZFsa1DcVAtvJ_hIRifAAJ3rTEbJpEBSrH5UchEmD33JpjCDwAEAQADAgADeQADW0cEAAEYBA","file_unique_id":"AQADJpjCDwAEW0cEAAE","file_size":57799,"width":1152,"height":720}],"caption":"fig_sol_guessing_N.eps.png"}}{"ok":true,"result":{"message_id":790,"from":{"id":931364299,"is_bot":true,"first_name":"Wintermute","username":"ab_wintermute_bot"},"chat":{"id":122533105,"first_name":"Alex","last_name":"Bochkarev","username":"abochka","type":"private"},"date":1581275590,"photo":[{"file_id":"AgACAgIAAxkDAAIDFl5AWcbIc4RV2Rko-SzELBuQdlgxAAJ4rTEbJpEBSmNwNLeUblZSUcbCDwAEAQADAgADbQAD6WcDAAEYBA","file_unique_id":"AQADUcbCDwAE6WcDAAE","file_size":11156,"width":320,"height":200},{"file_id":"AgACAgIAAxkDAAIDFl5AWcbIc4RV2Rko-SzELBuQdlgxAAJ4rTEbJpEBSmNwNLeUblZSUcbCDwAEAQADAgADeAAD6mcDAAEYBA","file_unique_id":"AQADUcbCDwAE6mcDAAE","file_size":37335,"width":800,"height":500},{"file_id":"AgACAgIAAxkDAAIDFl5AWcbIc4RV2Rko-SzELBuQdlgxAAJ4rTEbJpEBSmNwNLeUblZSUcbCDwAEAQADAgADeQAD62cDAAEYBA","file_unique_id":"AQADUcbCDwAE62cDAAE","file_size":58026,"width":1152,"height":720}],"caption":"fig_sol_guessing_R.eps.png"}}{"ok":true,"result":{"message_id":791,"from":{"id":931364299,"is_bot":true,"first_name":"Wintermute","username":"ab_wintermute_bot"},"chat":{"id":122533105,"first_name":"Alex","last_name":"Bochkarev","username":"abochka","type":"private"},"date":1581275592,"photo":[{"file_id":"AgACAgIAAxkDAAIDF15AWcjst3cE-OWu2lBJYm9T1vTZAAJ1sTEbg4UBSnwC-LjFbNvwjGPLDgAEAQADAgADbQADAQsCAAEYBA","file_unique_id":"AQADjGPLDgAEAQsCAAE","file_size":29555,"width":320,"height":320},{"file_id":"AgACAgIAAxkDAAIDF15AWcjst3cE-OWu2lBJYm9T1vTZAAJ1sTEbg4UBSnwC-LjFbNvwjGPLDgAEAQADAgADeAADAgsCAAEYBA","file_unique_id":"AQADjGPLDgAEAgsCAAE","file_size":149590,"width":720,"height":720}],"caption":"fig_sol_obj_int_N.eps.png"}}{"ok":true,"result":{"message_id":792,"from":{"id":931364299,"is_bot":true,"first_name":"Wintermute","username":"ab_wintermute_bot"},"chat":{"id":122533105,"first_name":"Alex","last_name":"Bochkarev","username":"abochka","type":"private"},"date":1581275593,"photo":[{"file_id":"AgACAgIAAxkDAAIDGF5AWck37AxrVJ42_CtY2wF4RlasAAJ5rTEbJpEBSpkdHSPy_IhjkHJcDwAEAQADAgADbQAD4k4FAAEYBA","file_unique_id":"AQADkHJcDwAE4k4FAAE","file_size":29404,"width":320,"height":320},{"file_id":"AgACAgIAAxkDAAIDGF5AWck37AxrVJ42_CtY2wF4RlasAAJ5rTEbJpEBSpkdHSPy_IhjkHJcDwAEAQADAgADeAAD404FAAEYBA","file_unique_id":"AQADkHJcDwAE404FAAE","file_size":149200,"width":720,"height":720}],"caption":"fig_sol_obj_int_R.eps.png"}} 
+ 
++------------------------------------------+ 
+| PALMETTO CLUSTER PBS RESOURCES REQUESTED | 
++------------------------------------------+ 
+ 
+mem=16gb,ncpus=16,walltime=36:00:00
+ 
+ 
++-------------------------------------+ 
+| PALMETTO CLUSTER PBS RESOURCES USED | 
++-------------------------------------+ 
+ 
+cpupercent=1600,cput=39:27:10,mem=2456324kb,ncpus=16,vmem=8868524kb,walltime=02:42:38
+ 
+ 
