@@ -21,19 +21,22 @@ BBLOG=./log_bb.py
 PP=./post_processing
 SCAL=./scal_test.py
 STATS=./gen_lsizes_stats.py
+CMP_LBs=./compare_simpl_LBs.py
+
 ######################################################################
 ## Numerical parameters
 PAR_SOL=8
 
 ### random dataset stats
-LW_n=50
+LW_n=1000
 LW_N=15
-LW_Ps=0.3 0.5 0.7
+LW_Ps=0.3 0.6 0.9
 
 ### dataset generation parameters:
 p=0.6# dataset generation parameter
-n=500# number of instances
+n=20000# number of instances
 N=15# number of variables per instance
+n_LBs=2000
 
 ### scalability figure
 SCAL_N=5 6 7 8 9 10 12 13 14 15 16 17 18 19 20 22 25 28
@@ -63,13 +66,14 @@ DTE=$(shell date +%F)
 
 all:
 
-figures: $(FIGS)/fig_sol_guessing_N.eps $(FIGS)/fig_BB_gaps_N.eps $(FIGS)/fig_sol_fireplace_N.eps $(FIGS)/fig_sol_obj_hist_N.eps $(FIGS)/fig_sol_obj_int_N.eps
+figures: figures_R figures_N
 
 scalfig: $(FIGS)/fig_scal.eps
 
 summary_figs: $(FIGS)/fig_summary_R.eps $(FIGS)/fig_summary_N.eps
 
 figures_R: $(FIGS)/fig_sol_guessing_R.eps $(FIGS)/fig_BB_gaps_R.eps $(FIGS)/fig_sol_fireplace_R.eps $(FIGS)/fig_sol_obj_hist_R.eps $(FIGS)/fig_sol_obj_int_R.eps
+figures_N: $(FIGS)/fig_sol_guessing_N.eps $(FIGS)/fig_BB_gaps_N.eps $(FIGS)/fig_sol_fireplace_N.eps $(FIGS)/fig_sol_obj_hist_N.eps $(FIGS)/fig_sol_obj_int_N.eps
 
 hists: $(FIGS)/fig_sol_obj_hist_R.eps $(FIGS)/fig_sol_obj_hist_N.eps
 	touch hists
@@ -100,6 +104,15 @@ $(FIGS)/fig_summary_N.eps: DS_FLAG=N
 $(FIGS)/fig_summary_%.eps: $(LOGS)/lwidths_%.log $(PP)/fig_summary.R
 	Rscript $(PP)/fig_summary.R -i $< -o $@
 
+$(FIGS)/LB.eps: $(LOGS)/LBs.log $(PP)/fig_LBs.R
+	Rscript $(PP)/fig_LBs.R -i $< -o $@
+
+$(LOGS)/LBs.log: $(CMP_LBs)
+	mkdir -p $(INST)/LBs && \
+	python ./gen_BDD_pair.py -n $(n_LBs) -v $N -p $p -RU $(INST)/LBs/ > $(LOGS)/$(DTE)_gen_$(N)var_LBs.log && \
+	ls $(INST)/LBs | grep -Po "A\\K[^\\.]*" > $(INST)/LBs/instances.list && \
+	python $(CMP_LBs) -d $(INST)/LBs/ -l $(INST)/LBs/instances.list > $@
+
 ## Generating and solving instances
 $(INST)/%/instances.list:
 	@echo Preparing the $*-instances dataset...
@@ -112,7 +125,7 @@ $(INST)/%/instances.list:
 
 # was: ls $(INST)/$*/A*.bdd | grep -Po "$(INST)/$*/A\\K[^\\.]*" > $@ &&\
 # basename -a `ls $(INST)/$*/A*.bdd` | sed -n -e's/^A//p' | sed -n -e's/\.bdd//p' > $@ && \
-# 
+#
 ######################################################################
 ## Main calculations (creating .log-files)
 .SECONDEXPANSION:
