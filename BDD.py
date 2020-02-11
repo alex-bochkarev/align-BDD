@@ -303,7 +303,12 @@ class BDD(object):
             active_var = self.vars[i]
             best_size = self.size() + with_whom.size()
 
+            cur_size = best_size
+
             for j in range(i+1,N):
+                if self.size()+with_whom.size() > cur_size*100:
+                    break
+
                 self.swap_up(j)
                 with_whom.swap_up(j)
                 cur_size = self.size()+with_whom.size()

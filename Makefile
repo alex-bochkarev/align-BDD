@@ -22,7 +22,7 @@ PP=./post_processing
 SCAL=./scal_test.py
 STATS=./gen_lsizes_stats.py
 CMP_LBs=./compare_simpl_LBs.py
-
+PSCAL=./BB_orig_solve.py
 ######################################################################
 ## Numerical parameters
 PAR_SOL=16
@@ -39,8 +39,8 @@ N=15# number of variables per instance
 n_LBs=500
 
 ### scalability figure
-SCAL_N=5 6 7 8 9 10 12 13 14 15 16 17 18 19 20 22 25 28
-SCAL_K=10
+SCAL_N=5 6 7 8 9 10 12 13 14 15 #16 17 18 19 #20 22 25 28
+SCAL_K=100
 SCAL_P=$(p)
 SCAL_R=N
 ######################################################################
@@ -56,7 +56,11 @@ SOL_FILES_N = $(addsuffix .log, $(addprefix $(LOGS)/part.solved_N., $(shell seq 
 BB_FILES_R = $(addsuffix .log, $(addprefix $(LOGS)/part.BB_bounds_R., $(shell seq -f %02g 0 $(MAX_I))))
 BB_FILES_N = $(addsuffix .log, $(addprefix $(LOGS)/part.BB_bounds_N., $(shell seq -f %02g 0 $(MAX_I))))
 
+PSCAL_FILES = $(addsuffix .log, $(addprefix $(LOGS)/part.scal., $(shell seq -f %02g 0 $(MAX_I))))
+
 DTE=$(shell date +%F)
+
+MAX_I=$(shell expr $(PAR_SOL) - 1 )
 
 .PHONY: all figures clean-raw-inst clean-insts move-logs
 
@@ -96,7 +100,7 @@ $(FIGS)/fig_BB_%_R.eps: $(LOGS)/BB_bounds_R.log $(PP)/fig_BB_%.R
 $(FIGS)/fig_BB_%_N.eps: $(LOGS)/BB_bounds_N.log $(PP)/fig_BB_%.R
 	$(BB_RECIPE)
 
-$(FIGS)/fig_scal.eps: $(LOGS)/scalability.log $(PP)/fig_scal.R
+$(FIGS)/fig_scal.eps: $(LOGS)/scal_par.log $(PP)/fig_scal.R
 	Rscript $(PP)/fig_scal.R -i $< -o $@
 
 $(FIGS)/fig_summary_R.eps: DS_FLAG=R
@@ -105,6 +109,42 @@ $(FIGS)/fig_summary_N.eps: DS_FLAG=N
 $(FIGS)/fig_summary_%.eps: $(LOGS)/lwidths_%.log $(PP)/fig_summary.R
 	Rscript $(PP)/fig_summary.R -i $< -o $@
 
+######################################################################
+## scalability figure -- parallel implementation
+$(LOGS)/scal_par.log: $(PSCAL_FILES)
+	python $(PSCAL) --header > $@ && \
+	tail -qn +2 $(PSCAL_FILES) >> $@ && \
+	rm -rf $(PSCAL_FILES)
+
+$(LOGS)/part.scal.%.log: $(INST)/scal/instances.list
+	python $(PSCAL) -i $<.$* -o $@ -d $(INST)/scal/
+
+$(INST)/scal/instances.list: ./gen_BDD_pair.py
+	@echo Preparing instances for the scalability set...
+	i=0 && \
+	rm -rf $(INST)/scal && \
+	mkdir -p $(INST)/scal && \
+	for S in $(SCAL_N); do \
+		python ./gen_BDD_pair.py -s $$(( ${SCAL_K} * $${i} )) -n $(SCAL_K) -v $$S -p $p -RU $(INST)/scal/ > /dev/null &&\
+		i=$$(( $${i} + 1 ));\
+	done && \
+	ls $(INST)/scal | grep -Po "A\\K[^\\.]*" > $@ && \
+	split -d -nl/$(PAR_SOL) $@ $(INST)/scal/instances.list.
+
+# was: ls $(INST)/$*/A*.bdd | grep -Po "$(INST)/$*/A\\K[^\\.]*" > $@ &&\
+# basename -a `ls $(INST)/$*/A*.bdd` | sed -n -e's/^A//p' | sed -n -e's/\.bdd//p' > $@ && \
+#
+######################################################################
+## Main calculations (creating .log-files)
+.SECONDEXPANSION:
+$(LOGS)/solved_%.log: $$(SOL_FILES_%)
+	python $(SOLVE) --header > $@ && \
+	tail -qn +2 $(SOL_FILES_$*) >> $@
+
+
+$(LOGS)/part.solved_R.%.log: $(INST)/R/instances.list $(SOLVE)
+	python $(SOLVE) -i $<.$* -o $@ -d $(INST)/R/
+######################################################################
 $(FIGS)/LB.eps: $(LOGS)/LBs.log $(PP)/fig_LBs.R
 	Rscript $(PP)/fig_LBs.R -i $< -o $@
 

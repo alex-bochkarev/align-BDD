@@ -34,19 +34,20 @@ infile = opt$input
 
 df = read.csv(infile, stringsAsFactors = FALSE)
 df$comment = NULL
+df = filter(df,N>0)
+df$value = as.numeric(df$value)
 
 df = pivot_wider(df, id_cols = c("instance","N"), names_from = num_type, values_from = value)
 
 df = df %>%
     mutate(
-        aux_time = BBsearch_time + alig_to_order_time,
-        rel_obj = orig_aux_obj / orig_sifts_red_obj
+        rel_obj = orig_simpl_obj / orig_gsifts1p_obj
     )
 
 p1 =
 ggplot(df)+
-    geom_point(aes(x=N, y = log(aux_time), color="Auxiliary problem / heuristic"), size=5, alpha=0.7)+
-    geom_point(aes(x=N, y = log(orig_sifts_red_time), color="BDD sifts"), size=5, alpha=0.7)+
+    geom_point(aes(x=N, y = log(orig_simpl_time), color="Auxiliary problem / heuristic"), size=5, alpha=0.7)+
+    geom_point(aes(x=N, y = log(orig_gsifts1p_time), color="BDD sifts"), size=5, alpha=0.7)+
     scale_x_continuous(
         breaks = seq(min(df$N),max(df$N),by = 2),
         minor_breaks = seq(min(df$N),max(df$N), by=1)
@@ -69,9 +70,14 @@ ggplot(df)+
     )
 
 leg = "No. of variables (N):"
+Nmin = min(df$N)
+Nmax = max(df$N)
+Ns = unique(df$N)
+Nmed = Ns[which.min(abs(Ns - median(Ns)))]
+
 p2 =
-ggplot(filter(df, N %in% c(5,15,28)), aes(x=rel_obj, fill=as.factor(N), color=as.factor(N)))+
-    geom_histogram(alpha=0.5)+
+ggplot(filter(df, N %in% c(Nmin,Nmed,Nmax)), aes(x=rel_obj, fill=as.factor(N), color=as.factor(N)))+
+    geom_histogram(alpha=0.5,position="identity")+
     geom_density(alpha=0.1,size=1.5)+
     guides(fill=guide_legend(title=leg), color = guide_legend(title=leg))+
     theme(
@@ -81,7 +87,7 @@ ggplot(filter(df, N %in% c(5,15,28)), aes(x=rel_obj, fill=as.factor(N), color=as
         legend.position = c(0.7,0.8),
         )+
     scale_x_continuous(
-        "(b) Objective (rel./ exact sifts), no more than",
+        "(b) Relative objective, no more than",
         label = scales::percent,
         breaks = seq(min(df$rel_obj), max(df$rel_obj), length.out = 11)
     )+
