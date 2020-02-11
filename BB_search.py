@@ -73,6 +73,68 @@ def nsearch(A,B,track=False):
 ######################################################################
 
 ######################################################################
+## Lower bound calculations
+def LB_current(A,B):
+    """current size (before the alignment)"""
+    return A.size()+B.size()
+
+def LB_first_aligned(A,B):
+    """min current size after aligning the first element only"""
+    return min(A.size()+B.slide(A.layer_var[0],0).size(), A.slide(B.layer_var[0],0).size()+B.size())
+
+def LB_last_aligned(A,B):
+    """min current size after aligning the last element (enumeration)"""
+    N = len(A)-1
+    return min([A.slide(A.layer_var[i],N).size() + B.slide(A.layer_var[i],N).size() for i in range(N+1)])
+
+def LB_by_level(A,B):
+    N = len(A)
+    LB = LB_current(A,B)
+
+    for i in range(N-1):
+        for j in range(i+1,N):
+            Ai = A.layer_var[i]; Aj = A.layer_var[j]
+            if B.p[Ai] > B.p[Aj]:
+                # it is an inversion
+                LB += min(
+                    2*A.n[i] - A.n[i+1],
+                    2*B.var_size(Aj) - B.n[ B.p[Aj]+1 ]
+                )
+
+    return LB
+
+def LB_by_level_complicated(A,B):
+    N = len(A)
+    LB = LB_current(A,B)
+
+    for i in range(N-1):
+        Bs = []
+        for j in range(i+1, N):
+            Ai = A.layer_var[i]; Aj = A.layer_var[j]
+            if B.p[Ai] > B.p[Aj]:
+                # an inversion
+                Bs.append(2*B.var_size(Aj) - B.n[ B.p[Aj]+1 ])
+        B_srt = -1*np.sort(-1 * np.array(Bs))
+        A_srt = np.array([A.n[i] * (2**k) - A.n[i+k] for k in range(1,len(Bs)+1)])
+        LB += np.sum(np.minimum(A_srt,B_srt))
+    return LB
+
+def LB_lvl_compl_symm(A,B):
+    return max(LB_by_level_complicated(A,B), LB_by_level_complicated(B,A))
+
+def LB_lvl_symm(A,B):
+    return max(LB_by_level(A,B), LB_by_level(B,A))
+
+# CODE - FUNC - LEGEND
+LOWER_BOUNDS = [
+    ["LB_first",LB_first_aligned,"min size first element aligned"],
+    ["LB_last",LB_last_aligned,"min size last element aligned"],
+    ["LB_levels",LB_by_level,"inversions-driven LB"],
+#    ["LB_levels_amd",LB_by_level_complicated,"inversions-driven LB (amd)"],
+    ["LB_lvl_symm",LB_lvl_symm,"inversion-driven (symmetric)"]
+#    ["LB_lvl_symm_amd",LB_lvl_compl_symm,"inversion-driven (amd, symm)"]
+]
+######################################################################
 ## auxiliary functions
 
 ###

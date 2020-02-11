@@ -68,9 +68,12 @@ ggplot(df)+
         panel.grid.minor.y = element_line(size=0.25,linetype = 'solid', colour = "lightgrey")
     )
 
+leg = "No. of variables (N):"
 p2 =
-ggplot(df)+
-    geom_histogram(aes(x = rel_obj), fill="blue")+
+ggplot(filter(df, N %in% c(5,15,28)), aes(x=rel_obj, fill=as.factor(N), color=as.factor(N)))+
+    geom_histogram(alpha=0.5)+
+    geom_density(alpha=0.1,size=1.5)+
+    guides(fill=guide_legend(title=leg), color = guide_legend(title=leg))+
     theme(
         panel.grid.major = element_line(size = 0.5, linetype = 'solid',
                                         color = "darkgrey"),
