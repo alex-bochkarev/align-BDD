@@ -108,25 +108,31 @@ def LB_by_level_complicated(A,B):
     LB = LB_current(A,B)
 
     for i in range(N-1):
-        slide_up = 0
+        Bs = []
         for j in range(i+1, N):
             Ai = A.layer_var[i]; Aj = A.layer_var[j]
             if B.p[Ai] > B.p[Aj]:
                 # an inversion
-                b1 = A.n[i]*np.sum([2**i for i in range(1,slide_up+1 +1)]) - np.sum(A.n[(i+1):(i+1+slide_up +1)])
-                b2 = 2*B.var_size(Aj) -B.n[ B.p[Aj]+1 ]
-                if b1<b2:
-                    slide_up += 1
-                    LB += b1
-                else:
-                    LB += b2
-        return LB
-                    # CODE - FUNC - LEGEND
+                Bs.append(2*B.var_size(Aj) - B.n[ B.p[Aj]+1 ])
+        B_srt = -1*np.sort(-1 * np.array(Bs))
+        A_srt = np.array([A.n[i] * (2**k) - A.n[i+k] for k in range(1,len(Bs)+1)])
+        LB += np.sum(np.minimum(A_srt,B_srt))
+    return LB
+
+def LB_lvl_compl_symm(A,B):
+    return max(LB_by_level_complicated(A,B), LB_by_level_complicated(B,A))
+
+def LB_lvl_symm(A,B):
+    return max(LB_by_level(A,B), LB_by_level(B,A))
+
+# CODE - FUNC - LEGEND
 LOWER_BOUNDS = [
     ["LB_first",LB_first_aligned,"min size first element aligned"],
     ["LB_last",LB_last_aligned,"min size last element aligned"],
     ["LB_levels",LB_by_level,"inversions-driven LB"],
-    ["LB_levels_amd",LB_by_level_complicated,"inversions-driven LB (amd)"]
+#    ["LB_levels_amd",LB_by_level_complicated,"inversions-driven LB (amd)"],
+    ["LB_lvl_symm",LB_lvl_symm,"inversion-driven (symmetric)"]
+#    ["LB_lvl_symm_amd",LB_lvl_compl_symm,"inversion-driven (amd, symm)"]
 ]
 ######################################################################
 ## auxiliary functions
