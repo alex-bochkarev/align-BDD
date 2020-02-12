@@ -39,8 +39,8 @@ N=15# number of variables per instance
 n_LBs=1000
 
 ### scalability figure
-SCAL_N=5 6 7 8 9 10 12 13 14 15 #16 17 18 19 #20 22 25 28
-SCAL_K=100
+SCAL_N=5 6 7 8 9 10 12 13 14 15 16 17 18 19 20 #22 25 28
+SCAL_K=500
 SCAL_P=$(p)
 SCAL_R=N
 ######################################################################
