@@ -209,7 +209,8 @@ class SearchNode(at.NodeMixin):
         # b2 = min([self.A.slide(self.A.layer_var[i],N).size() + self.B.slide(self.A.layer_var[i],N).size() for i in range(len(self.A))])
 
         # APPROACH 3: the first element should be aligned (either a1, or a2)
-        return min([self.A.size()+self.B.slide(self.A.layer_var[0],0).size(), self.B.size()+self.A.slide(self.B.layer_var[0],0).size()])
+        # return min([self.A.size()+self.B.slide(self.A.layer_var[0],0).size(), self.B.size()+self.A.slide(self.B.layer_var[0],0).size()])
+        return LB_by_level(self.A,self.B)
 
 
     # a special method that tells which node to choose

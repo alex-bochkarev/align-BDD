@@ -111,6 +111,9 @@ def simpl_gsifts_1p(A,B):
 def simpl_gsifts_2p(A,B):
     return simpl_greedy_sifts(A,B,passes=2)
 
+def simpl_gsifts_inf(A,B):
+    return simpl_greedy_sifts(A,B,passes=-1)
+
 def simpl_gsifts_3p(A,B):
     return simpl_greedy_sifts(A,B,passes=3)
 
@@ -343,7 +346,7 @@ SIMPL_HEU = [
     ["simpl_5random",simpl_5random,"best of 5 random orders"],
     ["simpl_gsifts_1p",simpl_gsifts_1p,"greedy sifts (1 pass)"],
     ["simpl_gsifts_2p",simpl_gsifts_2p,"greedy sifts (2 passes)"],
-    ["simpl_gsifts_3p",simpl_gsifts_3p,"greedy sifts (3 passes)"]
+    ["simpl_gsifts_inf",simpl_gsifts_inf,"greedy sifts (all)"]
     # ["simpl_g2sifts_1p",simpl_g2sifts_1p,"greedy 2-sifts (1 pass)"]
 ]
 

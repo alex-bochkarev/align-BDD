@@ -25,7 +25,7 @@ CMP_LBs=./compare_simpl_LBs.py
 PSCAL=./BB_orig_solve.py
 ######################################################################
 ## Numerical parameters
-PAR_SOL=16
+PAR_SOL=8
 
 ### random dataset stats
 LW_n=1000
@@ -34,7 +34,7 @@ LW_Ps=0.3 0.6 0.9
 
 ### dataset generation parameters:
 p=0.6# dataset generation parameter
-n=20000# number of instances
+n=5000# number of instances
 N=15# number of variables per instance
 n_LBs=500
 
