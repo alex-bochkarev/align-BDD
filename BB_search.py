@@ -129,9 +129,9 @@ def LB_lvl_symm(A,B):
 LOWER_BOUNDS = [
     ["LB_first",LB_first_aligned,"min size first element aligned"],
     ["LB_last",LB_last_aligned,"min size last element aligned"],
-    ["LB_levels",LB_by_level,"inversions-driven LB"],
+    ["LB_levels",LB_by_level,"inversions-driven LB"]
 #    ["LB_levels_amd",LB_by_level_complicated,"inversions-driven LB (amd)"],
-    ["LB_lvl_symm",LB_lvl_symm,"inversion-driven (symmetric)"]
+#    ["LB_lvl_symm",LB_lvl_symm,"inversion-driven (symmetric)"]
 #    ["LB_lvl_symm_amd",LB_lvl_compl_symm,"inversion-driven (amd, symm)"]
 ]
 ######################################################################
