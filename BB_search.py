@@ -141,9 +141,9 @@ LOWER_BOUNDS = [
 # DOT graph (tree) export-specific
 # adding labels (for DOT export)
 def nodenamefunc(node):
-    fixed_A_start = len(node.A)-node.depth
-    fixed_B_start = len(node.B)-node.depth
-    return "{}[{}]\nA:{}{}({: >3d})\nB:{}{}({: >3d})\nSize:{}, UB:{}, LB:{}".format(node.name, node.status, node.A.layer_var[:fixed_A_start],node.A.layer_var[fixed_A_start:],node.A.size(), node.B.layer_var[:fixed_B_start],node.B.layer_var[fixed_B_start:], node.B.size(),node.size(), node.calculate_UB(), node.calculate_LB())
+    fixed_A_start = node.A_tail_start #len(node.A)-node.depth
+    fixed_B_start = node.B_tail_start #len(node.B)-node.depth
+    return "{}[{}]\nA:{}{}({: >3d})\nB:{}{}({: >3d})\n|A|+|B|={}, LB:{}, UB:{}".format(node.name, node.status, node.A.layer_var[:fixed_A_start],node.A.layer_var[fixed_A_start:],node.A.size(), node.B.layer_var[:fixed_B_start],node.B.layer_var[fixed_B_start:], node.B.size(),node.size(), node.LB, node.UB)
 
 def nodeattrfunc(node):
     nlabel = "xlabel=\"Tree: LB={}, UB={}, obj={}\"".format(node.tree_LB,node.tree_UB, node.best_obj)
@@ -183,6 +183,8 @@ class SearchNode(at.NodeMixin):
         self.tree_UB = None
         self.tree_LB = None
         self.best_obj = None
+        self.LB = None
+        self.UB = None
 
     def size(self):
         return self.A.size() + self.B.size()
@@ -190,27 +192,36 @@ class SearchNode(at.NodeMixin):
     # upper bound at the current node
     def calculate_UB(self, t='fast'):
         if self.status == "T":
-            return self.A.size()+self.B.size()
+            self.UB = self.A.size()+self.B.size()
+            order = self.A.layer_var
         else:
             if t=='fast':
-                return min(self.A.size()+self.B.align_to(self.A).size(), self.B.size()+self.A.align_to(self.B).size())
+                Asize=self.A.size()+self.B.align_to(self.A).size()
+                Bsize=self.B.size()+self.A.align_to(self.B).size()
+                if Asize <= Bsize:
+                    self.UB = Asize
+                    order = self.A.layer_var
+                else:
+                    self.UB = Bsize
+                    order = self.B.layer_var
             else:
                 lA,lB = greedy_fix(self.A, self.B)
                 rA,rB = greedy_fix(self.B, self.A)
-                return min(lA.size()+lB.size(), rA.size()+rB.size())
+                sl = lA.size()+lB.size(); sr = rA.size()+rB.size()
+                if sl <= sr:
+                    self.UB = sl
+                    order = lA.layer_var
+                else:
+                    self.UB = sr
+                    order = rA.layer_var
+
+        return [self.UB, order]
 
     # lower bound at the current node
     def calculate_LB(self):
-        # APPROACH 1: current size
-        # b1 = self.A.size() + self.B.size() # just the current size -- since it's non-decreasing
-
-        # APPROACH 2: the last element should be aligned. At least the cheapest one
-        # N = len(self.A)-1
-        # b2 = min([self.A.slide(self.A.layer_var[i],N).size() + self.B.slide(self.A.layer_var[i],N).size() for i in range(len(self.A))])
-
-        # APPROACH 3: the first element should be aligned (either a1, or a2)
-        # return min([self.A.size()+self.B.slide(self.A.layer_var[0],0).size(), self.B.size()+self.A.slide(self.B.layer_var[0],0).size()])
-        return LB_by_level(self.A,self.B)
+        """calculates a lower bound for the current search tree node"""
+        self.LB = LB_by_level(self.A,self.B) # inversions-driven bound
+        return self.LB
 
 
     # a special method that tells which node to choose
@@ -229,37 +240,41 @@ class BBSearch:
         self.B = B
         self.step = 0
         self.tree_size = 1
-        self.LB = A.size() + B.size()
         self.verbose = False
 
-        if (A.size()+B.align_to(A).size() < A.align_to(B).size()+B.size()):
-            self.Ap_cand = A
-            self.Bp_cand = B.align_to(A)
-        else:
-            self.Ap_cand = A.align_to(B)
-            self.Bp_cand = B
-
-        self.node_cand = None
-
-        self.UB = self.Ap_cand.size() + self.Bp_cand.size()
 
         self.logs_UB = []
         self.logs_LB = []
         self.logs_step = []
 
         self.logging = False
-        # self.logs_step.append(0)
-        # self.logs_UB.append(self.UB)
-        # self.logs_LB.append(self.LB)
 
         self.status = "initialized"
 
         ## create the root node
         self.root = SearchNode("root", None, A,B,len(A),len(B),A,B)
-        self.open_nodes = [(self.LB, self.root)]
-        heap.heapify(self.open_nodes) # create a heap, key = lower bound
+
+        self.LB = self.root.calculate_LB()
+        self.UB, order = self.root.calculate_UB('slow')
+        self.Ap_cand = self.A.align_to(order)
+        self.Bp_cand = self.B.align_to(order)
+        self.node_cand = None
+        self.cand_parent = None
+
+        self.open_nodes = []
+
+        if self.LB == self.UB:
+            # a hypothetical case of good bounds
+            opt_node = SearchNode("step {}, node {}: UB=LB".format(step, self.tree_size),newnode,[],[],0,0,self.A.align_to(order), self.B.align_to(order))
+            opt_node.status = "O"
+            self.status = "optimal" # no need to proceed
+        else:
+            self.open_nodes = [(self.LB, self.root)]
+            heap.heapify(self.open_nodes) # create a heap, key = lower bound
 
     def current_best(self):
+        """returns current upper bound (best objective seen)"""
+
         return self.Ap_cand.size()+self.Bp_cand.size()
 
     # technical: dump the tree into a DOT-file (graphivz)
@@ -267,8 +282,8 @@ class BBSearch:
         if filename and self.root:
             DotExporter(self.root, nodenamefunc=nodenamefunc,nodeattrfunc = nodeattrfunc).to_dotfile(filename)
 
-    # technical: produce a LB/UB vs steps graph
     def make_graph_gap(self, ax=None, trueOpt=None):
+        """figure: produces an LB/UB vs step no. figure"""
         ax = ax or plt.gca()
 
         graph_df = pd.DataFrame(list(zip(self.logs_step, self.logs_UB, self.logs_LB)))
@@ -287,6 +302,7 @@ class BBSearch:
         ax.text(ax.get_xlim()[1]*0.55,ax.get_ylim()[1]*0.8,"B:\n{}".format(self.B))
 
     def set_logging(self, logfile, prefix, steps_list):
+        """sets up the logging process for BB search"""
         self.logging = True
         self.log_file = logfile
         self.log_prefix = prefix
@@ -295,17 +311,17 @@ class BBSearch:
     ## MAIN LOGIC
     ## search stop criterion: timeout or gap closed
     def stop_criterion(self):
+        """Stop criterion: timeout, no nodes left to process or LB=UB"""
+
         if self.step > TIMEOUT_ITERATIONS:
             self.status="timeout"
             return True
 
-        if len(self.open_nodes)==0:
+        if len(self.open_nodes)==0 or (self.current_best() == self.LB):
+            if self.verbose:
+                print("|open nodes|={}, curr_best({}) = LB({}): {}".format(len(self.open_nodes),self.current_best(), self.LB, (self.current_best() == self.LB)))
             self.status = "optimal"
             return True
-
-        # if self.LB == self.current_best():
-        #     self.status = "optimal"
-        #     return True
 
         return False
 
@@ -314,7 +330,9 @@ class BBSearch:
     def search(self):
         # calculate the initial UB and LB
         if self.status=="optimal" or len(self.open_nodes)==0:
-            print("No nodes to explore / optimal state reached")
+            if self.verbose:
+                print("No nodes to explore / optimal state reached")
+
             return self.status
 
         if self.verbose: print("Initial LB={}".format(self.LB))
@@ -322,56 +340,68 @@ class BBSearch:
         self.step = 0
 
         while not self.stop_criterion():
-            if self.verbose:
-                print(".",end="")
             node_LB, next_node = self.open_nodes.pop() # pick a node with the smallest LB
             self.expand(next_node, node_LB, self.step)     # expand a node
             self.step += 1
+            if self.verbose:
+                print("node expanded. Step {}, LB={}, UB={}".format(self.step, self.LB, self.UB))
 
             if self.logging:
                 if self.step in self.snapshot_steps:
                     log(self.log_prefix, str(self.step), str(self.LB), str(self.UB), outfile = self.log_file)
+        if (self.node_cand is None) and not (self.cand_parent is None):
+            # create an optimal node
+            order = self.Ap_cand.layer_var
+            opt_node = SearchNode("step {}, node {}: UB=LB".format(step, self.tree_size),self.cand_parent,[],[],0,0,self.A.align_to(order), self.B.align_to(order))
+            opt_node.status = "O"
+            if self.verbose:
+                print("optimal node created")
+
         if self.verbose:
             print("\nSearch done in {} iterations. UB={}, LB={}, status: {}, tree size: {}".format(self.step, self.UB, self.LB, self.status, self.tree_size))
-
+            if self.node_cand is None:
+                print("No candidate node found!")
 
         if self.status == "optimal":
             self.LB = self.current_best()
-            self.logs_LB.append(self.LB)
-            self.logs_UB.append(self.UB)
-            self.logs_step.append(self.step)
             if not self.node_cand is None:
                 self.node_cand.status="O"
 
         if self.logging:
+            self.logs_LB.append(self.LB)
+            self.logs_UB.append(self.UB)
+            self.logs_step.append(self.step)
             log(self.log_prefix, str(self.step), str(self.LB), str(self.UB), outfile = self.log_file, comment = "status:{}".format(self.status))
 
         return self.status
 
     ## "expanding" a search tree node
-    def expand(self, node, node_LB=None, step=0):
+    def expand(self, node, node_LB, step=0):
+        """Process the node =node="""
         if self.verbose:
             print("Node expansion: {}".format(node.name))
 
+        # set tree bounds to be shown on the graph
+        # (sample BB search tree figure)
         node.tree_LB = self.LB
         node.tree_UB = self.UB
         node.best_obj = self.current_best()
 
-        if node_LB is None:
-            node_LB = node.calculate_LB()
-
         if node_LB > self.UB:
-            # we can prune the node!
+            # we can prune the node
             node.status ="P"
             return
 
-        node.status = "E"
+        node.status = "E" # actually processing the node
+
         for i in reversed( range(len(node.Ar)) ):
             # enumerating all the possible last elements
             # starting from the last one
-            if vs.non_dominated(node.Ar.layer_var[i],node.Ar,node.Br) and vs.no_aligned_pair_breaks(node.Ar.layer_var[i],node.Ar,node.Br): ## TODO: these are the same! remove no_aligned_pair_breaks? (see code in heuristic.py)
+            if vs.non_dominated(node.Ar.layer_var[i],node.Ar,node.Br) and \
+               vs.no_aligned_pair_breaks(node.Ar.layer_var[i],node.Ar,node.Br):
+                ## FIXME: these are the same! remove no_aligned_pair_breaks? (see code in heuristic.py)
                 ## add a node
-                ## slide the element under consideration to the last position
+                ## sift the element under consideration to the last position
                 A_new = copy.deepcopy(node.A)
                 B_new = copy.deepcopy(node.B)
                 a = node.Ar.layer_var[i]
@@ -401,36 +431,59 @@ class BBSearch:
                 Ar_new = vs.VarSeq(A_new.layer_var[:len(node.Ar)-1], A_new.n[:len(node.Ar)-1])
                 Br_new = vs.VarSeq(B_new.layer_var[:len(node.Br)-1], B_new.n[:len(node.Br)-1])
 
-                newnode = SearchNode("step {}, node {}: {}to{}".format(step, self.tree_size, node.Ar.layer_var[i],len(node.Ar)-1), node, Ar_new, Br_new, node.A.p[node.Ar.layer_var[i]], node.B.p[node.Ar.layer_var[i]],A_new, B_new)
+                newnode = SearchNode("step {}, node {}: {}to{}".format(step, self.tree_size, node.Ar.layer_var[i],len(node.Ar)-1), node, Ar_new, Br_new, pos, pos,A_new, B_new)
 
                 self.tree_size += 1
 
                 ## check if the new one is a terminal node
                 if A_new.is_aligned(B_new):
                     newnode.status = "T"
-                    if self.UB > newnode.size():
-                        self.UB = newnode.size()
+                    newnode.LB = newnode.size()
+                    newnode.UB = newnode.size()
+                    if self.UB > newnode.UB:
+                        self.UB = newnode.UB
 
                     if self.current_best() > newnode.size():
                         self.Ap_cand = A_new
                         self.Bp_cand = B_new
                         self.node_cand = newnode
                 else:
-                    newnode.status = "?"
+                    newnode.status = "?" # new node to be expanded
                     heap.heappush(self.open_nodes,(newnode.calculate_LB(), newnode))
 
-                if self.open_nodes:
-                    self.LB = min(self.current_best(), self.open_nodes[0][0])
 
-                # update upper bound (from time to time)
 
+                ## update UPPER BOUND
                 t = 'fast'
                 if step % UB_UPDATE_FREQ == 0 and not ALWAYS_FAST:
                     t = 'slow'
-                self.UB = min(self.UB,newnode.calculate_UB(t))
 
-        self.logs_step.append(step)
-        self.logs_UB.append(self.UB)
-        self.logs_LB.append(self.LB)
+                UBc, order = newnode.calculate_UB(t)
+
+                if self.UB > UBc:
+                    self.cand_parent = newnode
+                    self.UB = UBc
+
+                if self.LB == UBc and newnode.status !="T":
+                    if self.verbose:
+                        print("UB=LB, process terminated")
+
+                    self.Ap_cand = self.A.align_to(order)
+                    self.Bp_cand = self.B.align_to(order)
+                    opt_node = SearchNode("step {}, node {}: UB=LB".format(step, self.tree_size),newnode,[],[],0,0,self.A.align_to(order), self.B.align_to(order))
+                    opt_node.status = "O"
+                    self.status = "optimal" # no need to proceed
+
+
+        ## update LOWER BOUND
+        if self.open_nodes:
+            self.LB = min(self.current_best(), self.open_nodes[0][0])
+        else:
+            self.LB = self.current_best()
+
+        if self.logging:
+            self.logs_step.append(step)
+            self.logs_UB.append(self.UB)
+            self.logs_LB.append(self.LB)
 
     ## auxiliary functions
