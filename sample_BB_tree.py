@@ -5,26 +5,29 @@ for the auxiliary problem (with varseqs)
 (c) A. Bochkarev, Clemson University, 2019
 abochka@clemson.edu
 """
+import timeit
 
-import varseq as vs
+SETUP_CODE = '''import varseq as vs
 import BB_search as BB
-from importlib import reload
+from importlib import reload'''
 
-reload(BB)
-A = vs.VarSeq.random(N = 7)
-B = vs.VarSeq.random(N = 7)
-
-print(B)
-
+TEST_CODE='''
+A = vs.VarSeq.random(N = 8)
+B = vs.VarSeq.random(N = 8)
 b = BB.BBSearch(A,B)
-b.verbose = True
-
 status = b.search()
+'''
+#b.verbose = True
 
-b.dump("./run_logs/sample_BB_tree.dot")
+print(timeit.repeat(setup = SETUP_CODE,
+                          stmt = TEST_CODE,
+                          repeat = 5,
+                          number = 10))
 
-with open("./run_logs/sample_BB_instance.txt","w") as f:
-    f.write("A:\n")
-    f.write(str(A))
-    f.write("\nB:\n")
-    f.write(str(B))
+# b.dump("./run_logs/sample_BB_tree.dot")
+
+# with open("./run_logs/sample_BB_instance.txt","w") as f:
+#     f.write("A:\n")
+#     f.write(str(A))
+#     f.write("\nB:\n")
+#     f.write(str(B))

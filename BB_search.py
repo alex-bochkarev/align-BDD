@@ -13,6 +13,7 @@ from anytree.exporter import DotExporter
 import myheap as mh
 import heapq as heap
 from experiments.misc import log
+import heuristics as heu
 
 # Selected algorithm parameters
 TIMEOUT_ITERATIONS = 100000
@@ -205,15 +206,16 @@ class SearchNode(at.NodeMixin):
                     self.UB = Bsize
                     order = self.B.layer_var
             else:
-                lA,lB = greedy_fix(self.A, self.B)
-                rA,rB = greedy_fix(self.B, self.A)
-                sl = lA.size()+lB.size(); sr = rA.size()+rB.size()
-                if sl <= sr:
-                    self.UB = sl
-                    order = lA.layer_var
-                else:
-                    self.UB = sr
-                    order = rA.layer_var
+                self.UB, order = heu.simpl_gsifts_2p(self.A,self.B)
+                # # lA,lB = greedy_fix(self.A, self.B)
+                # # rA,rB = greedy_fix(self.B, self.A)
+                # sl = lA.size()+lB.size(); sr = rA.size()+rB.size()
+                # if sl <= sr:
+                #     self.UB = sl
+                #     order = lA.layer_var
+                # else:
+                #     self.UB = sr
+                #     order = rA.layer_var
 
         return [self.UB, order]
 
@@ -352,7 +354,7 @@ class BBSearch:
         if (self.node_cand is None) and not (self.cand_parent is None):
             # create an optimal node
             order = self.Ap_cand.layer_var
-            opt_node = SearchNode("step {}, node {}: UB=LB".format(step, self.tree_size),self.cand_parent,[],[],0,0,self.A.align_to(order), self.B.align_to(order))
+            opt_node = SearchNode("step {}, node {}: UB=LB".format(self.step, self.tree_size),self.cand_parent,[],[],0,0,self.A.align_to(order), self.B.align_to(order))
             opt_node.status = "O"
             if self.verbose:
                 print("optimal node created")
@@ -478,6 +480,8 @@ class BBSearch:
         ## update LOWER BOUND
         if self.open_nodes:
             self.LB = min(self.current_best(), self.open_nodes[0][0])
+            if self.open_nodes[0][0] <= self.current_best():
+                self.cand_parent = self.open_nodes[0][1]
         else:
             self.LB = self.current_best()
 
