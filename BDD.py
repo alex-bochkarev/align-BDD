@@ -287,7 +287,7 @@ class BDD(object):
                 self.sift(start_order[i],i)
 
         for i in range(N):
-            with_whom.sift(self.vars[i],i)
+            with_whom.sift(start_order[i],i)
 
         # now the pair is aligned, but possibly huge
         # let us see if we can compress it:

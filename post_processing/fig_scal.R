@@ -47,12 +47,12 @@ df = df %>%
 p1 =
 ggplot(df)+
     geom_point(aes(x=N, y = log(orig_simpl_time), color="Auxiliary problem / heuristic"), size=5, alpha=0.7)+
-    geom_point(aes(x=N, y = log(orig_gsifts1p_time), color="BDD sifts"), size=5, alpha=0.7)+
+    geom_jitter(aes(x=N, y = log(orig_gsifts1p_time), color="BDD sifts"), size=5, alpha=0.5, width = 0.25)+
     scale_x_continuous(
         breaks = seq(min(df$N),max(df$N),by = 2),
         minor_breaks = seq(min(df$N),max(df$N), by=1)
     )+
-    labs(x="(a) No. of variables",y="Solution time, sec., logarithmic scale -- ln (t)", color="Solution method:")+
+    labs(x="No. of variables\n(a)",y="Solution time, sec., logarithmic scale -- ln (t)", color="Solution method:")+
     theme(
         legend.position = c(0.4, 0.8),
         legend.direction = "vertical",
@@ -69,32 +69,32 @@ ggplot(df)+
         panel.grid.minor.y = element_line(size=0.25,linetype = 'solid', colour = "lightgrey")
     )
 
-leg = "No. of variables (N):"
+leg = "# variables (N):"
 Nmin = min(df$N)
 Nmax = max(df$N)
 Ns = unique(df$N)
 Nmed = Ns[which.min(abs(Ns - median(Ns)))]
 
 p2 =
-ggplot(filter(df, N %in% c(Nmin,Nmed,Nmax)), aes(x=rel_obj, fill=as.factor(N), color=as.factor(N)))+
+ggplot(filter(df, N %in% c(Nmin,Nmed,Nmax)), aes(x=rel_obj, y=..density.., fill=as.factor(N), color=as.factor(N)))+
     geom_histogram(alpha=0.5,position="identity")+
-    geom_density(alpha=0.1,size=1.5)+
+    geom_density(alpha=0.1,position="identity")+
     guides(fill=guide_legend(title=leg), color = guide_legend(title=leg))+
     theme(
         panel.grid.major = element_line(size = 0.5, linetype = 'solid',
                                         color = "darkgrey"),
         axis.text.x = element_text(angle=90,hjust=0.8),
-        legend.position = c(0.7,0.8),
+        legend.position = c(0.5,0.8),
         )+
     scale_x_continuous(
-        "(b) Relative objective, no more than",
+        "Relative heuristic objective\n(b)",
         label = scales::percent,
         breaks = seq(min(df$rel_obj), max(df$rel_obj), length.out = 11)
     )+
     scale_y_continuous(
-        "Count of instances",
-        breaks = seq(0, nrow(df), length.out = 11),
-        minor_breaks = seq(0, nrow(df), length.out = 21),
+        "Density (no. of instances)",
+        ## breaks = seq(0, nrow(df), length.out = 11),
+        ## minor_breaks = seq(0, nrow(df), length.out = 21),
         label = scales::number_format(accuracy = 1.0)
     )+
     theme(

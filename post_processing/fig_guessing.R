@@ -95,7 +95,7 @@ plt =
                       ),
                       )+
     theme(
-        legend.position = c(0.8, 0.8),
+        legend.position = c(0.2, 0.8),
         legend.direction = "vertical",
         legend.title = element_text(size=24),
         legend.text = element_text(size=24),
