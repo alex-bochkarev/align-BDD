@@ -221,7 +221,7 @@ class SearchNode(at.NodeMixin):
 
     # lower bound at the current node
     def calculate_LB(self):
-        """calculates a lower bound for the current search tree node"""
+        """returns a lower bound for the current search tree node"""
         self.LB = LB_by_level(self.A,self.B) # inversions-driven bound
         return self.LB
 
@@ -261,13 +261,13 @@ class BBSearch:
         self.Ap_cand = self.A.align_to(order)
         self.Bp_cand = self.B.align_to(order)
         self.node_cand = None
-        self.cand_parent = None
+        self.cand_parent = self.root
 
         self.open_nodes = []
 
         if self.LB == self.UB:
             # a hypothetical case of good bounds
-            opt_node = SearchNode("step {}, node {}: UB=LB".format(step, self.tree_size),newnode,[],[],0,0,self.A.align_to(order), self.B.align_to(order))
+            opt_node = SearchNode("step {}, node {}: UB=LB".format(self.step, self.tree_size),newnode,[],[],0,0,self.A.align_to(order), self.B.align_to(order))
             opt_node.status = "O"
             self.status = "optimal" # no need to proceed
         else:
@@ -369,6 +369,11 @@ class BBSearch:
             if not self.node_cand is None:
                 self.node_cand.status="O"
 
+            while len(self.open_nodes) > 0:
+                node_LB, next_node = self.open_nodes.pop()
+                if next_node.status == "?":
+                    next_node.status = "P"
+
         if self.logging:
             self.logs_LB.append(self.LB)
             self.logs_UB.append(self.UB)
@@ -449,11 +454,18 @@ class BBSearch:
                         self.Ap_cand = A_new
                         self.Bp_cand = B_new
                         self.node_cand = newnode
+
+                    if self.LB == newnode.UB:
+                        newnode.status = "O"
+                        self.status = "optimal"
+                        self.node_cand = newnode
+                        self.Ap_cand = A_new
+                        self.Bp_cand = B_new
+                        if self.verbose:
+                            print("Optimal terminal node found.")
+                            return
                 else:
                     newnode.status = "?" # new node to be expanded
-                    heap.heappush(self.open_nodes,(newnode.calculate_LB(), newnode))
-
-
 
                 ## update UPPER BOUND
                 t = 'fast'
@@ -462,26 +474,33 @@ class BBSearch:
 
                 UBc, order = newnode.calculate_UB(t)
 
-                if self.UB > UBc:
-                    self.cand_parent = newnode
-                    self.UB = UBc
+                if self.current_best() > UBc:
+                    self.node_cand = newnode
+                    self.Ap_cand = self.A.align_to(order)
+                    self.Bp_cand = self.B.align_to(order)
+                    if self.UB > UBc:
+                        self.UB = UBc
 
                 if self.LB == UBc and newnode.status !="T":
                     if self.verbose:
                         print("UB=LB, process terminated")
 
+                    newnode.status = "E"
                     self.Ap_cand = self.A.align_to(order)
                     self.Bp_cand = self.B.align_to(order)
                     opt_node = SearchNode("step {}, node {}: UB=LB".format(step, self.tree_size),newnode,[],[],0,0,self.A.align_to(order), self.B.align_to(order))
                     opt_node.status = "O"
                     self.status = "optimal" # no need to proceed
+                    self.node_cand = opt_node
+                elif newnode.status != "T":
+                    heap.heappush(self.open_nodes,(newnode.calculate_LB(), newnode))
 
 
         ## update LOWER BOUND
         if self.open_nodes:
             self.LB = min(self.current_best(), self.open_nodes[0][0])
-            if self.open_nodes[0][0] <= self.current_best():
-                self.cand_parent = self.open_nodes[0][1]
+            # if self.open_nodes[0][0] < self.current_best():
+            #     self.cand_parent = self.open_nodes[0][1]
         else:
             self.LB = self.current_best()
 
