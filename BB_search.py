@@ -222,7 +222,11 @@ class SearchNode(at.NodeMixin):
     # lower bound at the current node
     def calculate_LB(self):
         """returns a lower bound for the current search tree node"""
-        self.LB = LB_by_level(self.A,self.B) # inversions-driven bound
+        if self.status=="T":
+            self.LB = self.size()
+        else:
+            self.LB = LB_by_level(self.A,self.B) # inversions-driven bound
+
         return self.LB
 
 
@@ -365,7 +369,7 @@ class BBSearch:
                 print("No candidate node found!")
 
         if self.status == "optimal":
-            self.LB = self.current_best()
+            # self.LB = self.current_best()
             if not self.node_cand is None:
                 self.node_cand.status="O"
 
@@ -445,62 +449,36 @@ class BBSearch:
                 ## check if the new one is a terminal node
                 if A_new.is_aligned(B_new):
                     newnode.status = "T"
-                    newnode.LB = newnode.size()
-                    newnode.UB = newnode.size()
-                    if self.UB > newnode.UB:
-                        self.UB = newnode.UB
-
-                    if self.current_best() > newnode.size():
-                        self.Ap_cand = A_new
-                        self.Bp_cand = B_new
-                        self.node_cand = newnode
-
-                    if self.LB == newnode.UB:
-                        newnode.status = "O"
-                        self.status = "optimal"
-                        self.node_cand = newnode
-                        self.Ap_cand = A_new
-                        self.Bp_cand = B_new
-                        if self.verbose:
-                            print("Optimal terminal node found.")
-                            return
                 else:
-                    newnode.status = "?" # new node to be expanded
+                    newnode.status = "?" # node to be expanded
+
+                ## calculate the node lower bound
+                newnode.LB = newnode.calculate_LB()
 
                 ## update UPPER BOUND
                 t = 'fast'
                 if step % UB_UPDATE_FREQ == 0 and not ALWAYS_FAST:
                     t = 'slow'
 
-                UBc, order = newnode.calculate_UB(t)
+                newnode.UB, order = newnode.calculate_UB(t)
 
-                if self.current_best() > UBc:
-                    self.node_cand = newnode
+                if self.UB > newnode.UB:
+                    self.UB = newnode.UB
+
+                if self.current_best() > newnode.UB:
                     self.Ap_cand = self.A.align_to(order)
                     self.Bp_cand = self.B.align_to(order)
-                    if self.UB > UBc:
-                        self.UB = UBc
+                    if newnode.status == "T":
+                        self.node_cand = newnode
+                    else:
+                        self.cand_parent = newnode
 
-                if self.LB == UBc and newnode.status !="T":
-                    if self.verbose:
-                        print("UB=LB, process terminated")
-
-                    newnode.status = "E"
-                    self.Ap_cand = self.A.align_to(order)
-                    self.Bp_cand = self.B.align_to(order)
-                    opt_node = SearchNode("step {}, node {}: UB=LB".format(step, self.tree_size),newnode,[],[],0,0,self.A.align_to(order), self.B.align_to(order))
-                    opt_node.status = "O"
-                    self.status = "optimal" # no need to proceed
-                    self.node_cand = opt_node
-                elif newnode.status != "T":
+                if self.LB < self.UB and newnode.status != "T":
                     heap.heappush(self.open_nodes,(newnode.calculate_LB(), newnode))
-
 
         ## update LOWER BOUND
         if self.open_nodes:
             self.LB = min(self.current_best(), self.open_nodes[0][0])
-            # if self.open_nodes[0][0] < self.current_best():
-            #     self.cand_parent = self.open_nodes[0][1]
         else:
             self.LB = self.current_best()
 

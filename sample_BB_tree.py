@@ -10,8 +10,8 @@ abochka@clemson.edu
 import varseq as vs
 import BB_search as BB
 
-A = vs.VarSeq.random(N = 10)
-B = vs.VarSeq.random(N = 10)
+A = vs.VarSeq.random(N = 8)
+B = vs.VarSeq.random(N = 8)
 b = BB.BBSearch(A,B)
 b.verbose = True
 status = b.search()
