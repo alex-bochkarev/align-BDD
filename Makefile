@@ -62,7 +62,7 @@ DTE=$(shell date +%F)
 
 MAX_I=$(shell expr $(PAR_SOL) - 1 )
 
-.PHONY: all figures clean-raw-inst clean-insts move-logs
+.PHONY: all figures clean-raw-inst clean-insts move-logs figures/sample_BB_tree.png
 
 ######################################################################
 ## High-level recipes
@@ -71,7 +71,7 @@ MAX_I=$(shell expr $(PAR_SOL) - 1 )
 all:
 
 figures/sample_BB_tree.png: ./sample_BB_tree.py
-	python ./sample_BB_tree.py && \
+	python ./sample_BB_tree.py -v -V 8 -n 10 -o ./run_logs/sample_BB_tree.dot && \
 	dot -Tpng ./run_logs/sample_BB_tree.dot > ./figures/sample_BB_tree.png
 
 figures: figures_R figures_N

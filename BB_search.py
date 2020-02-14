@@ -10,7 +10,6 @@ import copy as copy
 import math as math
 import anytree as at
 from anytree.exporter import DotExporter
-import myheap as mh
 import heapq as heap
 from experiments.misc import log
 import heuristics as heu
@@ -330,7 +329,7 @@ class BBSearch:
         self.step = 0
 
         while not self.stop_criterion():
-            node_LB, next_node = self.open_nodes.pop() # pick a node with the smallest LB
+            node_LB, next_node = heap.heappop(self.open_nodes) # pick a node with the smallest LB
             self.expand(next_node, node_LB, self.step)     # expand a node
             self.step += 1
             if self.verbose:
@@ -374,7 +373,7 @@ class BBSearch:
     def expand(self, node, node_LB, step=0):
         """Process the node =node="""
         if self.verbose:
-            print("Node expansion: {}".format(node.name))
+            print("Node expansion: {}, node LB={}, UB={}".format(node.name, node.LB, node.UB))
 
         # set tree bounds to be shown on the graph
         # (sample BB search tree figure)
@@ -458,7 +457,7 @@ class BBSearch:
                         self.cand_parent = newnode
 
                 if self.LB < self.UB and newnode.status != "T":
-                    heap.heappush(self.open_nodes,(newnode.calculate_LB(), newnode))
+                    heap.heappush(self.open_nodes,(newnode.LB, newnode))
 
         ## update LOWER BOUND
         if self.open_nodes:

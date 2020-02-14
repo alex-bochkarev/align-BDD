@@ -9,36 +9,30 @@ abochka@clemson.edu
 
 import varseq as vs
 import BB_search as BB
+import argparse as ap
 
-A = vs.VarSeq.random(N = 8)
-B = vs.VarSeq.random(N = 8)
-b = BB.BBSearch(A,B)
-b.verbose = True
-status = b.search()
+if __name__ == "__main__":
+    parser = ap.ArgumentParser(description=" Produces a sample BB search tree (a .dot file) (c) A. Bochkarev, Clemson University, 2020",
+                               formatter_class=ap.ArgumentDefaultsHelpFormatter)
+    parser.add_argument("-n", "--nodes", action="store", dest="n", help="max. number of search tree nodes ",
+                        type=int,default=15)
+    parser.add_argument("-V", "--vars", action="store", dest="V", help="no. of variables",
+                        type=int,default=15)
+    parser.add_argument("-o","--output", dest="filename", help=".dot filename to save")
+    parser.add_argument("-v","--verbose",dest="verbose", action="store_true")
 
-b.dump("./run_logs/sample_BB_tree.dot")
+    args = parser.parse_args()
 
-# SETUP_CODE = '''import varseq as vs
-# import BB_search as BB
-# from importlib import reload'''
+    tree_size = args.n*2
+    while tree_size > args.n:
+        A = vs.VarSeq.random(N = args.V)
+        B = vs.VarSeq.random(N = args.V)
+        b = BB.BBSearch(A,B)
+        b.verbose = args.verbose
+        status = b.search()
+        tree_size = b.tree_size
 
-# TEST_CODE='''
-# A = vs.VarSeq.random(N = 8)
-# B = vs.VarSeq.random(N = 8)
-# b = BB.BBSearch(A,B)
-# status = b.search()
-# '''
-# #b.verbose = True
-
-# print(timeit.repeat(setup = SETUP_CODE,
-#                           stmt = TEST_CODE,
-#                           repeat = 5,
-#                           number = 10))
-
-# # b.dump("./run_logs/sample_BB_tree.dot")
-
-# with open("./run_logs/sample_BB_instance.txt","w") as f:
-#     f.write("A:\n")
-#     f.write(str(A))
-#     f.write("\nB:\n")
-#     f.write(str(B))
+    b.dump(args.filename)
+    print("Instance generated:")
+    print(A)
+    print(B)

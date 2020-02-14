@@ -1,127 +1,94 @@
 digraph tree {
     "root[E]
-A:[1 7 4 3 6 5 8 2][]( 13)
-B:[4 5 7 8 1 3 6 2][]( 24)
-|A|+|B|=37, LB:38, UB:51" [xlabel="Tree: LB=38, UB=51, obj=51",];
-    "step 0, node 1: 2to7[E]
-A:[1 7 4 3 6 5 8][2]( 13)
-B:[4 5 7 8 1 3 6][2]( 24)
-|A|+|B|=37, LB:38, UB:64" [xlabel="Tree: LB=38, UB=51, obj=51",];
-    "step 1, node 2: 8to6[P]
-A:[1 7 4 3 6 5][8 2]( 13)
-B:[4 5 7 1 3 6][8 2]( 57)
-|A|+|B|=70, LB:70, UB:80" [xlabel="Tree: LB=39, UB=51, obj=51",fillcolor=grey, style=filled];
-    "step 1, node 3: 6to6[E]
-A:[1 7 4 3 5 8][6 2]( 14)
-B:[4 5 7 8 1 3][6 2]( 24)
-|A|+|B|=38, LB:39, UB:64" [xlabel="Tree: LB=39, UB=51, obj=51",];
-    "step 3, node 4: 8to5[P]
-A:[1 7 4 3 5][8 6 2]( 14)
-B:[4 5 7 1 3][8 6 2]( 36)
-|A|+|B|=50, LB:50, UB:60" [xlabel="Tree: LB=41, UB=49, obj=49",fillcolor=grey, style=filled];
-    "step 3, node 5: 3to5[E]
-A:[1 7 4 5 8][3 6 2]( 17)
-B:[4 5 7 8 1][3 6 2]( 24)
-|A|+|B|=41, LB:41, UB:49" [xlabel="Tree: LB=41, UB=49, obj=49",];
-    "step 5, node 6: 8to4[E]
-A:[1 7 4 5][8 3 6 2]( 17)
-B:[4 5 7 1][8 3 6 2]( 27)
-|A|+|B|=44, LB:44, UB:49" [xlabel="Tree: LB=44, UB=49, obj=49",];
-    "step 6, node 8: 5to3[P]
-A:[1 7 4][5 8 3 6 2]( 17)
-B:[4 1 7][5 8 3 6 2]( 32)
-|A|+|B|=49, LB:49, UB:49" [xlabel="Tree: LB=None, UB=None, obj=None",fillcolor=grey, style=filled];
-    "step 6, node 9: 7to3[P]
-A:[1 4 5][7 8 3 6 2]( 26)
-B:[4 5 1][7 8 3 6 2]( 32)
-|A|+|B|=58, LB:58, UB:58" [xlabel="Tree: LB=None, UB=None, obj=None",fillcolor=grey, style=filled];
-    "step 6, node 10: 1to3[T]
-A:[4 5 7][1 8 3 6 2]( 26)
-B:[4 5 7][1 8 3 6 2]( 27)
-|A|+|B|=53, LB:53, UB:53" [xlabel="Tree: LB=None, UB=None, obj=None",penwidth=5];
-    "step 5, node 7: 1to4[T]
-A:[4 5 7 8][1 3 6 2]( 40)
-B:[4 5 7 8][1 3 6 2]( 24)
-|A|+|B|=64, LB:64, UB:64" [xlabel="Tree: LB=None, UB=None, obj=None",penwidth=5];
-    "step 7, node 11: UB=LB[O]
-A:[][1 7 4 5 8 3 6 2]( 17)
-B:[][1 7 4 5 8 3 6 2]( 32)
-|A|+|B|=49, LB:None, UB:None" [xlabel="Tree: LB=None, UB=None, obj=None",fillcolor=orange, style=filled];
+A:[2 8 7 1 5 3 6 4][]( 19)
+B:[2 3 6 8 7 1 5 4][]( 49)
+|A|+|B|=68, LB:73, UB:86" [xlabel="Tree: LB=73, UB=86, obj=86",];
+    "step 0, node 1: 4to7[E]
+A:[2 8 7 1 5 3 6][4]( 19)
+B:[2 3 6 8 7 1 5][4]( 49)
+|A|+|B|=68, LB:73, UB:86" [xlabel="Tree: LB=73, UB=86, obj=86",];
+    "step 1, node 2: 6to6[P]
+A:[2 8 7 1 5 3][6 4]( 19)
+B:[2 3 8 7 1 5][6 4](135)
+|A|+|B|=154, LB:154, UB:154" [xlabel="Tree: LB=73, UB=86, obj=86",fillcolor=grey, style=filled];
+    "step 1, node 3: 5to6[E]
+A:[2 8 7 1 3 6][5 4]( 19)
+B:[2 3 6 8 7 1][5 4]( 49)
+|A|+|B|=68, LB:73, UB:86" [xlabel="Tree: LB=73, UB=86, obj=86",];
+    "step 3, node 4: 6to5[P]
+A:[2 8 7 1 3][6 5 4]( 19)
+B:[2 3 8 7 1][6 5 4]( 75)
+|A|+|B|=94, LB:94, UB:94" [xlabel="Tree: LB=75, UB=77, obj=77",fillcolor=grey, style=filled];
+    "step 3, node 5: 1to5[E]
+A:[2 8 7 3 6][1 5 4]( 22)
+B:[2 3 6 8 7][1 5 4]( 49)
+|A|+|B|=71, LB:75, UB:77" [xlabel="Tree: LB=75, UB=77, obj=77",];
+    "step 5, node 6: 6to4[P]
+A:[2 8 7 3][6 1 5 4]( 22)
+B:[2 3 8 7][6 1 5 4]( 55)
+|A|+|B|=77, LB:77, UB:77" [xlabel="Tree: LB=None, UB=None, obj=None",fillcolor=grey, style=filled];
+    "step 5, node 7: 7to4[P]
+A:[2 8 3 6][7 1 5 4]( 31)
+B:[2 3 6 8][7 1 5 4]( 49)
+|A|+|B|=80, LB:82, UB:82" [xlabel="Tree: LB=None, UB=None, obj=None",fillcolor=grey, style=filled];
+    "step 6, node 8: UB=LB[O]
+A:[][2 8 7 3 6 1 5 4]( 22)
+B:[][2 8 7 3 6 1 5 4]( 55)
+|A|+|B|=77, LB:None, UB:None" [xlabel="Tree: LB=None, UB=None, obj=None",fillcolor=orange, style=filled];
     "root[E]
-A:[1 7 4 3 6 5 8 2][]( 13)
-B:[4 5 7 8 1 3 6 2][]( 24)
-|A|+|B|=37, LB:38, UB:51" -> "step 0, node 1: 2to7[E]
-A:[1 7 4 3 6 5 8][2]( 13)
-B:[4 5 7 8 1 3 6][2]( 24)
-|A|+|B|=37, LB:38, UB:64";
-    "step 0, node 1: 2to7[E]
-A:[1 7 4 3 6 5 8][2]( 13)
-B:[4 5 7 8 1 3 6][2]( 24)
-|A|+|B|=37, LB:38, UB:64" -> "step 1, node 2: 8to6[P]
-A:[1 7 4 3 6 5][8 2]( 13)
-B:[4 5 7 1 3 6][8 2]( 57)
-|A|+|B|=70, LB:70, UB:80";
-    "step 0, node 1: 2to7[E]
-A:[1 7 4 3 6 5 8][2]( 13)
-B:[4 5 7 8 1 3 6][2]( 24)
-|A|+|B|=37, LB:38, UB:64" -> "step 1, node 3: 6to6[E]
-A:[1 7 4 3 5 8][6 2]( 14)
-B:[4 5 7 8 1 3][6 2]( 24)
-|A|+|B|=38, LB:39, UB:64";
-    "step 1, node 3: 6to6[E]
-A:[1 7 4 3 5 8][6 2]( 14)
-B:[4 5 7 8 1 3][6 2]( 24)
-|A|+|B|=38, LB:39, UB:64" -> "step 3, node 4: 8to5[P]
-A:[1 7 4 3 5][8 6 2]( 14)
-B:[4 5 7 1 3][8 6 2]( 36)
-|A|+|B|=50, LB:50, UB:60";
-    "step 1, node 3: 6to6[E]
-A:[1 7 4 3 5 8][6 2]( 14)
-B:[4 5 7 8 1 3][6 2]( 24)
-|A|+|B|=38, LB:39, UB:64" -> "step 3, node 5: 3to5[E]
-A:[1 7 4 5 8][3 6 2]( 17)
-B:[4 5 7 8 1][3 6 2]( 24)
-|A|+|B|=41, LB:41, UB:49";
-    "step 3, node 5: 3to5[E]
-A:[1 7 4 5 8][3 6 2]( 17)
-B:[4 5 7 8 1][3 6 2]( 24)
-|A|+|B|=41, LB:41, UB:49" -> "step 5, node 6: 8to4[E]
-A:[1 7 4 5][8 3 6 2]( 17)
-B:[4 5 7 1][8 3 6 2]( 27)
-|A|+|B|=44, LB:44, UB:49";
-    "step 3, node 5: 3to5[E]
-A:[1 7 4 5 8][3 6 2]( 17)
-B:[4 5 7 8 1][3 6 2]( 24)
-|A|+|B|=41, LB:41, UB:49" -> "step 5, node 7: 1to4[T]
-A:[4 5 7 8][1 3 6 2]( 40)
-B:[4 5 7 8][1 3 6 2]( 24)
-|A|+|B|=64, LB:64, UB:64";
-    "step 3, node 5: 3to5[E]
-A:[1 7 4 5 8][3 6 2]( 17)
-B:[4 5 7 8 1][3 6 2]( 24)
-|A|+|B|=41, LB:41, UB:49" -> "step 7, node 11: UB=LB[O]
-A:[][1 7 4 5 8 3 6 2]( 17)
-B:[][1 7 4 5 8 3 6 2]( 32)
-|A|+|B|=49, LB:None, UB:None";
-    "step 5, node 6: 8to4[E]
-A:[1 7 4 5][8 3 6 2]( 17)
-B:[4 5 7 1][8 3 6 2]( 27)
-|A|+|B|=44, LB:44, UB:49" -> "step 6, node 8: 5to3[P]
-A:[1 7 4][5 8 3 6 2]( 17)
-B:[4 1 7][5 8 3 6 2]( 32)
-|A|+|B|=49, LB:49, UB:49";
-    "step 5, node 6: 8to4[E]
-A:[1 7 4 5][8 3 6 2]( 17)
-B:[4 5 7 1][8 3 6 2]( 27)
-|A|+|B|=44, LB:44, UB:49" -> "step 6, node 9: 7to3[P]
-A:[1 4 5][7 8 3 6 2]( 26)
-B:[4 5 1][7 8 3 6 2]( 32)
-|A|+|B|=58, LB:58, UB:58";
-    "step 5, node 6: 8to4[E]
-A:[1 7 4 5][8 3 6 2]( 17)
-B:[4 5 7 1][8 3 6 2]( 27)
-|A|+|B|=44, LB:44, UB:49" -> "step 6, node 10: 1to3[T]
-A:[4 5 7][1 8 3 6 2]( 26)
-B:[4 5 7][1 8 3 6 2]( 27)
-|A|+|B|=53, LB:53, UB:53";
+A:[2 8 7 1 5 3 6 4][]( 19)
+B:[2 3 6 8 7 1 5 4][]( 49)
+|A|+|B|=68, LB:73, UB:86" -> "step 0, node 1: 4to7[E]
+A:[2 8 7 1 5 3 6][4]( 19)
+B:[2 3 6 8 7 1 5][4]( 49)
+|A|+|B|=68, LB:73, UB:86";
+    "step 0, node 1: 4to7[E]
+A:[2 8 7 1 5 3 6][4]( 19)
+B:[2 3 6 8 7 1 5][4]( 49)
+|A|+|B|=68, LB:73, UB:86" -> "step 1, node 2: 6to6[P]
+A:[2 8 7 1 5 3][6 4]( 19)
+B:[2 3 8 7 1 5][6 4](135)
+|A|+|B|=154, LB:154, UB:154";
+    "step 0, node 1: 4to7[E]
+A:[2 8 7 1 5 3 6][4]( 19)
+B:[2 3 6 8 7 1 5][4]( 49)
+|A|+|B|=68, LB:73, UB:86" -> "step 1, node 3: 5to6[E]
+A:[2 8 7 1 3 6][5 4]( 19)
+B:[2 3 6 8 7 1][5 4]( 49)
+|A|+|B|=68, LB:73, UB:86";
+    "step 1, node 3: 5to6[E]
+A:[2 8 7 1 3 6][5 4]( 19)
+B:[2 3 6 8 7 1][5 4]( 49)
+|A|+|B|=68, LB:73, UB:86" -> "step 3, node 4: 6to5[P]
+A:[2 8 7 1 3][6 5 4]( 19)
+B:[2 3 8 7 1][6 5 4]( 75)
+|A|+|B|=94, LB:94, UB:94";
+    "step 1, node 3: 5to6[E]
+A:[2 8 7 1 3 6][5 4]( 19)
+B:[2 3 6 8 7 1][5 4]( 49)
+|A|+|B|=68, LB:73, UB:86" -> "step 3, node 5: 1to5[E]
+A:[2 8 7 3 6][1 5 4]( 22)
+B:[2 3 6 8 7][1 5 4]( 49)
+|A|+|B|=71, LB:75, UB:77";
+    "step 3, node 5: 1to5[E]
+A:[2 8 7 3 6][1 5 4]( 22)
+B:[2 3 6 8 7][1 5 4]( 49)
+|A|+|B|=71, LB:75, UB:77" -> "step 5, node 6: 6to4[P]
+A:[2 8 7 3][6 1 5 4]( 22)
+B:[2 3 8 7][6 1 5 4]( 55)
+|A|+|B|=77, LB:77, UB:77";
+    "step 3, node 5: 1to5[E]
+A:[2 8 7 3 6][1 5 4]( 22)
+B:[2 3 6 8 7][1 5 4]( 49)
+|A|+|B|=71, LB:75, UB:77" -> "step 5, node 7: 7to4[P]
+A:[2 8 3 6][7 1 5 4]( 31)
+B:[2 3 6 8][7 1 5 4]( 49)
+|A|+|B|=80, LB:82, UB:82";
+    "step 3, node 5: 1to5[E]
+A:[2 8 7 3 6][1 5 4]( 22)
+B:[2 3 6 8 7][1 5 4]( 49)
+|A|+|B|=71, LB:75, UB:77" -> "step 6, node 8: UB=LB[O]
+A:[][2 8 7 3 6 1 5 4]( 22)
+B:[][2 8 7 3 6 1 5 4]( 55)
+|A|+|B|=77, LB:None, UB:None";
 }
