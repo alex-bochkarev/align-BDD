@@ -36,6 +36,6 @@ while True:
 
     if BB_size != opt_size:
         print("MISMATCH DETECTED:")
-        print("Instance:\n{}\nvs.\n{}\nBB size={}, opt size ={}".format(A,B,BB_size,opt_size))
+        print("Instance:\n{}\nvs.\n{}\nBB size={}, opt size ={}".format(A,B,BB_size,opt_size), flush = True)
     else:
-        print(".",end="")
+        print(".",end="",flush=True)

@@ -197,25 +197,9 @@ class SearchNode(at.NodeMixin):
             order = self.A.layer_var
         else:
             if t=='fast':
-                Asize=self.A.size()+self.B.align_to(self.A).size()
-                Bsize=self.B.size()+self.A.align_to(self.B).size()
-                if Asize <= Bsize:
-                    self.UB = Asize
-                    order = self.A.layer_var
-                else:
-                    self.UB = Bsize
-                    order = self.B.layer_var
+                self.UB, order = heu.minAB(self.A,self.B)
             else:
-                self.UB, order = heu.simpl_gsifts_2p(self.A,self.B)
-                # # lA,lB = greedy_fix(self.A, self.B)
-                # # rA,rB = greedy_fix(self.B, self.A)
-                # sl = lA.size()+lB.size(); sr = rA.size()+rB.size()
-                # if sl <= sr:
-                #     self.UB = sl
-                #     order = lA.layer_var
-                # else:
-                #     self.UB = sr
-                #     order = rA.layer_var
+                self.UB, order = heu.simpl_greedy_swaps(self.A,self.B)
 
         return [self.UB, order]
 
@@ -261,7 +245,7 @@ class BBSearch:
         self.root = SearchNode("root", None, A,B,len(A),len(B),A,B)
 
         self.LB = self.root.calculate_LB()
-        self.UB, order = self.root.calculate_UB('slow')
+        self.UB, order = self.root.calculate_UB('fast')
         self.Ap_cand = self.A.align_to(order)
         self.Bp_cand = self.B.align_to(order)
         self.node_cand = None
@@ -408,9 +392,7 @@ class BBSearch:
         for i in reversed( range(len(node.Ar)) ):
             # enumerating all the possible last elements
             # starting from the last one
-            if vs.non_dominated(node.Ar.layer_var[i],node.Ar,node.Br) and \
-               vs.no_aligned_pair_breaks(node.Ar.layer_var[i],node.Ar,node.Br):
-                ## FIXME: these are the same! remove no_aligned_pair_breaks? (see code in heuristic.py)
+            if vs.non_dominated(node.Ar.layer_var[i],node.Ar,node.Br):
                 ## add a node
                 ## sift the element under consideration to the last position
                 A_new = copy.deepcopy(node.A)
@@ -420,20 +402,22 @@ class BBSearch:
                 A_new = A_new.slide(a,pos)
                 B_new = B_new.slide(a,pos)
                 ## reshuffle the rest ``covered'' elements
-                A_covered_els = node.Ar.layer_var[i:len(node.Ar)]
+                xA = node.Ar.layer_var
+                xB = node.Br.layer_var
+                A_covered_els = xA[i:]
                 i_A = i
                 if A_covered_els != []:
-                    for j in range(len(node.Br)):
-                        if node.Br.layer_var[j] in A_covered_els and node.Br.layer_var[j]!=node.Ar.layer_var[i]:
-                            A_new.layer_var[i_A] = node.Br.layer_var[j]
-                            A_new.p[node.Br.layer_var[j]] = i_A
+                    for j in range(len(xB)):
+                        if xB[j] in A_covered_els and xB[j]!=xA[i]:
+                            A_new.layer_var[i_A] = xB[j]
+                            A_new.p[xB[j]] = i_A
                             i_A += 1
 
-                B_covered_els = node.Br.layer_var[node.B.p[node.Ar.layer_var[i]]:len(node.Br)]
+                B_covered_els = xB[node.B.p[xA[i]]:]
                 if B_covered_els != []:
-                    i_B = node.B.p[node.Ar.layer_var[i]]
-                    for j in range(len(node.Ar)):
-                        if node.Ar.layer_var[j] in B_covered_els and j!=i:
+                    i_B = node.B.p[xA[i]]
+                    for j in range(len(xA)):
+                        if xA[j] in B_covered_els and j!=i:
                             B_new.layer_var[i_B] = node.A.layer_var[j]
                             B_new.p[node.A.layer_var[j]] = i_B
                             i_B += 1
