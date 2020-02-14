@@ -198,6 +198,44 @@ class VarSeq:
 
         return lsorted
 
+    def q_align_to(self, to_what = None):
+        if to_what is None:
+            to_what = np.sort(self.layer_var)
+
+        if not (isinstance(to_what,list) or isinstance(to_what,tuple) \
+                or isinstance(to_what, np.ndarray)):
+            to_what = to_what.layer_var
+
+        # to-be var indices for each variable
+        # in the current sequence
+        var_ind = [0 for i in range(len(self))]
+
+        for i in range(len(to_what)):
+            var_ind[self.p[to_what[i]]] = i
+
+        # var_ind[i] now is the index of the i-th variable  in the *target* alignment
+
+        # initalize an empty array (-1 to indicate un-init value)
+        lsorted = VarSeq(to_what, [-1]*len(self))
+
+        sliding_up = set()
+        iB = 0
+        for iA in range(len(self)):
+            if not self.layer_var[iA] in sliding_up:
+                ## "moving" the var down
+                lsorted.n[iB] = self.n[iA]*(2**len(sliding_up))
+
+                while iB < var_ind[iA]:
+                    sliding_up.add(lsorted.layer_var[iB])
+                    iB += 1
+                    lsorted.n[iB] = lsorted.n[iB-1]*2
+                iB += 1
+
+            else:
+                sliding_up.remove(self.layer_var[iA])
+
+        return lsorted
+
     def OA_bruteforce(self, with_what):
         # generate all possible permutations
         perms = iters.permutations(self.layer_var)

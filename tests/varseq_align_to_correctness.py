@@ -14,6 +14,7 @@ abochka@clemson.edu
 import sys
 sys.path.append('..')
 
+import numpy as np
 import varseq as vs
 import BB_search as bb
 
@@ -21,21 +22,15 @@ print("Running a simple BB search correctness test (1 period = 1 instance)")
 print("[Ctrl-C] to stop")
 
 while True:
-    A = vs.VarSeq.random(N = 8)
-    B = vs.VarSeq.random(N = 8)
+    A = vs.VarSeq.random(N = 20)
+    B = vs.VarSeq.random(N = 20)
 
-    b = bb.BBSearch(A,B)
+    Ap1 = A.greedy_sort(B.layer_var)
+    Ap2 = A.q_align_to(B.layer_var)
 
-    alts, Ap, Bp = A.OA_bruteforce(B)
-
-    opt_size = Ap[0].size() + Bp[0].size()
-
-    status = b.search()
-
-    BB_size = b.Ap_cand.size() + b.Bp_cand.size()
-
-    if BB_size != opt_size:
+    if not (np.array_equal(Ap1.layer_var,Ap2.layer_var) and \
+            np.array_equal(Ap1.n, Ap2.n)):
         print("MISMATCH DETECTED:")
-        print("Instance:\n{}\nvs.\n{}\nBB size={}, opt size ={}".format(A,B,BB_size,opt_size), flush = True)
+        print("Instance:\n{}\nvs.\n{}".format(A,B), flush = True)
     # else:
-        # print(".",end="",flush=True)
+    #     print(".",end="",flush=True)
