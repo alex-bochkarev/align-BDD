@@ -271,7 +271,7 @@ class BBSearch:
 
         if self.LB == self.UB:
             # a hypothetical case of good bounds
-            opt_node = SearchNode("step {}, node {}: UB=LB".format(self.step, self.tree_size),newnode,[],[],0,0,self.A.align_to(order), self.B.align_to(order))
+            opt_node = SearchNode("step {}, node {}: UB=LB".format(self.step, self.tree_size),self.root,[],[],0,0,self.A.align_to(order), self.B.align_to(order))
             opt_node.status = "O"
             self.status = "optimal" # no need to proceed
         else:
