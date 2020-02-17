@@ -1,67 +1,58 @@
-######################################################################
-## varseq.py
-## problem for sorting and aligning BDDs (variables sequences)
+"""
+varseq.py -- key code implementing weighted variable sequences
+             data structure and methods
 
+(c) A. Bochkarev, Clemson University, 2020
+abochka@clemson.edu
+"""
 import numpy as np
 import copy
 import itertools as iters
 import math
 
-######################################################################
-## VarSeq class description
-# encodes a variable sequence
-# for the purposes of DP implementation
-# provides the methods:
-# - size -- returns the total # of nodes
-# - __len__ -- returns the # of variables (layers)
-# - __str__ -- prints vars and layer sizes
-# - S(a,j) -- returns increase of # of nodes to slide elem. a to pos. j
-# - slide(a,j) -- actually performs the slide (and returns modified seq)
-#
-# sorting methods:
-# - greedy_sort() -- sorts the seq by greedy algorithm (performing slides)
-# - align_to() -- same, but in one pass (without slides)
-
-## to-do's
-## TODO: rename lin_sort to align_to everywhere (other files)
-## TODO: consider A[i] instead of A.layer_var[i]?
-
 class VarSeq:
-    # constructor
+    """Implements a weighted variable sequence data structure"""
     def __init__(self, layer_vars, layer_sizes):
         assert len(layer_vars)==len(layer_sizes) # obviously, each layer should have a size
-        #assert layer_sizes[0] == 1 # the first layer can have the root only
+        # NOTE: we do not enforce n_1 = 1
 
-        # TODO: might want couple more checks
         self.layer_var = copy.copy(layer_vars)
         self.n = copy.copy(layer_sizes)
         self.p = dict(zip(layer_vars, range(len(layer_vars)))) # dictionary of var positions
 
-    # generating random varseq
-    ## generates random sequence that is valid as layer sizes
+    # generating a random varseq
     @classmethod
     def generate_nodes(cls, N):
+        """generates a random (valid) sequence of N weights: n_{i+1} <= 2n_i"""
         ns = [1]
         for i in range(N-1):
             ns.append(np.random.randint(1,2*ns[-1]+1))
         return np.array(ns)
 
     @classmethod
-    def random(cls, vars = None, N = None):
-        if N is None: N = 7
+    def random(cls, vars = None, N = 7):
+        """generates a random variable sequence
+
+        Returns a VarSeq object representing a weighted variable sequence
+        with N variables with random element weights. If no variable labels
+        are given, generates a random permutation of labels 1,...,N."""
+
         if vars is None: vars = np.random.permutation([(i+1) for i in range(N)])
         return cls(layer_vars=vars,layer_sizes = cls.generate_nodes(N))
 
-    # returns the size of the seq (total # of nodes)
     def size(self):
+        """returns the total sequence size (sum of element weights)"""
         return np.sum(self.n)
 
     def var_size(self, var):
+        """returns an element weight (given a label)"""
+
         return self.n[ self.p[var] ]
 
     # returns cost of sliding
     # of the element a(int) to position j
     def S(self, a,j):
+        """returns cost of sliding"""
         if self.p[a] == j:
             return 0 # nothing to do
 
