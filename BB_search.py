@@ -19,7 +19,7 @@ from experiments.misc import log
 import heuristics as heu
 
 # Selected algorithm parameters
-TIMEOUT_ITERATIONS = 100000
+TIMEOUT_ITERATIONS = 1000
 UB_UPDATE_FREQ = 5000 # in iterations
 ALWAYS_FAST = True
 
@@ -360,8 +360,8 @@ class BBSearch:
                 B_new = copy.deepcopy(node.B)
                 a = node.Ar.layer_var[i]
                 pos = len(node.Ar)-1
-                A_new = A_new.slide(a,pos)
-                B_new = B_new.slide(a,pos)
+                A_new.slide(a,pos,inplace=True)
+                B_new.slide(a,pos,inplace=True)
                 ## reshuffle the rest ``covered'' elements
                 xA = node.Ar.layer_var
                 xB = node.Br.layer_var

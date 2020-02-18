@@ -17,9 +17,11 @@ sys.path.append('..')
 import varseq as vs
 import BB_search as bb
 
-print("Running a simple BB search correctness test (1 period = 1 instance)")
+STEPS_CHUNK = 100
+print("Running a simple BB search correctness test (1 period = {} instances)".format(STEPS_CHUNK))
 print("[Ctrl-C] to stop")
 
+ctr = 0
 while True:
     A = vs.VarSeq.random(N = 8)
     B = vs.VarSeq.random(N = 8)
@@ -34,8 +36,9 @@ while True:
 
     BB_size = b.Ap_cand.size() + b.Bp_cand.size()
 
+    ctr = (ctr + 1) % STEPS_CHUNK
     if BB_size != opt_size:
         print("MISMATCH DETECTED:")
         print("Instance:\n{}\nvs.\n{}\nBB size={}, opt size ={}".format(A,B,BB_size,opt_size), flush = True)
-    # else:
-        # print(".",end="",flush=True)
+    elif ctr == 0:
+        print(".",end="",flush=True)
