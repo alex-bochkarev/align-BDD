@@ -13,7 +13,8 @@
 ## Files and directories
 PREF=./
 INST=$(PREF)/instances/raw
-LOGS=$(PREF)/run_logs
+LOGPREF=$(PREF)
+LOGS=$(LOGPREF)/run_logs
 ARC=./data_archive
 FIGS=./figures
 SOLVE=./solve_inst.py
@@ -28,19 +29,19 @@ PSCAL=./BB_orig_solve.py
 PAR_SOL=8
 
 ### random dataset stats
-LW_n=1000
+LW_n=100
 LW_N=15
 LW_Ps=0.3 0.6 0.9
 
 ### dataset generation parameters:
 p=0.6# dataset generation parameter
-n=5000# number of instances
+n=20000# number of instances
 N=15# number of variables per instance
 n_LBs=1000
 
 ### scalability figure
-SCAL_N=5 6 7 8 9 10 12 13 14 15 #16 17 18 19 20 #22 25 28
-SCAL_K=50
+SCAL_N=5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25
+SCAL_K=100
 SCAL_P=$(p)
 SCAL_R=R
 ######################################################################
