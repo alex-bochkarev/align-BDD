@@ -1,10 +1,11 @@
 """
-Implementation of the (exact) BDD-related machinery
+BDD.py -- implementation of the BDD-related machinery
 
 Involves actual variable ordering and BDDs alignment classes
-and functions (as opposed to the approximation of `varseq`)
+and functions (as opposed to the simplification defined
+in the `varseq.py`)
 
-(c) A. Bochkarev, Clemson University, 2019
+(c) A. Bochkarev, Clemson University, 2020
 """
 
 import numpy as np
@@ -61,7 +62,7 @@ class node(object):
 ######################################################################
 class BDD(object):
     """
-    Encodes a BDD and implements layer-ordering methods
+    Encodes a BDD and implements layer-ordering (revision) methods
 
     Attributes:
         layers: a list of layers (sets/hashes)
@@ -121,7 +122,10 @@ class BDD(object):
             return self.max_id
 
     def dump_gv(self,layerCapt = True):
-        """Exports the BDD to the Graphviz format"""
+        """Exports the BDD to the Graphviz format.
+
+        Returns: a Digraph object (see `graphviz` module).
+        """
         g = Digraph()
 
         for i, layer in enumerate(self.layers):
@@ -182,7 +186,8 @@ class BDD(object):
         return newnode
 
     def swap_up(self, layer):
-        """Swaps the layer with the one immediately above it (by _index_!)
+        """Swaps the layer with the one immediately above it
+        (by _index_! in-place operation)
 
         Arguments:
             layer: number (index) of the layer to be ''bubbled up''
@@ -541,6 +546,9 @@ class BDD(object):
         self.dump_gv(layerCapt).view("showfunc.dot", directory=dir, cleanup=True)
 
     def align_to(self, vars_order, inplace=False):
+        """revises the BDD to a given order
+        (with a series of consecutive sifts)"""
+
         if inplace:
             aligned = self
         else:
@@ -551,8 +559,13 @@ class BDD(object):
 
         return aligned;
 
-    def OA_bruteforce(self, with_what):
-        """finds the best (smallest) alignment with `with_what` BDD by bruteforce enumeration"""
+    def OA_bruteforce(self, with_what, LR=False):
+        """finds the best (smallest) alignment with BDD `with_what`
+        by brute-force enumeration.
+
+        `with_what` is assumed to be a BDD object.
+        If `LR` is set, layer-reduces each candidate BDD.
+        """
 
         # generate all possible permutations
         perms = iters.permutations(self.vars)
@@ -564,6 +577,10 @@ class BDD(object):
         for perm in perms:
             A_c = self.align_to(list(perm))
             B_c = with_what.align_to(list(perm))
+
+            if LR:
+                A_c.make_reduced()
+                B_c.make_reduced()
 
             if min_size > A_c.size() + B_c.size():
                 A_aligned = [A_c]
@@ -578,7 +595,7 @@ class BDD(object):
         return [alternatives, A_aligned, B_aligned]
 
     def is_reduced(self):
-        """quickly checks if the BDD is reduced (no ``redundant'' nodes)"""
+        """checks if the BDD is reduced (no ``redundant'' nodes)"""
 
         checked_nodes = set()
 
@@ -592,9 +609,9 @@ class BDD(object):
         return True
 
     def make_reduced(self):
-        """quickly makes the BDD reduced
+        """makes the BDD reduced
 
-        Swaps each layer back and forth, starting from the last ones
+        Swaps each layer back and forth, starting from the last one.
         """
 
         for i in range(len(self.vars)-1,0,-1):
@@ -602,6 +619,11 @@ class BDD(object):
             self.swap_up(i)
 
     def rename_vars(self, ren_dict):
+        """helper function: renames variables.
+
+        Arguments:
+          ren_dict -- a dict of labels in the form {before: after}"""
+
         new_vars = [ren_dict[v] for v in self.vars]
         self.vars = new_vars
         self.var_pos = dict(zip(self.vars,[i for i in range(len(self.vars))]))

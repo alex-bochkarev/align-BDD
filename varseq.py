@@ -12,7 +12,9 @@ import math
 
 class VarSeq:
     """Implements a weighted variable sequence data structure"""
+
     def __init__(self, layer_vars, layer_sizes):
+        """class constructor"""
         assert len(layer_vars)==len(layer_sizes) # obviously, each layer should have a size
         # NOTE: we do not enforce n_1 = 1
 
@@ -22,7 +24,7 @@ class VarSeq:
 
     # generating a random varseq
     @classmethod
-    def generate_nodes(cls, N):
+    def generate_weights(cls, N):
         """generates a random (valid) sequence of N weights: n_{i+1} <= 2n_i"""
         ns = [1]
         for i in range(N-1):
@@ -33,12 +35,12 @@ class VarSeq:
     def random(cls, vars = None, N = 7):
         """generates a random variable sequence
 
-        Returns a VarSeq object representing a weighted variable sequence
-        with N variables with random element weights. If no variable labels
-        are given, generates a random permutation of labels 1,...,N."""
+        Returns:  a VarSeq object representing a weighted variable sequence
+                  with N variables with random element weights. If no variable labels
+                  are given, uses a random permutation of labels 1,...,N."""
 
         if vars is None: vars = np.random.permutation([(i+1) for i in range(N)])
-        return cls(layer_vars=vars,layer_sizes = cls.generate_nodes(N))
+        return cls(layer_vars=vars,layer_sizes = cls.generate_weights(N))
 
     def size(self):
         """returns the total sequence size (sum of element weights)"""
@@ -49,10 +51,8 @@ class VarSeq:
 
         return self.n[ self.p[var] ]
 
-    # returns cost of sliding
-    # of the element a(int) to position j
     def S(self, a,j):
-        """returns cost of sliding"""
+        """returns cost of sliding (of element labeled a to position j)"""
         if self.p[a] == j:
             return 0 # nothing to do
 
@@ -64,8 +64,18 @@ class VarSeq:
 
     # performs an actual "slide"
     # of the element a(int) to position j
-    def slide(self, a, j):
-        s = copy.deepcopy(self)
+    def slide(self, a, j, inplace=False):
+        """performs a sift of element a to position j.
+
+        Returns:  a revised copy of a variable sequence
+                  or a self-pointer (if inplace=True)
+        """
+
+        if inplace:
+            s = self
+        else:
+            s = copy.deepcopy(self)
+
         if self.p[a] == j:
             return s
 
@@ -89,30 +99,18 @@ class VarSeq:
 
         return s
 
-    # just a simple wrapper function
-    # for code reliability
-    def reverse_up(self, a,b):
-        if a==b: return self
-
-        # ensure that a precedes b
-        if self.p[a] > self.p[b]:
-            a = a + b
-            b = a - b
-            a = a - b
-
-        return self.slide(b, self.p[a])
-
     ## auxiliary functions
-
-    ## used to print the var sequence
     def __str__(self):
+        """convert to string (used to print a sequence)"""
         return 'Vars: {}\nn   : {} (sz={})'.format(np.array(self.layer_var),np.array(self.n),np.sum(self.n))
 
-    ## returns a sequence length
     def __len__(self):
+        """returns a sequence length (no. of elements)"""
         return len(self.layer_var)
 
     def count_inversions_to(self, to_what):
+        """counts number of inversions with another list (or varseq)"""
+
         if type(to_what)==list:
             to_what = VarSeq(to_what,[1 for i in range(len(to_what))])
 
@@ -124,9 +122,12 @@ class VarSeq:
 
         return invs
 
-    ## transforms the diagram to align it
-    ## to the given variables order
+    # weighted variable sequence transformations (revisions)
     def greedy_sort(self, to_what = None):
+        """revises a varseq to a given order of labels (list/varseq)
+
+        Note: a naive implementation, ``sift-align'' procedure, O(N^2)
+        """
         if to_what is None:
             to_what = np.sort(self.layer_var)
 
@@ -135,61 +136,16 @@ class VarSeq:
             galigned = galigned.slide(to_what[i],i)
         return galigned;
 
-    ### align_to
-    ## aligns the seuqnece to a given order of variables
-    ## in "one pass", O(N)
     def align_to(self, to_what = None):
-        processed = set()
-        sliding_up = set()
-        chunk_start = 0; # note the numbering starts from zero
-        if to_what is None:
-            to_what = np.sort(self.layer_var)
+        """revises the varseq to given variable order in O(N) time.
 
-        if not (isinstance(to_what,list) or isinstance(to_what,tuple) or isinstance(to_what, np.ndarray)):
-            to_what = to_what.layer_var
+        Accepts a list/tuple/np.darray of target var names,
+        or a variable sequence (to extract variable labels from).
 
-        # to-be var indices for each variable
-        # in the current sequence
-        var_ind = [0 for i in range(len(self))]
+        Returns:  a revised variable sequence
+        Note:     the original sequence in unchanged (NOT in-place!)
+        """
 
-        for i in range(len(to_what)):
-            var_ind[self.p[to_what[i]]] = i
-        # var_ind[i] now is the index of the i-th variable  in the *target* alignment
-
-        # initalize an empty array (-1 to indicate un-init value)
-        lsorted = VarSeq(to_what, [-1]*len(self))
-
-        for i in range(len(self)):
-            if (var_ind[i] > i) and not self.layer_var[i] in processed:
-                ## "moving" the var down
-                lsorted.n[chunk_start] = self.n[i]*2**len(sliding_up)
-                if chunk_start != var_ind[i]:
-                    sliding_up.add(lsorted.layer_var[chunk_start])
-                    processed.add(lsorted.layer_var[chunk_start])
-
-                for j in range(chunk_start+1, var_ind[i]+1):
-                    lsorted.n[j] = lsorted.n[j-1]*2
-                    if j!=var_ind[i]: sliding_up.add(lsorted.layer_var[j])
-                    processed.add(lsorted.layer_var[j])
-
-                chunk_start = var_ind[i]+1
-                if chunk_start == len(self):
-                    break
-            else:
-                if self.layer_var[i] in sliding_up:
-                    sliding_up.remove(self.layer_var[i])
-
-                if var_ind[i] == i and not self.layer_var[i] in processed:
-                    lsorted.n[i] = self.n[i]*2**len(sliding_up)
-                    chunk_start += 1
-                    if chunk_start == len(self): break
-
-            ## update vars index
-            self.p[self.layer_var[i]] = i
-
-        return lsorted
-
-    def q_align_to(self, to_what = None):
         if to_what is None:
             to_what = np.sort(self.layer_var)
 
@@ -206,14 +162,15 @@ class VarSeq:
 
         # var_ind[i] now is the index of the i-th variable  in the *target* alignment
 
-        # initalize an empty array (-1 to indicate un-init value)
+        # initalize an empty sequence (-1 to indicate un-init value)
         lsorted = VarSeq(to_what, [-1]*len(self))
 
         sliding_up = set()
         iB = 0
         for iA in range(len(self)):
             if not self.layer_var[iA] in sliding_up:
-                ## "moving" the var down
+                ## a "sinking" element found
+
                 lsorted.n[iB] = self.n[iA]*(2**len(sliding_up))
 
                 while iB < var_ind[iA]:
@@ -228,6 +185,13 @@ class VarSeq:
         return lsorted
 
     def OA_bruteforce(self, with_what):
+        """Enumerates all the possible alignments with another
+        variable sequence by brute-force enumeration.
+
+        Note: with_what must be a variable sequence
+        Returns: a list, [<no. of optima>, <list of A-aligned>, <list of B-aligned>]
+        """
+
         # generate all possible permutations
         perms = iters.permutations(self.layer_var)
         min_size = math.inf
@@ -251,30 +215,19 @@ class VarSeq:
         return [alternatives, A_aligned, B_aligned]
 
     def is_aligned(self, to_what):
+        """helper function: checks if varseq is aligned w/ to_what"""
         return np.array_equal(self.layer_var, to_what.layer_var)
 
 ######################################################################
-## Auxiliary functions
+## Auxiliary functions (outside of the varseq class)
 
-## checks if the element "e" is non-dominated
-## with respect to VarSeq-s A and B
-## RETURNS: True = non-dominated, False = dominated
 def non_dominated(e, A, B):
+    """checks if the element "e" is non-dominated
+    (as a candidate for the last position) in VarSeq-s A and B
+
+    Returns: True = non-dominated, False = dominated"""
+
     if A.p[e]==len(A)-1 or B.p[e]==len(B)-1:
         return True
     else:
         return set(A.layer_var[A.p[e]+1:]).isdisjoint(set(B.layer_var[B.p[e]+1:]))
-
-## checks if moving an element "e"
-## would break any "aligned-pairs"
-## RETURNS: True = no aligned-pair breaks, False = slide would break an aligned pair
-def no_aligned_pair_breaks(e, A, B):
-    for i in range(A.p[e],len(A)):
-        if B.p[e] < B.p[A.layer_var[i]]:
-            return False
-
-    for i in range(B.p[e],len(B)):
-        if A.p[e] < A.p[B.layer_var[i]]:
-            return False
-
-    return True

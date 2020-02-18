@@ -1,8 +1,12 @@
-# Branch and bound type algorithm implementation
-# A. Bochkarev, 2019
+"""
+BB_search.py -- a branch-and-bound search scheme
+implementation for the align-sequences problem.
+
+(c) A. Bochkarev, Clemson University, 2020
+abochka@clemson.edu
+"""
 
 import varseq as vs
-#import seaborn as sns
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
@@ -20,59 +24,6 @@ UB_UPDATE_FREQ = 5000 # in iterations
 ALWAYS_FAST = True
 
 ######################################################################
-## HEURISTICS for UB calculation
-
-def fix_effect(A,B,a,pos):
-    return A.align_to(B.layer_var).size() - A.align_to(B.slide(a,pos).layer_var).size() - B.S(a,pos)
-
-def stable_algt(A,B,algt):
-
-    Ap = A.align_to(algt)
-    Bp = B.align_to(algt)
-
-    for i in range(len(A)):
-        for j in range(len(A)):
-            if fix_effect(A,Bp,A.layer_var[i],j) > 0 or fix_effect(B,Ap,B.layer_var[i],j) > 0:
-                return False
-
-    return True
-
-def greedy_fix(A,B,track=False):
-    X = vs.VarSeq(layer_vars = B.layer_var, layer_sizes = [1 for i in range(len(A))])
-    tr = [copy.copy(X.layer_var)]
-    while not stable_algt(A,B,X.layer_var):
-        for i in range(len(A)):
-            for j in range(len(A)):
-                if fix_effect(B,A.align_to(X.layer_var),B.layer_var[i],j) > 0:
-                    X = X.slide(B.layer_var[i],j)
-                    tr.append(X.layer_var)
-
-        for i in range(len(A)):
-            for j in range(len(A)):
-                if fix_effect(A,B.align_to(X.layer_var),A.layer_var[i],j) > 0:
-                    X = X.slide(A.layer_var[i],j)
-                    tr.append(X.layer_var)
-
-    if track:
-        return tr
-    else:
-        return [A.align_to(X.layer_var), B.align_to(X.layer_var)]
-
-## a simpler approach -- neighborhood search
-def nsearch(A,B,track=False):
-    X = vs.VarSeq(layer_vars = B.layer_var, layer_sizes = [1 for i in range(len(A))])
-    tr = [copy.copy(X.layer_var)]
-    done = False
-    while not done:
-        cur_size = A.align_to(X).size() + B.align_to(X).size()
-        for i in range(len(X)):
-            for j in range(len(X)):
-                Xc = X.slide(X.layer_var[i])
-
-## END of HEURISTICS section
-######################################################################
-
-######################################################################
 ## Lower bound calculations
 def LB_current(A,B):
     """current size (before the alignment)"""
@@ -88,6 +39,7 @@ def LB_last_aligned(A,B):
     return min([A.slide(A.layer_var[i],N).size() + B.slide(A.layer_var[i],N).size() for i in range(N+1)])
 
 def LB_by_level(A,B):
+    """inversions-driven heuristic"""
     N = len(A)
     LB = LB_current(A,B)
 
@@ -104,6 +56,7 @@ def LB_by_level(A,B):
     return LB
 
 def LB_by_level_complicated(A,B):
+    """inversions-driven heuristic (improved)"""
     N = len(A)
     LB = LB_current(A,B)
 
@@ -120,11 +73,15 @@ def LB_by_level_complicated(A,B):
     return LB
 
 def LB_lvl_compl_symm(A,B):
+    """symmetric version of the previous one"""
     return max(LB_by_level_complicated(A,B), LB_by_level_complicated(B,A))
 
 def LB_lvl_symm(A,B):
+    """symmetric version of the `LB_by_level`"""
+
     return max(LB_by_level(A,B), LB_by_level(B,A))
 
+# List of lower bounds to examine
 # CODE - FUNC - LEGEND
 LOWER_BOUNDS = [
     ["LB_first",LB_first_aligned,"min size first element aligned"],
@@ -134,18 +91,22 @@ LOWER_BOUNDS = [
 #    ["LB_lvl_symm",LB_lvl_symm,"inversion-driven (symmetric)"]
 #    ["LB_lvl_symm_amd",LB_lvl_compl_symm,"inversion-driven (amd, symm)"]
 ]
+
 ######################################################################
 ## auxiliary functions
 
-###
-# DOT graph (tree) export-specific
-# adding labels (for DOT export)
+## DOT graph (tree) export-specific
+## adding labels (for DOT export)
 def nodenamefunc(node):
+    """generates node names for graphviz export"""
+
     fixed_A_start = node.A_tail_start #len(node.A)-node.depth
     fixed_B_start = node.B_tail_start #len(node.B)-node.depth
     return "{}[{}]\nA:{}{}({: >3d})\nB:{}{}({: >3d})\n|A|+|B|={}, LB:{}, UB:{}".format(node.name, node.status, node.A.layer_var[:fixed_A_start],node.A.layer_var[fixed_A_start:],node.A.size(), node.B.layer_var[:fixed_B_start],node.B.layer_var[fixed_B_start:], node.B.size(),node.size(), node.LB, node.UB)
 
 def nodeattrfunc(node):
+    """generates node attributes for graphviz export"""
+
     nlabel = "xlabel=\"Tree: LB={}, UB={}, obj={}\"".format(node.tree_LB,node.tree_UB, node.best_obj)
     ncolor = ""
 
@@ -159,16 +120,17 @@ def nodeattrfunc(node):
         ncolor = "penwidth=5"
 
     return "{},{}".format(nlabel,ncolor)
-#
-###
 
 ######################################################################
 ## class SearchNode
 ## node-level search logic
 ## node status chars: I - init-d, ? - open, E - expanded, P - pruned,
 ##                    T - terminal
+
 class SearchNode(at.NodeMixin):
+    """Implements search tree node-related logic"""
     def __init__(self, name, parent, Aresid, Bresid, A_tail_start, B_tail_start,A,B):
+        """class constructor"""
         self.name = name
         self.parent = parent
         self.Ar = copy.deepcopy(Aresid)
@@ -187,10 +149,12 @@ class SearchNode(at.NodeMixin):
         self.UB = None
 
     def size(self):
+        """returns node size (total no. of nodes in both diagrams)"""
         return self.A.size() + self.B.size()
 
     # upper bound at the current node
     def calculate_UB(self, t='fast'):
+        """returns an upper bound for the specific node"""
         if self.status == "T":
             self.UB = self.A.size()+self.B.size()
             order = self.A.layer_var
@@ -220,11 +184,10 @@ class SearchNode(at.NodeMixin):
         return np.random.ranf() > 0.5
 
 ######################################################################
-## class BBSearch
-## data structure to keep the search tree and the tree-level logic
 class BBSearch:
-    # technical: tree initialization procedure
+    """keeps the search tree and search tree-level logic"""
     def __init__(self, A,B):
+        """class constructor"""
         self.A = A
         self.B = B
         self.step = 0
@@ -266,8 +229,8 @@ class BBSearch:
 
         return self.Ap_cand.size()+self.Bp_cand.size()
 
-    # technical: dump the tree into a DOT-file (graphivz)
     def dump(self, filename=None):
+        """technical: dump the tree into a DOT-file (graphivz)"""
         if filename and self.root:
             DotExporter(self.root, nodenamefunc=nodenamefunc,nodeattrfunc = nodeattrfunc).to_dotfile(filename)
 
@@ -314,9 +277,9 @@ class BBSearch:
 
         return False
 
-    ## !!!
-    ## the main search procedure
     def search(self):
+        """main procedure: performs BB search"""
+
         # calculate the initial UB and LB
         if self.status=="optimal" or len(self.open_nodes)==0:
             if self.verbose:
@@ -369,9 +332,8 @@ class BBSearch:
 
         return self.status
 
-    ## "expanding" a search tree node
     def expand(self, node, node_LB, step=0):
-        """Process the node =node="""
+        """Processes the node `node`"""
         if self.verbose:
             print("Node expansion: {}, node LB={}, UB={}".format(node.name, node.LB, node.UB))
 
@@ -469,5 +431,3 @@ class BBSearch:
             self.logs_step.append(step)
             self.logs_UB.append(self.UB)
             self.logs_LB.append(self.LB)
-
-    ## auxiliary functions

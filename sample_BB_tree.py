@@ -2,7 +2,7 @@
 Aux script: draws a sample B&B search tree
 for the auxiliary problem (with varseqs)
 
-(c) A. Bochkarev, Clemson University, 2019
+(c) A. Bochkarev, Clemson University, 2020
 abochka@clemson.edu
 """
 # import timeit

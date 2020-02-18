@@ -1,10 +1,15 @@
 """
-Benchmarks several heuristic algos against a given set
-of varseq instances (from a given folder)
+Implements several heuristics
+to be tested with a separate script
+
+(also contains some legacy testing code)
 
 (c) A. Bochkarev, Clemson University, 2019
 abochka@clemson.edu
 """
+
+# TODO: review the legacy code / consider moving
+
 import sys
 import requests # needed for Telegram
 import numpy as np
@@ -18,13 +23,6 @@ from copy import deepcopy, copy
 import cProfile
 import pstats
 
-
-def tg_sendtext(bot_message):
-    bot_token = '<token>'
-    bot_chatID = '<chatid>'
-    send_text = 'https://api.telegram.org/bot' + bot_token + '/sendMessage?chat_id=' + bot_chatID + '&parse_mode=Markdown&text=' + bot_message
-    response = requests.get(send_text)
-    return response.json()
 
 def toA(A,B):
     Bp = B.align_to(A)

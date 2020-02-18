@@ -1,8 +1,8 @@
 """
-Aux script: generates a dataset for BDDs
+Auxiliary script: generates a dataset for BDDs
 (given a list of BDD filenames)
 
-(c) A. Bochkarev, Clemson University, 2019
+(c) A. Bochkarev, Clemson University, 2020
 abochka@clemson.edu
 """
 
