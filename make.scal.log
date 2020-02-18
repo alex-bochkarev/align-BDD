@@ -1,8 +1,30 @@
-mkdir -p .//instances/raw/sc25 && \
-python ./gen_BDD_pair.py -n 10 -v 25 -p 0.6 -UN .//instances/raw/sc25 > .//instances/raw/sc25/gen.log && \
-basename -a -s .bdd .//instances/raw/sc25/A*.bdd | sed 's/A//' > .//instances/raw/sc25/inst.list && \
-python ./scal_test.py -l .//instances/raw/sc25/inst.list -d .//instances/raw/sc25/ > run_logs/scal_N25.log
-mkdir -p .//instances/raw/sc28 && \
-python ./gen_BDD_pair.py -n 10 -v 28 -p 0.6 -UN .//instances/raw/sc28 > .//instances/raw/sc28/gen.log && \
-basename -a -s .bdd .//instances/raw/sc28/A*.bdd | sed 's/A//' > .//instances/raw/sc28/inst.list && \
-python ./scal_test.py -l .//instances/raw/sc28/inst.list -d .//instances/raw/sc28/ > run_logs/scal_N28.log
+Preparing instances for the scalability set...
+i=0 && \
+rm -rf /local_scratch/pbs.8098962.pbs02//instances/raw/scal && \
+mkdir -p /local_scratch/pbs.8098962.pbs02//instances/raw/scal && \
+for S in 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 ; do \
+	python ./gen_BDD_pair.py -s $(( 250 * ${i} )) -n 250 -v $S -p 0.6 -RU /local_scratch/pbs.8098962.pbs02//instances/raw/scal/ > /dev/null &&\
+	i=$(( ${i} + 1 ));\
+done && \
+ls /local_scratch/pbs.8098962.pbs02//instances/raw/scal | grep -Po "A\\K[^\\.]*" > /local_scratch/pbs.8098962.pbs02//instances/raw/scal/instances.list && \
+split -d -nl/16 /local_scratch/pbs.8098962.pbs02//instances/raw/scal/instances.list /local_scratch/pbs.8098962.pbs02//instances/raw/scal/instances.list.
+python ./BB_orig_solve.py -i /local_scratch/pbs.8098962.pbs02//instances/raw/scal/instances.list.00 -o /local_scratch/pbs.8098962.pbs02//run_logs/part.scal.00.log -d /local_scratch/pbs.8098962.pbs02//instances/raw/scal/
+python ./BB_orig_solve.py -i /local_scratch/pbs.8098962.pbs02//instances/raw/scal/instances.list.01 -o /local_scratch/pbs.8098962.pbs02//run_logs/part.scal.01.log -d /local_scratch/pbs.8098962.pbs02//instances/raw/scal/
+python ./BB_orig_solve.py -i /local_scratch/pbs.8098962.pbs02//instances/raw/scal/instances.list.02 -o /local_scratch/pbs.8098962.pbs02//run_logs/part.scal.02.log -d /local_scratch/pbs.8098962.pbs02//instances/raw/scal/
+python ./BB_orig_solve.py -i /local_scratch/pbs.8098962.pbs02//instances/raw/scal/instances.list.03 -o /local_scratch/pbs.8098962.pbs02//run_logs/part.scal.03.log -d /local_scratch/pbs.8098962.pbs02//instances/raw/scal/
+python ./BB_orig_solve.py -i /local_scratch/pbs.8098962.pbs02//instances/raw/scal/instances.list.04 -o /local_scratch/pbs.8098962.pbs02//run_logs/part.scal.04.log -d /local_scratch/pbs.8098962.pbs02//instances/raw/scal/
+python ./BB_orig_solve.py -i /local_scratch/pbs.8098962.pbs02//instances/raw/scal/instances.list.05 -o /local_scratch/pbs.8098962.pbs02//run_logs/part.scal.05.log -d /local_scratch/pbs.8098962.pbs02//instances/raw/scal/
+python ./BB_orig_solve.py -i /local_scratch/pbs.8098962.pbs02//instances/raw/scal/instances.list.06 -o /local_scratch/pbs.8098962.pbs02//run_logs/part.scal.06.log -d /local_scratch/pbs.8098962.pbs02//instances/raw/scal/
+python ./BB_orig_solve.py -i /local_scratch/pbs.8098962.pbs02//instances/raw/scal/instances.list.07 -o /local_scratch/pbs.8098962.pbs02//run_logs/part.scal.07.log -d /local_scratch/pbs.8098962.pbs02//instances/raw/scal/
+python ./BB_orig_solve.py -i /local_scratch/pbs.8098962.pbs02//instances/raw/scal/instances.list.08 -o /local_scratch/pbs.8098962.pbs02//run_logs/part.scal.08.log -d /local_scratch/pbs.8098962.pbs02//instances/raw/scal/
+python ./BB_orig_solve.py -i /local_scratch/pbs.8098962.pbs02//instances/raw/scal/instances.list.09 -o /local_scratch/pbs.8098962.pbs02//run_logs/part.scal.09.log -d /local_scratch/pbs.8098962.pbs02//instances/raw/scal/
+python ./BB_orig_solve.py -i /local_scratch/pbs.8098962.pbs02//instances/raw/scal/instances.list.10 -o /local_scratch/pbs.8098962.pbs02//run_logs/part.scal.10.log -d /local_scratch/pbs.8098962.pbs02//instances/raw/scal/
+python ./BB_orig_solve.py -i /local_scratch/pbs.8098962.pbs02//instances/raw/scal/instances.list.11 -o /local_scratch/pbs.8098962.pbs02//run_logs/part.scal.11.log -d /local_scratch/pbs.8098962.pbs02//instances/raw/scal/
+python ./BB_orig_solve.py -i /local_scratch/pbs.8098962.pbs02//instances/raw/scal/instances.list.12 -o /local_scratch/pbs.8098962.pbs02//run_logs/part.scal.12.log -d /local_scratch/pbs.8098962.pbs02//instances/raw/scal/
+python ./BB_orig_solve.py -i /local_scratch/pbs.8098962.pbs02//instances/raw/scal/instances.list.13 -o /local_scratch/pbs.8098962.pbs02//run_logs/part.scal.13.log -d /local_scratch/pbs.8098962.pbs02//instances/raw/scal/
+python ./BB_orig_solve.py -i /local_scratch/pbs.8098962.pbs02//instances/raw/scal/instances.list.14 -o /local_scratch/pbs.8098962.pbs02//run_logs/part.scal.14.log -d /local_scratch/pbs.8098962.pbs02//instances/raw/scal/
+python ./BB_orig_solve.py -i /local_scratch/pbs.8098962.pbs02//instances/raw/scal/instances.list.15 -o /local_scratch/pbs.8098962.pbs02//run_logs/part.scal.15.log -d /local_scratch/pbs.8098962.pbs02//instances/raw/scal/
+make: *** Deleting file `/local_scratch/pbs.8098962.pbs02//run_logs/part.scal.14.log'
+make: *** Deleting file `/local_scratch/pbs.8098962.pbs02//run_logs/part.scal.13.log'
+make: *** [/local_scratch/pbs.8098962.pbs02//run_logs/part.scal.14.log] Terminated
+make: *** [/local_scratch/pbs.8098962.pbs02//run_logs/part.scal.13.log] Terminated

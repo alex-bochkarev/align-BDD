@@ -25,7 +25,7 @@ CMP_LBs=./compare_simpl_LBs.py
 PSCAL=./BB_orig_solve.py
 ######################################################################
 ## Numerical parameters
-PAR_SOL=8
+PAR_SOL=16
 
 ### random dataset stats
 LW_n=1000
@@ -39,10 +39,10 @@ N=15# number of variables per instance
 n_LBs=1000
 
 ### scalability figure
-SCAL_N=5 6 7 8 9 10 12 13 14 15 16 17 18 19 20 #22 25 28
-SCAL_K=500
-SCAL_P=$(p)
-SCAL_R=N
+SCAL_N=5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 #28
+SCAL_K=250
+SCAL_P=0.5
+SCAL_R=R
 ######################################################################
 ## calculated vars/parameters
 SCAL_FILES=$(addsuffix .log, $(addprefix $(LOGS)/scal_$(SCAL_R),$(SCAL_N)))
@@ -242,7 +242,7 @@ install_R_pkg:
 move-logs:
 	@echo moving logs away from $(LOGS) to $(ARC)
 	tar --remove-files -czf $(ARC)/$(DTE)-logs.tar.gz $(LOGS)/*
-	touch move_logs
+	touch move-logs
 
 # clean recipes
 clean-raw-inst:
