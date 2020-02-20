@@ -1,0 +1,27 @@
+mkdir -p /local_scratch/pbs.8134185.pbs02//instances/raw/R /local_scratch/pbs.8134185.pbs02//instances/raw/N
+mkdir -p /local_scratch/pbs.8134185.pbs02//run_logs
+Cleaning up raw instances in /local_scratch/pbs.8134185.pbs02//instances/raw...
+rm -f /local_scratch/pbs.8134185.pbs02//instances/raw/R/*.bdd
+rm -f /local_scratch/pbs.8134185.pbs02//instances/raw/R/*.list*
+rm -f /local_scratch/pbs.8134185.pbs02//instances/raw/N/*.bdd
+rm -f /local_scratch/pbs.8134185.pbs02//instances/raw/N/*.list*
+rm -rf /local_scratch/pbs.8134185.pbs02//instances/raw/ds_stats
+rm -f /local_scratch/pbs.8134185.pbs02//instances/raw/*.bdd
+Cleaning up log files...
+rm -f /local_scratch/pbs.8134185.pbs02//run_logs/*.log
+ 
+ 
++------------------------------------------+ 
+| PALMETTO CLUSTER PBS RESOURCES REQUESTED | 
++------------------------------------------+ 
+ 
+mem=15gb,ncpus=16,walltime=37:00:00
+ 
+ 
++-------------------------------------+ 
+| PALMETTO CLUSTER PBS RESOURCES USED | 
++-------------------------------------+ 
+ 
+cpupercent=258,cput=26:02:52,mem=1639732kb,ncpus=16,vmem=2735340kb,walltime=23:44:43
+ 
+ 

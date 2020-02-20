@@ -1,0 +1,18 @@
+mkdir -p /local_scratch/pbs.8131945.pbs02//instances/raw/R /local_scratch/pbs.8131945.pbs02//instances/raw/N
+mkdir -p /local_scratch/pbs.8131945.pbs02//run_logs
+ 
+ 
++------------------------------------------+ 
+| PALMETTO CLUSTER PBS RESOURCES REQUESTED | 
++------------------------------------------+ 
+ 
+mem=15gb,ncpus=16,walltime=37:00:00
+ 
+ 
++-------------------------------------+ 
+| PALMETTO CLUSTER PBS RESOURCES USED | 
++-------------------------------------+ 
+ 
+cpupercent=589,cput=24:12:24,mem=1531116kb,ncpus=16,vmem=4888148kb,walltime=16:09:57
+ 
+ 

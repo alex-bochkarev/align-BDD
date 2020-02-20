@@ -1,10 +1,10 @@
 #PBS -N Scal
-#PBS -l select=1:ncpus=1:mem=15gb,walltime=12:00:00
+#PBS -l select=1:ncpus=16:mem=15gb,walltime=37:00:00
 #PBS -M abochka@clemson.edu
 #PBS -m abe
 
 # boilerplate things
-STARTMSG="START: scalability figure"
+STARTMSG="START: scalability figure, parallel (revised-2)"
 ENDMSG="END: scalability figure done."
 
 module add anaconda3/5.1.0
@@ -19,14 +19,16 @@ cd /home/abochka/BDD/align-BDD
 echo $STARTMSG | $tg > /dev/null
 make prep_dirs PREF=$TMPDIR/
 echo making the scalability figure | $tg > /dev/null
-make scalfig > make.scal.log
-echo moving logfiles... | $tg > /dev/null
-make move_logs PREF=$TMPDIR/
+make -j16 scalfig PREF=$TMPDIR/ LOGPREF=./ > ./make.scal.log 2>&1
+cd figures
+convert fig_scal.eps fig_scal.png
+$tgi ./fig_scal.png > /dev/null
+rm ./fig_scal.png
+cd ..
+
 echo cleaning... | $tg > /dev/null
 make clean-tmp PREF=$TMPDIR/
 echo $ENDMSG | $tg > /dev/null
-echo showing resulting images: | $tg
-cd figures
-$tgi figures/fig_scal.eps > /dev/null
 # deactivate the env
 source deactivate ab-local
+

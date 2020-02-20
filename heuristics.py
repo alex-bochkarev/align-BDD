@@ -296,8 +296,8 @@ def fast_greedy_2sifts(A,B):
 
 def orig_simpl(A,B,simpl):
     Ap = deepcopy(A); Bp = deepcopy(B)
-    Ap.align_to(simpl["simpl_BB"][2])
-    Bp.align_to(simpl["simpl_BB"][2])
+    Ap.align_to(simpl["simpl_BB"][2],inplace=True)
+    Bp.align_to(simpl["simpl_BB"][2],inplace=True)
     return [Ap.size()+Bp.size(),simpl["simpl_BB"][1], simpl["simpl_BB"][2]]
 
 def orig_gsifts1p(A,B,simpl):
