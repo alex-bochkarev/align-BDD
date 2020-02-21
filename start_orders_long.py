@@ -14,7 +14,7 @@ from math import factorial
 from itertools import permutations
 from copy import deepcopy,copy
 from BB_search import BBSearch
-from argparse import ArgumentsParser, ArgumentDefaultsHelpFormatter
+from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
 
 N = 3
 if __name__ == "__main__":
@@ -22,7 +22,7 @@ if __name__ == "__main__":
                                formatter_class=ArgumentDefaultsHelpFormatter)
     parser.add_argument("-N", "--no_vars", action="store", dest="N", help="help",
                         type=int,default=3)
-    parser.add_argument("-d","--directory","out_dir", help="output directory (to save bdds)")
+    parser.add_argument("-d","--directory",dest="out_dir", help="output directory (to save bdds)")
 
     args = parser.parse_args()
     N = args.N
