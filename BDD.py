@@ -257,7 +257,7 @@ class BDD(object):
 
 
     def sift(self, var, pos):
-        """Sifts a variable `var`(name, not index) to position `pos`"""
+        """Sifts a variable `var`(name, not index) to position `pos`, in-place"""
 
         assert pos >= 0 and pos < len(self.layers)-1
         assert var in self.vars
@@ -627,6 +627,10 @@ class BDD(object):
         new_vars = [ren_dict[v] for v in self.vars]
         self.vars = new_vars
         self.var_pos = dict(zip(self.vars,[i for i in range(len(self.vars))]))
+
+    def is_aligned(self, to_what):
+        """helper function: checks if the BDD is aligned w/ to_what"""
+        return np.array_equal(self.vars, to_what.vars)
 
 ######################################################################
 ## testing code

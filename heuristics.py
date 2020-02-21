@@ -16,6 +16,9 @@ import numpy as np
 
 import opt_parser as als
 import varseq as vs
+import BB_search as BB
+import BDD as BDD
+
 from glob import glob
 from copy import deepcopy, copy
 
@@ -296,8 +299,9 @@ def fast_greedy_2sifts(A,B):
 
 def orig_simpl(A,B,simpl):
     Ap = deepcopy(A); Bp = deepcopy(B)
-    Ap.align_to(simpl["simpl_BB"][2])
-    Bp.align_to(simpl["simpl_BB"][2])
+    Ap.align_to(simpl["simpl_BB"][2],inplace=True)
+    Bp.align_to(simpl["simpl_BB"][2],inplace=True)
+    assert Ap.is_aligned(Bp)
     return [Ap.size()+Bp.size(),simpl["simpl_BB"][1], simpl["simpl_BB"][2]]
 
 def orig_gsifts1p(A,B,simpl):
@@ -334,6 +338,109 @@ def orig_5random(A,B,simpl):
             best_o = copy(Ap.vars)
     return [best_size, 0, best_o]
 
+def orig_interleaved(A,B,simpl):
+    N = len(A)
+    Nlast = N
+    Ac = deepcopy(A); Bc = deepcopy(B);
+
+    for i in range(Nlast):
+        if Ac.vars[i] == Bc.vars[i]:
+            continue
+
+        vsA = vs.VarSeq(Ac.vars[i:], [Ac.n(j) for j in range(i,N)])
+        vsB = vs.VarSeq(Bc.vars[i:], [Bc.n(j) for j in range(i,N)])
+        b = BB.BBSearch(vsA,vsB)
+        b.search()
+        cand_var = b.Ap_cand.layer_var[0]
+        Ac.sift(cand_var,i)
+        Bc.sift(cand_var,i)
+
+    i = Nlast
+    vsAF = vs.VarSeq(Ac.vars[i:], [Ac.n(j) for j in range(i,N)])
+    vsBF = vs.VarSeq(Bc.vars[i:], [Bc.n(j) for j in range(i,N)])
+    b = BB.BBSearch(vsAF,vsBF)
+    b.search()
+    for i in range(Nlast,N):
+        cand_var = b.Ap_cand.layer_var[i-Nlast]
+        Ac.sift(cand_var,i)
+        Bc.sift(cand_var,i)
+
+    assert Ac.is_aligned(Bc)
+
+    return [Ac.size()+Bc.size(),0,Ac.vars]
+
+def orig_meta(A,B,simpl):
+    N = len(A)
+    Ac = deepcopy(A); Bc = deepcopy(B);
+    vsA = vs.VarSeq(Ac.vars, [Ac.n(j) for j in range(N)])
+    vsB = vs.VarSeq(Bc.vars, [Bc.n(j) for j in range(N)])
+    b = BB.BBSearch(vsA,vsB)
+    b.search()
+
+    Ac.gsifts(Bc, start_order=b.Ap_cand.layer_var)
+
+    assert Ac.is_aligned(Bc)
+    return [Ac.size()+Bc.size(),0,Ac.vars]
+
+def orig_interleave_when_diverge(A,B,simpl):
+    ALLOWANCE = 0.99
+    Ap = deepcopy(A); Bp = deepcopy(B)
+    N = len(Ap)
+    vsA = vs.VarSeq(A.vars, [A.n(i) for i in range(N)])
+    vsB = vs.VarSeq(B.vars, [B.n(i) for i in range(N)])
+
+    simpl_order = simpl["simpl_BB"][2]
+    i = 0
+    while i<N:
+        if Ap.vars[i] == Bp.vars[i]:
+            i += 1
+            continue
+        Ap.sift(simpl_order[i],i)
+        Bp.sift(simpl_order[i],i)
+        vsA.slide(simpl_order[i],i,inplace=True)
+        vsB.slide(simpl_order[i],i,inplace=True)
+        if (Ap.size()+Bp.size() < ALLOWANCE * (vsA.size()+vsB.size())) and i<8:
+            # we diverged too much -- need to re-solve
+            # rebuild varseqs
+            vsA = vs.VarSeq(Ap.vars, [Ap.n(i) for i in range(N)])
+            vsB = vs.VarSeq(Bp.vars, [Bp.n(i) for i in range(N)])
+            # solve the simplified problem
+            b = BB.BBSearch(vsA,vsB)
+            b.search()
+            simpl_order = b.Ap_cand.layer_var
+
+        i += 1
+
+    assert Ap.is_aligned(Bp)
+    return [Ap.size()+Bp.size(),simpl["simpl_BB"][1], simpl_order]
+
+def orig_rnd_starts(A,B,simpl):
+    best_o = simpl["simpl_BB"][2] # retrieve opt order
+    best_size = deepcopy(A).align_to(best_o).size() + deepcopy(B).align_to(best_o).size()
+
+    N = len(A)
+    for i in range(5):
+        Ap = deepcopy(A);
+        Bp = deepcopy(B);
+
+        Ap = Ap.align_to(np.random.permutation(A.vars))
+        Bp = Bp.align_to(np.random.permutation(B.vars))
+
+        vsA = vs.VarSeq(Ap.vars, [Ap.n(i) for i in range(N)])
+        vsB = vs.VarSeq(Bp.vars, [Bp.n(i) for i in range(N)])
+        # solve the simplified problem
+        b = BB.BBSearch(vsA,vsB)
+        b.search()
+        simpl_order = b.Ap_cand.layer_var
+        Ap = Ap.align_to(simpl_order)
+        Bp = Bp.align_to(simpl_order)
+
+        if (Ap.size()+Bp.size()) < best_size:
+            best_size = Ap.size()+Bp.size()
+            best_o = copy(Ap.vars)
+
+    return [best_size, 0, best_o]
+
 # heuristic structure
 # CODE - FUNC - LEGEND
 SIMPL_HEU = [
@@ -352,8 +459,12 @@ ORIG_HEU = [
     ["orig_simpl",orig_simpl,"simplified problem"],
     ["orig_gsifts1p",orig_gsifts1p,"greedy BDD sifts (1 pass)"],
     ["orig_bestAB",orig_bestAB,"best of A and B"],
-    ["orig_5random",orig_5random,"best of 5 random orders"]
+    # ["orig_5random",orig_5random,"best of 5 random orders"],
+    ["orig_ild",orig_interleave_when_diverge,"interleave-when-diverge"],
+    ["orig_simpl_rnd",orig_rnd_starts,"simplified problem w/randomized starts"]
+    # ["orig_meta",orig_meta,"greedy sifts + simplified problem"]
 ]
+
 if __name__ == "__main__":
     if len(sys.argv) != 2:
         print("USAGE: {} <inst_directory>/".format(sys.argv[0]))
