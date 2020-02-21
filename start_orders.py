@@ -16,7 +16,7 @@ from copy import deepcopy
 from BB_search import BBSearch
 import matplotlib.pyplot as plt
 
-N = 7
+N = 8
 # if __name__ == "__main__":
 print("# Generating a problem...")
 A = BDD.random(N=N); B = BDD.random(N=N)
@@ -25,28 +25,28 @@ B.rename_vars(dict(zip([i for i in range(1,N+1)],np.random.permutation([i for i 
 A.make_reduced()
 B.make_reduced()
 print("# Generated. Initial size {}".format(A.size()+B.size()))
+print("# A: {}|{}; B:{}|{}".format(A.vars, [A.n(i) for i in range(N)],
+    B.vars, [B.n(i) for i in range(N)]))
+
 print("# Solving...")
 no_opts, As, Bs = A.OA_bruteforce(B)
 print("# done. Optimal objective: {}".format(As[0].size()+Bs[0].size()))
 print("# Building all the possible {} orderings...".format(factorial(N)))
 perms = permutations(A.vars)
 orders = [o for o in perms]
-print("# Building all the possible {} problem configurations...".format(len(orders)*(len(orders)+1)/2))
-configs = []
+print("# Solving for all the possible {} problem configurations...".format(len(orders)*(len(orders)+1)/2))
+print("MIN_I_OPT,I_AB,objective")
 for i in range(len(orders)):
     for j in range(i,len(orders)):
-        configs.append([orders[i],orders[j]])
+        c = [orders[i],orders[j]]
 
-print("# Re-solving for all orders")
-objs = []
-print("MIN_I_OPT,I_AB,objective")
-for c in configs:
-    Ap = deepcopy(A); Bp = deepcopy(B)
-    Ap.align_to(c[0],inplace=True); B.align_to(c[1],inplace=True)
-    vsA = VarSeq(Ap.vars,[Ap.n(i) for i in range(N)])
-    vsB = VarSeq(Bp.vars,[Bp.n(i) for i in range(N)])
-    b = BBSearch(vsA,vsB)
-    b.search()
-    Ap.align_to(b.Ap_cand.layer_var, inplace=True); Bp.align_to(b.Ap_cand.layer_var, inplace=True)
-    objs.append(Ap.size()+Bp.size())
-    print("{},{},{}".format(min([vsA.count_inversions_to(D.vars) for D in As]+[vsB.count_inversions_to(D.vars) for D in As]),vsA.count_inversions_to(vsB),objs[-1]))
+        Ap = deepcopy(A); Bp = deepcopy(B)
+        Ap.align_to(c[0],inplace=True); B.align_to(c[1],inplace=True)
+        vsA = VarSeq(Ap.vars,[Ap.n(i) for i in range(N)])
+        vsB = VarSeq(Bp.vars,[Bp.n(i) for i in range(N)])
+        b = BBSearch(vsA,vsB)
+        b.search()
+        Ap.align_to(b.Ap_cand.layer_var, inplace=True); Bp.align_to(b.Ap_cand.layer_var, inplace=True)
+        obj = Ap.size()+Bp.size()
+        print("{},{},{}".format(min([vsA.count_inversions_to(D.vars) for D in As]+[vsB.count_inversions_to(D.vars) for D in As]),vsA.count_inversions_to(vsB),obj))
+

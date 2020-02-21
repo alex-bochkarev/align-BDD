@@ -1,0 +1,32 @@
+#PBS -N StartOrders
+#PBS -l select=1:ncpus=1:mem=10gb,walltime=22:00:00
+#PBS -M abochka@clemson.edu
+#PBS -m abe
+
+# boilerplate things
+STARTMSG="START: starting orders analysis"
+ENDMSG="END: starting orders analysis"
+
+module add anaconda3/5.1.0
+module add R/3.6.0
+source activate ab-local
+tg=/home/abochka/bin/tgsend.sh
+tgi=/home/abochka/bin/tgsend_img.sh
+tgs=/home/abochka/bin/tgsend_st.sh
+
+cd /home/abochka/BDD/aBDD-2nd
+
+echo $STARTMSG | $tg
+python ./start_orders.py > run_logs/start_orders.log
+head -7 run_logs/start_orders.log | $tg > /dev/null
+
+Rscript post_processing/start_orders.R -i run_logs/start_orders.log -o figures/start_orders.eps
+cd figures
+convert ./start_orders.eps ./start_orders.png
+$tgi ./start_orders.png
+rm ./start_orders.png
+echo $ENDMSG | $tg
+
+# deactivate the env
+source deactivate ab-local
+
