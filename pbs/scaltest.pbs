@@ -1,10 +1,10 @@
 #PBS -N Scal
-#PBS -l select=1:ncpus=16:mem=15gb,walltime=37:00:00
+#PBS -l select=1:ncpus=16:mem=15gb,walltime=48:00:00
 #PBS -M abochka@clemson.edu
 #PBS -m abe
 
 # boilerplate things
-STARTMSG="START: scalability figure, parallel (revised-2)"
+STARTMSG="START: scalability figure, parallel (revised-2),K=250"
 ENDMSG="END: scalability figure done."
 
 module add anaconda3/5.1.0
