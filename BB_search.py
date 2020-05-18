@@ -261,22 +261,6 @@ class BBSearch:
         self.snapshot_steps = steps_list
 
     ## MAIN LOGIC
-    ## search stop criterion: timeout or gap closed
-    def stop_criterion(self):
-        """Stop criterion: timeout, no nodes left to process or LB=UB"""
-
-        if self.step > TIMEOUT_ITERATIONS:
-            self.status="timeout"
-            return True
-
-        if len(self.open_nodes)==0 or (self.current_best() == self.LB):
-            if self.verbose:
-                print("|open nodes|={}, curr_best({}) = LB({}): {}".format(len(self.open_nodes),self.current_best(), self.LB, (self.current_best() == self.LB)))
-            self.status = "optimal"
-            return True
-
-        return False
-
     def search(self):
         """main procedure: performs BB search"""
 
@@ -291,23 +275,130 @@ class BBSearch:
 
         self.step = 0
 
-        while not self.stop_criterion():
-            node_LB, next_node = heap.heappop(self.open_nodes) # pick a node with the smallest LB
-            self.expand(next_node, node_LB, self.step)     # expand a node
+        while (len(self.open_nodes) > 0 and self.step <= TIMEOUT_ITERATIONS):
+            LB, node = heap.heappop(self.open_nodes) # pick a node with the smallest LB
+            ######################################################################
+            # expanding the node
+
+            if self.verbose:
+                print("Node expansion: {}, node LB={}, UB={}".format(node.name, LB, node.UB))
+
+            # set tree bounds to be shown on the graph
+            # (sample BB search tree figure)
+            node.tree_LB = LB
+            node.tree_UB = self.UB
+            node.best_obj = self.current_best()
+
+            if LB >= self.UB:
+                # we can prune the node
+                node.status ="P"
+                self.status="optimal"
+                break
+
+            node.status = "E" # actually processing the node
+
+            for i in reversed( range(len(node.Ar)) ):
+                # enumerating all the possible last elements
+                # starting from the last one
+                if vs.non_dominated(node.Ar.layer_var[i],node.Ar,node.Br):
+                    ## add a node
+                    ## sift the element under consideration to the last position
+                    A_new = copy.deepcopy(node.A)
+                    B_new = copy.deepcopy(node.B)
+                    a = node.Ar.layer_var[i]
+                    pos = len(node.Ar)-1
+                    A_new.slide(a,pos,inplace=True)
+                    B_new.slide(a,pos,inplace=True)
+                    ## reshuffle the rest ``covered'' elements
+                    xA = node.Ar.layer_var
+                    xB = node.Br.layer_var
+                    A_covered_els = xA[i:]
+                    i_A = i
+                    if A_covered_els != []:
+                        for j in range(len(xB)):
+                            if xB[j] in A_covered_els and xB[j]!=xA[i]:
+                                A_new.layer_var[i_A] = xB[j]
+                                A_new.p[xB[j]] = i_A
+                                i_A += 1
+
+                    B_covered_els = xB[node.B.p[xA[i]]:]
+                    if B_covered_els != []:
+                        i_B = node.B.p[xA[i]]
+                        for j in range(len(xA)):
+                            if xA[j] in B_covered_els and j!=i:
+                                B_new.layer_var[i_B] = node.A.layer_var[j]
+                                B_new.p[node.A.layer_var[j]] = i_B
+                                i_B += 1
+
+                    ## save the results / create a node
+                    Ar_new = vs.VarSeq(A_new.layer_var[:len(node.Ar)-1], A_new.n[:len(node.Ar)-1])
+                    Br_new = vs.VarSeq(B_new.layer_var[:len(node.Br)-1], B_new.n[:len(node.Br)-1])
+
+                    newnode = SearchNode("step {}, node {}: {}to{}".format(self.step, self.tree_size, node.Ar.layer_var[i],len(node.Ar)-1), node, Ar_new, Br_new, pos, pos,A_new, B_new)
+
+                    self.tree_size += 1
+
+                    ## check if the new one is a terminal node
+                    if A_new.is_aligned(B_new):
+                        newnode.status = "T"
+                    else:
+                        newnode.status = "?" # node to be expanded
+
+                    ## calculate the node lower bound
+                    newnode.LB = newnode.calculate_LB()
+
+                    ## update UPPER BOUND
+                    t = 'fast'
+                    if self.step % UB_UPDATE_FREQ == 0 and not ALWAYS_FAST:
+                        t = 'slow'
+
+                    newnode.UB, order = newnode.calculate_UB(t)
+
+                    if self.UB > newnode.UB:
+                        self.UB = newnode.UB
+                        self.Ap_cand = self.A.align_to(order)
+                        self.Bp_cand = self.B.align_to(order)
+                        if newnode.status == "T":
+                            self.node_cand = newnode
+                        else:
+                            self.cand_parent = newnode
+
+                    if newnode.LB < self.UB and newnode.status != "T":
+                        heap.heappush(self.open_nodes,(newnode.LB, newnode))
+
+            ## update LOWER BOUND
+
+            if self.logging:
+                self.logs_step.append(self.step)
+                self.logs_UB.append(self.UB)
+                self.logs_LB.append(LB)
+            # end of node expansion
+            ######################################################################
             self.step += 1
             if self.verbose:
-                print("node expanded. Step {}, LB={}, UB={}".format(self.step, self.LB, self.UB))
+                print("node expanded. Step {}, LB={}, UB={}".format(self.step, LB, self.UB))
 
             if self.logging:
                 if self.step in self.snapshot_steps:
-                    log(self.log_prefix, str(self.step), str(self.LB), str(self.UB), outfile = self.log_file)
-        if (self.node_cand is None) and not (self.cand_parent is None):
+                    log(self.log_prefix, str(self.step), str(LB), str(self.UB), outfile = self.log_file)
+
+        if self.step > TIMEOUT_ITERATIONS:
+            self.status="timeout"
+        elif (self.node_cand is None) and not (self.cand_parent is None):
             # create an optimal node
             order = self.Ap_cand.layer_var
             opt_node = SearchNode("step {}, node {}: UB=LB".format(self.step, self.tree_size),self.cand_parent,[],[],0,0,self.A.align_to(order), self.B.align_to(order))
             opt_node.status = "O"
             if self.verbose:
                 print("optimal node created")
+            self.status="optimal"
+        elif (self.node_cand is None and self.cand_parent is None):
+            print("ERROR: optimum found, but both node candidate and candidate parent are None (please report a bug)")
+            print("Optimal order: {}, objective={}".format(self.Ap_cand.layer_var, self.current_best()))
+            print("...while aligning: \nA:\n{}\nB:\n{}".format(self.A,self.B))
+            exit(1)
+        else:
+            self.status="optimal"
 
         if self.verbose:
             print("\nSearch done in {} iterations. UB={}, LB={}, status: {}, tree size: {}".format(self.step, self.UB, self.LB, self.status, self.tree_size))
@@ -325,109 +416,9 @@ class BBSearch:
                     next_node.status = "P"
 
         if self.logging:
-            self.logs_LB.append(self.LB)
+            self.logs_LB.append(LB)
             self.logs_UB.append(self.UB)
             self.logs_step.append(self.step)
             log(self.log_prefix, str(self.step), str(self.LB), str(self.UB), outfile = self.log_file, comment = "status:{}".format(self.status))
 
         return self.status
-
-    def expand(self, node, node_LB, step=0):
-        """Processes the node `node`"""
-        if self.verbose:
-            print("Node expansion: {}, node LB={}, UB={}".format(node.name, node.LB, node.UB))
-
-        # set tree bounds to be shown on the graph
-        # (sample BB search tree figure)
-        node.tree_LB = self.LB
-        node.tree_UB = self.UB
-        node.best_obj = self.current_best()
-
-        if node_LB > self.UB:
-            # we can prune the node
-            node.status ="P"
-            return
-
-        node.status = "E" # actually processing the node
-
-        for i in reversed( range(len(node.Ar)) ):
-            # enumerating all the possible last elements
-            # starting from the last one
-            if vs.non_dominated(node.Ar.layer_var[i],node.Ar,node.Br):
-                ## add a node
-                ## sift the element under consideration to the last position
-                A_new = copy.deepcopy(node.A)
-                B_new = copy.deepcopy(node.B)
-                a = node.Ar.layer_var[i]
-                pos = len(node.Ar)-1
-                A_new.slide(a,pos,inplace=True)
-                B_new.slide(a,pos,inplace=True)
-                ## reshuffle the rest ``covered'' elements
-                xA = node.Ar.layer_var
-                xB = node.Br.layer_var
-                A_covered_els = xA[i:]
-                i_A = i
-                if A_covered_els != []:
-                    for j in range(len(xB)):
-                        if xB[j] in A_covered_els and xB[j]!=xA[i]:
-                            A_new.layer_var[i_A] = xB[j]
-                            A_new.p[xB[j]] = i_A
-                            i_A += 1
-
-                B_covered_els = xB[node.B.p[xA[i]]:]
-                if B_covered_els != []:
-                    i_B = node.B.p[xA[i]]
-                    for j in range(len(xA)):
-                        if xA[j] in B_covered_els and j!=i:
-                            B_new.layer_var[i_B] = node.A.layer_var[j]
-                            B_new.p[node.A.layer_var[j]] = i_B
-                            i_B += 1
-
-                ## save the results / create a node
-                Ar_new = vs.VarSeq(A_new.layer_var[:len(node.Ar)-1], A_new.n[:len(node.Ar)-1])
-                Br_new = vs.VarSeq(B_new.layer_var[:len(node.Br)-1], B_new.n[:len(node.Br)-1])
-
-                newnode = SearchNode("step {}, node {}: {}to{}".format(step, self.tree_size, node.Ar.layer_var[i],len(node.Ar)-1), node, Ar_new, Br_new, pos, pos,A_new, B_new)
-
-                self.tree_size += 1
-
-                ## check if the new one is a terminal node
-                if A_new.is_aligned(B_new):
-                    newnode.status = "T"
-                else:
-                    newnode.status = "?" # node to be expanded
-
-                ## calculate the node lower bound
-                newnode.LB = newnode.calculate_LB()
-
-                ## update UPPER BOUND
-                t = 'fast'
-                if step % UB_UPDATE_FREQ == 0 and not ALWAYS_FAST:
-                    t = 'slow'
-
-                newnode.UB, order = newnode.calculate_UB(t)
-
-                if self.UB > newnode.UB:
-                    self.UB = newnode.UB
-
-                if self.current_best() > newnode.UB:
-                    self.Ap_cand = self.A.align_to(order)
-                    self.Bp_cand = self.B.align_to(order)
-                    if newnode.status == "T":
-                        self.node_cand = newnode
-                    else:
-                        self.cand_parent = newnode
-
-                if self.LB < self.UB and newnode.status != "T":
-                    heap.heappush(self.open_nodes,(newnode.LB, newnode))
-
-        ## update LOWER BOUND
-        if self.open_nodes:
-            self.LB = min(self.current_best(), self.open_nodes[0][0])
-        else:
-            self.LB = self.current_best()
-
-        if self.logging:
-            self.logs_step.append(step)
-            self.logs_UB.append(self.UB)
-            self.logs_LB.append(self.LB)

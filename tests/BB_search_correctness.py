@@ -17,7 +17,7 @@ sys.path.append('..')
 import varseq as vs
 import BB_search as bb
 
-STEPS_CHUNK = 100
+STEPS_CHUNK = 1
 print("Running a simple BB search correctness test (1 period = {} instances)".format(STEPS_CHUNK))
 print("[Ctrl-C] to stop")
 
