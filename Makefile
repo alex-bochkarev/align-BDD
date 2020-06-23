@@ -77,7 +77,7 @@ figures/sample_BB_tree.png: ./sample_BB_tree.py
 
 figures: figures_R figures_N
 
-scalfig: $(FIGS)/fig_scal.eps
+scalfig: $(FIGS)/fig_scal.eps $(FIGS)/fig_scal_all.png
 
 summary_figs: $(FIGS)/fig_summary_R.eps $(FIGS)/fig_summary_N.eps
 	touch summary_figs
@@ -107,6 +107,9 @@ $(FIGS)/fig_BB_%_N.eps: $(LOGS)/BB_bounds_N.log $(PP)/fig_BB_%.R
 
 $(FIGS)/fig_scal.eps: $(LOGS)/scal_par.log $(PP)/fig_scal.R
 	Rscript $(PP)/fig_scal.R -i $< -o $@
+
+$(FIGS)/fig_scal_all.png: $(LOGS)/scal_par.log $(PP)/fig_scal.R
+	Rscript $(PP)/fig_scal_objs.R -i $< -o $@
 
 $(FIGS)/fig_summary_R.eps: DS_FLAG=R
 $(FIGS)/fig_summary_N.eps: DS_FLAG=N

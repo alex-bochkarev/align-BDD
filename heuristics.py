@@ -298,6 +298,9 @@ def orig_simpl(A,B,simpl):
     Ap = deepcopy(A); Bp = deepcopy(B)
     Ap.align_to(simpl["simpl_BB"][2],inplace=True)
     Bp.align_to(simpl["simpl_BB"][2],inplace=True)
+    # make sure these are aligned
+    assert Ap.vars == Bp.vars
+
     return [Ap.size()+Bp.size(),simpl["simpl_BB"][1], simpl["simpl_BB"][2]]
 
 def orig_gsifts1p(A,B,simpl):
@@ -307,6 +310,11 @@ def orig_gsifts1p(A,B,simpl):
     BpA.gsifts(ApA)
     sA = ApA.size()+BpA.size()
     sB = ApB.size()+BpB.size()
+    
+    # make sure these are aligned indeed
+    assert ApA.vars == BpA.vars
+    assert ApB.vars == BpB.vars
+
     if sA < sB:
         return [ApA.size()+BpA.size(), 0, ApA.vars]
     else:

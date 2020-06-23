@@ -4,27 +4,29 @@
 #PBS -m abe
 
 # boilerplate things
-STARTMSG="START: scalability figure, parallel (revised-2),K=250"
+STARTMSG="START: scalability figure, parallel (revised-3, w/asserts),K=250"
 ENDMSG="END: scalability figure done."
 
 module add anaconda3/5.1.0
 source activate ab-local
 module add R/3.6.0
-tg=/home/abochka/bin/tgsend.sh
-tgi=/home/abochka/bin/tgsend_img.sh
-tgs=/home/abochka/bin/tgsend_st.sh
+# tg=echo
+# tg=/home/abochka/bin/tgsend.sh
+# tgi=/home/abochka/bin/tgsend_img.sh
+# tgs=/home/abochka/bin/tgsend_st.sh
 
 cd /home/abochka/BDD/align-BDD
 
-echo $STARTMSG | $tg > /dev/null
+echo $STARTMSG # | $tg > /dev/null
 make prep_dirs PREF=$TMPDIR/
-echo making the scalability figure | $tg > /dev/null
+echo making the scalability figure #| $tg > /dev/null
 make -j16 scalfig PREF=$TMPDIR/ LOGPREF=./ > ./make.scal.log 2>&1
-cd figures
-convert fig_scal.eps fig_scal.png
-$tgi ./fig_scal.png > /dev/null
-rm ./fig_scal.png
-cd ..
+#cd figures
+#convert fig_scal.eps fig_scal.png
+#$tgi ./fig_scal.png > /dev/null
+#$tgi ./fig_scal_all.png > /dev/null
+#rm ./fig_scal.png
+#cd ..
 
 echo cleaning... | $tg > /dev/null
 make clean-tmp PREF=$TMPDIR/
