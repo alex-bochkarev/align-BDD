@@ -1,8 +1,0 @@
-mkdir -p .//instances/raw/sc25 && \
-python ./gen_BDD_pair.py -n 10 -v 25 -p 0.6 -UN .//instances/raw/sc25 > .//instances/raw/sc25/gen.log && \
-basename -a -s .bdd .//instances/raw/sc25/A*.bdd | sed 's/A//' > .//instances/raw/sc25/inst.list && \
-python ./scal_test.py -l .//instances/raw/sc25/inst.list -d .//instances/raw/sc25/ > run_logs/scal_N25.log
-mkdir -p .//instances/raw/sc28 && \
-python ./gen_BDD_pair.py -n 10 -v 28 -p 0.6 -UN .//instances/raw/sc28 > .//instances/raw/sc28/gen.log && \
-basename -a -s .bdd .//instances/raw/sc28/A*.bdd | sed 's/A//' > .//instances/raw/sc28/inst.list && \
-python ./scal_test.py -l .//instances/raw/sc28/inst.list -d .//instances/raw/sc28/ > run_logs/scal_N28.log

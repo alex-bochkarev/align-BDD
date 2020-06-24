@@ -1,0 +1,33 @@
+#PBS -N BDD_1
+#PBS -l select=1:ncpus=16:mem=16gb,walltime=08:00:00
+#PBS -j oe
+#PBS -o ./run_logs/main_figs.log
+#comment PBS -l select=1:ncpus=16:mem=16gb,walltime=00:05:00
+# comment PBS -M abochka@clemson.edu
+# comment PBS -m abe
+
+# boilerplate things
+PF=-j16
+
+module add anaconda3/5.1.0
+source activate ab-local
+module add R/3.6.0
+
+cd /home/abochka/BDD/align-BDD
+
+echo "START: global makefile run, branch **$(git rev-parse --abbrev-ref HEAD)**, commit $(git rev-parse HEAD)"
+make $PF clean PREF=$TMPDIR/
+make $PF prep_dirs PREF=$TMPDIR/
+
+echo "Making main figures..."
+make $PF figures PREF=$TMPDIR/
+
+echo "Moving logfiles..."
+make $PF move-logs PREF=$TMPDIR/
+echo "Cleaning.." 
+make $PF clean-tmp PREF=$TMPDIR/
+
+echo $ENDMSG | $tg > /dev/null
+# deactivate the env
+source deactivate ab-local
+echo "END: done with the global makefile run"

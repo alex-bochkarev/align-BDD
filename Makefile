@@ -5,10 +5,6 @@
 # (c) Alexey Bochkraev, Clemson University, 2020
 # abochka@clemson.edu
 
-# Makefile todo-list:
-# TODO add random seed / other means for the dataset reproducibilty
-# TODO remove instances.list after the calculation
-
 ######################################################################
 ## Files and directories
 PREF=./
@@ -34,7 +30,7 @@ LW_Ps=0.3 0.6 0.9
 
 ### dataset generation parameters:
 p=0.6# dataset generation parameter
-n=500# number of instances
+n=10000# number of instances
 N=15# number of variables per instance
 n_LBs=1000
 
@@ -74,7 +70,9 @@ figures/sample_BB_tree.png: ./sample_BB_tree.py
 	python ./sample_BB_tree.py -v -V 8 -n 10 -o ./run_logs/sample_BB_tree.dot && \
 	dot -Tpng ./run_logs/sample_BB_tree.dot > ./figures/sample_BB_tree.png
 
-figures: figures_R figures_N
+figures: $(FIGS)/fig_sol_guessing_R.eps $(FIGS)/fig_sol_fireplace_R.eps $(FIGS)/fig_BB_gaps_R.eps $(FIGS)/LB.eps $(FIGS)/fig_sol_obj_hist_R.eps $(FIGS)/fig_sol_obj_int_R.eps
+
+#figures_R figures_N
 
 scalfig: $(FIGS)/fig_scal.eps
 
@@ -245,8 +243,8 @@ install_R_pkg:
 
 move-logs:
 	@echo moving logs away from $(LOGS) to $(ARC)
-	tar --remove-files -czf $(ARC)/$(DTE)-logs.tar.gz $(LOGS)/*
-	touch move_logs
+	rm -f $(LOGS)/part.* && \
+	tar --remove-files -czf $(ARC)/$(DTE)-logs.tar.gz -C $(LOGS) .
 
 # clean recipes
 clean-raw-inst:
