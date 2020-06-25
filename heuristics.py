@@ -459,8 +459,8 @@ ORIG_HEU = [
     ["orig_simpl",orig_simpl,"simplified problem"],
     ["orig_gsifts1p",orig_gsifts1p,"greedy BDD sifts (1 pass)"],
     ["orig_bestAB",orig_bestAB,"best of A and B"],
-    # ["orig_5random",orig_5random,"best of 5 random orders"],
-    ["orig_ild",orig_interleave_when_diverge,"interleave-when-diverge"],
+    ["orig_5random",orig_5random,"best of 5 random orders"],
+    # ["orig_ild",orig_interleave_when_diverge,"interleave-when-diverge"],
     ["orig_simpl_rnd",orig_rnd_starts,"simplified problem w/randomized starts"]
     # ["orig_meta",orig_meta,"greedy sifts + simplified problem"]
 ]

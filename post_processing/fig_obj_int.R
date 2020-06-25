@@ -15,7 +15,9 @@ library(optparse)
 
 SHOW_HEU = c("all") # heuristics to show (codes)
 ORIG_BASE_COL = "orig_gsifts1p_obj" # col to divide by
-Nticks = 50
+xNticks = 15
+yNticks = 15
+Npts = 50
 ######################################################################
 ## unpack the command line arguments
 option_list = list(
@@ -83,7 +85,7 @@ df_time_o = merge(x=df_time_o, y=df_legend, by.x = "heuristic", by.y = "value")
 pfrom = min(df_time_o$obj)
 pto = max(df_time_o$obj)
 
-opt_percent = seq(from = pfrom, to = pto,length.out = Nticks)
+opt_percent = seq(from = pfrom, to = pto,length.out = Npts)
 
 cols = unique(df_rel$num_type)
 
@@ -111,19 +113,19 @@ plt_integrated =
     theme_light()+
     theme(
         panel.grid.major = element_line(size = 0.5, linetype = 'solid',
-                                        colour = "darkgrey"),
+                                        colour = "lightgrey"),
         axis.text.x = element_text(angle=90,hjust=1),
         legend.position = c(0.8,0.3)
         )+
     scale_x_continuous(
         "Objective value relative to greedy BDD sifts, no worse than",
-        breaks = seq(pfrom,pto,length.out = Nticks),
+        breaks = seq(pfrom,pto,length.out = xNticks),
         limits = c(pfrom,pto),
         labels = scales::number_format(accuracy =0.01)
     )+
     scale_y_continuous(
         "Share of instances",
-        breaks = seq(0,1.00,length.out = 50),
+        breaks = seq(0,1.00,length.out = yNticks),
         labels = scales::percent_format(accuracy = 0.1)
     )+
     labs(color = "Heuristic:", linetype = "Heuristic:", shape = "Heuristic:")+

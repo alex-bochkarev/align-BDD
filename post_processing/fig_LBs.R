@@ -42,6 +42,7 @@ df = filter(df,legend != "timelog")
 ## xmax = max(df$gap)
 ######################################################################
 ## draw the figure
+ymax = 20.0
 plt_LBs =
     ggplot(filter(df, legend != "timelog"), aes(x=gap , fill=legend, color=legend))+
     geom_histogram(aes(y=..density..), alpha=0.4,binwidth = 0.01,position = "identity")+
@@ -63,6 +64,7 @@ plt_LBs =
         ## minor_breaks = seq(xmin,xmax,length.out=21),
         ## limits = c(xmin,xmax)
     )+
+  coord_cartesian(ylim=c(0,ymax))+
     theme(
         legend.position = c(0.6, 0.8),
         legend.direction = "vertical",
@@ -90,6 +92,7 @@ df_times = merge(
 )
 xmin = 0
 xmax = quantile(df_times$gap,0.997)*1000.0
+
 plt_LBs_time =
     ggplot(df_times, aes(x=gap*1000.0, y=..density.. , fill=legend, color=legend))+
     geom_histogram(, alpha=0.4,binwidth = 0.01,position = "identity")+
@@ -98,15 +101,15 @@ plt_LBs_time =
     ## styling
     scale_y_continuous(
         "Density (share of instances)",
-        labels = scales::number_format(accuracy = 0.5)
+      labels = scales::number_format(accuracy = 0.5)
     )+
     scale_x_continuous(
         "Wall-clock time / instance, msec.",
         labels = scales::number_format(accuracy = 0.5),
-        limits = c(0,xmax),
         breaks = seq(xmin,xmax,length.out=11),
-        minor_breaks = seq(xmin,xmax,length.out=21),
+        minor_breaks = seq(xmin,xmax,length.out=21)
     )+
+  coord_cartesian(xlim=c(0,xmax), ylim=c(0,ymax))+
     theme(
         legend.position = c(0.6, 0.8),
         legend.direction = "vertical",

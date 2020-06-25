@@ -87,40 +87,42 @@ df_rel = df_rel %>%
 df_time_o = pivot_wider(select(df_rel,-num_type),names_from = "entry_type",values_from = "value")
 df_time_o = merge(x=df_time_o, y=df_legend, by.x = "heuristic", by.y = "value")
 
-ymin = 0.9
-ymax = quantile(df_time_o$obj, Y_QUANTILE)
-xmin = 0
-xmax = max(df_time_o$time)
+omin = 1.0
+omax = quantile(df_time_o$obj, Y_QUANTILE)
+tmin = 0
+tmax = max(df_time_o$time)
 plt_zoomed =
-    ggplot(df_time_o,aes(x=time, y=obj , shape=comment,color=comment))+
-    geom_point(size=5)+
-    scale_y_continuous(
-        "Objective value (percent of the exact min)",
-        labels = scales::percent
-    )+
-    scale_x_continuous(
-        "Calculation (wall-clock) time per instance, sec.",
-        labels = scales::number_format(accuracy = 0.1),
-        breaks = seq(xmin,xmax,length.out = Nticks)
-    )+
-  coord_cartesian(ylim=c(ymin,ymax))+
-    scale_shape_manual(values=1:length(unique(df_time_o$comment)))+
-    guides(
-        color=guide_legend(title="Heuristic / method:"),
-        shape=guide_legend(title="Heuristic / method:")
-        )+
-    theme(
-        legend.position = c(0.8, 0.8),
-        legend.direction = "vertical",
-        legend.title = element_text(size=24),
-        legend.text = element_text(size=24),
-        axis.text.x = element_text(size=22,angle=45,vjust = 0.7),
-        axis.text.y = element_text(size=22),
-        axis.title.x = element_text(size = 26),
-        axis.title.y = element_text(size = 26, margin = margin(t=50)),
-        panel.background = element_blank(),
-        panel.grid.major = element_line(size = 0.5, linetype = 'solid',
-                                        color = "darkgrey"),
-      )
+  ##  ggplot(df_time_o,aes(x=time, y=obj , shape=comment,color=comment))+
+  ggplot(filter(df_time_o, !(comment %in% c("branch-and-bound","greedy sifts (all)"))), aes(x=comment, y=log(obj), fill=comment))+
+  #geom_point(size=5)+
+  ## ggplot(df_time_o, aes(y=log(obj), x=comment, fill=comment))+
+  geom_jitter(alpha=0.2,width=0.2)+
+  geom_violin()+
+  scale_y_continuous(
+    "Objective value (percent of the exact min)",
+    ## breaks=seq(omin,omax, length.out = 5),
+    labels = scales::percent
+  )+
+  ## scale_x_continuous(
+  ##   "Calculation (wall-clock) time per instance, sec.",
+  ##   labels = scales::number_format(accuracy = 0.1),
+  ##   breaks = seq(xmin,xmax,length.out = Nticks)
+  ## )+
+  ## coord_cartesian(xlim=c(omin,omax))+
+  ## scale_shape_manual(values=1:length(unique(df_time_o$comment)))+
+  guides(fill=FALSE)+
+  theme(
+    ## legend.position = c(0.8, 0.8),
+    ## legend.direction = "vertical",
+    ## legend.title = element_text(size=24),
+    ## legend.text = element_text(size=24),
+    axis.text.x = element_text(size=22,angle=45,vjust = 0.7),
+    axis.text.y = element_text(size=22),
+    axis.title.x = element_text(size = 26),
+    axis.title.y = element_text(size = 26, margin = margin(t=50)),
+    panel.background = element_blank(),
+    panel.grid.major = element_line(size = 0.5, linetype = 'solid',
+                                    color = "darkgrey"),
+    )
 
 ggsave(opt$out,plt_zoomed,width = 16, height = 10, device = cairo_ps)

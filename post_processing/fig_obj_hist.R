@@ -19,6 +19,7 @@ ORIG_BASE_COL = "orig_gsifts1p_obj" # col to divide by
 
 ## Heuristics to show (codes)
 SHOW_HEU = c("all")
+# SHOW_HEU = c("orig_simpl_obj_rel","orig_bestAB_obj_rel","orig_simpl_rnd_obj_rel")
 
 ######################################################################
 ## unpack the command line arguments
