@@ -42,7 +42,7 @@ df = filter(df,legend != "timelog")
 ## xmax = max(df$gap)
 ######################################################################
 ## draw the figure
-ymax = 20.0
+ymax = 12.0
 plt_LBs =
     ggplot(filter(df, legend != "timelog"), aes(x=gap , fill=legend, color=legend))+
     geom_histogram(aes(y=..density..), alpha=0.4,binwidth = 0.01,position = "identity")+
@@ -93,30 +93,42 @@ df_times = merge(
 xmin = 0
 xmax = quantile(df_times$gap,0.997)*1000.0
 
+label_wrap <- function(variable, value) {
+  lapply(strwrap(as.character(value), width=25, simplify=FALSE), 
+         paste, collapse="\n")
+}
+
+df_times$short_labels = str_wrap(df_times$legend, width=10)
+
 plt_LBs_time =
-    ggplot(df_times, aes(x=gap*1000.0, y=..density.. , fill=legend, color=legend))+
-    geom_histogram(, alpha=0.4,binwidth = 0.01,position = "identity")+
-    geom_density(alpha=0.1,size=1.5)+
-    guides(fill=guide_legend(title="Lower bound:"), color = guide_legend(title="Lower bound:"))+
+    ggplot(df_times, aes(y=gap*1000, fill=short_labels, x=short_labels))+
+    ## geom_histogram(alpha=0.4,binwidth = 0.01,position = "identity")+
+    ## geom_density(alpha=0.1,size=1.5)+
+  geom_jitter(color='black',width=0.1, alpha=0.5)+
+    geom_boxplot(notch=TRUE)+
+    guides(fill=FALSE, color = FALSE)+
     ## styling
     scale_y_continuous(
-        "Density (share of instances)",
-      labels = scales::number_format(accuracy = 0.5)
+      "Wall-clock time / instance, msec.",
+      labels = scales::number_format(accuracy = 0.1),
+      breaks = seq(xmin, xmax, length.out = 5),
+      limits = c(0,xmax)
     )+
-    scale_x_continuous(
-        "Wall-clock time / instance, msec.",
-        labels = scales::number_format(accuracy = 0.5),
-        breaks = seq(xmin,xmax,length.out=11),
-        minor_breaks = seq(xmin,xmax,length.out=21)
+    scale_x_discrete(
+        "Lower bound"
+        ## labels = scales::number_format(accuracy = 0.5),
+        ## breaks = seq(xmin,xmax,length.out=11),
+        ## minor_breaks = seq(xmin,xmax,length.out=21)
     )+
-  coord_cartesian(xlim=c(0,xmax), ylim=c(0,ymax))+
+  ## coord_cartesian(xlim=c(0,xmax))+
+  coord_flip()+
     theme(
         legend.position = c(0.6, 0.8),
         legend.direction = "vertical",
         legend.title = element_text(size=24),
         legend.text = element_text(size=24),
         legend.text.align = 0,
-        axis.text.x = element_text(size=22,angle=45,vjust = 0.7),
+        axis.text.x = element_text(size=18,angle=90,vjust = 0.9),
         axis.text.y = element_text(size=22),
         axis.title.x = element_text(size = 26),
         axis.title.y = element_text(size = 26),

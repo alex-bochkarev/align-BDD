@@ -2,11 +2,10 @@
 #PBS -l select=1:ncpus=16:mem=16gb,walltime=08:00:00
 #PBS -j oe
 #PBS -o ./run_logs/main_figs.log
-#comment PBS -l select=1:ncpus=16:mem=16gb,walltime=00:05:00
-# comment PBS -M abochka@clemson.edu
-# comment PBS -m abe
+#PBS -M abochka@clemson.edu
+#PBS -m abe
 
-# boilerplate things
+# general parameters
 PF=-j16
 
 module add anaconda3/5.1.0
@@ -22,12 +21,14 @@ make $PF prep_dirs PREF=$TMPDIR/
 echo "Making main figures..."
 make $PF figures PREF=$TMPDIR/
 
+echo "Running tests..."
+make test PREF=$TMPDIR/
+
 echo "Moving logfiles..."
 make $PF move-logs PREF=$TMPDIR/
 echo "Cleaning.." 
 make $PF clean-tmp PREF=$TMPDIR/
 
-echo $ENDMSG | $tg > /dev/null
 # deactivate the env
 source deactivate ab-local
 echo "END: done with the global makefile run"

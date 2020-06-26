@@ -70,7 +70,7 @@ figures/sample_BB_tree.png: ./sample_BB_tree.py
 	python ./sample_BB_tree.py -v -V 8 -n 10 -o ./run_logs/sample_BB_tree.dot && \
 	dot -Tpng ./run_logs/sample_BB_tree.dot > ./figures/sample_BB_tree.png
 
-figures: $(FIGS)/fig_sol_guessing_R.eps $(FIGS)/fig_sol_fireplace_R.eps $(FIGS)/fig_BB_gaps_R.eps $(FIGS)/LB.eps $(FIGS)/fig_sol_obj_hist_R.eps $(FIGS)/fig_sol_obj_int_R.eps
+figures: $(FIGS)/fig_sol_guessing_R.eps $(FIGS)/fig_sol_fireplace_R.eps $(FIGS)/fig_BB_gaps_R.eps $(FIGS)/LB.eps $(FIGS)/fig_sol_obj_hist_R.eps $(FIGS)/fig_sol_obj_int_R.eps $(FIGS)/guessing.tex
 
 #figures_R figures_N
 
@@ -110,6 +110,9 @@ $(FIGS)/fig_summary_N.eps: DS_FLAG=N
 
 $(FIGS)/fig_summary_%.eps: $(LOGS)/lwidths_%.log $(PP)/fig_summary.R
 	Rscript $(PP)/fig_summary.R -i $< -o $@
+
+$(FIGS)/guessing.tex: $(LOGS)/solved_R.log $(PP)/tab_guessing.R
+	Rscript $(PP)/tab_guessing.R -i $< -o $@
 
 ######################################################################
 ## scalability figure -- parallel implementation
@@ -270,3 +273,9 @@ clean-figures:
 
 clean: clean-raw-inst clean-logs clean-figures clean-archive
 clean-tmp: clean-raw-inst clean-logs
+
+test: $(LOGS)/BB.test
+	@echo Running tests...
+
+$(LOGS)/BB.test: $(LOGS)/BB_bounds_R.log $(LOGS)/solved_R.log tests/BB_log_correct.R
+	Rscript tests/BB_log_correct.R -b $(LOGS)/BB_bounds_R.log -s $(LOGS)/solved_R.log > $(LOGS)/BB.test

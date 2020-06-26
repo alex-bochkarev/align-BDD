@@ -145,7 +145,6 @@ class SearchNode(at.NodeMixin):
         self.tree_UB = None
         self.tree_LB = None
         self.best_obj = None
-        self.LB = None
         self.UB = None
 
     def size(self):
@@ -170,11 +169,11 @@ class SearchNode(at.NodeMixin):
     def calculate_LB(self):
         """returns a lower bound for the current search tree node"""
         if self.status=="T":
-            self.LB = self.size()
+            LB = self.size()
         else:
-            self.LB = LB_by_level(self.A,self.B) # inversions-driven bound
+            LB = LB_by_level(self.A,self.B) # inversions-driven bound
 
-        return self.LB
+        return LB
 
 
     # a special method that tells which node to choose
@@ -206,23 +205,16 @@ class BBSearch:
         ## create the root node
         self.root = SearchNode("root", None, A,B,len(A),len(B),A,B)
 
-        self.LB = self.root.calculate_LB()
         self.UB, order = self.root.calculate_UB('fast')
         self.Ap_cand = self.A.align_to(order)
         self.Bp_cand = self.B.align_to(order)
         self.node_cand = None
         self.cand_parent = self.root
 
-        self.open_nodes = []
+        LB = self.root.calculate_LB()
 
-        if self.LB == self.UB:
-            # a hypothetical case of good bounds
-            opt_node = SearchNode("step {}, node {}: UB=LB".format(self.step, self.tree_size),self.root,[],[],0,0,self.A.align_to(order), self.B.align_to(order))
-            opt_node.status = "O"
-            self.status = "optimal" # no need to proceed
-        else:
-            self.open_nodes = [(self.LB, self.root)]
-            heap.heapify(self.open_nodes) # create a heap, key = lower bound
+        self.open_nodes = [(LB, self.root)]
+        heap.heapify(self.open_nodes) # create a heap, key = lower bound
 
     def current_best(self):
         """returns current upper bound (best objective seen)"""
@@ -271,7 +263,7 @@ class BBSearch:
 
             return self.status
 
-        if self.verbose: print("Initial LB={}".format(self.LB))
+        if self.verbose: print("Initial LB={}".format(LB))
 
         self.step = 0
 
@@ -293,6 +285,7 @@ class BBSearch:
                 # we can prune the node
                 node.status ="P"
                 self.status="optimal"
+                LB = self.UB
                 break
 
             node.status = "E" # actually processing the node
@@ -392,6 +385,7 @@ class BBSearch:
             if self.verbose:
                 print("optimal node created")
             self.status="optimal"
+            LB = self.UB
         elif (self.node_cand is None and self.cand_parent is None):
             print("ERROR: optimum found, but both node candidate and candidate parent are None (please report a bug)")
             print("Optimal order: {}, objective={}".format(self.Ap_cand.layer_var, self.current_best()))
@@ -399,14 +393,14 @@ class BBSearch:
             exit(1)
         else:
             self.status="optimal"
+            LB = self.UB
 
         if self.verbose:
-            print("\nSearch done in {} iterations. UB={}, LB={}, status: {}, tree size: {}".format(self.step, self.UB, self.LB, self.status, self.tree_size))
+            print("\nSearch done in {} iterations. UB={}, LB={}, status: {}, tree size: {}".format(self.step, self.UB, LB, self.status, self.tree_size))
             if self.node_cand is None:
                 print("No candidate node found!")
 
         if self.status == "optimal":
-            # self.LB = self.current_best()
             if not self.node_cand is None:
                 self.node_cand.status="O"
 
@@ -419,6 +413,6 @@ class BBSearch:
             self.logs_LB.append(LB)
             self.logs_UB.append(self.UB)
             self.logs_step.append(self.step)
-            log(self.log_prefix, str(self.step), str(self.LB), str(self.UB), outfile = self.log_file, comment = "status:{}".format(self.status))
+            log(self.log_prefix, str(self.step), str(LB), str(self.UB), outfile = self.log_file, comment = "status:{}".format(self.status))
 
         return self.status
