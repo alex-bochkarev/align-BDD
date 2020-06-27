@@ -32,7 +32,7 @@ LW_Ps=0.3 0.6 0.9
 p=0.6# dataset generation parameter
 n=10000# number of instances
 N=15# number of variables per instance
-n_LBs=1000
+n_LBs=2000
 
 ### scalability figure
 SCAL_N=5 6 7 8 9 10 12 13 14 15 #16 17 18 19 20 #22 25 28
