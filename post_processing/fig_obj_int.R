@@ -104,6 +104,21 @@ int_df_m = merge(x=int_df_m, y=df_legend, by.x="heuristic", by.y = "value")
 
 ######################################################################
 ## draw the figure
+apprs = int_df_m %>%
+  group_by(heuristic) %>%
+  group_map(~ approxfun(.x$opt_percent, .x$shares)(1.0))
+
+names(apprs) <- unique(int_df_m$heuristic)
+cat("Share of instances outperforming the baseline:")
+apprs
+
+apprs = int_df_m %>%
+  group_by(heuristic) %>%
+  group_map(~ approxfun(.x$opt_percent, .x$shares)(1.3))
+
+names(apprs) <- unique(int_df_m$heuristic)
+cat("Share of instances at most 30% of the baseline:")
+apprs
 
 plt_integrated =
     ggplot(int_df_m)+
