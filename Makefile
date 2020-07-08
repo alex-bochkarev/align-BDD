@@ -18,7 +18,7 @@ PP=./post_processing
 SCAL=./scal_test.py
 STATS=./gen_lsizes_stats.py
 CMP_LBs=./compare_simpl_LBs.py
-PSCAL=./BB_orig_solve.py
+PSCAL=./par_scal_test.py
 ######################################################################
 ## Numerical parameters
 PAR_SOL=	4

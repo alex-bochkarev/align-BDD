@@ -21,11 +21,12 @@ from collections import deque
 import copy
 import math
 
+GSIFTS_MAX_INCREASE_MUL = 100  # max increase of the BDD size (e.g., 100 times) during greedy sifts
+
 ## special node IDs (see the node class docstring)
 NROOT = 0
 NTRUE = -1
 NFALSE = -2
-
 ######################################################################
 class node(object):
     """
@@ -311,7 +312,7 @@ class BDD(object):
             cur_size = best_size
 
             for j in range(i+1,N):
-                if self.size()+with_whom.size() > cur_size*100:
+                if self.size()+with_whom.size() > cur_size*GSIFTS_MAX_INCREASE_MUL:
                     break
 
                 self.swap_up(j)

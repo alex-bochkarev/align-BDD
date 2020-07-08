@@ -1,7 +1,7 @@
 #PBS -N Scal
-#PBS -l select=1:ncpus=1:mem=15gb,walltime=12:00:00
-#PBS -M abochka@clemson.edu
-#PBS -m abe
+#PBS -l select=1:ncpus=4:mem=15gb,walltime=05:00:00
+#PBS -j oe
+#PBS -o ./run_logs/scal_test.log
 
 # boilerplate things
 STARTMSG="START: scalability figure"
@@ -19,9 +19,9 @@ cd /home/abochka/BDD/align-BDD
 echo $STARTMSG | $tg > /dev/null
 make prep_dirs PREF=$TMPDIR/
 echo making the scalability figure | $tg > /dev/null
-make scalfig > make.scal.log
-echo moving logfiles... | $tg > /dev/null
-make move_logs PREF=$TMPDIR/
+make -j4 scalfig
+echo moving logfiles...
+make move-logs PREF=$TMPDIR/
 echo cleaning... | $tg > /dev/null
 make clean-tmp PREF=$TMPDIR/
 echo $ENDMSG | $tg > /dev/null
