@@ -88,4 +88,4 @@ if __name__ == "__main__":
 
                 log(N,inst_id, "gsifts_status",gs_status, outfile=logf)
                 log(N,inst_id, "orig_gsifts1p_time",t1-t0, outfile=logf)
-                log(N,inst_id, "orig_gsifts1p_obj",bdd_A.size()+bdd_B.size(), outfile=logf)
+                log(N,inst_id, "orig_gsifts1p_obj",A.size()+B.size(), outfile=logf)
