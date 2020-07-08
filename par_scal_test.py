@@ -82,7 +82,7 @@ if __name__ == "__main__":
 
                 t1 = time()
                 if A.is_aligned(B):
-                    status="aligned"
+                    gs_status="aligned"
                 else:
                     gs_status="non-aligned"
 

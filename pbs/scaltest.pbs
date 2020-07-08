@@ -10,23 +10,17 @@ ENDMSG="END: scalability figure done."
 module add anaconda3/5.1.0
 source activate ab-local
 module add R/3.6.0
-tg=/home/abochka/bin/tgsend.sh
-tgi=/home/abochka/bin/tgsend_img.sh
-tgs=/home/abochka/bin/tgsend_st.sh
 
 cd /home/abochka/BDD/align-BDD
 
-echo $STARTMSG | $tg > /dev/null
+echo $STARTMSG
 make prep_dirs PREF=$TMPDIR/
-echo making the scalability figure | $tg > /dev/null
-make -j4 scalfig
+echo making the scalability figure
+make -j4 PREF=$TMPDIR/ scalfig
 echo moving logfiles...
 make move-logs PREF=$TMPDIR/
-echo cleaning... | $tg > /dev/null
+echo cleaning...
 make clean-tmp PREF=$TMPDIR/
-echo $ENDMSG | $tg > /dev/null
-echo showing resulting images: | $tg
-cd figures
-$tgi figures/fig_scal.eps > /dev/null
+echo $ENDMSG
 # deactivate the env
 source deactivate ab-local
