@@ -121,6 +121,8 @@ plt_convergence =
         legend.direction = "vertical",
         legend.title = element_text(size=24),
         legend.text = element_text(size=24),
+        legend.key = element_blank(),
+        legend.key.width = unit(5,"cm"),
         axis.text.x = element_text(size=22,angle=45,vjust = 0.7),
         axis.text.y = element_text(size=22),
         axis.title.x = element_text(size = 26),
