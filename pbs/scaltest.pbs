@@ -4,6 +4,7 @@
 #PBS -o ./run_logs/scal_test.log
 #PBS -M abochka@clemson.edu
 #PBS -m abe
+trap "cp ${TMPDIR}/* ~/BDD/align-BDD/tmp/;exit" TERM # save the TMP folder if killed
 
 # boilerplate things
 STARTMSG="START: scalability figure"
