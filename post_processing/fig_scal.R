@@ -44,22 +44,54 @@ df = df %>%
         rel_obj = orig_simpl_obj / orig_gsifts1p_obj
     )
 
+## calculate means for each instance size
+df_means = df %>%
+  group_by(N) %>%
+  summarise(
+    mean_simpl_time = median(orig_simpl_time),
+    mean_gsifts_time = median(orig_gsifts1p_time)
+  )
+
+## percentage where aux problem outperforms
+df_outp = df
+df_outp$aux_outp = with(df_outp,
+                           orig_simpl_time < orig_gsifts1p_time & rel_obj < 1.0
+                           )
+
+df_outp = df_outp %>%
+  group_by(N) %>%
+  summarize(
+    simpl_outp = sum(aux_outp) / length(aux_outp)
+  )
+
 p1 =
 ggplot(df)+
-    geom_point(aes(x=N, y = log(orig_simpl_time), color="Auxiliary problem / heuristic"), size=5, alpha=0.7)+
-    geom_jitter(aes(x=N, y = log(orig_gsifts1p_time), color="BDD sifts"), size=5, alpha=0.5, width = 0.25)+
+    geom_point(aes(x=N, y = log(orig_simpl_time), color="Auxiliary problem / heuristic"),
+             shape=3, size=5, alpha=0.3)+
+    geom_jitter(aes(x=N, y = log(orig_gsifts1p_time), color="BDD sifts"),
+              size=2, alpha=0.3, width = 0.1)+
+    geom_line(data=df_means, aes(x=N, y=log(mean_simpl_time),
+                               color="Auxiliary problem / heuristic", linetype="Auxiliary problem / heuristic"), size=2)+
+    geom_line(data=df_means, aes(x=N, y=log(mean_gsifts_time),
+                               color="BDD sifts", linetype="BDD sifts"), size=2)+
+    geom_label(data=df_outp, aes(x=N, label=scales::percent(accuracy=1,simpl_outp)),y=7.5, size=3)+
+    scale_linetype_manual(values = c("solid", "dashed"),
+                        labels = c("Auxiliary problem / heuristic", "BDD sifts"))+
     scale_x_continuous(
-        breaks = seq(min(df$N),max(df$N),by = 2),
+        breaks = seq(min(df$N),max(df$N),by = 1),
         minor_breaks = seq(min(df$N),max(df$N), by=1)
     )+
-    labs(x="No. of variables\n(a)",y="Solution time, sec., logarithmic scale -- ln (t)", color="Solution method:")+
+    labs(x="No. of variables\n(a)",y="Solution time, sec., logarithmic scale, ln (t)")+
+    guides(color=guide_legend("Solution method (log of median values):"), linetype=guide_legend("Solution method (log of median values):"))+
     theme(
         legend.position = c(0.4, 0.8),
         legend.direction = "vertical",
-        legend.title = element_text(size=24),
-        legend.text = element_text(size=24),
-        axis.text.x = element_text(size=22,angle=45,vjust = 0.7),
-        axis.text.y = element_text(size=22),
+        legend.title = element_text(size=16),
+        legend.text = element_text(size=16),
+        legend.key = element_blank(),
+        legend.key.width = unit(2.5,"cm"),
+        axis.text.x = element_text(size=18,angle=45,vjust = 0.7),
+        axis.text.y = element_text(size=18),
         axis.title.x = element_text(size = 26),
         axis.title.y = element_text(size = 26),
         panel.background = element_blank(),
@@ -69,17 +101,18 @@ ggplot(df)+
         panel.grid.minor.y = element_line(size=0.25,linetype = 'solid', colour = "lightgrey")
     )
 
-leg = "# variables (N):"
-Nmin = min(df$N)
-Nmax = max(df$N)
-Ns = unique(df$N)
-Nmed = Ns[which.min(abs(Ns - median(Ns)))]
+## leg = "# variables (N):"
+## Nmin = min(df$N)
+## Nmax = max(df$N)
+## Ns = unique(df$N)
+## Nmed = Ns[which.min(abs(Ns - median(Ns)))]
+Ns = c(5,10,12,15,17,20,22,25)
 
 p2 =
-ggplot(filter(df, N %in% c(Nmin,Nmed,Nmax)), aes(x=rel_obj, y=..density.., fill=as.factor(N), color=as.factor(N)))+
-    geom_histogram(alpha=0.5,position="identity")+
-    geom_density(alpha=0.1,position="identity")+
-    guides(fill=guide_legend(title=leg), color = guide_legend(title=leg))+
+ggplot(filter(df, N %in% Ns), aes(x=rel_obj))+
+    geom_histogram(position="identity",binwidth = 0.05)+
+#    geom_density(alpha=0.1,position="identity")+
+    ## guides(fill=FALSE, color = FALSE)+
     theme(
         panel.grid.major = element_line(size = 0.5, linetype = 'solid',
                                         color = "darkgrey"),
@@ -92,24 +125,28 @@ ggplot(filter(df, N %in% c(Nmin,Nmed,Nmax)), aes(x=rel_obj, y=..density.., fill=
         breaks = seq(min(df$rel_obj), max(df$rel_obj), length.out = 11)
     )+
     scale_y_continuous(
-        "Density (no. of instances)",
-        ## breaks = seq(0, nrow(df), length.out = 11),
-        ## minor_breaks = seq(0, nrow(df), length.out = 21),
-        label = scales::number_format(accuracy = 1.0)
-    )+
+      "No. of instances",
+      position="right")+
+    ##     ## breaks = seq(0, nrow(df), length.out = 11),
+    ##     ## minor_breaks = seq(0, nrow(df), length.out = 21),
+    ##     label = scales::number_format(accuracy = 1.0)
+    ## )+
     theme(
         legend.title = element_text(size=24),
         legend.text = element_text(size=24),
         axis.text.x = element_text(size=22,angle=45,vjust = 0.7),
-        axis.text.y = element_text(size=22),
+        axis.text.y = element_text(size=11),
         axis.title.x = element_text(size = 26),
         axis.title.y = element_text(size = 26),
         panel.background = element_blank(),
         panel.grid.major = element_line(size = 0.5, linetype = 'solid',
                                         colour = "lightgrey"),
         panel.grid.minor.x = element_line(size=0.25,linetype = 'solid', colour = "lightgrey"),
-        panel.grid.minor.y = element_line(size=0.25,linetype = 'solid', colour = "lightgrey")
-    )
+        panel.grid.minor.y = element_line(size=0.25,linetype = 'solid', colour = "lightgrey"),
+        strip.text.y = element_text(size=16, angle=180)
+        ## strip.background = element_blank()
+    )+
+  facet_grid(N ~ ., scales="free_y", switch="y")
 
 cairo_ps(opt$out, width = 16, height = 10)
 grid.arrange(p1,p2,ncol=2)
