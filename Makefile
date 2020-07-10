@@ -21,7 +21,7 @@ CMP_LBs=./compare_simpl_LBs.py
 PSCAL=./par_scal_test.py
 ######################################################################
 ## Numerical parameters
-PAR_SOL=8
+PAR_SOL=4
 
 ### random dataset stats
 LW_n=1000
@@ -35,7 +35,7 @@ N=15# number of variables per instance
 n_LBs=2000
 
 ### scalability figure
-SCAL_N=5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30
+SCAL_N=5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 #26 27 28 29 30
 SCAL_K=100
 SCAL_P=$(p)
 SCAL_R=R
@@ -134,7 +134,9 @@ $(INST)/scal/instances.list: ./gen_BDD_pair.py
 		i=$$(( $${i} + 1 ));\
 	done && \
 	ls $(INST)/scal | grep -Po "A\\K[^\\.]*" > $@ && \
-	split -d -nl/$(PAR_SOL) $@ $(INST)/scal/instances.list.
+	shuf $@ > $@.shuffled && \
+	split -d -nl/$(PAR_SOL) $@.shuffled $(INST)/scal/instances.list. && \
+	rm $@.shuffled
 
 # was: ls $(INST)/$*/A*.bdd | grep -Po "$(INST)/$*/A\\K[^\\.]*" > $@ &&\
 # basename -a `ls $(INST)/$*/A*.bdd` | sed -n -e's/^A//p' | sed -n -e's/\.bdd//p' > $@ && \

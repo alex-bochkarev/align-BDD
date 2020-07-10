@@ -1,0 +1,19 @@
+#PBS -N Figs
+#PBS -l select=1:ncpus=1:mem=1gb,walltime=00:10:00
+#PBS -j oe
+#PBS -o run_logs/scal_sending.log
+
+# boilerplate things
+
+tg=/home/abochka/bin/tgsend.sh
+tgi=/home/abochka/bin/tgsend_img.sh
+tgs=/home/abochka/bin/tgsend_st.sh
+
+cd /home/abochka/BDD/align-BDD/figures
+
+echo "Image from the scaling test:" | $tg
+convert fig_scal.eps fig_scal.png
+$tgi fig_scal.png
+mkdir -p ./png
+mv ./fig_scal.png png/
+

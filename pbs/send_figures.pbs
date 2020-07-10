@@ -16,7 +16,6 @@ ls | $tg > /dev/null
 for file in $(ls); do
     convert $file $file.png
     $tgi $file.png
-    rm $file.png
 done
 mkdir -p ./png
 mv ./*.png png/
