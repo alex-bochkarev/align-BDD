@@ -92,10 +92,10 @@ xmax = quantile(df_time_o$obj,X_QUANTILE)
 latex_label = parse(text = TeX("try $S_A$, $S_B$, choose the best one"))
 
 plt_dens =
-    ggplot(df_time_o, aes(x=obj , fill=comment, color=comment))+
+    ggplot(df_time_o, aes(x=obj))+
     geom_histogram(alpha=0.4,binwidth = 0.01,position = "identity")+
     #geom_density(alpha=0.1,size=1.5)+
-    guides(fill=guide_legend(title="Heuristic:"), color = guide_legend(title="Heuristic:"))+
+    ## guides(fill=guide_legend(title="Heuristic:"), color = guide_legend(title="Heuristic:"))+
 #    ggtitle("Objective values distribution for different heuristics (original problem, 15vars 100k dataset, non-reduced instances)")+
     geom_vline(xintercept = 1.0, size=0.5, color="red", linetype="dashed")+
     annotate("text",x=1.0, y=4.2,label = "100% = greedy BDD sifts", color="red")+
@@ -103,10 +103,11 @@ plt_dens =
     labs(fill="Heuristic used:", color="Heuristic used:")+
     scale_y_continuous(
         "Density (share of instances)",
-        labels = scales::number_format(accuracy = 0.5)
+        labels = scales::number_format(accuracy = 0.5),
+        position = "right"
     )+
     scale_x_continuous(
-        "Objective value, relative to the result of exact-sifts heuristic (taken as 100%)",
+        "Objective value, relative to greedy BDD-sifts heuristic (taken as 100%)",
         labels = scales::percent,
         breaks = seq(xmin,xmax,length.out=11),
         minor_breaks = seq(xmin,xmax,length.out=21),
@@ -126,9 +127,11 @@ plt_dens =
         panel.grid.major = element_line(size = 0.5, linetype = 'solid',
                                         colour = "lightgrey"),
         panel.grid.minor.x = element_line(size=0.5,linetype = 'solid', colour = "lightgrey"),
-        panel.grid.minor.y = element_line(size=0.5,linetype = 'solid', colour = "lightgrey")
-          )+
-    facet_grid(comment ~ ., scales="free_y")
+        panel.grid.minor.y = element_line(size=0.5,linetype = 'solid', colour = "lightgrey"),
+        strip.text.y = element_text(size=22, angle=180),
+        strip.background = element_blank()
+    )+
+    facet_grid(comment ~ ., scales="free_y", switch="y")
     ## end of styling
 
 ggsave(opt$out,plt_dens, device = cairo_ps, width = 16, height = 10)

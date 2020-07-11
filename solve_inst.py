@@ -34,7 +34,7 @@ if __name__ == "__main__":
             log("-1,legend",heuristic[0], comment=heuristic[2])
         for heuristic in heu.ORIG_HEU:
             log("-1,legend",heuristic[0], comment=heuristic[2])
-        log("-1,legend,simpl_BB", comment="branch-and-bound")
+        log("-1,legend,simpl_BB", comment="Branch-and-bound")
         exit(0)
 
     inst_dir = args.inst_dir

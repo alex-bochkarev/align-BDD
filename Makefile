@@ -55,6 +55,7 @@ BB_FILES_N = $(addsuffix .log, $(addprefix $(LOGS)/part.BB_bounds_N., $(shell se
 PSCAL_FILES = $(addsuffix .log, $(addprefix $(LOGS)/part.scal., $(shell seq -f %02g 0 $(MAX_I))))
 
 DTE=$(shell date +%F)
+TS=$(shell date +%H-%M-%S)
 
 MAX_I=$(shell expr $(PAR_SOL) - 1 )
 
@@ -249,7 +250,7 @@ install_R_pkg:
 move-logs:
 	@echo moving logs away from $(LOGS) to $(ARC)
 	rm -f $(LOGS)/part.* && \
-	tar --remove-files -czf $(ARC)/$(DTE)-logs.tar.gz -C $(LOGS) .
+	tar --remove-files -czf $(ARC)/$(DTE)_$(TS)_logs.tar.gz -C $(LOGS) .
 
 # clean recipes
 clean-raw-inst:
