@@ -311,10 +311,12 @@ def orig_gsifts1p(A,B,simpl):
     BpA.gsifts(ApA)
     sA = ApA.size()+BpA.size()
     sB = ApB.size()+BpB.size()
-    if sA < sB:
-        return [ApA.size()+BpA.size(), 0, ApA.vars]
+    if sA < sB and sA>0:
+        return [sA, 0, ApA.vars]
+    elif sB < sA and sB>0:
+        return [sB, 0, ApB.vars]
     else:
-        return [ApB.size()+BpB.size(), 0, ApB.vars]
+        return [-1,0,ApA.vars]
 
 def orig_bestAB(A,B,simpl):
     Ap = deepcopy(A); Bp = deepcopy(B)

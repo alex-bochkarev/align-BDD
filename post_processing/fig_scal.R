@@ -64,6 +64,8 @@ df_outp = df_outp %>%
     simpl_outp = sum(aux_outp) / length(aux_outp)
   )
 
+cat(paste("No. of unsolved instances (total): ", as.character(nrow(filter(df, orig_gsifts1p_obj < 0)))))
+
 p1 =
 ggplot(df)+
     geom_point(aes(x=N, y = log(orig_simpl_time), color="Auxiliary problem / heuristic"),

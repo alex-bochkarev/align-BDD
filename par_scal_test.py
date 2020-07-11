@@ -72,20 +72,14 @@ if __name__ == "__main__":
                 ######################################################
                 ## Greedy sifts heuristic
                 t0 = time()
-                A = deepcopy(bdd_A)
-                B = deepcopy(bdd_B)
-
-                A.gsifts(B)
-                if not A.is_aligned(B):
-                    A = bdd_A; B = bdd_B
-                    B.gsifts(A)
-
+                size,_,o = heu.orig_gsifts1p(bdd_A,bdd_B, None)
                 t1 = time()
-                if A.is_aligned(B):
+
+                if size>0:
                     gs_status="aligned"
                 else:
                     gs_status="non-aligned"
 
                 log(N,inst_id, "gsifts_status",gs_status, outfile=logf)
                 log(N,inst_id, "orig_gsifts1p_time",t1-t0, outfile=logf)
-                log(N,inst_id, "orig_gsifts1p_obj",A.size()+B.size(), outfile=logf)
+                log(N,inst_id, "orig_gsifts1p_obj",size, outfile=logf)
