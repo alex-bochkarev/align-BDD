@@ -446,22 +446,22 @@ def orig_rnd_starts(A,B,simpl):
 SIMPL_HEU = [
     # ["simpl_toA",toA, "align to A"],
     # ["simpl_toB",toB, "align to B"],
-    ["simpl_minAB",minAB, "best of A and B"],
-    ["simpl_gswaps",simpl_greedy_swaps,"greedy swaps"],
-    ["simpl_5random",simpl_5random,"best of 5 random orders"],
-    ["simpl_gsifts_1p",simpl_gsifts_1p,"greedy sifts (1 pass)"],
-    ["simpl_gsifts_2p",simpl_gsifts_2p,"greedy sifts (2 passes)"],
-    ["simpl_gsifts_inf",simpl_gsifts_inf,"greedy sifts (all)"]
+    ["simpl_minAB",minAB, "Best of A and B"],
+    ["simpl_gswaps",simpl_greedy_swaps,"Greedy swaps"],
+    ["simpl_5random",simpl_5random,"Best/five random orders"],
+    ["simpl_gsifts_1p",simpl_gsifts_1p,"Greedy sifts (one pass)"],
+    ["simpl_gsifts_2p",simpl_gsifts_2p,"Greedy sifts (two passes)"],
+    ["simpl_gsifts_inf",simpl_gsifts_inf,"Greedy sifts (all)"]
     # ["simpl_g2sifts_1p",simpl_g2sifts_1p,"greedy 2-sifts (1 pass)"]
 ]
 
 ORIG_HEU = [
-    ["orig_simpl",orig_simpl,"simplified problem"],
-    ["orig_gsifts1p",orig_gsifts1p,"greedy BDD sifts (1 pass)"],
-    ["orig_bestAB",orig_bestAB,"best of A and B"],
-    ["orig_5random",orig_5random,"best of 5 random orders"],
+    ["orig_simpl",orig_simpl,"Simplified problem"],
+    ["orig_gsifts1p",orig_gsifts1p,"Greedy BDD sifts (one pass)"],
+    ["orig_bestAB",orig_bestAB,"Best of A and B"],
+    ["orig_5random",orig_5random,"Best of five random orders"]
     # ["orig_ild",orig_interleave_when_diverge,"interleave-when-diverge"],
-    ["orig_simpl_rnd",orig_rnd_starts,"simplified problem w/randomized starts"]
+    #["orig_simpl_rnd",orig_rnd_starts,"Simplified problem w/randomized starts"]
     # ["orig_meta",orig_meta,"greedy sifts + simplified problem"]
 ]
 
