@@ -21,7 +21,7 @@ from collections import deque
 import copy
 import math
 
-GSIFTS_MAX_INCREASE_MUL = 1000  # max increase of the BDD size (e.g., 100 times) during greedy sifts
+GSIFTS_MAX_INCREASE_MUL = 100000  # max increase of the BDD size (e.g., 100 times) during greedy sifts
 
 ## special node IDs (see the node class docstring)
 NROOT = 0

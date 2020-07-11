@@ -1,0 +1,3 @@
+Checking correctness of 'BB_bounds' logfile vs 'solved' logfile...
+BB_bounds log: [ OK ] All LBs equal UBs for optimal points
+BB_bounds vs solved log: [ OK ] optima are consistent between the two logfiles

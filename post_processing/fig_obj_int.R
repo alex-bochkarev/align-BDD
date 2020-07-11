@@ -82,6 +82,10 @@ df_rel = df_rel %>%
 df_time_o = pivot_wider(select(df_rel,-num_type),names_from = "entry_type",values_from = "value")
 df_time_o = merge(x=df_time_o, y=df_legend, by.x = "heuristic", by.y = "value")
 
+cat(paste("No. if instances not solved by greedy BDD sifts: ",as.character(nrow(filter(df_time_o, obj <0))), "\n"))
+
+df_time_o = filter(df_time_o, obj > 0)
+
 pfrom = min(df_time_o$obj)
 pto = max(df_time_o$obj)
 

@@ -104,7 +104,7 @@ plt_dens =
     ## styling
     labs(fill="Heuristic used:", color="Heuristic used:")+
     scale_y_continuous(
-        "Density (share of instances)",
+        "No. of instances",
         labels = scales::number_format(accuracy = 0.5),
         position = "right"
     )+
