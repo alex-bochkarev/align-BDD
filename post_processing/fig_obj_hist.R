@@ -93,8 +93,8 @@ latex_label = parse(text = TeX("try $S_A$, $S_B$, choose the best one"))
 
 plt_dens =
     ggplot(df_time_o, aes(x=obj , fill=comment, color=comment))+
-    geom_histogram(aes(y=..density..), alpha=0.4,binwidth = 0.01,position = "identity")+
-    geom_density(alpha=0.1,size=1.5)+
+    geom_histogram(alpha=0.4,binwidth = 0.01,position = "identity")+
+    #geom_density(alpha=0.1,size=1.5)+
     guides(fill=guide_legend(title="Heuristic:"), color = guide_legend(title="Heuristic:"))+
 #    ggtitle("Objective values distribution for different heuristics (original problem, 15vars 100k dataset, non-reduced instances)")+
     geom_vline(xintercept = 1.0, size=0.5, color="red", linetype="dashed")+
@@ -127,7 +127,8 @@ plt_dens =
                                         colour = "lightgrey"),
         panel.grid.minor.x = element_line(size=0.5,linetype = 'solid', colour = "lightgrey"),
         panel.grid.minor.y = element_line(size=0.5,linetype = 'solid', colour = "lightgrey")
-          )
+          )+
+    facet_grid(comment ~ ., scales="free_y")
     ## end of styling
 
 ggsave(opt$out,plt_dens, device = cairo_ps, width = 16, height = 10)

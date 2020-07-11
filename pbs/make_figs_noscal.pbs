@@ -1,12 +1,12 @@
 #PBS -N BDD_1
-#PBS -l select=1:ncpus=16:mem=16gb,walltime=08:00:00
+#PBS -l select=1:ncpus=4:mem=16gb,walltime=08:00:00
 #PBS -j oe
 #PBS -o ./run_logs/main_figs.log
 #PBS -M abochka@clemson.edu
 #PBS -m abe
 
 # general parameters
-PF=-j16
+PF=-j4
 
 module add anaconda3/5.1.0
 source activate ab-local
