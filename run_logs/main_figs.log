@@ -1,40 +1,40 @@
-START: global makefile run, branch **BDD_sifts_fix**, commit abb1a06252e6add1c10b15d6c00cc452721fdeaa
-Cleaning up raw instances in /local_scratch/pbs.9031905.pbs02//instances/raw...
-rm -f /local_scratch/pbs.9031905.pbs02//instances/raw/R/*.bdd
+START: global makefile run, branch **BDD_sifts_fix**, commit 1aee0fbdff7fff954bd8359b546cd49643b1340b
+Cleaning up raw instances in /local_scratch/pbs.9033590.pbs02//instances/raw...
+rm -f /local_scratch/pbs.9033590.pbs02//instances/raw/R/*.bdd
 Cleaning up log files...
+rm -f /local_scratch/pbs.9033590.pbs02//run_logs/*.log
 Cleaning up figures...
-Cleaning up instance archives...
-rm -f /local_scratch/pbs.9031905.pbs02//run_logs/*.log
+rm -f /local_scratch/pbs.9033590.pbs02//instances/raw/R/*.list*
 rm -f ./figures/*.eps
+Cleaning up instance archives...
 rm -f ./data_archive/*.tar.gz
-rm -f /local_scratch/pbs.9031905.pbs02//instances/raw/R/*.list*
-rm -f /local_scratch/pbs.9031905.pbs02//instances/raw/N/*.bdd
-rm -f /local_scratch/pbs.9031905.pbs02//instances/raw/N/*.list*
-rm -rf /local_scratch/pbs.9031905.pbs02//instances/raw/ds_stats
-rm -f /local_scratch/pbs.9031905.pbs02//instances/raw/*.bdd
-mkdir -p /local_scratch/pbs.9031905.pbs02//instances/raw/R /local_scratch/pbs.9031905.pbs02//instances/raw/N
-mkdir -p /local_scratch/pbs.9031905.pbs02//run_logs
+rm -f /local_scratch/pbs.9033590.pbs02//instances/raw/N/*.bdd
+rm -f /local_scratch/pbs.9033590.pbs02//instances/raw/N/*.list*
+rm -rf /local_scratch/pbs.9033590.pbs02//instances/raw/ds_stats
+rm -f /local_scratch/pbs.9033590.pbs02//instances/raw/*.bdd
+mkdir -p /local_scratch/pbs.9033590.pbs02//instances/raw/R /local_scratch/pbs.9033590.pbs02//instances/raw/N
+mkdir -p /local_scratch/pbs.9033590.pbs02//run_logs
 Making main figures...
 Preparing the R-instances dataset...
-mkdir -p /local_scratch/pbs.9031905.pbs02//instances/raw/R && \
+mkdir -p /local_scratch/pbs.9033590.pbs02//instances/raw/R && \
 if [ -f ./data_archive/dataset_R.tar.gz ]; then tar -zxmf ./data_archive/dataset_R.tar.gz; \
 else \
-python ./gen_BDD_pair.py -n 10000 -v 15 -p 0.6 -RU /local_scratch/pbs.9031905.pbs02//instances/raw/R/ > /local_scratch/pbs.9031905.pbs02//run_logs/2020-07-11_gen_15var_R.log; fi && \
-ls /local_scratch/pbs.9031905.pbs02//instances/raw/R | grep -Po "A\\K[^\\.]*" > /local_scratch/pbs.9031905.pbs02//instances/raw/R/instances.list && \
-split -d -nl/4 /local_scratch/pbs.9031905.pbs02//instances/raw/R/instances.list /local_scratch/pbs.9031905.pbs02//instances/raw/R/instances.list.
-mkdir -p /local_scratch/pbs.9031905.pbs02//instances/raw/LBs && \
-python ./gen_BDD_pair.py -n 2000 -v 15 -p 0.6 -RU /local_scratch/pbs.9031905.pbs02//instances/raw/LBs/ > /local_scratch/pbs.9031905.pbs02//run_logs/2020-07-11_gen_15var_LBs.log && \
-ls /local_scratch/pbs.9031905.pbs02//instances/raw/LBs | grep -Po "A\\K[^\\.]*" > /local_scratch/pbs.9031905.pbs02//instances/raw/LBs/instances.list && \
-python ./compare_simpl_LBs.py -d /local_scratch/pbs.9031905.pbs02//instances/raw/LBs/ -l /local_scratch/pbs.9031905.pbs02//instances/raw/LBs/instances.list > /local_scratch/pbs.9031905.pbs02//run_logs/LBs.log
-python ./solve_inst.py -i /local_scratch/pbs.9031905.pbs02//instances/raw/R/instances.list.00 -o /local_scratch/pbs.9031905.pbs02//run_logs/part.solved_R.00.log -d /local_scratch/pbs.9031905.pbs02//instances/raw/R/
-python ./solve_inst.py -i /local_scratch/pbs.9031905.pbs02//instances/raw/R/instances.list.01 -o /local_scratch/pbs.9031905.pbs02//run_logs/part.solved_R.01.log -d /local_scratch/pbs.9031905.pbs02//instances/raw/R/
-python ./solve_inst.py -i /local_scratch/pbs.9031905.pbs02//instances/raw/R/instances.list.02 -o /local_scratch/pbs.9031905.pbs02//run_logs/part.solved_R.02.log -d /local_scratch/pbs.9031905.pbs02//instances/raw/R/
-python ./solve_inst.py -i /local_scratch/pbs.9031905.pbs02//instances/raw/R/instances.list.03 -o /local_scratch/pbs.9031905.pbs02//run_logs/part.solved_R.03.log -d /local_scratch/pbs.9031905.pbs02//instances/raw/R/
-python ./log_bb.py -i /local_scratch/pbs.9031905.pbs02//instances/raw/R/instances.list.00 -o /local_scratch/pbs.9031905.pbs02//run_logs/part.BB_bounds_R.00.log -d /local_scratch/pbs.9031905.pbs02//instances/raw/R/
-python ./log_bb.py -i /local_scratch/pbs.9031905.pbs02//instances/raw/R/instances.list.01 -o /local_scratch/pbs.9031905.pbs02//run_logs/part.BB_bounds_R.01.log -d /local_scratch/pbs.9031905.pbs02//instances/raw/R/
-python ./log_bb.py -i /local_scratch/pbs.9031905.pbs02//instances/raw/R/instances.list.02 -o /local_scratch/pbs.9031905.pbs02//run_logs/part.BB_bounds_R.02.log -d /local_scratch/pbs.9031905.pbs02//instances/raw/R/
-python ./log_bb.py -i /local_scratch/pbs.9031905.pbs02//instances/raw/R/instances.list.03 -o /local_scratch/pbs.9031905.pbs02//run_logs/part.BB_bounds_R.03.log -d /local_scratch/pbs.9031905.pbs02//instances/raw/R/
-Rscript ./post_processing/fig_LBs.R -i /local_scratch/pbs.9031905.pbs02//run_logs/LBs.log -o figures/LB.eps
+python ./gen_BDD_pair.py -n 1000 -v 15 -p 0.6 -RU /local_scratch/pbs.9033590.pbs02//instances/raw/R/ > /local_scratch/pbs.9033590.pbs02//run_logs/2020-07-11_gen_15var_R.log; fi && \
+ls /local_scratch/pbs.9033590.pbs02//instances/raw/R | grep -Po "A\\K[^\\.]*" > /local_scratch/pbs.9033590.pbs02//instances/raw/R/instances.list && \
+split -d -nl/4 /local_scratch/pbs.9033590.pbs02//instances/raw/R/instances.list /local_scratch/pbs.9033590.pbs02//instances/raw/R/instances.list.
+mkdir -p /local_scratch/pbs.9033590.pbs02//instances/raw/LBs && \
+python ./gen_BDD_pair.py -n 1000 -v 15 -p 0.6 -RU /local_scratch/pbs.9033590.pbs02//instances/raw/LBs/ > /local_scratch/pbs.9033590.pbs02//run_logs/2020-07-11_gen_15var_LBs.log && \
+ls /local_scratch/pbs.9033590.pbs02//instances/raw/LBs | grep -Po "A\\K[^\\.]*" > /local_scratch/pbs.9033590.pbs02//instances/raw/LBs/instances.list && \
+python ./compare_simpl_LBs.py -d /local_scratch/pbs.9033590.pbs02//instances/raw/LBs/ -l /local_scratch/pbs.9033590.pbs02//instances/raw/LBs/instances.list > /local_scratch/pbs.9033590.pbs02//run_logs/LBs.log
+python ./solve_inst.py -i /local_scratch/pbs.9033590.pbs02//instances/raw/R/instances.list.00 -o /local_scratch/pbs.9033590.pbs02//run_logs/part.solved_R.00.log -d /local_scratch/pbs.9033590.pbs02//instances/raw/R/
+python ./solve_inst.py -i /local_scratch/pbs.9033590.pbs02//instances/raw/R/instances.list.01 -o /local_scratch/pbs.9033590.pbs02//run_logs/part.solved_R.01.log -d /local_scratch/pbs.9033590.pbs02//instances/raw/R/
+python ./solve_inst.py -i /local_scratch/pbs.9033590.pbs02//instances/raw/R/instances.list.02 -o /local_scratch/pbs.9033590.pbs02//run_logs/part.solved_R.02.log -d /local_scratch/pbs.9033590.pbs02//instances/raw/R/
+python ./solve_inst.py -i /local_scratch/pbs.9033590.pbs02//instances/raw/R/instances.list.03 -o /local_scratch/pbs.9033590.pbs02//run_logs/part.solved_R.03.log -d /local_scratch/pbs.9033590.pbs02//instances/raw/R/
+python ./log_bb.py -i /local_scratch/pbs.9033590.pbs02//instances/raw/R/instances.list.00 -o /local_scratch/pbs.9033590.pbs02//run_logs/part.BB_bounds_R.00.log -d /local_scratch/pbs.9033590.pbs02//instances/raw/R/
+python ./log_bb.py -i /local_scratch/pbs.9033590.pbs02//instances/raw/R/instances.list.01 -o /local_scratch/pbs.9033590.pbs02//run_logs/part.BB_bounds_R.01.log -d /local_scratch/pbs.9033590.pbs02//instances/raw/R/
+python ./log_bb.py -i /local_scratch/pbs.9033590.pbs02//instances/raw/R/instances.list.02 -o /local_scratch/pbs.9033590.pbs02//run_logs/part.BB_bounds_R.02.log -d /local_scratch/pbs.9033590.pbs02//instances/raw/R/
+python ./log_bb.py -i /local_scratch/pbs.9033590.pbs02//instances/raw/R/instances.list.03 -o /local_scratch/pbs.9033590.pbs02//run_logs/part.BB_bounds_R.03.log -d /local_scratch/pbs.9033590.pbs02//instances/raw/R/
+Rscript ./post_processing/fig_LBs.R -i /local_scratch/pbs.9033590.pbs02//run_logs/LBs.log -o figures/LB.eps
 
 Attaching package: ‘dplyr’
 
@@ -51,13 +51,13 @@ The following objects are masked from ‘package:base’:
     intersect, setdiff, setequal, union
 
 Warning messages:
-1: Removed 18 rows containing non-finite values (stat_boxplot). 
-2: Removed 18 rows containing missing values (geom_point). 
+1: Removed 9 rows containing non-finite values (stat_boxplot). 
+2: Removed 9 rows containing missing values (geom_point). 
 null device 
           1 
-python ./solve_inst.py --header > /local_scratch/pbs.9031905.pbs02//run_logs/solved_R.log && \
-tail -qn +2 /local_scratch/pbs.9031905.pbs02//run_logs/part.solved_R.00.log /local_scratch/pbs.9031905.pbs02//run_logs/part.solved_R.01.log /local_scratch/pbs.9031905.pbs02//run_logs/part.solved_R.02.log /local_scratch/pbs.9031905.pbs02//run_logs/part.solved_R.03.log >> /local_scratch/pbs.9031905.pbs02//run_logs/solved_R.log
-Rscript ./post_processing/fig_guessing.R -i /local_scratch/pbs.9031905.pbs02//run_logs/solved_R.log -o figures/fig_sol_guessing_R.eps
+python ./log_bb.py --header > /local_scratch/pbs.9033590.pbs02//run_logs/BB_bounds_R.log && \
+tail -qn +2 /local_scratch/pbs.9033590.pbs02//run_logs/part.BB_bounds_R.00.log /local_scratch/pbs.9033590.pbs02//run_logs/part.BB_bounds_R.01.log /local_scratch/pbs.9033590.pbs02//run_logs/part.BB_bounds_R.02.log /local_scratch/pbs.9033590.pbs02//run_logs/part.BB_bounds_R.03.log >> /local_scratch/pbs.9033590.pbs02//run_logs/BB_bounds_R.log
+Rscript ./post_processing/fig_BB_gaps.R -i /local_scratch/pbs.9033590.pbs02//run_logs/BB_bounds_R.log -o figures/fig_BB_gaps_R.eps
 
 Attaching package: ‘dplyr’
 
@@ -69,19 +69,12 @@ The following objects are masked from ‘package:base’:
 
     intersect, setdiff, setequal, union
 
-Rscript ./post_processing/fig_fireplace.R -i /local_scratch/pbs.9031905.pbs02//run_logs/solved_R.log -o figures/fig_sol_fireplace_R.eps
-
-Attaching package: ‘dplyr’
-
-The following objects are masked from ‘package:stats’:
-
-    filter, lag
-
-The following objects are masked from ‘package:base’:
-
-    intersect, setdiff, setequal, union
-
-Rscript ./post_processing/fig_obj_hist.R -i /local_scratch/pbs.9031905.pbs02//run_logs/solved_R.log -o figures/fig_sol_obj_hist_R.eps
+python ./solve_inst.py --header > /local_scratch/pbs.9033590.pbs02//run_logs/solved_R.log && \
+tail -qn +2 /local_scratch/pbs.9033590.pbs02//run_logs/part.solved_R.00.log /local_scratch/pbs.9033590.pbs02//run_logs/part.solved_R.01.log /local_scratch/pbs.9033590.pbs02//run_logs/part.solved_R.02.log /local_scratch/pbs.9033590.pbs02//run_logs/part.solved_R.03.log >> /local_scratch/pbs.9033590.pbs02//run_logs/solved_R.log
+Rscript ./post_processing/fig_guessing.R -i /local_scratch/pbs.9033590.pbs02//run_logs/solved_R.log -o figures/fig_sol_guessing_R.eps
+Rscript ./post_processing/fig_fireplace.R -i /local_scratch/pbs.9033590.pbs02//run_logs/solved_R.log -o figures/fig_sol_fireplace_R.eps
+Rscript ./post_processing/fig_obj_hist.R -i /local_scratch/pbs.9033590.pbs02//run_logs/solved_R.log -o figures/fig_sol_obj_hist_R.eps
+Rscript ./post_processing/fig_obj_int.R -i /local_scratch/pbs.9033590.pbs02//run_logs/solved_R.log -o figures/fig_sol_obj_int_R.eps
 
 Attaching package: ‘dplyr’
 
@@ -97,16 +90,34 @@ The following objects are masked from ‘package:base’:
 
     intersect, setdiff, setequal, union
 
-Warning messages:
-1: Removed 599 rows containing non-finite values (stat_bin). 
-2: Removed 6 rows containing missing values (geom_bar). 
-Rscript ./post_processing/fig_obj_int.R -i /local_scratch/pbs.9031905.pbs02//run_logs/solved_R.log -o figures/fig_sol_obj_int_R.eps
+
+Attaching package: ‘dplyr’
+
+The following objects are masked from ‘package:stats’:
+
+    filter, lag
+
+The following objects are masked from ‘package:base’:
+
+    intersect, setdiff, setequal, union
+
 
 Attaching package: ‘dplyr’
 
 The following object is masked from ‘package:gridExtra’:
 
     combine
+
+The following objects are masked from ‘package:stats’:
+
+    filter, lag
+
+The following objects are masked from ‘package:base’:
+
+    intersect, setdiff, setequal, union
+
+
+Attaching package: ‘dplyr’
 
 The following objects are masked from ‘package:stats’:
 
@@ -117,26 +128,27 @@ The following objects are masked from ‘package:base’:
     intersect, setdiff, setequal, union
 
 Share of instances outperforming the baseline:$orig_5random
-[1] 0.0003430711
+[1] 0.9224328
 
 $orig_bestAB
-[1] 0.006475522
+[1] 0.922353
 
 $orig_simpl
-[1] 0.1961364
+[1] 0.9224328
 
 Share of instances at most 30% of the baseline:$orig_5random
-[1] 0.004443744
+[1] 0.9257204
 
 $orig_bestAB
-[1] 0.4594546
+[1] 0.925644
 
 $orig_simpl
-[1] 0.6266748
+[1] 0.9257204
 
-python ./log_bb.py --header > /local_scratch/pbs.9031905.pbs02//run_logs/BB_bounds_R.log && \
-tail -qn +2 /local_scratch/pbs.9031905.pbs02//run_logs/part.BB_bounds_R.00.log /local_scratch/pbs.9031905.pbs02//run_logs/part.BB_bounds_R.01.log /local_scratch/pbs.9031905.pbs02//run_logs/part.BB_bounds_R.02.log /local_scratch/pbs.9031905.pbs02//run_logs/part.BB_bounds_R.03.log >> /local_scratch/pbs.9031905.pbs02//run_logs/BB_bounds_R.log
-Rscript ./post_processing/fig_BB_gaps.R -i /local_scratch/pbs.9031905.pbs02//run_logs/BB_bounds_R.log -o figures/fig_BB_gaps_R.eps
+Rscript ./post_processing/tab_guessing.R -i /local_scratch/pbs.9033590.pbs02//run_logs/solved_R.log -o figures/guessing.tex
+Warning messages:
+1: Removed 59 rows containing non-finite values (stat_bin). 
+2: Removed 6 rows containing missing values (geom_bar). 
 
 Attaching package: ‘dplyr’
 
@@ -149,22 +161,22 @@ The following objects are masked from ‘package:base’:
     intersect, setdiff, setequal, union
 
 Running tests...
-Rscript tests/BB_log_correct.R -b /local_scratch/pbs.9031905.pbs02//run_logs/BB_bounds_R.log -s /local_scratch/pbs.9031905.pbs02//run_logs/solved_R.log > /local_scratch/pbs.9031905.pbs02//run_logs/BB.test
+Rscript tests/BB_log_correct.R -b /local_scratch/pbs.9033590.pbs02//run_logs/BB_bounds_R.log -s /local_scratch/pbs.9033590.pbs02//run_logs/solved_R.log > /local_scratch/pbs.9033590.pbs02//run_logs/BB.test
 Running tests...
 Moving logfiles...
-moving logs away from /local_scratch/pbs.9031905.pbs02//run_logs to ./data_archive
-rm -f /local_scratch/pbs.9031905.pbs02//run_logs/part.* && \
-tar --remove-files -czf ./data_archive/2020-07-11-logs.tar.gz -C /local_scratch/pbs.9031905.pbs02//run_logs .
+moving logs away from /local_scratch/pbs.9033590.pbs02//run_logs to ./data_archive
+rm -f /local_scratch/pbs.9033590.pbs02//run_logs/part.* && \
+tar --remove-files -czf ./data_archive/2020-07-11_14-12-25_logs.tar.gz -C /local_scratch/pbs.9033590.pbs02//run_logs .
 Cleaning..
-Cleaning up raw instances in /local_scratch/pbs.9031905.pbs02//instances/raw...
-rm -f /local_scratch/pbs.9031905.pbs02//instances/raw/R/*.bdd
+Cleaning up raw instances in /local_scratch/pbs.9033590.pbs02//instances/raw...
+rm -f /local_scratch/pbs.9033590.pbs02//instances/raw/R/*.bdd
 Cleaning up log files...
-rm -f /local_scratch/pbs.9031905.pbs02//run_logs/*.log
-rm -f /local_scratch/pbs.9031905.pbs02//instances/raw/R/*.list*
-rm -f /local_scratch/pbs.9031905.pbs02//instances/raw/N/*.bdd
-rm -f /local_scratch/pbs.9031905.pbs02//instances/raw/N/*.list*
-rm -rf /local_scratch/pbs.9031905.pbs02//instances/raw/ds_stats
-rm -f /local_scratch/pbs.9031905.pbs02//instances/raw/*.bdd
+rm -f /local_scratch/pbs.9033590.pbs02//run_logs/*.log
+rm -f /local_scratch/pbs.9033590.pbs02//instances/raw/R/*.list*
+rm -f /local_scratch/pbs.9033590.pbs02//instances/raw/N/*.bdd
+rm -f /local_scratch/pbs.9033590.pbs02//instances/raw/N/*.list*
+rm -rf /local_scratch/pbs.9033590.pbs02//instances/raw/ds_stats
+rm -f /local_scratch/pbs.9033590.pbs02//instances/raw/*.bdd
 END: done with the global makefile run
  
  
@@ -179,6 +191,6 @@ mem=16gb,ncpus=4,walltime=08:00:00
 | PALMETTO CLUSTER PBS RESOURCES USED | 
 +-------------------------------------+ 
  
-cpupercent=400,cput=05:04:23,mem=605320kb,ncpus=4,vmem=2601160kb,walltime=01:18:42
+cpupercent=398,cput=00:34:30,mem=594200kb,ncpus=4,vmem=2612104kb,walltime=00:09:52
  
  

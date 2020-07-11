@@ -311,6 +311,13 @@ def orig_gsifts1p(A,B,simpl):
     BpA.gsifts(ApA)
     sA = ApA.size()+BpA.size()
     sB = ApB.size()+BpB.size()
+
+    # make sure sequences are aligned
+    if not ApA.is_aligned(BpA): 
+        sA = -1
+    if not ApB.is_aligned(BpB):
+        sB = -1
+
     if sA < sB and sA>0:
         return [sA, 0, ApA.vars]
     elif sB < sA and sB>0:

@@ -39,7 +39,7 @@ df$value = as.numeric(df$value)
 
 df = pivot_wider(df, id_cols = c("instance","N"), names_from = num_type, values_from = value)
 
-df = df %>%
+df = filter(df, orig_gsifts1p_obj > 0) %>%
     mutate(
         rel_obj = orig_simpl_obj / orig_gsifts1p_obj
     )
@@ -64,7 +64,7 @@ df_outp = df_outp %>%
     simpl_outp = sum(aux_outp) / length(aux_outp)
   )
 
-cat(paste("No. of unsolved instances (total): ", as.character(nrow(filter(df, orig_gsifts1p_obj < 0)))))
+cat(paste("No. of unsolved instances (total): ", as.character(nrow(filter(df, orig_gsifts1p_obj < 0))), "\n"))
 
 p1 =
 ggplot(df)+
