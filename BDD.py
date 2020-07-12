@@ -313,8 +313,8 @@ class BDD(object):
 
             ## try moving the var down
             for j in range(i+1,N):
-                if self.size()+with_whom.size() > cur_size*GSIFTS_MAX_INCREASE_MUL:
-                    break
+                #if self.size()+with_whom.size() > cur_size*GSIFTS_MAX_INCREASE_MUL:
+                #    break
 
                 self.swap_up(j)
                 with_whom.swap_up(j)
@@ -330,8 +330,8 @@ class BDD(object):
             cur_size = self.size()+with_whom.size()
 
             for j in reversed(range(1,i+1)):
-                if self.size()+with_whom.size() > cur_size*GSIFTS_MAX_INCREASE_MUL:
-                    break
+                #if self.size()+with_whom.size() > cur_size*GSIFTS_MAX_INCREASE_MUL:
+                #    break
 
                 self.swap_up(j)
                 with_whom.swap_up(j)

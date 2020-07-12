@@ -1,27 +1,27 @@
 START: scalability figure
-mkdir -p /local_scratch/pbs.9034693.pbs02//instances/raw/R /local_scratch/pbs.9034693.pbs02//instances/raw/N
-mkdir -p /local_scratch/pbs.9034693.pbs02//run_logs
+mkdir -p /local_scratch/pbs.9038342.pbs02//instances/raw/R /local_scratch/pbs.9038342.pbs02//instances/raw/N
+mkdir -p /local_scratch/pbs.9038342.pbs02//run_logs
 making the scalability figure
 Preparing instances for the scalability set...
 i=0 && \
-rm -rf /local_scratch/pbs.9034693.pbs02//instances/raw/scal && \
-mkdir -p /local_scratch/pbs.9034693.pbs02//instances/raw/scal && \
+rm -rf /local_scratch/pbs.9038342.pbs02//instances/raw/scal && \
+mkdir -p /local_scratch/pbs.9038342.pbs02//instances/raw/scal && \
 for S in 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 ; do \
-	python ./gen_BDD_pair.py -s $(( 100 * ${i} )) -n 100 -v $S -p 0.6 -RU /local_scratch/pbs.9034693.pbs02//instances/raw/scal/ > /dev/null &&\
+	python ./gen_BDD_pair.py -s $(( 100 * ${i} )) -n 100 -v $S -p 0.6 -RU /local_scratch/pbs.9038342.pbs02//instances/raw/scal/ > /dev/null &&\
 	i=$(( ${i} + 1 ));\
 done && \
-ls /local_scratch/pbs.9034693.pbs02//instances/raw/scal | grep -Po "A\\K[^\\.]*" > /local_scratch/pbs.9034693.pbs02//instances/raw/scal/instances.list && \
-shuf /local_scratch/pbs.9034693.pbs02//instances/raw/scal/instances.list > /local_scratch/pbs.9034693.pbs02//instances/raw/scal/instances.list.shuffled && \
-split -d -nl/4 /local_scratch/pbs.9034693.pbs02//instances/raw/scal/instances.list.shuffled /local_scratch/pbs.9034693.pbs02//instances/raw/scal/instances.list. && \
-rm /local_scratch/pbs.9034693.pbs02//instances/raw/scal/instances.list.shuffled
-python ./par_scal_test.py -i /local_scratch/pbs.9034693.pbs02//instances/raw/scal/instances.list.00 -o /local_scratch/pbs.9034693.pbs02//run_logs/part.scal.00.log -d /local_scratch/pbs.9034693.pbs02//instances/raw/scal/
-python ./par_scal_test.py -i /local_scratch/pbs.9034693.pbs02//instances/raw/scal/instances.list.01 -o /local_scratch/pbs.9034693.pbs02//run_logs/part.scal.01.log -d /local_scratch/pbs.9034693.pbs02//instances/raw/scal/
-python ./par_scal_test.py -i /local_scratch/pbs.9034693.pbs02//instances/raw/scal/instances.list.02 -o /local_scratch/pbs.9034693.pbs02//run_logs/part.scal.02.log -d /local_scratch/pbs.9034693.pbs02//instances/raw/scal/
-python ./par_scal_test.py -i /local_scratch/pbs.9034693.pbs02//instances/raw/scal/instances.list.03 -o /local_scratch/pbs.9034693.pbs02//run_logs/part.scal.03.log -d /local_scratch/pbs.9034693.pbs02//instances/raw/scal/
-python ./par_scal_test.py --header > /local_scratch/pbs.9034693.pbs02//run_logs/scal_par.log && \
-tail -qn +2 /local_scratch/pbs.9034693.pbs02//run_logs/part.scal.00.log /local_scratch/pbs.9034693.pbs02//run_logs/part.scal.01.log /local_scratch/pbs.9034693.pbs02//run_logs/part.scal.02.log /local_scratch/pbs.9034693.pbs02//run_logs/part.scal.03.log >> /local_scratch/pbs.9034693.pbs02//run_logs/scal_par.log && \
-rm -rf /local_scratch/pbs.9034693.pbs02//run_logs/part.scal.00.log /local_scratch/pbs.9034693.pbs02//run_logs/part.scal.01.log /local_scratch/pbs.9034693.pbs02//run_logs/part.scal.02.log /local_scratch/pbs.9034693.pbs02//run_logs/part.scal.03.log
-Rscript ./post_processing/fig_scal.R -i /local_scratch/pbs.9034693.pbs02//run_logs/scal_par.log -o figures/fig_scal.eps
+ls /local_scratch/pbs.9038342.pbs02//instances/raw/scal | grep -Po "A\\K[^\\.]*" > /local_scratch/pbs.9038342.pbs02//instances/raw/scal/instances.list && \
+shuf /local_scratch/pbs.9038342.pbs02//instances/raw/scal/instances.list > /local_scratch/pbs.9038342.pbs02//instances/raw/scal/instances.list.shuffled && \
+split -d -nl/4 /local_scratch/pbs.9038342.pbs02//instances/raw/scal/instances.list.shuffled /local_scratch/pbs.9038342.pbs02//instances/raw/scal/instances.list. && \
+rm /local_scratch/pbs.9038342.pbs02//instances/raw/scal/instances.list.shuffled
+python ./par_scal_test.py -i /local_scratch/pbs.9038342.pbs02//instances/raw/scal/instances.list.00 -o /local_scratch/pbs.9038342.pbs02//run_logs/part.scal.00.log -d /local_scratch/pbs.9038342.pbs02//instances/raw/scal/
+python ./par_scal_test.py -i /local_scratch/pbs.9038342.pbs02//instances/raw/scal/instances.list.01 -o /local_scratch/pbs.9038342.pbs02//run_logs/part.scal.01.log -d /local_scratch/pbs.9038342.pbs02//instances/raw/scal/
+python ./par_scal_test.py -i /local_scratch/pbs.9038342.pbs02//instances/raw/scal/instances.list.02 -o /local_scratch/pbs.9038342.pbs02//run_logs/part.scal.02.log -d /local_scratch/pbs.9038342.pbs02//instances/raw/scal/
+python ./par_scal_test.py -i /local_scratch/pbs.9038342.pbs02//instances/raw/scal/instances.list.03 -o /local_scratch/pbs.9038342.pbs02//run_logs/part.scal.03.log -d /local_scratch/pbs.9038342.pbs02//instances/raw/scal/
+python ./par_scal_test.py --header > /local_scratch/pbs.9038342.pbs02//run_logs/scal_par.log && \
+tail -qn +2 /local_scratch/pbs.9038342.pbs02//run_logs/part.scal.00.log /local_scratch/pbs.9038342.pbs02//run_logs/part.scal.01.log /local_scratch/pbs.9038342.pbs02//run_logs/part.scal.02.log /local_scratch/pbs.9038342.pbs02//run_logs/part.scal.03.log >> /local_scratch/pbs.9038342.pbs02//run_logs/scal_par.log && \
+rm -rf /local_scratch/pbs.9038342.pbs02//run_logs/part.scal.00.log /local_scratch/pbs.9038342.pbs02//run_logs/part.scal.01.log /local_scratch/pbs.9038342.pbs02//run_logs/part.scal.02.log /local_scratch/pbs.9038342.pbs02//run_logs/part.scal.03.log
+Rscript ./post_processing/fig_scal.R -i /local_scratch/pbs.9038342.pbs02//run_logs/scal_par.log -o figures/fig_scal.eps
 
 Attaching package: ‘dplyr’
 
@@ -46,19 +46,19 @@ No. of unsolved instances (total):  0
 null device 
           1 
 moving logfiles...
-moving logs away from /local_scratch/pbs.9034693.pbs02//run_logs to ./data_archive
-rm -f /local_scratch/pbs.9034693.pbs02//run_logs/part.* && \
-tar --remove-files -czf ./data_archive/2020-07-12_05-40-00_logs.tar.gz -C /local_scratch/pbs.9034693.pbs02//run_logs .
+moving logs away from /local_scratch/pbs.9038342.pbs02//run_logs to ./data_archive
+rm -f /local_scratch/pbs.9038342.pbs02//run_logs/part.* && \
+tar --remove-files -czf ./data_archive/2020-07-12_16-22-38_logs.tar.gz -C /local_scratch/pbs.9038342.pbs02//run_logs .
 cleaning...
-Cleaning up raw instances in /local_scratch/pbs.9034693.pbs02//instances/raw...
-rm -f /local_scratch/pbs.9034693.pbs02//instances/raw/R/*.bdd
-rm -f /local_scratch/pbs.9034693.pbs02//instances/raw/R/*.list*
-rm -f /local_scratch/pbs.9034693.pbs02//instances/raw/N/*.bdd
-rm -f /local_scratch/pbs.9034693.pbs02//instances/raw/N/*.list*
-rm -rf /local_scratch/pbs.9034693.pbs02//instances/raw/ds_stats
-rm -f /local_scratch/pbs.9034693.pbs02//instances/raw/*.bdd
+Cleaning up raw instances in /local_scratch/pbs.9038342.pbs02//instances/raw...
+rm -f /local_scratch/pbs.9038342.pbs02//instances/raw/R/*.bdd
+rm -f /local_scratch/pbs.9038342.pbs02//instances/raw/R/*.list*
+rm -f /local_scratch/pbs.9038342.pbs02//instances/raw/N/*.bdd
+rm -f /local_scratch/pbs.9038342.pbs02//instances/raw/N/*.list*
+rm -rf /local_scratch/pbs.9038342.pbs02//instances/raw/ds_stats
+rm -f /local_scratch/pbs.9038342.pbs02//instances/raw/*.bdd
 Cleaning up log files...
-rm -f /local_scratch/pbs.9034693.pbs02//run_logs/*.log
+rm -f /local_scratch/pbs.9038342.pbs02//run_logs/*.log
 END: scalability figure done.
  
  
@@ -73,6 +73,6 @@ mem=16gb,ncpus=4,walltime=24:00:00
 | PALMETTO CLUSTER PBS RESOURCES USED | 
 +-------------------------------------+ 
  
-cpupercent=381,cput=36:21:35,mem=3442504kb,ncpus=4,vmem=5345252kb,walltime=11:53:40
+cpupercent=387,cput=33:08:02,mem=3012752kb,ncpus=4,vmem=4917192kb,walltime=09:30:07
  
  

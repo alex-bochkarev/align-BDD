@@ -1,4 +1,4 @@
-{"ok":true,"result":{"message_id":1120,"from":{"id":931364299,"is_bot":true,"first_name":"Wintermute","username":"ab_wintermute_bot"},"chat":{"id":122533105,"first_name":"Alex","last_name":"Bochkarev","username":"abochka","type":"private"},"date":1594546807,"text":"Image from the scaling test:"}}{"ok":true,"result":{"message_id":1121,"from":{"id":931364299,"is_bot":true,"first_name":"Wintermute","username":"ab_wintermute_bot"},"chat":{"id":122533105,"first_name":"Alex","last_name":"Bochkarev","username":"abochka","type":"private"},"date":1594546809,"photo":[{"file_id":"AgACAgIAAxkDAAIEYV8K2nmDPqcuE9EEJEhElpyA3AI4AAKvrzEbMYBYSC4KVMIeZljYx3qSlS4AAwEAAwIAA20AA_dtAQABGgQ","file_unique_id":"AQADx3qSlS4AA_dtAQAB","file_size":18150,"width":320,"height":200},{"file_id":"AgACAgIAAxkDAAIEYV8K2nmDPqcuE9EEJEhElpyA3AI4AAKvrzEbMYBYSC4KVMIeZljYx3qSlS4AAwEAAwIAA3gAA_htAQABGgQ","file_unique_id":"AQADx3qSlS4AA_htAQAB","file_size":84731,"width":800,"height":500},{"file_id":"AgACAgIAAxkDAAIEYV8K2nmDPqcuE9EEJEhElpyA3AI4AAKvrzEbMYBYSC4KVMIeZljYx3qSlS4AAwEAAwIAA3kAA_ltAQABGgQ","file_unique_id":"AQADx3qSlS4AA_ltAQAB","file_size":148024,"width":1152,"height":720}],"caption":"fig_scal.png"}} 
+{"ok":true,"result":{"message_id":1138,"from":{"id":931364299,"is_bot":true,"first_name":"Wintermute","username":"ab_wintermute_bot"},"chat":{"id":122533105,"first_name":"Alex","last_name":"Bochkarev","username":"abochka","type":"private"},"date":1594585361,"text":"Image from the scaling test:"}}{"ok":true,"result":{"message_id":1139,"from":{"id":931364299,"is_bot":true,"first_name":"Wintermute","username":"ab_wintermute_bot"},"chat":{"id":122533105,"first_name":"Alex","last_name":"Bochkarev","username":"abochka","type":"private"},"date":1594585366,"photo":[{"file_id":"AgACAgIAAxkDAAIEc18LcRahIU8059lgFMWy4wgbpWfvAAKksDEbMYBYSLc6Fe5Zz1ud4zN6kS4AAwEAAwIAA20AAx2DBQABGgQ","file_unique_id":"AQAD4zN6kS4AAx2DBQAB","file_size":20856,"width":320,"height":200},{"file_id":"AgACAgIAAxkDAAIEc18LcRahIU8059lgFMWy4wgbpWfvAAKksDEbMYBYSLc6Fe5Zz1ud4zN6kS4AAwEAAwIAA3gAAx-DBQABGgQ","file_unique_id":"AQAD4zN6kS4AAx-DBQAB","file_size":90196,"width":800,"height":500},{"file_id":"AgACAgIAAxkDAAIEc18LcRahIU8059lgFMWy4wgbpWfvAAKksDEbMYBYSLc6Fe5Zz1ud4zN6kS4AAwEAAwIAA3kAAx6DBQABGgQ","file_unique_id":"AQAD4zN6kS4AAx6DBQAB","file_size":155282,"width":1152,"height":720}],"caption":"fig_scal.png"}} 
  
 +------------------------------------------+ 
 | PALMETTO CLUSTER PBS RESOURCES REQUESTED | 
@@ -11,6 +11,6 @@ mem=1gb,ncpus=1,walltime=00:10:00
 | PALMETTO CLUSTER PBS RESOURCES USED | 
 +-------------------------------------+ 
  
-cpupercent=33,cput=00:00:01,mem=0kb,ncpus=1,vmem=0kb,walltime=00:00:03
+cpupercent=14,cput=00:00:01,mem=0kb,ncpus=1,vmem=0kb,walltime=00:00:07
  
  

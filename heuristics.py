@@ -318,7 +318,7 @@ def orig_gsifts1p(A,B,simpl):
     if not ApB.is_aligned(BpB):
         sB = -1
 
-    if sA < sB and sA>0:
+    if sA <= sB and sA>0:
         return [sA, 0, ApA.vars]
     elif sB < sA and sB>0:
         return [sB, 0, ApB.vars]
