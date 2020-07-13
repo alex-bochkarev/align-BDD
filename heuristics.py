@@ -313,7 +313,7 @@ def orig_gsifts1p(A,B,simpl):
     sB = ApB.size()+BpB.size()
 
     # make sure sequences are aligned
-    if not ApA.is_aligned(BpA): 
+    if not ApA.is_aligned(BpA):
         sA = -1
     if not ApB.is_aligned(BpB):
         sB = -1

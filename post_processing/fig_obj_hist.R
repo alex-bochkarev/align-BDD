@@ -95,12 +95,12 @@ latex_label = parse(text = TeX("try $S_A$, $S_B$, choose the best one"))
 
 plt_dens =
     ggplot(df_time_o, aes(x=obj))+
-    geom_histogram(alpha=0.4,binwidth = 0.01,position = "identity")+
+    geom_histogram(binwidth = 0.01,position = "identity")+
     #geom_density(alpha=0.1,size=1.5)+
     ## guides(fill=guide_legend(title="Heuristic:"), color = guide_legend(title="Heuristic:"))+
 #    ggtitle("Objective values distribution for different heuristics (original problem, 15vars 100k dataset, non-reduced instances)")+
     geom_vline(xintercept = 1.0, size=0.5, color="red", linetype="dashed")+
-    annotate("text",x=1.0, y=4.2,label = "100% = greedy BDD sifts", color="red")+
+    ## annotate("text",x=1.0, y=4.2,label = "100% = greedy BDD sifts", color="red")+
     ## styling
     labs(fill="Heuristic used:", color="Heuristic used:")+
     scale_y_continuous(

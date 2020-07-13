@@ -82,8 +82,8 @@ ggplot(df)+
         minor_breaks = seq(min(df$N),max(df$N), by=1)
     )+
     ## scale_y_continuous(limits = c(0, 100))+
-    labs(x="No. of variables\n(a)",y="Solution time, sec., logarithmic scale, ln (t)")+
-    guides(color=guide_legend("Solution method (log of median values):"), linetype=guide_legend("Solution method (log of median values):"))+
+    labs(x="No. of variables\n(a)",y="Solution time, sec., linear scale, t")+
+    guides(color=guide_legend("Solution method (median values):"), linetype=guide_legend("Solution method (median values):"))+
     theme(
         legend.position = c(0.2, 0.8),
         legend.direction = "vertical",

@@ -134,7 +134,7 @@ plt_zoomed =
       axis.title.y = element_text(size = 26, margin = margin(t=50)),
       panel.background = element_rect(fill = NA, color = "black"),
       panel.grid.major = element_line(size = 0.5, linetype = 'solid',
-                                      color = "darkgrey"),
+                                      color = "lightgrey"),
       strip.text.x = element_text(size = 22),
       strip.text.y = element_text(size=22, angle=180),
       strip.background = element_blank()
