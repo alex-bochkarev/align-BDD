@@ -24,9 +24,9 @@ PSCAL=./par_scal_test.py
 PAR_SOL=4
 
 ### random dataset stats
-LW_n=1000
+LW_n=10000
 LW_N=15
-LW_Ps=0.3 0.6 0.9
+LW_Ps=0.2 0.4 0.6 0.8
 
 ### dataset generation parameters:
 p=0.6# dataset generation parameter

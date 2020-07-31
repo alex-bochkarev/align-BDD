@@ -8,7 +8,8 @@ library(ggplot2)
 library(reshape)
 library(dplyr)
 library(optparse)
-#library(Hmisc)
+library(latex2exp)
+library(stringr)
 
 ######################################################################
 ## unpack the command line arguments
@@ -32,8 +33,8 @@ if (is.null(opt$input) | is.null(opt$out)){
 
 infile = opt$input
 outfile = opt$out
-Nticks = 10
-quantile_to_show = 0.9
+Nticks = 15
+quantile_to_show = 0.95
 
 df = read.csv(file=infile, header=FALSE, sep=",",stringsAsFactors=FALSE)
 colnames(df) = c("ID","N","LR",paste('n',seq(1,length(colnames(df))-4),sep="_"),"P")
@@ -41,17 +42,20 @@ colnames(df) = c("ID","N","LR",paste('n',seq(1,length(colnames(df))-4),sep="_"),
 df_m = melt(df, id.vars=c('ID', 'P','LR',"N"))
 max_lw = quantile(df_m$value,quantile_to_show)
 
-plt = ggplot(df_m,aes(x=value, fill=factor(P)))+
-    coord_flip(xlim=c(1,max_lw))+
-    xlab("Layer widths")+
-    ylab("Percent of generated BDDs")+
-    scale_y_continuous(labels = scales::percent_format(accuracy = 1L),
-                       breaks = c(0.5,1.0))+
-    scale_x_continuous(
-        breaks = seq(1,max_lw,by = floor((max_lw-1)/Nticks)+1))+
-        ## minor_breaks = seq(1,max_lw, length.out = 2*(floor((max_lw-1) / (floor((max_lw-1)/Nticks))))+1))+
-    geom_bar(aes(y=..prop..,group=P),alpha=0.9, position='dodge')+
-    facet_wrap(~variable, nrow=1)+
+df_m$var_label = str_replace(as.character(df_m$variable), "_","[")
+df_m$var_label = paste(df_m$var_label,"]",sep="")
+df_m$layer = factor(df_m$var_label, levels = as.character(unique(df_m$var_label)))
+
+plt = ggplot(df_m, aes(x=factor(P, levels=unique(df_m$P)), y=value, fill=P))+
+    ## coord_flip(xlim=c(1,max_lw))+
+    ylab("Layer widths")+
+    xlab("Generation parameter value (for each layer)")+
+  scale_y_continuous(
+    limits = quantile(df_m$value, c(0, quantile_to_show)),
+    breaks = seq(1,max_lw,by = floor((max_lw-1)/Nticks)+1))+
+  scale_x_discrete(breaks = unique(df_m$P))+
+    geom_boxplot(outlier.shape = NA)+
+    facet_wrap(~layer, nrow=1, label = "label_parsed")+
     theme(
         panel.background = element_rect(fill = "lightgrey",
                                         colour = "lightgrey",
@@ -61,14 +65,14 @@ plt = ggplot(df_m,aes(x=value, fill=factor(P)))+
         legend.position = c(0.1,0.9),
         axis.text.x = element_text(angle=90,hjust=1)
     )+
-    guides(fill=guide_legend(title="Generation parameter (p):"))+
+    guides(fill=FALSE)+
     theme(
         legend.position = c(0.2, 0.8),
         legend.direction = "vertical",
         legend.title = element_text(size=24),
         legend.text = element_text(size=24),
         legend.text.align = 0,
-        axis.text.x = element_text(size=18,angle=45,vjust = 0.7),
+        axis.text.x = element_text(size=11,angle=90,vjust = 0.7),
         axis.text.y = element_text(size=22),
         axis.title.x = element_text(size = 26),
         axis.title.y = element_text(size = 26),
