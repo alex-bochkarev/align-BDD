@@ -58,7 +58,7 @@ class node(object):
         elif arc=="lo":
             self.lo = to_whom
         else:
-            print("ERROR: wrong arc specifier while creating an edge -- {}".format(arc))
+            print("ERROR: wrong arc specifier while creating an edge -- {} (expected 'hi' or 'lo')".format(arc))
 
 ######################################################################
 class BDD(object):
@@ -186,12 +186,12 @@ class BDD(object):
 
         return newnode
 
-    def swap_up(self, layer):
+    def swap_up(self, layer_idx):
         """Swaps the layer with the one immediately above it
         (by _index_! in-place operation)
 
         Arguments:
-            layer: number (index) of the layer to be ''bubbled up''
+            layer_idx: number (index) of the layer to be ''bubbled up''
 
         Note:
             Operation takes O (no-of-nodes in the upper layer) time.
@@ -200,61 +200,61 @@ class BDD(object):
             redundancy in terms of logical functions)
         """
 
-        assert layer >= 1 # otherwise there's no layer to swap to
-        assert layer <= len(self.layers)-2 # we can't swap-up the terminal layer
+        assert layer_idx >= 1 # otherwise there's no layer to swap to
+        assert layer_idx <= len(self.layers)-2 # we can't swap-up the terminal layer
 
         new_nodes = dict()
 
-        for n in self.layers[layer]:
+        for n in self.layers[layer_idx]:
             if not n.id in self.nodes.keys():
-                print("Node {} not found in layer {}, among:".format(n.id,layer))
-                for k in self.layers[layer]:
+                print("Node {} not found in layer {}, among:".format(n.id,layer_idx))
+                for k in self.layers[layer_idx]:
                     print(k.id)
-                print("The set is: {}".format(self.layers[layer]))
+                print("The set is: {}".format(self.layers[layer_idx]))
 
             del self.nodes[n.id]
             self.av_node_ids.append(n.id)
 
-        self.layers[layer] = set()
+        self.layers[layer_idx] = set()
 
-        for F in self.layers[layer-1]:
+        prev_layer = self.layers[layer_idx-1]
+
+        for F in prev_layer:
             # iterating throuhg the nodes of the upper layer
 
+            # save the pointers
+            F_hi_hi = F.hi.hi; F_hi_lo = F.hi.lo
+            F_lo_hi = F.lo.hi; F_lo_lo = F.lo.lo
+
             # creating the "hi"-node
-            if not ( F.hi.hi.id, F.lo.hi.id ) in new_nodes.keys():
-                F_hi = node(self.new_node_name(), F.hi.hi, F.lo.hi)
+            if not ( F_hi_hi.id, F_lo_hi.id ) in new_nodes.keys():
+                F_hi = self.addnode(F,"hi")
+                F_hi.link(F_hi_hi, "hi"); F_hi.link(F_lo_hi, "lo")
                 new_nodes.update({( F_hi.hi.id, F_hi.lo.id ):F_hi})
             else:
-                F_hi = new_nodes[( F.hi.hi.id, F.lo.hi.id )] # re-cycle the old node
+                F_hi = new_nodes[( F_hi_hi.id, F_lo_hi.id )] # re-cycle the old node
+                F.link(F_hi, "hi")
 
             # creating the "lo"-node
-            if not ( F.hi.lo.id, F.lo.lo.id ) in new_nodes.keys():
-                F_lo = node(self.new_node_name(), F.hi.lo, F.lo.lo)
+            if not ( F_hi_lo.id, F_lo_lo.id ) in new_nodes.keys():
+                F_lo = self.addnode(F,"lo")
+                F_lo.link(F_hi_lo, "hi"); F_lo.link(F_lo_lo,"lo")
                 new_nodes.update({( F_lo.hi.id, F_lo.lo.id ):F_lo})
             else:
                 F_lo = new_nodes[( F.hi.lo.id, F.lo.lo.id )] # re-cycle the old node
+                F.link(F_lo,"lo")
 
-            # now, implement the change to the BDD for this source F
-            F.link(F_hi,"hi")
-            F.link(F_lo,"lo")
-
-            if not F_hi.id in self.nodes.keys():
-                self.nodes.update({F_hi.id: F_hi})
-
-            if not F_lo.id in self.nodes.keys():
-                self.nodes.update({F_lo.id: F_lo})
-
-        self.layers[layer] = set(new_nodes.values())
+        self.layers[layer_idx] = set(new_nodes.values())
 
         # NOTE: old nodes in the source layer must be (physically) deleted
         # by the Python garbage collection
 
         # rename layers and update aux structures as necessary
-        self.var_pos.update({self.vars[layer]:layer-1, self.vars[layer-1]:layer})
+        self.var_pos.update({self.vars[layer_idx]:layer_idx-1, self.vars[layer_idx-1]:layer_idx})
 
-        v_1 = self.vars[layer-1]
-        self.vars[layer-1] = self.vars[layer]
-        self.vars[layer] = v_1
+        v_1 = self.vars[layer_idx-1]
+        self.vars[layer_idx-1] = self.vars[layer_idx]
+        self.vars[layer_idx] = v_1
 
 
     def sift(self, var, pos):
@@ -437,29 +437,25 @@ class BDD(object):
                 if id in next_layer:
                     current_layer += 1
                     next_layer = set()
+                elif id not in self.nodes.keys():
+                    self.addnode(None, node_id=id)
+                    print(f"Just added no-parent node {id}")
 
                 if hi_id in next_layer:
                     F_hi = self.nodes[hi_id]
+                    self.nodes[id].link(F_hi, "hi")
                 else:
-                    F_hi = node(hi_id)
-                    self.nodes.update({hi_id:F_hi})
-                    self.layers[current_layer+1].add(F_hi)
-                    F_hi.layer = current_layer+1
+                    F_hi = self.addnode(self.nodes[id],"hi",node_id=hi_id)
                     next_layer.add(hi_id)
 
                 if lo_id in next_layer:
                     F_lo = self.nodes[lo_id]
+                    self.nodes[id].link(F_lo, "lo")
                 else:
-                    F_lo = node(lo_id)
-                    self.nodes.update({lo_id:F_lo})
-                    self.layers[current_layer+1].add(F_lo)
-                    F_lo.layer = current_layer+1
+                    F_lo = self.addnode(self.nodes[id],"lo", node_id=lo_id)
                     next_layer.add(lo_id)
 
-                if id in self.nodes.keys():
-                    self.nodes[id].link(F_hi,"hi")
-                    self.nodes[id].link(F_lo,"lo")
-                else:
+                if not id in self.nodes.keys():
                     if current_layer>0:
                         print("WARNING: a node with no source at layer {}".format(current_layer))
 
