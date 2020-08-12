@@ -439,7 +439,8 @@ class BDD(object):
                     next_layer = set()
                 elif id not in self.nodes.keys():
                     self.addnode(None, node_id=id)
-                    print(f"Just added no-parent node {id}")
+                    if id != 0:
+                        print(f"WARNING: during load, just added a no-parent node {id}")
 
                 if hi_id in next_layer:
                     F_hi = self.nodes[hi_id]
