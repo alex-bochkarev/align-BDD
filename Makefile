@@ -30,7 +30,7 @@ LW_Ps=0.2 0.4 0.6 0.8
 
 ### dataset generation parameters:
 p=0.6# dataset generation parameter
-n=1000# number of instances
+n=10000# number of instances
 N=15# number of variables per instance
 n_LBs=1000
 

@@ -1,48 +1,48 @@
-START: global makefile run, branch **master**, commit f55c6698d58c269ce096059abab589a95e072781
-Cleaning up raw instances in /local_scratch/pbs.65258.pbs02//instances/raw...
-rm -f /local_scratch/pbs.65258.pbs02//instances/raw/R/*.bdd
+START: global makefile run, branch **master**, commit b14bf6f4f835fcf4a8820602dc54d0309335a85d
+Cleaning up raw instances in /local_scratch/pbs.65740.pbs02//instances/raw...
+rm -f /local_scratch/pbs.65740.pbs02//instances/raw/R/*.bdd
 Cleaning up log files...
-rm -f /local_scratch/pbs.65258.pbs02//run_logs/*.log
+rm -f /local_scratch/pbs.65740.pbs02//run_logs/*.log
 Cleaning up figures...
 rm -f ./figures/*.eps
 Cleaning up instance archives...
 rm -f ./data_archive/*.tar.gz
-rm -f /local_scratch/pbs.65258.pbs02//instances/raw/R/*.list*
-rm -f /local_scratch/pbs.65258.pbs02//instances/raw/N/*.bdd
-rm -f /local_scratch/pbs.65258.pbs02//instances/raw/N/*.list*
-rm -rf /local_scratch/pbs.65258.pbs02//instances/raw/ds_stats
-rm -f /local_scratch/pbs.65258.pbs02//instances/raw/*.bdd
-mkdir -p /local_scratch/pbs.65258.pbs02//instances/raw/R /local_scratch/pbs.65258.pbs02//instances/raw/N
-mkdir -p /local_scratch/pbs.65258.pbs02//run_logs
+rm -f /local_scratch/pbs.65740.pbs02//instances/raw/R/*.list*
+rm -f /local_scratch/pbs.65740.pbs02//instances/raw/N/*.bdd
+rm -f /local_scratch/pbs.65740.pbs02//instances/raw/N/*.list*
+rm -rf /local_scratch/pbs.65740.pbs02//instances/raw/ds_stats
+rm -f /local_scratch/pbs.65740.pbs02//instances/raw/*.bdd
+mkdir -p /local_scratch/pbs.65740.pbs02//instances/raw/R /local_scratch/pbs.65740.pbs02//instances/raw/N
+mkdir -p /local_scratch/pbs.65740.pbs02//run_logs
 Making main figures...
 Preparing the R-instances dataset...
-mkdir -p /local_scratch/pbs.65258.pbs02//instances/raw/R && \
+mkdir -p /local_scratch/pbs.65740.pbs02//instances/raw/R && \
 if [ -f ./data_archive/dataset_R.tar.gz ]; then tar -zxmf ./data_archive/dataset_R.tar.gz; \
 else \
-python ./gen_BDD_pair.py -n 1000 -v 15 -p 0.6 -RU /local_scratch/pbs.65258.pbs02//instances/raw/R/ > /local_scratch/pbs.65258.pbs02//run_logs/2020-08-12_gen_15var_R.log; fi && \
-ls /local_scratch/pbs.65258.pbs02//instances/raw/R | grep -Po "A\\K[^\\.]*" > /local_scratch/pbs.65258.pbs02//instances/raw/R/instances.list && \
-split -d -nl/8 /local_scratch/pbs.65258.pbs02//instances/raw/R/instances.list /local_scratch/pbs.65258.pbs02//instances/raw/R/instances.list.
-mkdir -p /local_scratch/pbs.65258.pbs02//instances/raw/LBs && \
-python ./gen_BDD_pair.py -n 1000 -v 15 -p 0.6 -RU /local_scratch/pbs.65258.pbs02//instances/raw/LBs/ > /local_scratch/pbs.65258.pbs02//run_logs/2020-08-12_gen_15var_LBs.log && \
-ls /local_scratch/pbs.65258.pbs02//instances/raw/LBs | grep -Po "A\\K[^\\.]*" > /local_scratch/pbs.65258.pbs02//instances/raw/LBs/instances.list && \
-python ./compare_simpl_LBs.py -d /local_scratch/pbs.65258.pbs02//instances/raw/LBs/ -l /local_scratch/pbs.65258.pbs02//instances/raw/LBs/instances.list > /local_scratch/pbs.65258.pbs02//run_logs/LBs.log
-python ./solve_inst.py -i /local_scratch/pbs.65258.pbs02//instances/raw/R/instances.list.00 -o /local_scratch/pbs.65258.pbs02//run_logs/part.solved_R.00.log -d /local_scratch/pbs.65258.pbs02//instances/raw/R/
-python ./solve_inst.py -i /local_scratch/pbs.65258.pbs02//instances/raw/R/instances.list.01 -o /local_scratch/pbs.65258.pbs02//run_logs/part.solved_R.01.log -d /local_scratch/pbs.65258.pbs02//instances/raw/R/
-python ./solve_inst.py -i /local_scratch/pbs.65258.pbs02//instances/raw/R/instances.list.02 -o /local_scratch/pbs.65258.pbs02//run_logs/part.solved_R.02.log -d /local_scratch/pbs.65258.pbs02//instances/raw/R/
-python ./solve_inst.py -i /local_scratch/pbs.65258.pbs02//instances/raw/R/instances.list.03 -o /local_scratch/pbs.65258.pbs02//run_logs/part.solved_R.03.log -d /local_scratch/pbs.65258.pbs02//instances/raw/R/
-python ./solve_inst.py -i /local_scratch/pbs.65258.pbs02//instances/raw/R/instances.list.04 -o /local_scratch/pbs.65258.pbs02//run_logs/part.solved_R.04.log -d /local_scratch/pbs.65258.pbs02//instances/raw/R/
-python ./solve_inst.py -i /local_scratch/pbs.65258.pbs02//instances/raw/R/instances.list.05 -o /local_scratch/pbs.65258.pbs02//run_logs/part.solved_R.05.log -d /local_scratch/pbs.65258.pbs02//instances/raw/R/
-python ./solve_inst.py -i /local_scratch/pbs.65258.pbs02//instances/raw/R/instances.list.06 -o /local_scratch/pbs.65258.pbs02//run_logs/part.solved_R.06.log -d /local_scratch/pbs.65258.pbs02//instances/raw/R/
-python ./solve_inst.py -i /local_scratch/pbs.65258.pbs02//instances/raw/R/instances.list.07 -o /local_scratch/pbs.65258.pbs02//run_logs/part.solved_R.07.log -d /local_scratch/pbs.65258.pbs02//instances/raw/R/
-python ./log_bb.py -i /local_scratch/pbs.65258.pbs02//instances/raw/R/instances.list.00 -o /local_scratch/pbs.65258.pbs02//run_logs/part.BB_bounds_R.00.log -d /local_scratch/pbs.65258.pbs02//instances/raw/R/
-python ./log_bb.py -i /local_scratch/pbs.65258.pbs02//instances/raw/R/instances.list.01 -o /local_scratch/pbs.65258.pbs02//run_logs/part.BB_bounds_R.01.log -d /local_scratch/pbs.65258.pbs02//instances/raw/R/
-python ./log_bb.py -i /local_scratch/pbs.65258.pbs02//instances/raw/R/instances.list.02 -o /local_scratch/pbs.65258.pbs02//run_logs/part.BB_bounds_R.02.log -d /local_scratch/pbs.65258.pbs02//instances/raw/R/
-python ./log_bb.py -i /local_scratch/pbs.65258.pbs02//instances/raw/R/instances.list.03 -o /local_scratch/pbs.65258.pbs02//run_logs/part.BB_bounds_R.03.log -d /local_scratch/pbs.65258.pbs02//instances/raw/R/
-python ./log_bb.py -i /local_scratch/pbs.65258.pbs02//instances/raw/R/instances.list.04 -o /local_scratch/pbs.65258.pbs02//run_logs/part.BB_bounds_R.04.log -d /local_scratch/pbs.65258.pbs02//instances/raw/R/
-python ./log_bb.py -i /local_scratch/pbs.65258.pbs02//instances/raw/R/instances.list.05 -o /local_scratch/pbs.65258.pbs02//run_logs/part.BB_bounds_R.05.log -d /local_scratch/pbs.65258.pbs02//instances/raw/R/
-python ./log_bb.py -i /local_scratch/pbs.65258.pbs02//instances/raw/R/instances.list.06 -o /local_scratch/pbs.65258.pbs02//run_logs/part.BB_bounds_R.06.log -d /local_scratch/pbs.65258.pbs02//instances/raw/R/
-python ./log_bb.py -i /local_scratch/pbs.65258.pbs02//instances/raw/R/instances.list.07 -o /local_scratch/pbs.65258.pbs02//run_logs/part.BB_bounds_R.07.log -d /local_scratch/pbs.65258.pbs02//instances/raw/R/
-Rscript ./post_processing/fig_LBs.R -i /local_scratch/pbs.65258.pbs02//run_logs/LBs.log -o figures/LB.eps
+python ./gen_BDD_pair.py -n 10000 -v 15 -p 0.6 -RU /local_scratch/pbs.65740.pbs02//instances/raw/R/ > /local_scratch/pbs.65740.pbs02//run_logs/2020-08-12_gen_15var_R.log; fi && \
+ls /local_scratch/pbs.65740.pbs02//instances/raw/R | grep -Po "A\\K[^\\.]*" > /local_scratch/pbs.65740.pbs02//instances/raw/R/instances.list && \
+split -d -nl/8 /local_scratch/pbs.65740.pbs02//instances/raw/R/instances.list /local_scratch/pbs.65740.pbs02//instances/raw/R/instances.list.
+mkdir -p /local_scratch/pbs.65740.pbs02//instances/raw/LBs && \
+python ./gen_BDD_pair.py -n 1000 -v 15 -p 0.6 -RU /local_scratch/pbs.65740.pbs02//instances/raw/LBs/ > /local_scratch/pbs.65740.pbs02//run_logs/2020-08-12_gen_15var_LBs.log && \
+ls /local_scratch/pbs.65740.pbs02//instances/raw/LBs | grep -Po "A\\K[^\\.]*" > /local_scratch/pbs.65740.pbs02//instances/raw/LBs/instances.list && \
+python ./compare_simpl_LBs.py -d /local_scratch/pbs.65740.pbs02//instances/raw/LBs/ -l /local_scratch/pbs.65740.pbs02//instances/raw/LBs/instances.list > /local_scratch/pbs.65740.pbs02//run_logs/LBs.log
+python ./solve_inst.py -i /local_scratch/pbs.65740.pbs02//instances/raw/R/instances.list.00 -o /local_scratch/pbs.65740.pbs02//run_logs/part.solved_R.00.log -d /local_scratch/pbs.65740.pbs02//instances/raw/R/
+python ./solve_inst.py -i /local_scratch/pbs.65740.pbs02//instances/raw/R/instances.list.01 -o /local_scratch/pbs.65740.pbs02//run_logs/part.solved_R.01.log -d /local_scratch/pbs.65740.pbs02//instances/raw/R/
+python ./solve_inst.py -i /local_scratch/pbs.65740.pbs02//instances/raw/R/instances.list.02 -o /local_scratch/pbs.65740.pbs02//run_logs/part.solved_R.02.log -d /local_scratch/pbs.65740.pbs02//instances/raw/R/
+python ./solve_inst.py -i /local_scratch/pbs.65740.pbs02//instances/raw/R/instances.list.03 -o /local_scratch/pbs.65740.pbs02//run_logs/part.solved_R.03.log -d /local_scratch/pbs.65740.pbs02//instances/raw/R/
+python ./solve_inst.py -i /local_scratch/pbs.65740.pbs02//instances/raw/R/instances.list.04 -o /local_scratch/pbs.65740.pbs02//run_logs/part.solved_R.04.log -d /local_scratch/pbs.65740.pbs02//instances/raw/R/
+python ./solve_inst.py -i /local_scratch/pbs.65740.pbs02//instances/raw/R/instances.list.05 -o /local_scratch/pbs.65740.pbs02//run_logs/part.solved_R.05.log -d /local_scratch/pbs.65740.pbs02//instances/raw/R/
+python ./solve_inst.py -i /local_scratch/pbs.65740.pbs02//instances/raw/R/instances.list.06 -o /local_scratch/pbs.65740.pbs02//run_logs/part.solved_R.06.log -d /local_scratch/pbs.65740.pbs02//instances/raw/R/
+python ./solve_inst.py -i /local_scratch/pbs.65740.pbs02//instances/raw/R/instances.list.07 -o /local_scratch/pbs.65740.pbs02//run_logs/part.solved_R.07.log -d /local_scratch/pbs.65740.pbs02//instances/raw/R/
+python ./log_bb.py -i /local_scratch/pbs.65740.pbs02//instances/raw/R/instances.list.00 -o /local_scratch/pbs.65740.pbs02//run_logs/part.BB_bounds_R.00.log -d /local_scratch/pbs.65740.pbs02//instances/raw/R/
+python ./log_bb.py -i /local_scratch/pbs.65740.pbs02//instances/raw/R/instances.list.01 -o /local_scratch/pbs.65740.pbs02//run_logs/part.BB_bounds_R.01.log -d /local_scratch/pbs.65740.pbs02//instances/raw/R/
+python ./log_bb.py -i /local_scratch/pbs.65740.pbs02//instances/raw/R/instances.list.02 -o /local_scratch/pbs.65740.pbs02//run_logs/part.BB_bounds_R.02.log -d /local_scratch/pbs.65740.pbs02//instances/raw/R/
+python ./log_bb.py -i /local_scratch/pbs.65740.pbs02//instances/raw/R/instances.list.03 -o /local_scratch/pbs.65740.pbs02//run_logs/part.BB_bounds_R.03.log -d /local_scratch/pbs.65740.pbs02//instances/raw/R/
+python ./log_bb.py -i /local_scratch/pbs.65740.pbs02//instances/raw/R/instances.list.04 -o /local_scratch/pbs.65740.pbs02//run_logs/part.BB_bounds_R.04.log -d /local_scratch/pbs.65740.pbs02//instances/raw/R/
+python ./log_bb.py -i /local_scratch/pbs.65740.pbs02//instances/raw/R/instances.list.05 -o /local_scratch/pbs.65740.pbs02//run_logs/part.BB_bounds_R.05.log -d /local_scratch/pbs.65740.pbs02//instances/raw/R/
+python ./log_bb.py -i /local_scratch/pbs.65740.pbs02//instances/raw/R/instances.list.06 -o /local_scratch/pbs.65740.pbs02//run_logs/part.BB_bounds_R.06.log -d /local_scratch/pbs.65740.pbs02//instances/raw/R/
+python ./log_bb.py -i /local_scratch/pbs.65740.pbs02//instances/raw/R/instances.list.07 -o /local_scratch/pbs.65740.pbs02//run_logs/part.BB_bounds_R.07.log -d /local_scratch/pbs.65740.pbs02//instances/raw/R/
+Rscript ./post_processing/fig_LBs.R -i /local_scratch/pbs.65740.pbs02//run_logs/LBs.log -o figures/LB.eps
 
 Attaching package: ‘dplyr’
 
@@ -58,14 +58,14 @@ The following objects are masked from ‘package:base’:
 
     intersect, setdiff, setequal, union
 
-python ./log_bb.py --header > /local_scratch/pbs.65258.pbs02//run_logs/BB_bounds_R.log && \
-tail -qn +2 /local_scratch/pbs.65258.pbs02//run_logs/part.BB_bounds_R.00.log /local_scratch/pbs.65258.pbs02//run_logs/part.BB_bounds_R.01.log /local_scratch/pbs.65258.pbs02//run_logs/part.BB_bounds_R.02.log /local_scratch/pbs.65258.pbs02//run_logs/part.BB_bounds_R.03.log /local_scratch/pbs.65258.pbs02//run_logs/part.BB_bounds_R.04.log /local_scratch/pbs.65258.pbs02//run_logs/part.BB_bounds_R.05.log /local_scratch/pbs.65258.pbs02//run_logs/part.BB_bounds_R.06.log /local_scratch/pbs.65258.pbs02//run_logs/part.BB_bounds_R.07.log >> /local_scratch/pbs.65258.pbs02//run_logs/BB_bounds_R.log
 Warning messages:
 1: In if (x %in% names(facet_names)) { :
   the condition has length > 1 and only the first element will be used
 2: In if (x %in% names(facet_names)) { :
   the condition has length > 1 and only the first element will be used
-Rscript ./post_processing/fig_BB_gaps.R -i /local_scratch/pbs.65258.pbs02//run_logs/BB_bounds_R.log -o figures/fig_BB_gaps_R.eps
+python ./solve_inst.py --header > /local_scratch/pbs.65740.pbs02//run_logs/solved_R.log && \
+tail -qn +2 /local_scratch/pbs.65740.pbs02//run_logs/part.solved_R.00.log /local_scratch/pbs.65740.pbs02//run_logs/part.solved_R.01.log /local_scratch/pbs.65740.pbs02//run_logs/part.solved_R.02.log /local_scratch/pbs.65740.pbs02//run_logs/part.solved_R.03.log /local_scratch/pbs.65740.pbs02//run_logs/part.solved_R.04.log /local_scratch/pbs.65740.pbs02//run_logs/part.solved_R.05.log /local_scratch/pbs.65740.pbs02//run_logs/part.solved_R.06.log /local_scratch/pbs.65740.pbs02//run_logs/part.solved_R.07.log >> /local_scratch/pbs.65740.pbs02//run_logs/solved_R.log
+Rscript ./post_processing/fig_guessing.R -i /local_scratch/pbs.65740.pbs02//run_logs/solved_R.log -o figures/fig_sol_guessing_R.eps
 
 Attaching package: ‘dplyr’
 
@@ -77,13 +77,8 @@ The following objects are masked from ‘package:base’:
 
     intersect, setdiff, setequal, union
 
-python ./solve_inst.py --header > /local_scratch/pbs.65258.pbs02//run_logs/solved_R.log && \
-tail -qn +2 /local_scratch/pbs.65258.pbs02//run_logs/part.solved_R.00.log /local_scratch/pbs.65258.pbs02//run_logs/part.solved_R.01.log /local_scratch/pbs.65258.pbs02//run_logs/part.solved_R.02.log /local_scratch/pbs.65258.pbs02//run_logs/part.solved_R.03.log /local_scratch/pbs.65258.pbs02//run_logs/part.solved_R.04.log /local_scratch/pbs.65258.pbs02//run_logs/part.solved_R.05.log /local_scratch/pbs.65258.pbs02//run_logs/part.solved_R.06.log /local_scratch/pbs.65258.pbs02//run_logs/part.solved_R.07.log >> /local_scratch/pbs.65258.pbs02//run_logs/solved_R.log
-Rscript ./post_processing/fig_guessing.R -i /local_scratch/pbs.65258.pbs02//run_logs/solved_R.log -o figures/fig_sol_guessing_R.eps
-Rscript ./post_processing/fig_fireplace.R -i /local_scratch/pbs.65258.pbs02//run_logs/solved_R.log -o figures/fig_sol_fireplace_R.eps
-Rscript ./post_processing/fig_obj_hist.R -i /local_scratch/pbs.65258.pbs02//run_logs/solved_R.log -o figures/fig_sol_obj_hist_R.eps
-Rscript ./post_processing/fig_obj_int.R -i /local_scratch/pbs.65258.pbs02//run_logs/solved_R.log -o figures/fig_sol_obj_int_R.eps
-Rscript ./post_processing/tab_guessing.R -i /local_scratch/pbs.65258.pbs02//run_logs/solved_R.log -o figures/guessing.tex
+Rscript ./post_processing/fig_fireplace.R -i /local_scratch/pbs.65740.pbs02//run_logs/solved_R.log -o figures/fig_sol_fireplace_R.eps
+Rscript ./post_processing/fig_obj_hist.R -i /local_scratch/pbs.65740.pbs02//run_logs/solved_R.log -o figures/fig_sol_obj_hist_R.eps
 
 Attaching package: ‘dplyr’
 
@@ -110,17 +105,10 @@ The following objects are masked from ‘package:base’:
 
     intersect, setdiff, setequal, union
 
-
-Attaching package: ‘dplyr’
-
-The following objects are masked from ‘package:stats’:
-
-    filter, lag
-
-The following objects are masked from ‘package:base’:
-
-    intersect, setdiff, setequal, union
-
+Warning messages:
+1: Removed 600 rows containing non-finite values (stat_bin). 
+2: Removed 6 rows containing missing values (geom_bar). 
+Rscript ./post_processing/fig_obj_int.R -i /local_scratch/pbs.65740.pbs02//run_logs/solved_R.log -o figures/fig_sol_obj_int_R.eps
 
 Attaching package: ‘dplyr’
 
@@ -137,6 +125,27 @@ The following objects are masked from ‘package:base’:
     intersect, setdiff, setequal, union
 
 No. if instances not solved by greedy BDD sifts:  0 
+Share of instances outperforming the baseline:$orig_5random
+[1] 4.867571e-05
+
+$orig_bestAB
+[1] 0.1121002
+
+$orig_simpl
+[1] 0.2413019
+
+Share of instances at most 30% of the baseline:$orig_5random
+[1] 0.003193168
+
+$orig_bestAB
+[1] 0.4565719
+
+$orig_simpl
+[1] 0.6251796
+
+python ./log_bb.py --header > /local_scratch/pbs.65740.pbs02//run_logs/BB_bounds_R.log && \
+tail -qn +2 /local_scratch/pbs.65740.pbs02//run_logs/part.BB_bounds_R.00.log /local_scratch/pbs.65740.pbs02//run_logs/part.BB_bounds_R.01.log /local_scratch/pbs.65740.pbs02//run_logs/part.BB_bounds_R.02.log /local_scratch/pbs.65740.pbs02//run_logs/part.BB_bounds_R.03.log /local_scratch/pbs.65740.pbs02//run_logs/part.BB_bounds_R.04.log /local_scratch/pbs.65740.pbs02//run_logs/part.BB_bounds_R.05.log /local_scratch/pbs.65740.pbs02//run_logs/part.BB_bounds_R.06.log /local_scratch/pbs.65740.pbs02//run_logs/part.BB_bounds_R.07.log >> /local_scratch/pbs.65740.pbs02//run_logs/BB_bounds_R.log
+Rscript ./post_processing/fig_BB_gaps.R -i /local_scratch/pbs.65740.pbs02//run_logs/BB_bounds_R.log -o figures/fig_BB_gaps_R.eps
 
 Attaching package: ‘dplyr’
 
@@ -148,42 +157,21 @@ The following objects are masked from ‘package:base’:
 
     intersect, setdiff, setequal, union
 
-Share of instances outperforming the baseline:$orig_5random
-[1] 0
-
-$orig_bestAB
-[1] 0.005627783
-
-$orig_simpl
-[1] 0.2123383
-
-Share of instances at most 30% of the baseline:$orig_5random
-[1] 0.003306406
-
-$orig_bestAB
-[1] 0.4677237
-
-$orig_simpl
-[1] 0.6322724
-
-Warning messages:
-1: Removed 60 rows containing non-finite values (stat_bin). 
-2: Removed 6 rows containing missing values (geom_bar). 
 Running tests...
-Rscript tests/BB_log_correct.R -b /local_scratch/pbs.65258.pbs02//run_logs/BB_bounds_R.log -s /local_scratch/pbs.65258.pbs02//run_logs/solved_R.log > /local_scratch/pbs.65258.pbs02//run_logs/BB.test
+Rscript tests/BB_log_correct.R -b /local_scratch/pbs.65740.pbs02//run_logs/BB_bounds_R.log -s /local_scratch/pbs.65740.pbs02//run_logs/solved_R.log > /local_scratch/pbs.65740.pbs02//run_logs/BB.test
 Running tests...
 Moving logfiles...
-moving logs away from /local_scratch/pbs.65258.pbs02//run_logs to ./data_archive
-rm -f /local_scratch/pbs.65258.pbs02//run_logs/part.* && \
-tar --remove-files -czf ./data_archive/2020-08-12_11-48-58_logs.tar.gz -C /local_scratch/pbs.65258.pbs02//run_logs .
+moving logs away from /local_scratch/pbs.65740.pbs02//run_logs to ./data_archive
+rm -f /local_scratch/pbs.65740.pbs02//run_logs/part.* && \
+tar --remove-files -czf ./data_archive/2020-08-12_13-22-01_logs.tar.gz -C /local_scratch/pbs.65740.pbs02//run_logs .
 Cleaning..
-Cleaning up raw instances in /local_scratch/pbs.65258.pbs02//instances/raw...
-rm -f /local_scratch/pbs.65258.pbs02//instances/raw/R/*.bdd
+Cleaning up raw instances in /local_scratch/pbs.65740.pbs02//instances/raw...
+rm -f /local_scratch/pbs.65740.pbs02//instances/raw/R/*.bdd
 Cleaning up log files...
-rm -f /local_scratch/pbs.65258.pbs02//run_logs/*.log
-rm -f /local_scratch/pbs.65258.pbs02//instances/raw/R/*.list*
-rm -f /local_scratch/pbs.65258.pbs02//instances/raw/N/*.bdd
-rm -f /local_scratch/pbs.65258.pbs02//instances/raw/N/*.list*
-rm -rf /local_scratch/pbs.65258.pbs02//instances/raw/ds_stats
-rm -f /local_scratch/pbs.65258.pbs02//instances/raw/*.bdd
+rm -f /local_scratch/pbs.65740.pbs02//run_logs/*.log
+rm -f /local_scratch/pbs.65740.pbs02//instances/raw/R/*.list*
+rm -f /local_scratch/pbs.65740.pbs02//instances/raw/N/*.bdd
+rm -f /local_scratch/pbs.65740.pbs02//instances/raw/N/*.list*
+rm -rf /local_scratch/pbs.65740.pbs02//instances/raw/ds_stats
+rm -f /local_scratch/pbs.65740.pbs02//instances/raw/*.bdd
 END: done with the global makefile run
