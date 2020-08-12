@@ -241,7 +241,7 @@ class BDD(object):
                 F_lo.link(F_hi_lo, "hi"); F_lo.link(F_lo_lo,"lo")
                 new_nodes.update({( F_lo.hi.id, F_lo.lo.id ):F_lo})
             else:
-                F_lo = new_nodes[( F.hi.lo.id, F.lo.lo.id )] # re-cycle the old node
+                F_lo = new_nodes[( F_hi_lo.id, F_lo_lo.id )] # re-cycle the old node
                 F.link(F_lo,"lo")
 
         self.layers[layer_idx] = set(new_nodes.values())

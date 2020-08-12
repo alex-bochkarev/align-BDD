@@ -89,16 +89,59 @@ reload(BDD)
 
 B = BDD.BDD()
 B.load("./sample_5var_inst.bdd")
-B.show()
 
-Bp = deepcopy(B)
+def test_BDD_transformations(B,no_iters=250):
+    # let's test the basic things
+    print("First: for Bp = B,")
+    Bp = deepcopy(B)
+    print("Variables:\n B:{}\nBp:{}".format(B.vars,Bp.vars))
+    eq = are_equivalent(B,Bp))
+    print("B ~ Bp: {}".format(eq))
+    if not eq:
+          print("Non-equivalent BDDs: STOP")
+          exit(-1)
 
-Bp = Bp.align_to(list('14325'))
-Bp.show()
+    N = len(B.vars)
+    ##
+    print("Randomly sifting variables...")
+    for i in range(no_iters):
+        Bp.sift(B.vars[np.random.randint(N)], np.random.randint(N))
+        print(".",end="")
 
-if are_equivalent(B,Bp):
-    eq = "are"
-else:
-    eq = "are NOT"
+    print("Variables:\n B:{}\nBp:{}".format(B.vars,Bp.vars))
+    eq = are_equivalent(B,Bp))
+    print("B ~ Bp: {}".format(eq))
+    if not eq:
+          print("Non-equivalent BDDs: STOP")
+          exit(-1)
 
-print("B and Bp {} equivalent".format(eq))
+    ##
+    print("Randomly aligning variables (inplace)...")
+    for i in range(no_iters):
+        Bp.align_to(np.random.permutation(Bp.vars),inplace=True)
+        print(".",end="")
+
+    print("Variables:\n B:{}\nBp:{}".format(B.vars,Bp.vars))
+    eq = are_equivalent(B,Bp))
+    print("B ~ Bp: {}".format(eq))
+    if not eq:
+          print("Non-equivalent BDDs: STOP")
+          exit(-1)
+
+    ##
+
+    print("Randomly aligning variables (non inplace)...")
+    for i in range(no_iters):
+        Bp = Bp.align_to(np.random.permutation(Bp.vars))
+        print(".",end="")
+
+    print("Variables:\n B:{}\nBp:{}".format(B.vars,Bp.vars))
+    eq = are_equivalent(B,Bp))
+    print("B ~ Bp: {}".format(eq))
+    if not eq:
+          print("Non-equivalent BDDs: STOP")
+          exit(-1)
+
+for i in range(100):
+    A = BDD.BDD.random(10)
+    test_BDD_transformations(A)
