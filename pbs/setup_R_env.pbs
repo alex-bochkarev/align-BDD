@@ -1,23 +1,8 @@
-#PBS -N Rpkg
-#PBS -l select=1:ncpus=1:mem=8gb,walltime=01:00:00
-#PBS -M abochka@clemson.edu
-#PBS -m abe
+#PBS -N SetupR
+#PBS -l select=1:ncpus=1:mem=4gb,walltime=01:00:00
 
-# boilerplate things
-STARTMSG="START: msg"
-ENDMSG="END: msg"
-
-module add R/3.6.0
-tg=/home/abochka/bin/tgsend.sh
-tgi=/home/abochka/bin/tgsend_img.sh
-tgs=/home/abochka/bin/tgsend_st.sh
+module add r/4.0.2-gcc/8.3.1
 
 cd /home/abochka/BDD/align-BDD
-make 
-echo $STARTMSG | $tg
-# run-command
-echo $ENDMSG | $tg
 
-# deactivate the env
-source deactivate ab-local
-
+Rscript aux/R_install_packages.R

@@ -1,16 +1,16 @@
 #PBS -N BDD_1
-#PBS -l select=1:ncpus=4:mem=16gb,walltime=08:00:00
+#PBS -l select=1:ncpus=8:mem=16gb,walltime=08:00:00
 #PBS -j oe
 #PBS -o ./run_logs/main_figs.log
 #PBS -M abochka@clemson.edu
 #PBS -m abe
 
 # general parameters
-PF=-j4
+PF=-j8
 
-module add anaconda3/5.1.0
+module add anaconda3/5.1.0-gcc/8.3.1
 source activate ab-local
-module add R/3.6.0
+module add r/4.0.2-gcc/8.3.1
 
 cd /home/abochka/BDD/align-BDD
 

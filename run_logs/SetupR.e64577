@@ -1,0 +1,1274 @@
+Installing packages into ‘/home/abochka/.R_packages_local’
+(as ‘lib’ is unspecified)
+also installing the dependencies ‘ps’, ‘processx’, ‘callr’, ‘prettyunits’, ‘backports’, ‘desc’, ‘pkgbuild’, ‘rprojroot’, ‘rstudioapi’, ‘assertthat’, ‘utf8’, ‘evaluate’, ‘pkgload’, ‘praise’, ‘lattice’, ‘colorspace’, ‘cli’, ‘crayon’, ‘fansi’, ‘pillar’, ‘pkgconfig’, ‘testthat’, ‘nlme’, ‘Matrix’, ‘farver’, ‘labeling’, ‘munsell’, ‘RColorBrewer’, ‘viridisLite’, ‘Rcpp’, ‘ellipsis’, ‘generics’, ‘glue’, ‘lifecycle’, ‘magrittr’, ‘R6’, ‘rlang’, ‘tibble’, ‘tidyselect’, ‘vctrs’, ‘digest’, ‘gtable’, ‘isoband’, ‘MASS’, ‘mgcv’, ‘scales’, ‘withr’, ‘plyr’, ‘getopt’, ‘stringi’, ‘purrr’, ‘cpp11’
+
+trying URL 'http://cran.us.r-project.org/src/contrib/ps_1.3.4.tar.gz'
+Content type 'application/x-gzip' length 99047 bytes (96 KB)
+==================================================
+downloaded 96 KB
+
+trying URL 'http://cran.us.r-project.org/src/contrib/processx_3.4.3.tar.gz'
+Content type 'application/x-gzip' length 132841 bytes (129 KB)
+==================================================
+downloaded 129 KB
+
+trying URL 'http://cran.us.r-project.org/src/contrib/callr_3.4.3.tar.gz'
+Content type 'application/x-gzip' length 85802 bytes (83 KB)
+==================================================
+downloaded 83 KB
+
+trying URL 'http://cran.us.r-project.org/src/contrib/prettyunits_1.1.1.tar.gz'
+Content type 'application/x-gzip' length 10366 bytes (10 KB)
+==================================================
+downloaded 10 KB
+
+trying URL 'http://cran.us.r-project.org/src/contrib/backports_1.1.8.tar.gz'
+Content type 'application/x-gzip' length 18047 bytes (17 KB)
+==================================================
+downloaded 17 KB
+
+trying URL 'http://cran.us.r-project.org/src/contrib/desc_1.2.0.tar.gz'
+Content type 'application/x-gzip' length 65612 bytes (64 KB)
+==================================================
+downloaded 64 KB
+
+trying URL 'http://cran.us.r-project.org/src/contrib/pkgbuild_1.1.0.tar.gz'
+Content type 'application/x-gzip' length 29854 bytes (29 KB)
+==================================================
+downloaded 29 KB
+
+trying URL 'http://cran.us.r-project.org/src/contrib/rprojroot_1.3-2.tar.gz'
+Content type 'application/x-gzip' length 50414 bytes (49 KB)
+==================================================
+downloaded 49 KB
+
+trying URL 'http://cran.us.r-project.org/src/contrib/rstudioapi_0.11.tar.gz'
+Content type 'application/x-gzip' length 98082 bytes (95 KB)
+==================================================
+downloaded 95 KB
+
+trying URL 'http://cran.us.r-project.org/src/contrib/assertthat_0.2.1.tar.gz'
+Content type 'application/x-gzip' length 12742 bytes (12 KB)
+==================================================
+downloaded 12 KB
+
+trying URL 'http://cran.us.r-project.org/src/contrib/utf8_1.1.4.tar.gz'
+Content type 'application/x-gzip' length 218882 bytes (213 KB)
+==================================================
+downloaded 213 KB
+
+trying URL 'http://cran.us.r-project.org/src/contrib/evaluate_0.14.tar.gz'
+Content type 'application/x-gzip' length 24206 bytes (23 KB)
+==================================================
+downloaded 23 KB
+
+trying URL 'http://cran.us.r-project.org/src/contrib/pkgload_1.1.0.tar.gz'
+Content type 'application/x-gzip' length 58046 bytes (56 KB)
+==================================================
+downloaded 56 KB
+
+trying URL 'http://cran.us.r-project.org/src/contrib/praise_1.0.0.tar.gz'
+Content type 'application/x-gzip' length 6100 bytes
+==================================================
+downloaded 6100 bytes
+
+trying URL 'http://cran.us.r-project.org/src/contrib/lattice_0.20-41.tar.gz'
+Content type 'application/x-gzip' length 389631 bytes (380 KB)
+==================================================
+downloaded 380 KB
+
+trying URL 'http://cran.us.r-project.org/src/contrib/colorspace_1.4-1.tar.gz'
+Content type 'application/x-gzip' length 2152594 bytes (2.1 MB)
+==================================================
+downloaded 2.1 MB
+
+trying URL 'http://cran.us.r-project.org/src/contrib/cli_2.0.2.tar.gz'
+Content type 'application/x-gzip' length 116357 bytes (113 KB)
+==================================================
+downloaded 113 KB
+
+trying URL 'http://cran.us.r-project.org/src/contrib/crayon_1.3.4.tar.gz'
+Content type 'application/x-gzip' length 658694 bytes (643 KB)
+==================================================
+downloaded 643 KB
+
+trying URL 'http://cran.us.r-project.org/src/contrib/fansi_0.4.1.tar.gz'
+Content type 'application/x-gzip' length 270906 bytes (264 KB)
+==================================================
+downloaded 264 KB
+
+trying URL 'http://cran.us.r-project.org/src/contrib/pillar_1.4.6.tar.gz'
+Content type 'application/x-gzip' length 113884 bytes (111 KB)
+==================================================
+downloaded 111 KB
+
+trying URL 'http://cran.us.r-project.org/src/contrib/pkgconfig_2.0.3.tar.gz'
+Content type 'application/x-gzip' length 6080 bytes
+==================================================
+downloaded 6080 bytes
+
+trying URL 'http://cran.us.r-project.org/src/contrib/testthat_2.3.2.tar.gz'
+Content type 'application/x-gzip' length 249661 bytes (243 KB)
+==================================================
+downloaded 243 KB
+
+trying URL 'http://cran.us.r-project.org/src/contrib/nlme_3.1-148.tar.gz'
+Content type 'application/x-gzip' length 792813 bytes (774 KB)
+==================================================
+downloaded 774 KB
+
+trying URL 'http://cran.us.r-project.org/src/contrib/Matrix_1.2-18.tar.gz'
+Content type 'application/x-gzip' length 1871705 bytes (1.8 MB)
+==================================================
+downloaded 1.8 MB
+
+trying URL 'http://cran.us.r-project.org/src/contrib/farver_2.0.3.tar.gz'
+Content type 'application/x-gzip' length 1279579 bytes (1.2 MB)
+==================================================
+downloaded 1.2 MB
+
+trying URL 'http://cran.us.r-project.org/src/contrib/labeling_0.3.tar.gz'
+Content type 'application/x-gzip' length 10722 bytes (10 KB)
+==================================================
+downloaded 10 KB
+
+trying URL 'http://cran.us.r-project.org/src/contrib/munsell_0.5.0.tar.gz'
+Content type 'application/x-gzip' length 182653 bytes (178 KB)
+==================================================
+downloaded 178 KB
+
+trying URL 'http://cran.us.r-project.org/src/contrib/RColorBrewer_1.1-2.tar.gz'
+Content type 'application/x-gzip' length 11532 bytes (11 KB)
+==================================================
+downloaded 11 KB
+
+trying URL 'http://cran.us.r-project.org/src/contrib/viridisLite_0.3.0.tar.gz'
+Content type 'application/x-gzip' length 44019 bytes (42 KB)
+==================================================
+downloaded 42 KB
+
+trying URL 'http://cran.us.r-project.org/src/contrib/Rcpp_1.0.5.tar.gz'
+Content type 'application/x-gzip' length 2950521 bytes (2.8 MB)
+==================================================
+downloaded 2.8 MB
+
+trying URL 'http://cran.us.r-project.org/src/contrib/ellipsis_0.3.1.tar.gz'
+Content type 'application/x-gzip' length 7582 bytes
+==================================================
+downloaded 7582 bytes
+
+trying URL 'http://cran.us.r-project.org/src/contrib/generics_0.0.2.tar.gz'
+Content type 'application/x-gzip' length 163610 bytes (159 KB)
+==================================================
+downloaded 159 KB
+
+trying URL 'http://cran.us.r-project.org/src/contrib/glue_1.4.1.tar.gz'
+Content type 'application/x-gzip' length 98581 bytes (96 KB)
+==================================================
+downloaded 96 KB
+
+trying URL 'http://cran.us.r-project.org/src/contrib/lifecycle_0.2.0.tar.gz'
+Content type 'application/x-gzip' length 164455 bytes (160 KB)
+==================================================
+downloaded 160 KB
+
+trying URL 'http://cran.us.r-project.org/src/contrib/magrittr_1.5.tar.gz'
+Content type 'application/x-gzip' length 200504 bytes (195 KB)
+==================================================
+downloaded 195 KB
+
+trying URL 'http://cran.us.r-project.org/src/contrib/R6_2.4.1.tar.gz'
+Content type 'application/x-gzip' length 35536 bytes (34 KB)
+==================================================
+downloaded 34 KB
+
+trying URL 'http://cran.us.r-project.org/src/contrib/rlang_0.4.7.tar.gz'
+Content type 'application/x-gzip' length 847308 bytes (827 KB)
+==================================================
+downloaded 827 KB
+
+trying URL 'http://cran.us.r-project.org/src/contrib/tibble_3.0.3.tar.gz'
+Content type 'application/x-gzip' length 254549 bytes (248 KB)
+==================================================
+downloaded 248 KB
+
+trying URL 'http://cran.us.r-project.org/src/contrib/tidyselect_1.1.0.tar.gz'
+Content type 'application/x-gzip' length 90842 bytes (88 KB)
+==================================================
+downloaded 88 KB
+
+trying URL 'http://cran.us.r-project.org/src/contrib/vctrs_0.3.2.tar.gz'
+Content type 'application/x-gzip' length 958372 bytes (935 KB)
+==================================================
+downloaded 935 KB
+
+trying URL 'http://cran.us.r-project.org/src/contrib/digest_0.6.25.tar.gz'
+Content type 'application/x-gzip' length 145642 bytes (142 KB)
+==================================================
+downloaded 142 KB
+
+trying URL 'http://cran.us.r-project.org/src/contrib/gtable_0.3.0.tar.gz'
+Content type 'application/x-gzip' length 368081 bytes (359 KB)
+==================================================
+downloaded 359 KB
+
+trying URL 'http://cran.us.r-project.org/src/contrib/isoband_0.2.2.tar.gz'
+Content type 'application/x-gzip' length 2295931 bytes (2.2 MB)
+==================================================
+downloaded 2.2 MB
+
+trying URL 'http://cran.us.r-project.org/src/contrib/MASS_7.3-51.6.tar.gz'
+Content type 'application/x-gzip' length 494134 bytes (482 KB)
+==================================================
+downloaded 482 KB
+
+trying URL 'http://cran.us.r-project.org/src/contrib/mgcv_1.8-31.tar.gz'
+Content type 'application/x-gzip' length 936344 bytes (914 KB)
+==================================================
+downloaded 914 KB
+
+trying URL 'http://cran.us.r-project.org/src/contrib/scales_1.1.1.tar.gz'
+Content type 'application/x-gzip' length 515201 bytes (503 KB)
+==================================================
+downloaded 503 KB
+
+trying URL 'http://cran.us.r-project.org/src/contrib/withr_2.2.0.tar.gz'
+Content type 'application/x-gzip' length 99545 bytes (97 KB)
+==================================================
+downloaded 97 KB
+
+trying URL 'http://cran.us.r-project.org/src/contrib/plyr_1.8.6.tar.gz'
+Content type 'application/x-gzip' length 401191 bytes (391 KB)
+==================================================
+downloaded 391 KB
+
+trying URL 'http://cran.us.r-project.org/src/contrib/getopt_1.20.3.tar.gz'
+Content type 'application/x-gzip' length 18573 bytes (18 KB)
+==================================================
+downloaded 18 KB
+
+trying URL 'http://cran.us.r-project.org/src/contrib/stringi_1.4.6.tar.gz'
+Content type 'application/x-gzip' length 7284354 bytes (6.9 MB)
+==================================================
+downloaded 6.9 MB
+
+trying URL 'http://cran.us.r-project.org/src/contrib/purrr_0.3.4.tar.gz'
+Content type 'application/x-gzip' length 375062 bytes (366 KB)
+==================================================
+downloaded 366 KB
+
+trying URL 'http://cran.us.r-project.org/src/contrib/cpp11_0.2.1.tar.gz'
+Content type 'application/x-gzip' length 198184 bytes (193 KB)
+==================================================
+downloaded 193 KB
+
+trying URL 'http://cran.us.r-project.org/src/contrib/dplyr_1.0.1.tar.gz'
+Content type 'application/x-gzip' length 933183 bytes (911 KB)
+==================================================
+downloaded 911 KB
+
+trying URL 'http://cran.us.r-project.org/src/contrib/ggplot2_3.3.2.tar.gz'
+Content type 'application/x-gzip' length 3054431 bytes (2.9 MB)
+==================================================
+downloaded 2.9 MB
+
+trying URL 'http://cran.us.r-project.org/src/contrib/ggridges_0.5.2.tar.gz'
+Content type 'application/x-gzip' length 2271413 bytes (2.2 MB)
+==================================================
+downloaded 2.2 MB
+
+trying URL 'http://cran.us.r-project.org/src/contrib/gridExtra_2.3.tar.gz'
+Content type 'application/x-gzip' length 1062844 bytes (1.0 MB)
+==================================================
+downloaded 1.0 MB
+
+trying URL 'http://cran.us.r-project.org/src/contrib/latex2exp_0.4.0.tar.gz'
+Content type 'application/x-gzip' length 288749 bytes (281 KB)
+==================================================
+downloaded 281 KB
+
+trying URL 'http://cran.us.r-project.org/src/contrib/optparse_1.6.6.tar.gz'
+Content type 'application/x-gzip' length 37896 bytes (37 KB)
+==================================================
+downloaded 37 KB
+
+trying URL 'http://cran.us.r-project.org/src/contrib/reshape_0.8.8.tar.gz'
+Content type 'application/x-gzip' length 42558 bytes (41 KB)
+==================================================
+downloaded 41 KB
+
+trying URL 'http://cran.us.r-project.org/src/contrib/stringr_1.4.0.tar.gz'
+Content type 'application/x-gzip' length 135777 bytes (132 KB)
+==================================================
+downloaded 132 KB
+
+trying URL 'http://cran.us.r-project.org/src/contrib/tidyr_1.1.1.tar.gz'
+Content type 'application/x-gzip' length 879411 bytes (858 KB)
+==================================================
+downloaded 858 KB
+
+trying URL 'http://cran.us.r-project.org/src/contrib/xtable_1.8-4.tar.gz'
+Content type 'application/x-gzip' length 564589 bytes (551 KB)
+==================================================
+downloaded 551 KB
+
+* installing *source* package ‘ps’ ...
+** package ‘ps’ successfully unpacked and MD5 sums checked
+** using staged installation
+** libs
+installing via 'install.libs.R' to /home/abochka/.R_packages_local/00LOCK-ps/00new/ps
+** R
+** inst
+** byte-compile and prepare package for lazy loading
+** help
+*** installing help indices
+** building package indices
+** testing if installed package can be loaded from temporary location
+** checking absolute paths in shared objects and dynamic libraries
+** testing if installed package can be loaded from final location
+** testing if installed package keeps a record of temporary installation path
+* DONE (ps)
+* installing *source* package ‘prettyunits’ ...
+** package ‘prettyunits’ successfully unpacked and MD5 sums checked
+** using staged installation
+** R
+** byte-compile and prepare package for lazy loading
+** help
+*** installing help indices
+** building package indices
+** testing if installed package can be loaded from temporary location
+** testing if installed package can be loaded from final location
+** testing if installed package keeps a record of temporary installation path
+* DONE (prettyunits)
+* installing *source* package ‘backports’ ...
+** package ‘backports’ successfully unpacked and MD5 sums checked
+** using staged installation
+** libs
+installing to /home/abochka/.R_packages_local/00LOCK-backports/00new/backports/libs
+** R
+** byte-compile and prepare package for lazy loading
+** help
+*** installing help indices
+** building package indices
+** testing if installed package can be loaded from temporary location
+** checking absolute paths in shared objects and dynamic libraries
+** testing if installed package can be loaded from final location
+** testing if installed package keeps a record of temporary installation path
+* DONE (backports)
+* installing *source* package ‘rstudioapi’ ...
+** package ‘rstudioapi’ successfully unpacked and MD5 sums checked
+** using staged installation
+** R
+** inst
+** byte-compile and prepare package for lazy loading
+** help
+*** installing help indices
+*** copying figures
+** building package indices
+** installing vignettes
+** testing if installed package can be loaded from temporary location
+** testing if installed package can be loaded from final location
+** testing if installed package keeps a record of temporary installation path
+* DONE (rstudioapi)
+* installing *source* package ‘assertthat’ ...
+** package ‘assertthat’ successfully unpacked and MD5 sums checked
+** using staged installation
+** R
+** byte-compile and prepare package for lazy loading
+** help
+*** installing help indices
+** building package indices
+** testing if installed package can be loaded from temporary location
+** testing if installed package can be loaded from final location
+** testing if installed package keeps a record of temporary installation path
+* DONE (assertthat)
+* installing *source* package ‘utf8’ ...
+** package ‘utf8’ successfully unpacked and MD5 sums checked
+** using staged installation
+** libs
+installing to /home/abochka/.R_packages_local/00LOCK-utf8/00new/utf8/libs
+** R
+** inst
+** byte-compile and prepare package for lazy loading
+** help
+*** installing help indices
+** building package indices
+** installing vignettes
+** testing if installed package can be loaded from temporary location
+** checking absolute paths in shared objects and dynamic libraries
+** testing if installed package can be loaded from final location
+** testing if installed package keeps a record of temporary installation path
+* DONE (utf8)
+* installing *source* package ‘evaluate’ ...
+** package ‘evaluate’ successfully unpacked and MD5 sums checked
+** using staged installation
+** R
+** byte-compile and prepare package for lazy loading
+** help
+*** installing help indices
+** building package indices
+** testing if installed package can be loaded from temporary location
+** testing if installed package can be loaded from final location
+** testing if installed package keeps a record of temporary installation path
+* DONE (evaluate)
+* installing *source* package ‘praise’ ...
+** package ‘praise’ successfully unpacked and MD5 sums checked
+** using staged installation
+** R
+** inst
+** byte-compile and prepare package for lazy loading
+** help
+*** installing help indices
+** building package indices
+** testing if installed package can be loaded from temporary location
+** testing if installed package can be loaded from final location
+** testing if installed package keeps a record of temporary installation path
+* DONE (praise)
+* installing *source* package ‘lattice’ ...
+** package ‘lattice’ successfully unpacked and MD5 sums checked
+** using staged installation
+** libs
+installing to /home/abochka/.R_packages_local/00LOCK-lattice/00new/lattice/libs
+** R
+** data
+*** moving datasets to lazyload DB
+** demo
+** inst
+** byte-compile and prepare package for lazy loading
+** help
+*** installing help indices
+** building package indices
+** testing if installed package can be loaded from temporary location
+** checking absolute paths in shared objects and dynamic libraries
+** testing if installed package can be loaded from final location
+** testing if installed package keeps a record of temporary installation path
+* DONE (lattice)
+* installing *source* package ‘colorspace’ ...
+** package ‘colorspace’ successfully unpacked and MD5 sums checked
+** using staged installation
+** libs
+installing to /home/abochka/.R_packages_local/00LOCK-colorspace/00new/colorspace/libs
+** R
+** data
+*** moving datasets to lazyload DB
+** demo
+** inst
+** byte-compile and prepare package for lazy loading
+** help
+*** installing help indices
+** building package indices
+** installing vignettes
+** testing if installed package can be loaded from temporary location
+** checking absolute paths in shared objects and dynamic libraries
+** testing if installed package can be loaded from final location
+** testing if installed package keeps a record of temporary installation path
+* DONE (colorspace)
+* installing *source* package ‘crayon’ ...
+** package ‘crayon’ successfully unpacked and MD5 sums checked
+** using staged installation
+** R
+** inst
+** byte-compile and prepare package for lazy loading
+** help
+*** installing help indices
+** building package indices
+** testing if installed package can be loaded from temporary location
+** testing if installed package can be loaded from final location
+** testing if installed package keeps a record of temporary installation path
+* DONE (crayon)
+* installing *source* package ‘fansi’ ...
+** package ‘fansi’ successfully unpacked and MD5 sums checked
+** using staged installation
+** libs
+installing to /home/abochka/.R_packages_local/00LOCK-fansi/00new/fansi/libs
+** R
+** inst
+** byte-compile and prepare package for lazy loading
+** help
+*** installing help indices
+** building package indices
+** installing vignettes
+** testing if installed package can be loaded from temporary location
+** checking absolute paths in shared objects and dynamic libraries
+** testing if installed package can be loaded from final location
+** testing if installed package keeps a record of temporary installation path
+* DONE (fansi)
+* installing *source* package ‘pkgconfig’ ...
+** package ‘pkgconfig’ successfully unpacked and MD5 sums checked
+** using staged installation
+** R
+** inst
+** byte-compile and prepare package for lazy loading
+** help
+*** installing help indices
+** building package indices
+** testing if installed package can be loaded from temporary location
+** testing if installed package can be loaded from final location
+** testing if installed package keeps a record of temporary installation path
+* DONE (pkgconfig)
+* installing *source* package ‘farver’ ...
+** package ‘farver’ successfully unpacked and MD5 sums checked
+** using staged installation
+** libs
+installing to /home/abochka/.R_packages_local/00LOCK-farver/00new/farver/libs
+** R
+** byte-compile and prepare package for lazy loading
+** help
+*** installing help indices
+*** copying figures
+** building package indices
+** testing if installed package can be loaded from temporary location
+** checking absolute paths in shared objects and dynamic libraries
+** testing if installed package can be loaded from final location
+** testing if installed package keeps a record of temporary installation path
+* DONE (farver)
+* installing *source* package ‘labeling’ ...
+** package ‘labeling’ successfully unpacked and MD5 sums checked
+** using staged installation
+** R
+** byte-compile and prepare package for lazy loading
+** help
+*** installing help indices
+** building package indices
+** testing if installed package can be loaded from temporary location
+** testing if installed package can be loaded from final location
+** testing if installed package keeps a record of temporary installation path
+* DONE (labeling)
+* installing *source* package ‘RColorBrewer’ ...
+** package ‘RColorBrewer’ successfully unpacked and MD5 sums checked
+** using staged installation
+** R
+** inst
+** byte-compile and prepare package for lazy loading
+** help
+*** installing help indices
+** building package indices
+** testing if installed package can be loaded from temporary location
+** testing if installed package can be loaded from final location
+** testing if installed package keeps a record of temporary installation path
+* DONE (RColorBrewer)
+* installing *source* package ‘viridisLite’ ...
+** package ‘viridisLite’ successfully unpacked and MD5 sums checked
+** using staged installation
+** R
+** data
+*** moving datasets to lazyload DB
+** byte-compile and prepare package for lazy loading
+** help
+*** installing help indices
+*** copying figures
+** building package indices
+** testing if installed package can be loaded from temporary location
+** testing if installed package can be loaded from final location
+** testing if installed package keeps a record of temporary installation path
+* DONE (viridisLite)
+* installing *source* package ‘Rcpp’ ...
+** package ‘Rcpp’ successfully unpacked and MD5 sums checked
+** using staged installation
+** libs
+installing to /home/abochka/.R_packages_local/00LOCK-Rcpp/00new/Rcpp/libs
+** R
+** inst
+** byte-compile and prepare package for lazy loading
+** help
+*** installing help indices
+** building package indices
+** installing vignettes
+** testing if installed package can be loaded from temporary location
+** checking absolute paths in shared objects and dynamic libraries
+** testing if installed package can be loaded from final location
+** testing if installed package keeps a record of temporary installation path
+* DONE (Rcpp)
+* installing *source* package ‘generics’ ...
+** package ‘generics’ successfully unpacked and MD5 sums checked
+** using staged installation
+** R
+** byte-compile and prepare package for lazy loading
+** help
+*** installing help indices
+** building package indices
+** testing if installed package can be loaded from temporary location
+** testing if installed package can be loaded from final location
+** testing if installed package keeps a record of temporary installation path
+* DONE (generics)
+* installing *source* package ‘glue’ ...
+** package ‘glue’ successfully unpacked and MD5 sums checked
+** using staged installation
+** libs
+installing to /home/abochka/.R_packages_local/00LOCK-glue/00new/glue/libs
+** R
+** inst
+** byte-compile and prepare package for lazy loading
+** help
+*** installing help indices
+*** copying figures
+** building package indices
+** installing vignettes
+** testing if installed package can be loaded from temporary location
+** checking absolute paths in shared objects and dynamic libraries
+** testing if installed package can be loaded from final location
+** testing if installed package keeps a record of temporary installation path
+* DONE (glue)
+* installing *source* package ‘magrittr’ ...
+** package ‘magrittr’ successfully unpacked and MD5 sums checked
+** using staged installation
+** R
+** inst
+** byte-compile and prepare package for lazy loading
+** help
+*** installing help indices
+** building package indices
+** installing vignettes
+** testing if installed package can be loaded from temporary location
+** testing if installed package can be loaded from final location
+** testing if installed package keeps a record of temporary installation path
+* DONE (magrittr)
+* installing *source* package ‘R6’ ...
+** package ‘R6’ successfully unpacked and MD5 sums checked
+** using staged installation
+** R
+** byte-compile and prepare package for lazy loading
+** help
+*** installing help indices
+** building package indices
+** testing if installed package can be loaded from temporary location
+** testing if installed package can be loaded from final location
+** testing if installed package keeps a record of temporary installation path
+* DONE (R6)
+* installing *source* package ‘rlang’ ...
+** package ‘rlang’ successfully unpacked and MD5 sums checked
+** using staged installation
+** libs
+installing to /home/abochka/.R_packages_local/00LOCK-rlang/00new/rlang/libs
+** R
+** inst
+** byte-compile and prepare package for lazy loading
+** help
+*** installing help indices
+*** copying figures
+** building package indices
+** testing if installed package can be loaded from temporary location
+** checking absolute paths in shared objects and dynamic libraries
+** testing if installed package can be loaded from final location
+** testing if installed package keeps a record of temporary installation path
+* DONE (rlang)
+* installing *source* package ‘digest’ ...
+** package ‘digest’ successfully unpacked and MD5 sums checked
+** using staged installation
+** libs
+installing to /home/abochka/.R_packages_local/00LOCK-digest/00new/digest/libs
+** R
+** demo
+** inst
+** byte-compile and prepare package for lazy loading
+** help
+*** installing help indices
+** building package indices
+** installing vignettes
+** testing if installed package can be loaded from temporary location
+** checking absolute paths in shared objects and dynamic libraries
+** testing if installed package can be loaded from final location
+** testing if installed package keeps a record of temporary installation path
+* DONE (digest)
+* installing *source* package ‘gtable’ ...
+** package ‘gtable’ successfully unpacked and MD5 sums checked
+** using staged installation
+** R
+** inst
+** byte-compile and prepare package for lazy loading
+** help
+*** installing help indices
+*** copying figures
+** building package indices
+** installing vignettes
+** testing if installed package can be loaded from temporary location
+** testing if installed package can be loaded from final location
+** testing if installed package keeps a record of temporary installation path
+* DONE (gtable)
+* installing *source* package ‘MASS’ ...
+** package ‘MASS’ successfully unpacked and MD5 sums checked
+** using staged installation
+** libs
+installing to /home/abochka/.R_packages_local/00LOCK-MASS/00new/MASS/libs
+** R
+** data
+*** moving datasets to lazyload DB
+** inst
+** byte-compile and prepare package for lazy loading
+** help
+*** installing help indices
+** building package indices
+** testing if installed package can be loaded from temporary location
+** checking absolute paths in shared objects and dynamic libraries
+** testing if installed package can be loaded from final location
+** testing if installed package keeps a record of temporary installation path
+* DONE (MASS)
+* installing *source* package ‘withr’ ...
+** package ‘withr’ successfully unpacked and MD5 sums checked
+** using staged installation
+** R
+** inst
+** byte-compile and prepare package for lazy loading
+** help
+*** installing help indices
+*** copying figures
+** building package indices
+** installing vignettes
+** testing if installed package can be loaded from temporary location
+** testing if installed package can be loaded from final location
+** testing if installed package keeps a record of temporary installation path
+* DONE (withr)
+* installing *source* package ‘getopt’ ...
+** package ‘getopt’ successfully unpacked and MD5 sums checked
+** using staged installation
+** R
+** exec
+** byte-compile and prepare package for lazy loading
+** help
+*** installing help indices
+** building package indices
+** testing if installed package can be loaded from temporary location
+** testing if installed package can be loaded from final location
+** testing if installed package keeps a record of temporary installation path
+* DONE (getopt)
+* installing *source* package ‘stringi’ ...
+** package ‘stringi’ successfully unpacked and MD5 sums checked
+** using staged installation
+** libs
+installing via 'install.libs.R' to /home/abochka/.R_packages_local/00LOCK-stringi/00new/stringi
+** R
+** inst
+** byte-compile and prepare package for lazy loading
+** help
+*** installing help indices
+** building package indices
+** testing if installed package can be loaded from temporary location
+** checking absolute paths in shared objects and dynamic libraries
+** testing if installed package can be loaded from final location
+** testing if installed package keeps a record of temporary installation path
+* DONE (stringi)
+* installing *source* package ‘cpp11’ ...
+** package ‘cpp11’ successfully unpacked and MD5 sums checked
+** using staged installation
+** R
+** inst
+** byte-compile and prepare package for lazy loading
+** help
+*** installing help indices
+** building package indices
+** installing vignettes
+** testing if installed package can be loaded from temporary location
+** testing if installed package can be loaded from final location
+** testing if installed package keeps a record of temporary installation path
+* DONE (cpp11)
+* installing *source* package ‘xtable’ ...
+** package ‘xtable’ successfully unpacked and MD5 sums checked
+** using staged installation
+** R
+** data
+** inst
+** byte-compile and prepare package for lazy loading
+** help
+*** installing help indices
+** building package indices
+** installing vignettes
+** testing if installed package can be loaded from temporary location
+** testing if installed package can be loaded from final location
+** testing if installed package keeps a record of temporary installation path
+* DONE (xtable)
+* installing *source* package ‘processx’ ...
+** package ‘processx’ successfully unpacked and MD5 sums checked
+** using staged installation
+** libs
+installing via 'install.libs.R' to /home/abochka/.R_packages_local/00LOCK-processx/00new/processx
+** R
+** inst
+** byte-compile and prepare package for lazy loading
+** help
+*** installing help indices
+** building package indices
+** testing if installed package can be loaded from temporary location
+** checking absolute paths in shared objects and dynamic libraries
+** testing if installed package can be loaded from final location
+** testing if installed package keeps a record of temporary installation path
+* DONE (processx)
+* installing *source* package ‘rprojroot’ ...
+** package ‘rprojroot’ successfully unpacked and MD5 sums checked
+** using staged installation
+** R
+** inst
+** byte-compile and prepare package for lazy loading
+** help
+*** installing help indices
+** building package indices
+** installing vignettes
+** testing if installed package can be loaded from temporary location
+** testing if installed package can be loaded from final location
+** testing if installed package keeps a record of temporary installation path
+* DONE (rprojroot)
+* installing *source* package ‘cli’ ...
+** package ‘cli’ successfully unpacked and MD5 sums checked
+** using staged installation
+** R
+** inst
+** byte-compile and prepare package for lazy loading
+** help
+*** installing help indices
+*** copying figures
+** building package indices
+** installing vignettes
+** testing if installed package can be loaded from temporary location
+** testing if installed package can be loaded from final location
+** testing if installed package keeps a record of temporary installation path
+* DONE (cli)
+* installing *source* package ‘nlme’ ...
+** package ‘nlme’ successfully unpacked and MD5 sums checked
+** using staged installation
+** libs
+installing to /home/abochka/.R_packages_local/00LOCK-nlme/00new/nlme/libs
+** R
+** data
+*** moving datasets to lazyload DB
+** inst
+** byte-compile and prepare package for lazy loading
+** help
+*** installing help indices
+** building package indices
+** testing if installed package can be loaded from temporary location
+** checking absolute paths in shared objects and dynamic libraries
+** testing if installed package can be loaded from final location
+** testing if installed package keeps a record of temporary installation path
+* DONE (nlme)
+* installing *source* package ‘Matrix’ ...
+** package ‘Matrix’ successfully unpacked and MD5 sums checked
+** using staged installation
+** libs
+installing to /home/abochka/.R_packages_local/00LOCK-Matrix/00new/Matrix/libs
+** R
+** data
+** inst
+** byte-compile and prepare package for lazy loading
+** help
+*** installing help indices
+** building package indices
+** installing vignettes
+** testing if installed package can be loaded from temporary location
+** checking absolute paths in shared objects and dynamic libraries
+** testing if installed package can be loaded from final location
+** testing if installed package keeps a record of temporary installation path
+* DONE (Matrix)
+* installing *source* package ‘munsell’ ...
+** package ‘munsell’ successfully unpacked and MD5 sums checked
+** using staged installation
+** R
+** inst
+** byte-compile and prepare package for lazy loading
+** help
+*** installing help indices
+*** copying figures
+** building package indices
+** testing if installed package can be loaded from temporary location
+** testing if installed package can be loaded from final location
+** testing if installed package keeps a record of temporary installation path
+* DONE (munsell)
+* installing *source* package ‘ellipsis’ ...
+** package ‘ellipsis’ successfully unpacked and MD5 sums checked
+** using staged installation
+** libs
+installing to /home/abochka/.R_packages_local/00LOCK-ellipsis/00new/ellipsis/libs
+** R
+** byte-compile and prepare package for lazy loading
+** help
+*** installing help indices
+** building package indices
+** testing if installed package can be loaded from temporary location
+** checking absolute paths in shared objects and dynamic libraries
+** testing if installed package can be loaded from final location
+** testing if installed package keeps a record of temporary installation path
+* DONE (ellipsis)
+* installing *source* package ‘lifecycle’ ...
+** package ‘lifecycle’ successfully unpacked and MD5 sums checked
+** using staged installation
+** R
+** inst
+** byte-compile and prepare package for lazy loading
+** help
+*** installing help indices
+*** copying figures
+** building package indices
+** installing vignettes
+** testing if installed package can be loaded from temporary location
+** testing if installed package can be loaded from final location
+** testing if installed package keeps a record of temporary installation path
+* DONE (lifecycle)
+* installing *source* package ‘plyr’ ...
+** package ‘plyr’ successfully unpacked and MD5 sums checked
+** using staged installation
+** libs
+installing to /home/abochka/.R_packages_local/00LOCK-plyr/00new/plyr/libs
+** R
+** data
+*** moving datasets to lazyload DB
+** inst
+** byte-compile and prepare package for lazy loading
+** help
+*** installing help indices
+** building package indices
+** testing if installed package can be loaded from temporary location
+** checking absolute paths in shared objects and dynamic libraries
+** testing if installed package can be loaded from final location
+** testing if installed package keeps a record of temporary installation path
+* DONE (plyr)
+* installing *source* package ‘purrr’ ...
+** package ‘purrr’ successfully unpacked and MD5 sums checked
+** using staged installation
+** libs
+installing to /home/abochka/.R_packages_local/00LOCK-purrr/00new/purrr/libs
+** R
+** inst
+** byte-compile and prepare package for lazy loading
+** help
+*** installing help indices
+*** copying figures
+** building package indices
+** installing vignettes
+** testing if installed package can be loaded from temporary location
+** checking absolute paths in shared objects and dynamic libraries
+** testing if installed package can be loaded from final location
+** testing if installed package keeps a record of temporary installation path
+* DONE (purrr)
+* installing *source* package ‘gridExtra’ ...
+** package ‘gridExtra’ successfully unpacked and MD5 sums checked
+** using staged installation
+** R
+** inst
+** byte-compile and prepare package for lazy loading
+** help
+*** installing help indices
+** building package indices
+** installing vignettes
+** testing if installed package can be loaded from temporary location
+** testing if installed package can be loaded from final location
+** testing if installed package keeps a record of temporary installation path
+* DONE (gridExtra)
+* installing *source* package ‘optparse’ ...
+** package ‘optparse’ successfully unpacked and MD5 sums checked
+** using staged installation
+** R
+** exec
+** inst
+** byte-compile and prepare package for lazy loading
+** help
+*** installing help indices
+** building package indices
+** installing vignettes
+** testing if installed package can be loaded from temporary location
+** testing if installed package can be loaded from final location
+** testing if installed package keeps a record of temporary installation path
+* DONE (optparse)
+* installing *source* package ‘stringr’ ...
+** package ‘stringr’ successfully unpacked and MD5 sums checked
+** using staged installation
+** R
+** data
+*** moving datasets to lazyload DB
+** inst
+** byte-compile and prepare package for lazy loading
+** help
+*** installing help indices
+*** copying figures
+** building package indices
+** installing vignettes
+** testing if installed package can be loaded from temporary location
+** testing if installed package can be loaded from final location
+** testing if installed package keeps a record of temporary installation path
+* DONE (stringr)
+* installing *source* package ‘callr’ ...
+** package ‘callr’ successfully unpacked and MD5 sums checked
+** using staged installation
+** R
+** inst
+** byte-compile and prepare package for lazy loading
+** help
+*** installing help indices
+** building package indices
+** testing if installed package can be loaded from temporary location
+** testing if installed package can be loaded from final location
+** testing if installed package keeps a record of temporary installation path
+* DONE (callr)
+* installing *source* package ‘desc’ ...
+** package ‘desc’ successfully unpacked and MD5 sums checked
+** using staged installation
+** R
+** inst
+** byte-compile and prepare package for lazy loading
+** help
+*** installing help indices
+** building package indices
+** testing if installed package can be loaded from temporary location
+** testing if installed package can be loaded from final location
+** testing if installed package keeps a record of temporary installation path
+* DONE (desc)
+* installing *source* package ‘vctrs’ ...
+** package ‘vctrs’ successfully unpacked and MD5 sums checked
+** using staged installation
+** libs
+installing to /home/abochka/.R_packages_local/00LOCK-vctrs/00new/vctrs/libs
+** R
+** inst
+** byte-compile and prepare package for lazy loading
+** help
+*** installing help indices
+*** copying figures
+** building package indices
+** installing vignettes
+** testing if installed package can be loaded from temporary location
+** checking absolute paths in shared objects and dynamic libraries
+** testing if installed package can be loaded from final location
+** testing if installed package keeps a record of temporary installation path
+* DONE (vctrs)
+* installing *source* package ‘mgcv’ ...
+** package ‘mgcv’ successfully unpacked and MD5 sums checked
+** using staged installation
+** libs
+installing to /home/abochka/.R_packages_local/00LOCK-mgcv/00new/mgcv/libs
+** R
+** data
+** inst
+** byte-compile and prepare package for lazy loading
+** help
+*** installing help indices
+** building package indices
+** testing if installed package can be loaded from temporary location
+** checking absolute paths in shared objects and dynamic libraries
+** testing if installed package can be loaded from final location
+** testing if installed package keeps a record of temporary installation path
+* DONE (mgcv)
+* installing *source* package ‘scales’ ...
+** package ‘scales’ successfully unpacked and MD5 sums checked
+** using staged installation
+** R
+** byte-compile and prepare package for lazy loading
+** help
+*** installing help indices
+*** copying figures
+** building package indices
+** testing if installed package can be loaded from temporary location
+** testing if installed package can be loaded from final location
+** testing if installed package keeps a record of temporary installation path
+* DONE (scales)
+* installing *source* package ‘latex2exp’ ...
+** package ‘latex2exp’ successfully unpacked and MD5 sums checked
+** using staged installation
+** R
+** inst
+** byte-compile and prepare package for lazy loading
+** help
+*** installing help indices
+** building package indices
+** installing vignettes
+** testing if installed package can be loaded from temporary location
+** testing if installed package can be loaded from final location
+** testing if installed package keeps a record of temporary installation path
+* DONE (latex2exp)
+* installing *source* package ‘reshape’ ...
+** package ‘reshape’ successfully unpacked and MD5 sums checked
+** using staged installation
+** R
+** data
+*** moving datasets to lazyload DB
+** inst
+** byte-compile and prepare package for lazy loading
+** help
+*** installing help indices
+** building package indices
+** testing if installed package can be loaded from temporary location
+** testing if installed package can be loaded from final location
+** testing if installed package keeps a record of temporary installation path
+* DONE (reshape)
+* installing *source* package ‘pkgbuild’ ...
+** package ‘pkgbuild’ successfully unpacked and MD5 sums checked
+** using staged installation
+** R
+** byte-compile and prepare package for lazy loading
+** help
+*** installing help indices
+** building package indices
+** testing if installed package can be loaded from temporary location
+** testing if installed package can be loaded from final location
+** testing if installed package keeps a record of temporary installation path
+* DONE (pkgbuild)
+* installing *source* package ‘pillar’ ...
+** package ‘pillar’ successfully unpacked and MD5 sums checked
+** using staged installation
+** R
+** byte-compile and prepare package for lazy loading
+** help
+*** installing help indices
+*** copying figures
+** building package indices
+** testing if installed package can be loaded from temporary location
+** testing if installed package can be loaded from final location
+** testing if installed package keeps a record of temporary installation path
+* DONE (pillar)
+* installing *source* package ‘tidyselect’ ...
+** package ‘tidyselect’ successfully unpacked and MD5 sums checked
+** using staged installation
+** R
+** inst
+** byte-compile and prepare package for lazy loading
+** help
+*** installing help indices
+** building package indices
+** installing vignettes
+** testing if installed package can be loaded from temporary location
+** testing if installed package can be loaded from final location
+** testing if installed package keeps a record of temporary installation path
+* DONE (tidyselect)
+* installing *source* package ‘pkgload’ ...
+** package ‘pkgload’ successfully unpacked and MD5 sums checked
+** using staged installation
+** libs
+installing to /home/abochka/.R_packages_local/00LOCK-pkgload/00new/pkgload/libs
+** R
+** inst
+** byte-compile and prepare package for lazy loading
+** help
+*** installing help indices
+** building package indices
+** testing if installed package can be loaded from temporary location
+** checking absolute paths in shared objects and dynamic libraries
+** testing if installed package can be loaded from final location
+** testing if installed package keeps a record of temporary installation path
+* DONE (pkgload)
+* installing *source* package ‘tibble’ ...
+** package ‘tibble’ successfully unpacked and MD5 sums checked
+** using staged installation
+** libs
+installing to /home/abochka/.R_packages_local/00LOCK-tibble/00new/tibble/libs
+** R
+** inst
+** byte-compile and prepare package for lazy loading
+** help
+*** installing help indices
+*** copying figures
+** building package indices
+** installing vignettes
+** testing if installed package can be loaded from temporary location
+** checking absolute paths in shared objects and dynamic libraries
+** testing if installed package can be loaded from final location
+** testing if installed package keeps a record of temporary installation path
+* DONE (tibble)
+* installing *source* package ‘testthat’ ...
+** package ‘testthat’ successfully unpacked and MD5 sums checked
+** using staged installation
+** libs
+installing to /home/abochka/.R_packages_local/00LOCK-testthat/00new/testthat/libs
+** R
+** inst
+** byte-compile and prepare package for lazy loading
+** help
+*** installing help indices
+*** copying figures
+** building package indices
+** installing vignettes
+** testing if installed package can be loaded from temporary location
+** checking absolute paths in shared objects and dynamic libraries
+** testing if installed package can be loaded from final location
+** testing if installed package keeps a record of temporary installation path
+* DONE (testthat)
+* installing *source* package ‘dplyr’ ...
+** package ‘dplyr’ successfully unpacked and MD5 sums checked
+** using staged installation
+** libs
+installing to /home/abochka/.R_packages_local/00LOCK-dplyr/00new/dplyr/libs
+** R
+** data
+*** moving datasets to lazyload DB
+** inst
+** byte-compile and prepare package for lazy loading
+** help
+*** installing help indices
+*** copying figures
+** building package indices
+** installing vignettes
+** testing if installed package can be loaded from temporary location
+** checking absolute paths in shared objects and dynamic libraries
+** testing if installed package can be loaded from final location
+** testing if installed package keeps a record of temporary installation path
+* DONE (dplyr)
+* installing *source* package ‘isoband’ ...
+** package ‘isoband’ successfully unpacked and MD5 sums checked
+** using staged installation
+** libs
+installing to /home/abochka/.R_packages_local/00LOCK-isoband/00new/isoband/libs
+** R
+** inst
+** byte-compile and prepare package for lazy loading
+** help
+*** installing help indices
+*** copying figures
+** building package indices
+** installing vignettes
+** testing if installed package can be loaded from temporary location
+** checking absolute paths in shared objects and dynamic libraries
+** testing if installed package can be loaded from final location
+** testing if installed package keeps a record of temporary installation path
+* DONE (isoband)
+* installing *source* package ‘tidyr’ ...
+** package ‘tidyr’ successfully unpacked and MD5 sums checked
+** using staged installation
+** libs
+installing to /home/abochka/.R_packages_local/00LOCK-tidyr/00new/tidyr/libs
+** R
+** data
+*** moving datasets to lazyload DB
+** inst
+** byte-compile and prepare package for lazy loading
+** help
+*** installing help indices
+*** copying figures
+** building package indices
+** installing vignettes
+** testing if installed package can be loaded from temporary location
+** checking absolute paths in shared objects and dynamic libraries
+** testing if installed package can be loaded from final location
+** testing if installed package keeps a record of temporary installation path
+* DONE (tidyr)
+* installing *source* package ‘ggplot2’ ...
+** package ‘ggplot2’ successfully unpacked and MD5 sums checked
+** using staged installation
+** R
+** data
+*** moving datasets to lazyload DB
+** inst
+** byte-compile and prepare package for lazy loading
+** help
+*** installing help indices
+*** copying figures
+** building package indices
+** installing vignettes
+** testing if installed package can be loaded from temporary location
+** testing if installed package can be loaded from final location
+** testing if installed package keeps a record of temporary installation path
+* DONE (ggplot2)
+* installing *source* package ‘ggridges’ ...
+** package ‘ggridges’ successfully unpacked and MD5 sums checked
+** using staged installation
+** R
+** data
+*** moving datasets to lazyload DB
+** inst
+** byte-compile and prepare package for lazy loading
+** help
+*** installing help indices
+*** copying figures
+** building package indices
+** installing vignettes
+** testing if installed package can be loaded from temporary location
+** testing if installed package can be loaded from final location
+** testing if installed package keeps a record of temporary installation path
+* DONE (ggridges)
+
+The downloaded source packages are in
+	‘/local_scratch/pbs.64577.pbs02/Rtmpigtggp/downloaded_packages’

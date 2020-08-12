@@ -21,7 +21,7 @@ CMP_LBs=./compare_simpl_LBs.py
 PSCAL=./par_scal_test.py
 ######################################################################
 ## Numerical parameters
-PAR_SOL=4
+PAR_SOL=8
 
 ### random dataset stats
 LW_n=10000

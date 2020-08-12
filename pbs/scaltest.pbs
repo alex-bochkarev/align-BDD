@@ -1,5 +1,5 @@
 #PBS -N Scal
-#PBS -l select=1:ncpus=4:mem=16gb,walltime=24:00:00
+#PBS -l select=1:ncpus=8:mem=16gb,walltime=24:00:00
 #PBS -j oe
 #PBS -o ./run_logs/scal_test.log
 #PBS -M abochka@clemson.edu
@@ -10,16 +10,16 @@ trap "cp ${TMPDIR}/* ~/BDD/align-BDD/tmp/;exit" TERM # save the TMP folder if ki
 STARTMSG="START: scalability figure"
 ENDMSG="END: scalability figure done."
 
-module add anaconda3/5.1.0
+module add anaconda3/5.1.0-gcc/8.3.1
 source activate ab-local
-module add R/3.6.0
+module add r/4.0.2-gcc/8.3.1
 
 cd /home/abochka/BDD/align-BDD
 
 echo $STARTMSG
 make prep_dirs PREF=$TMPDIR/
 echo making the scalability figure
-make -j4 PAR_SOL=4 PREF=$TMPDIR/ scalfig
+make -j8 PAR_SOL=8 PREF=$TMPDIR/ scalfig
 echo moving logfiles...
 make move-logs PREF=$TMPDIR/
 echo cleaning...
