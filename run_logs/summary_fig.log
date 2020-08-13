@@ -1,0 +1,61 @@
+START: generating summary figures, branch **master**, commit e94fa371ee051b6bf303d61f8f84d1b62764cb7e
+Cleaning up raw instances in /local_scratch/pbs.66345.pbs02//instances/raw...
+rm -f /local_scratch/pbs.66345.pbs02//instances/raw/R/*.bdd
+Cleaning up log files...
+rm -f /local_scratch/pbs.66345.pbs02//run_logs/*.log
+Cleaning up figures...
+rm -f ./figures/*.eps
+Cleaning up instance archives...
+rm -f ./data_archive/*.tar.gz
+rm -f /local_scratch/pbs.66345.pbs02//instances/raw/R/*.list*
+rm -f /local_scratch/pbs.66345.pbs02//instances/raw/N/*.bdd
+rm -f /local_scratch/pbs.66345.pbs02//instances/raw/N/*.list*
+rm -rf /local_scratch/pbs.66345.pbs02//instances/raw/ds_stats
+rm -f /local_scratch/pbs.66345.pbs02//instances/raw/*.bdd
+mkdir -p /local_scratch/pbs.66345.pbs02//instances/raw/R /local_scratch/pbs.66345.pbs02//instances/raw/N
+mkdir -p /local_scratch/pbs.66345.pbs02//run_logs
+Making the figure...
+mkdir -p /local_scratch/pbs.66345.pbs02//instances/raw/ds_stats/Rp0.2 && python ./gen_BDD_pair.py -n 10000 -v 15 -p 0.2 -RU /local_scratch/pbs.66345.pbs02//instances/raw/ds_stats/Rp0.2 > /dev/null && ls /local_scratch/pbs.66345.pbs02//instances/raw/ds_stats/Rp0.2/*.bdd > /local_scratch/pbs.66345.pbs02//instances/raw/ds_stats/Rp0.2/lwidths_Rp0.2.list && python ./gen_lsizes_stats.py -s 0.2 /local_scratch/pbs.66345.pbs02//instances/raw/ds_stats/Rp0.2/lwidths_Rp0.2.list > /local_scratch/pbs.66345.pbs02//run_logs/lwidths_Rp0.2.log && rm -rf /local_scratch/pbs.66345.pbs02//instances/raw/ds_stats/Rp0.2
+mkdir -p /local_scratch/pbs.66345.pbs02//instances/raw/ds_stats/Rp0.4 && python ./gen_BDD_pair.py -n 10000 -v 15 -p 0.4 -RU /local_scratch/pbs.66345.pbs02//instances/raw/ds_stats/Rp0.4 > /dev/null && ls /local_scratch/pbs.66345.pbs02//instances/raw/ds_stats/Rp0.4/*.bdd > /local_scratch/pbs.66345.pbs02//instances/raw/ds_stats/Rp0.4/lwidths_Rp0.4.list && python ./gen_lsizes_stats.py -s 0.4 /local_scratch/pbs.66345.pbs02//instances/raw/ds_stats/Rp0.4/lwidths_Rp0.4.list > /local_scratch/pbs.66345.pbs02//run_logs/lwidths_Rp0.4.log && rm -rf /local_scratch/pbs.66345.pbs02//instances/raw/ds_stats/Rp0.4
+mkdir -p /local_scratch/pbs.66345.pbs02//instances/raw/ds_stats/Rp0.6 && python ./gen_BDD_pair.py -n 10000 -v 15 -p 0.6 -RU /local_scratch/pbs.66345.pbs02//instances/raw/ds_stats/Rp0.6 > /dev/null && ls /local_scratch/pbs.66345.pbs02//instances/raw/ds_stats/Rp0.6/*.bdd > /local_scratch/pbs.66345.pbs02//instances/raw/ds_stats/Rp0.6/lwidths_Rp0.6.list && python ./gen_lsizes_stats.py -s 0.6 /local_scratch/pbs.66345.pbs02//instances/raw/ds_stats/Rp0.6/lwidths_Rp0.6.list > /local_scratch/pbs.66345.pbs02//run_logs/lwidths_Rp0.6.log && rm -rf /local_scratch/pbs.66345.pbs02//instances/raw/ds_stats/Rp0.6
+mkdir -p /local_scratch/pbs.66345.pbs02//instances/raw/ds_stats/Rp0.8 && python ./gen_BDD_pair.py -n 10000 -v 15 -p 0.8 -RU /local_scratch/pbs.66345.pbs02//instances/raw/ds_stats/Rp0.8 > /dev/null && ls /local_scratch/pbs.66345.pbs02//instances/raw/ds_stats/Rp0.8/*.bdd > /local_scratch/pbs.66345.pbs02//instances/raw/ds_stats/Rp0.8/lwidths_Rp0.8.list && python ./gen_lsizes_stats.py -s 0.8 /local_scratch/pbs.66345.pbs02//instances/raw/ds_stats/Rp0.8/lwidths_Rp0.8.list > /local_scratch/pbs.66345.pbs02//run_logs/lwidths_Rp0.8.log && rm -rf /local_scratch/pbs.66345.pbs02//instances/raw/ds_stats/Rp0.8
+ls /local_scratch/pbs.66345.pbs02//run_logs/lwidths_Rp*.log && \
+tail -qn +2 /local_scratch/pbs.66345.pbs02//run_logs/lwidths_Rp*.log > /local_scratch/pbs.66345.pbs02//run_logs/lwidths_R.log
+/local_scratch/pbs.66345.pbs02//run_logs/lwidths_Rp0.2.log
+/local_scratch/pbs.66345.pbs02//run_logs/lwidths_Rp0.4.log
+/local_scratch/pbs.66345.pbs02//run_logs/lwidths_Rp0.6.log
+/local_scratch/pbs.66345.pbs02//run_logs/lwidths_Rp0.8.log
+Rscript ./post_processing/fig_summary.R -i /local_scratch/pbs.66345.pbs02//run_logs/lwidths_R.log -o figures/fig_summary_R.eps
+
+Attaching package: ‘dplyr’
+
+The following object is masked from ‘package:reshape’:
+
+    rename
+
+The following objects are masked from ‘package:stats’:
+
+    filter, lag
+
+The following objects are masked from ‘package:base’:
+
+    intersect, setdiff, setequal, union
+
+Warning messages:
+1: Use of `df_m$P` is discouraged. Use `P` instead. 
+2: Removed 59737 rows containing non-finite values (stat_boxplot). 
+Moving logfiles...
+moving logs away from /local_scratch/pbs.66345.pbs02//run_logs to ./data_archive
+rm -f /local_scratch/pbs.66345.pbs02//run_logs/part.* && \
+tar --remove-files -czf ./data_archive/2020-08-12_17-57-44_logs.tar.gz -C /local_scratch/pbs.66345.pbs02//run_logs .
+Cleaning..
+Cleaning up raw instances in /local_scratch/pbs.66345.pbs02//instances/raw...
+rm -f /local_scratch/pbs.66345.pbs02//instances/raw/R/*.bdd
+Cleaning up log files...
+rm -f /local_scratch/pbs.66345.pbs02//run_logs/*.log
+rm -f /local_scratch/pbs.66345.pbs02//instances/raw/R/*.list*
+rm -f /local_scratch/pbs.66345.pbs02//instances/raw/N/*.bdd
+rm -f /local_scratch/pbs.66345.pbs02//instances/raw/N/*.list*
+rm -rf /local_scratch/pbs.66345.pbs02//instances/raw/ds_stats
+rm -f /local_scratch/pbs.66345.pbs02//instances/raw/*.bdd
+END: done with the global makefile run

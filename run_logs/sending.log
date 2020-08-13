@@ -1,9 +1,10 @@
-/var/spool/pbs/mom_priv/jobs/65741.pbs02.SC: line 21: convert: command not found
-/var/spool/pbs/mom_priv/jobs/65741.pbs02.SC: line 21: convert: command not found
-/var/spool/pbs/mom_priv/jobs/65741.pbs02.SC: line 21: convert: command not found
-/var/spool/pbs/mom_priv/jobs/65741.pbs02.SC: line 21: convert: command not found
-/var/spool/pbs/mom_priv/jobs/65741.pbs02.SC: line 21: convert: command not found
-/var/spool/pbs/mom_priv/jobs/65741.pbs02.SC: line 21: convert: command not found
-/var/spool/pbs/mom_priv/jobs/65741.pbs02.SC: line 21: convert: command not found
-/var/spool/pbs/mom_priv/jobs/65741.pbs02.SC: line 21: convert: command not found
+/var/spool/pbs/mom_priv/jobs/67081.pbs02.SC: line 21: convert: command not found
+/var/spool/pbs/mom_priv/jobs/67081.pbs02.SC: line 21: convert: command not found
+/var/spool/pbs/mom_priv/jobs/67081.pbs02.SC: line 21: convert: command not found
+/var/spool/pbs/mom_priv/jobs/67081.pbs02.SC: line 21: convert: command not found
+/var/spool/pbs/mom_priv/jobs/67081.pbs02.SC: line 21: convert: command not found
+/var/spool/pbs/mom_priv/jobs/67081.pbs02.SC: line 21: convert: command not found
+/var/spool/pbs/mom_priv/jobs/67081.pbs02.SC: line 21: convert: command not found
+/var/spool/pbs/mom_priv/jobs/67081.pbs02.SC: line 21: convert: command not found
+/var/spool/pbs/mom_priv/jobs/67081.pbs02.SC: line 21: convert: command not found
 mv: cannot stat './*.png': No such file or directory

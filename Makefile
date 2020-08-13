@@ -274,7 +274,7 @@ clean-figures:
 	@echo Cleaning up figures...
 	rm -f $(FIGS)/*.eps
 
-clean: clean-raw-inst clean-logs clean-figures clean-archive
+clean: clean-raw-inst clean-logs clean-figures
 clean-tmp: clean-raw-inst clean-logs
 
 test: $(LOGS)/BB.test
