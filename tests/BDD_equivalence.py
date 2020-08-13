@@ -184,12 +184,21 @@ if __name__ == '__main__':
             print_pair(B,Bp)
 
         # non-eq to another random BDD
+        keep_trying = True
         Bp = BDD.BDD.random(N)
 
-        eq, msg = are_equivalent(B,Bp)
-        if eq:
-            print("WARNING: B is equivalent to another random BDD. Unlikely...")
-            print_pair(B,Bp)
+        while keep_trying:
+            eq, msg = are_equivalent(B,Bp)
+            if eq:
+                Bp.make_reduced()
+                B.make_reduced()
+                if B.profile() != Bp.profile():
+                    print("ERROR: B is equivalent to another random BDD with a different profile!")
+                    print_pair(B,Bp)
+                else:
+                    Bp = BDD.BDD.random(N)
+            else:
+                keep_trying = False
 
         ## Random swaps
         Bp = deepcopy(B)
@@ -239,6 +248,7 @@ if __name__ == '__main__':
         Bp = deepcopy(B)
         for i in range(NO_ALIGNS):
             A = BDD.BDD.random(N)
+            A.rename_vars(dict(zip(Bp.vars,np.random.permutation(Bp.vars))))
             Bp.gsifts(A)
 
         eq, msg = are_equivalent(B,Bp)
