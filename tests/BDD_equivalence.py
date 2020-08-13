@@ -27,80 +27,13 @@ TIMEOUT = 600 # in seconds
 PROGRESS_STEPS = 100
 P_STEP = TIMEOUT / PROGRESS_STEPS
 
-def get_value(B, x):
-    """Finds the terminal node (T or F) corresponding to the variable choices in x
-
-    Args:
-        B: a BDD
-        x: a dict of {var_name: value}, where value is in {0,1}.
-
-    Returns:
-        True/False/-1: terminal node corresponding to the path implied by x, encoded as Boolean (or -1 if error)
-    """
-
-    (node,) = B.layers[0]
-
-    for i in range(len(x)):
-        if x[B.vars[i]] == 0:
-            node = node.lo
-        elif x[B.vars[i]] == 1:
-            node = node.hi
-        else:
-            print("Wrong value ({}) for variabe {}: 0 or 1 expected".format(x[B.vars[i]], B.vars[i]))
-            return -1
-
-    if node.id == B.T.id:
-        return True
-    elif node.id == B.F.id:
-        return False
-    else:
-        print("Error not a True or False node reached!")
-        print("node is {}, T is {}, F is {}".format(node.id, B.T.id, B.F.id))
-        return -1
-
-# x = dict(zip([x for x in "12345"], [0,0,0,0,0]))
-# print("Value for {} is {}".format(x, get_value(B,x)))
-
-def get_truth_table(B):
-    """Prints a truth table for the Boolean function defined by BDD B"""
-    tt = []
-    ind = []
-    for x_num in range(2**len(B)):
-        x = [int(j) for j in np.binary_repr(x_num, width = len(B.vars))]
-        tt.append(x + [ get_value(B,dict( zip(B.vars, x) )) ])
-        ind.append(np.binary_repr(x_num, width = len(B.vars)))
-
-    tt = pd.DataFrame(tt, columns = B.vars + ["Value"], index = ind)
-    return tt
-
-# print("")
-# tt = get_truth_table(B)
-
-def are_equivalent(A,B):
-    """Checks if two BDDs (A and B) are equivalent in the sense that they define the same Boolean function,
-    by checking if the corresponding truth tables coincide. Returns Bool
-    """
-
-    msg = None
-    tt_A = get_truth_table(A); tt_B = get_truth_table(B)
-    tt_B = tt_B[A.vars + ['Value']]
-    tt_B['new_index'] = [c for c in tt_B.apply(lambda row: "".join([str(x) for x in row[:-1]]), axis=1) ]
-    tt_B.set_index('new_index', inplace=True)
-
-    for idx, row in tt_A.iterrows():
-        if row['Value'] != tt_B.loc[idx]['Value']:
-            msg = "\nINFO: Discrepancy found. For x={}, value(A)={}, value(B)={}".format(idx, row['Value'], tt_B.loc[idx]['Value'])
-            return [False, msg]
-
-    return [True, msg]
-
 def test_BDD_transformations(B,no_iters=250):
     """Implements a simple ad-hoc test"""
     # let's test the basic things
     print("First: for Bp = B,")
     Bp = deepcopy(B)
     print("Variables:\n B:{}\nBp:{}".format(B.vars,Bp.vars))
-    eq, _ = are_equivalent(B,Bp)
+    eq, _ = B.is_equivalent(Bp)
     print("B ~ Bp: {}".format(eq))
     if not eq:
           print("Non-equivalent BDDs: STOP")
@@ -114,7 +47,7 @@ def test_BDD_transformations(B,no_iters=250):
         print(".",end="")
 
     print("Variables:\n B:{}\nBp:{}".format(B.vars,Bp.vars))
-    eq, _ = are_equivalent(B,Bp)
+    eq, _ = B.is_equivalent(Bp)
     print("B ~ Bp: {}".format(eq))
     if not eq:
           print("Non-equivalent BDDs: STOP")
@@ -127,7 +60,7 @@ def test_BDD_transformations(B,no_iters=250):
         print(".",end="")
 
     print("Variables:\n B:{}\nBp:{}".format(B.vars,Bp.vars))
-    eq, _ = are_equivalent(B,Bp)
+    eq, _ = B.is_equivalent(Bp)
     print("B ~ Bp: {}".format(eq))
     if not eq:
           print("Non-equivalent BDDs: STOP")
@@ -140,7 +73,7 @@ def test_BDD_transformations(B,no_iters=250):
         print(".",end="")
 
     print("Variables:\n B:{}\nBp:{}".format(B.vars,Bp.vars))
-    eq, _ = are_equivalent(B,Bp)
+    eq, _ = B.is_equivalent(Bp)
     print("B ~ Bp: {}".format(eq))
     if not eq:
           print("Non-equivalent BDDs: STOP")
@@ -177,7 +110,7 @@ if __name__ == '__main__':
         # trivial tests first
         # self-equivalence
         Bp = deepcopy(B)
-        eq, msg = are_equivalent(B,Bp)
+        eq, msg = B.is_equivalent(Bp)
         if not eq:
             print("ERROR: B not equivalent to Bp=B!")
             print(msg)
@@ -188,7 +121,7 @@ if __name__ == '__main__':
         Bp = BDD.BDD.random(N)
 
         while keep_trying:
-            eq, msg = are_equivalent(B,Bp)
+            eq, msg = B.is_equivalent(Bp)
             if eq:
                 Bp.make_reduced()
                 B.make_reduced()
@@ -205,7 +138,7 @@ if __name__ == '__main__':
         for i in range(NO_SWAPS):
             Bp.swap_up(np.random.randint(1,N))
 
-        eq, msg = are_equivalent(B,Bp)
+        eq, msg = B.is_equivalent(Bp)
         if not eq:
             print("ERROR: B is not equivalent to Bp after random swaps")
             print(msg)
@@ -216,7 +149,7 @@ if __name__ == '__main__':
         for i in range(NO_SIFTS):
             Bp.sift(B.vars[np.random.randint(N)], np.random.randint(N))
 
-        eq, msg = are_equivalent(B,Bp)
+        eq, msg = B.is_equivalent(Bp)
         if not eq:
             print("ERROR: B is not equivalent to Bp after random sifts")
             print(msg)
@@ -227,7 +160,7 @@ if __name__ == '__main__':
         for i in range(NO_ALIGNS):
             Bp = Bp.align_to(np.random.permutation(B.vars), inplace=False)
 
-        eq, msg = are_equivalent(B,Bp)
+        eq, msg = B.is_equivalent(Bp)
         if not eq:
             print("ERROR: B is not equivalent to Bp after random aligns")
             print(msg)
@@ -238,7 +171,7 @@ if __name__ == '__main__':
         for i in range(NO_ALIGNS):
             Bp.align_to(np.random.permutation(B.vars), inplace=True)
 
-        eq, msg = are_equivalent(B,Bp)
+        eq, msg = B.is_equivalent(Bp)
         if not eq:
             print("ERROR: B is not equivalent to Bp after random aligns (inplace)")
             print(msg)
@@ -251,7 +184,7 @@ if __name__ == '__main__':
             A.rename_vars(dict(zip(Bp.vars,np.random.permutation(Bp.vars))))
             Bp.gsifts(A)
 
-        eq, msg = are_equivalent(B,Bp)
+        eq, msg = B.is_equivalent(Bp)
         if not eq:
             print("ERROR: B is not equivalent to Bp after gsifts with a random BDD")
             print(msg)
