@@ -1,0 +1,72 @@
+digraph {
+	subgraph cluster_0 {
+		0
+		color=lightgrey label="x1, sz=1"
+	}
+	subgraph cluster_1 {
+    { rank = same; 2 -> 1 [ style = invis ] }
+		2
+		1
+		color=lightgrey label="x4, sz=2"
+	}
+	subgraph cluster_2 {
+    { rank = same; 3 -> 4 -> 5 -> 13 [ style = invis ] }
+		4
+		13
+		5
+		3
+		color=lightgrey label="x3, sz=4"
+	}
+	subgraph cluster_3 {
+    { rank = same; 6 -> 7 -> 8 -> 12 -> 14 [ style = invis ] }
+		14
+		8
+		7
+		6
+		12
+		color=lightgrey label="x2, sz=5"
+	}
+	subgraph cluster_4 {
+    { rank = same; 9 -> 10 -> 11 [ style = invis ] }
+		11
+		9
+		10
+		color=lightgrey label="x5, sz=3"
+	}
+	subgraph cluster_5 {
+    { rank = same; -1 -> -2 [ style = invis ] }
+	  -1 [label=T fillcolor=orange style=filled]
+		-2 [label=F fillcolor=gray style=filled]
+		color=white
+	}
+	0 -> 1
+	0 -> 2 [style=dashed]
+	2 -> 5
+	2 -> 3 [style=dashed]
+	1 -> 4
+	1 -> 13 [style=dashed]
+	4 -> 12
+	4 -> 6 [style=dashed]
+	13 -> 6
+	13 -> 7 [style=dashed]
+	5 -> 12
+	5 -> 8 [style=dashed]
+	3 -> 6
+	3 -> 14 [style=dashed]
+	14 -> 11
+	14 -> 11 [style=dashed]
+	8 -> 10
+	8 -> 10 [style=dashed]
+	7 -> 9
+	7 -> 11 [style=dashed]
+	6 -> 9
+	6 -> 10 [style=dashed]
+	12 -> 9
+	12 -> 9 [style=dashed]
+	11 -> -1
+	11 -> -1 [style=dashed]
+	9 -> -2
+	9 -> -2 [style=dashed]
+	10 -> -2
+	10 -> -1 [style=dashed]
+}
