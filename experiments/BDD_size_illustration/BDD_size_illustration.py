@@ -15,6 +15,7 @@ import numpy as np
 import pandas as pd
 from importlib import reload
 from itertools import permutations
+from copy import deepcopy
 
 sys.path.append('../..')
 import BDD
@@ -23,8 +24,6 @@ reload(BDD)
 
 B = BDD.BDD()
 B.load("./sample_5var_inst.bdd")
-
-B.show()
 
 print("Order -- size")
 min_o = None; max_o = None
@@ -48,9 +47,12 @@ print("Min order: {} -- |B|={}".format(min_o, min_s))
 print("Max order: {} -- |B|={}".format(max_o, max_s))
 
 Bp = B.align_to(max_o)
-Bp.dump_gv().view("max_BDD")
-B.dump_gv().view("orig_BDD")
+Bp.dump_gv().view("max_BDD.dot")
+B.dump_gv().view("orig_BDD.dot")
+# NOTE: I have edited the .dot files cosmetically (horizontal node orders, node and var labels)
 
 print("B is reduced: {}".format(B.is_reduced()))
 print("Bp is reduced: {}".format(Bp.is_reduced()))
-print("B and Bp are equivalent: {}".format(are_equivalent(B,Bp)))
+print("B and Bp are equivalent: {}".format(B.is_equivalent(Bp)[0]))
+
+print(Bp.truth_table())
