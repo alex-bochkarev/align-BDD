@@ -109,6 +109,8 @@ ggplot(df)+
 ## Ns = unique(df$N)
 ## Nmed = Ns[which.min(abs(Ns - median(Ns)))]
 Ns = c(5,10,12,15,17,20,22,25)
+xmin = min(df$rel_obj)
+xmax = quantile(df$rel_obj, 0.99)
 
 p2 =
 ggplot(filter(df, N %in% Ns), aes(x=rel_obj))+
@@ -124,7 +126,8 @@ ggplot(filter(df, N %in% Ns), aes(x=rel_obj))+
     scale_x_continuous(
         "Relative heuristic objective\n(b)",
         label = scales::percent,
-        breaks = seq(min(df$rel_obj), max(df$rel_obj), length.out = 11)
+        breaks = seq(min(df$rel_obj), max(df$rel_obj), length.out = 11),
+        limits = c(xmin,xmax)
     )+
     scale_y_continuous(
       "No. of instances",

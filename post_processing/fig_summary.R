@@ -37,14 +37,15 @@ Nticks = 15
 quantile_to_show = 0.95
 
 df = read.csv(file=infile, header=FALSE, sep=",",stringsAsFactors=FALSE)
-colnames(df) = c("ID","N","LR",paste('n',seq(1,length(colnames(df))-4),sep="_"),"P")
+## colnames(df) = c("ID","N","LR",paste('n',seq(1,length(colnames(df))-4),sep="_"),"P")
+colnames(df) = c("ID","N","LR", as.character(seq(1,length(colnames(df))-4)),"P")
 
 df_m = melt(df, id.vars=c('ID', 'P','LR',"N"))
 max_lw = quantile(df_m$value,quantile_to_show)
 
-df_m$var_label = str_replace(as.character(df_m$variable), "_","[")
-df_m$var_label = paste(df_m$var_label,"]",sep="")
-df_m$layer = factor(df_m$var_label, levels = as.character(unique(df_m$var_label)))
+# df_m$var_label = str_replace(as.character(df_m$variable), "_","[")
+# df_m$var_label = paste(df_m$var_label,"]",sep="")
+# df_m$layer = factor(df_m$var_label, levels = as.character(unique(df_m$var_label)))
 
 plt = ggplot(df_m, aes(x=factor(P, levels=unique(df_m$P)), y=value, fill=P))+
     ## coord_flip(xlim=c(1,max_lw))+
@@ -55,7 +56,7 @@ plt = ggplot(df_m, aes(x=factor(P, levels=unique(df_m$P)), y=value, fill=P))+
     breaks = seq(1,max_lw,by = floor((max_lw-1)/Nticks)+1))+
   scale_x_discrete(breaks = unique(df_m$P))+
     geom_boxplot(outlier.shape = NA)+
-    facet_wrap(~layer, nrow=1, label = "label_parsed")+
+  facet_wrap(~variable, nrow=1)+ #, label = "label_parsed"
     theme(
         panel.background = element_rect(fill = "lightgrey",
                                         colour = "lightgrey",
@@ -80,7 +81,8 @@ plt = ggplot(df_m, aes(x=factor(P, levels=unique(df_m$P)), y=value, fill=P))+
         panel.grid.major = element_line(size = 0.5, linetype = 'solid',
                                         colour = "lightgrey"),
         panel.grid.minor.x = element_line(size=0.25,linetype = 'solid', colour = "lightgrey"),
-        panel.grid.minor.y = element_line(size=0.25,linetype = 'solid', colour = "lightgrey")
+        panel.grid.minor.y = element_line(size=0.25,linetype = 'solid', colour = "lightgrey"),
+        strip.text.x = element_text(size = 22)
     )
 
 ggsave(plot=plt, device = cairo_ps, outfile,width = 16, height = 9, dpi=300)
