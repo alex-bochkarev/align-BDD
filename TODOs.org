@@ -7,7 +7,10 @@
 - scal_update (major scal update)
 
 As of beginning of the day <2020-07-11> all of these are merged into =master=
+** TODO Revise tests for key functions
 ** DONE Move =are_equivalent= method to =BDD.py=
    CLOSED: [2020-08-13 Thu 11:14]
  [2020-08-12 Wed 12:07]
  [[file:~/projects/align-BDD/experiments/BDD_size_illustration/BDD_size_illustration.py::B.load("./sample_5var_inst.bdd")]]
+* Notes
+  - first submission corresponds to =master= commit =04a5b38=
