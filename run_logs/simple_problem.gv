@@ -1,0 +1,33 @@
+// Uncapacitated Facility Location
+digraph G {
+	F1 [color=lightgrey shape=doublecircle style=filled]
+	F2 [color=lightgrey shape=doublecircle style=filled]
+	F3 [color=lightgrey shape=doublecircle style=filled]
+	F4 [color=lightgrey shape=doublecircle style=filled]
+	F5 [color=lightgrey shape=doublecircle style=filled]
+	C1 [shape=circle]
+	F1 -> C1
+	F4 -> C1
+	C2 [shape=circle]
+	F1 -> C2
+	F4 -> C2
+	C3 [shape=circle]
+	F1 -> C3
+	F4 -> C3
+	C4 [shape=circle]
+	F1 -> C4
+	F2 -> C4
+	C5 [shape=circle]
+	F1 -> C5
+	F2 -> C5
+	C6 [shape=circle]
+	F2 -> C6
+	F3 -> C6
+	C7 [shape=circle]
+	F2 -> C7
+	F3 -> C7
+	F5 -> C7
+	C8 [shape=circle]
+	F3 -> C8
+	F5 -> C8
+}

@@ -8,6 +8,7 @@
 
 As of beginning of the day <2020-07-11> all of these are merged into =master=
 ** TODO Revise tests for key functions
+** TODO add diagram generation tests :UFL:
 ** DONE Move =are_equivalent= method to =BDD.py=
    CLOSED: [2020-08-13 Thu 11:14]
  [2020-08-12 Wed 12:07]

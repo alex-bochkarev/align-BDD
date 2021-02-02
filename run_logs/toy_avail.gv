@@ -1,0 +1,91 @@
+digraph {
+	subgraph cluster_0 {
+		0
+		color=lightgrey label="xx1, sz=1"
+	}
+	subgraph cluster_1 {
+		1
+		2
+		color=lightgrey label="xz1-1, sz=2"
+	}
+	subgraph cluster_2 {
+		3
+		4
+		5
+		color=lightgrey label="xz1-2, sz=3"
+	}
+	subgraph cluster_3 {
+		6
+		7
+		8
+		color=lightgrey label="xz1-3, sz=3"
+	}
+	subgraph cluster_4 {
+		10
+		9
+		color=lightgrey label="xx2, sz=2"
+	}
+	subgraph cluster_5 {
+		12
+		11
+		13
+		color=lightgrey label="xz2-2, sz=3"
+	}
+	subgraph cluster_6 {
+		14
+		16
+		15
+		color=lightgrey label="xz2-3, sz=3"
+	}
+	subgraph cluster_7 {
+		17
+		18
+		19
+		color=lightgrey label="xz2-4, sz=3"
+	}
+	subgraph cluster_8 {
+		-2 [label=F fillcolor=gray style=filled]
+		-1 [label=T fillcolor=orange style=filled]
+		color=white
+	}
+	0 -> 1
+	0 -> 2 [style=dashed]
+	1 -> 3
+	1 -> 5 [style=dashed]
+	2 -> 5
+	2 -> 4 [style=dashed]
+	3 -> 6
+	3 -> 8 [style=dashed]
+	4 -> 8
+	4 -> 7 [style=dashed]
+	5 -> 8
+	5 -> 8 [style=dashed]
+	6 -> 9
+	6 -> 10 [style=dashed]
+	7 -> 10
+	7 -> 9 [style=dashed]
+	8 -> 10
+	8 -> 10 [style=dashed]
+	10 -> 13
+	10 -> 13 [style=dashed]
+	9 -> 11
+	9 -> 12 [style=dashed]
+	12 -> 16
+	12 -> 15 [style=dashed]
+	11 -> 14
+	11 -> 16 [style=dashed]
+	13 -> 16
+	13 -> 16 [style=dashed]
+	14 -> 17
+	14 -> 19 [style=dashed]
+	16 -> 19
+	16 -> 19 [style=dashed]
+	15 -> 19
+	15 -> 18 [style=dashed]
+	17 -> -1
+	17 -> -2 [style=dashed]
+	18 -> -2
+	18 -> -1 [style=dashed]
+	19 -> -2
+	19 -> -2 [style=dashed]
+}
