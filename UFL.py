@@ -10,13 +10,17 @@ General notes:
 abochka@clemson.edu
 """
 from graphviz import Digraph
+import numpy as np
+import gurobipy as gp
+from gurobipy import GRB
+
 import BDD as DD
 
-import numpy as np
 
-
-def draw_problem_dia(S, n, filename="run_logs/problem_dia.gv"):
+def draw_problem_dia(S, filename="run_logs/problem_dia.gv"):
     """Draws the bipartite graph describing the probelm"""
+
+    n = len(build_Sf(S).keys())
 
     dot = Digraph('G', comment="Uncapacitated Facility Location")
     for i in range(n):
@@ -195,25 +199,86 @@ def create_availability_BDD(S):
 
     return A
 
+
 # testing
 def test_DD_creation(S, name):
     """Testing unit: BDD generation"""
 
     # unpack the problem from S
-    draw_problem_dia(S, n, filename="run_logs/"+name+"_problem.gv")
+    draw_problem_dia(S, filename="run_logs/"+name+"_problem.gv")
 
     create_covering_BDD(S).dump_gv().view(filename="run_logs/"+name+"_covering.gv")
     create_availability_BDD(S).dump_gv().view(filename="run_logs/"+name+"_avail.gv")
 
-## define a toy problem
+
+def build_MIP(S, f, c, λ):
+    """Builds 'plain-vanilla' MIP instance for UFL
+    (linear overlap penalty)
+
+    Arguments:
+    ----------
+    S:list -- list of customer neighborhoods
+    f:dict -- facility costs
+    c:dict -- covering costs ((i,j) for covering customer j with facility i)
+    λ:num -- coefficient for overlapping costs.
+
+    Returns:
+    ---------
+    Gurobipy model (`gp.Model`)
+    """
+
+    m = gp.Model()
+    m.modelSense = GRB.MINIMIZE
+
+    Sf = build_Sf(S)
+
+    x = dict()
+    z = dict()
+    b = dict()
+
+    F = range(1, len(Sf.keys())+1)
+    C = range(1, len(S)+1)
+    for i in F:
+        x[i] = m.addVar(vtype=GRB.BINARY, name=f"x{i}")
+        for j in Sf[i]:
+            z[(i, j)] = m.addVar(vtype=GRB.BINARY, name=f"z{i}_{j}")
+            m.addConstr(z[(i, j)] <= x[i])
+
+    for j in C:
+        b[j] = m.addVar(name=f"b{j}")
+        m.addConstr(b[j] == gp.quicksum(z[(i, j)] for i in S[j-1]))
+        m.addConstr(b[j] >= 1)
+
+    # set the Objective
+    obj = gp.quicksum(f[i]*x[i] for i in F)
+    obj += gp.quicksum(c[(i, j)]*z[(i, j)] for j in C for i in S[j-1])
+
+    # linear overlap penalty:
+    obj += λ*gp.quicksum(b[j] for j in C)
+    obj += - λ* len(S)
+
+    m.setObjective(obj)
+    m.update()
+    return m
+
+
 S = [[1], [1,2], [1,2], [2]]
-test_DD_creation(S, "toy")
+f = { 1: 0.5, 2:0.7 }
+c = {(1,1):1.1, (1,2):1.2, (2,2):2.2, (1,3):1.3, (2,3):2.3, (2,4):2.4 }
+λ = 0.5
 
-## define a slightly more complicated one
-S = [[1,4], [1,4],[1,4],
-        [1,2], [1,2],
-        [2,3],
-        [2,3,5],
-        [3,5]]
+m = build_MIP(S, f, c, λ)
+if __name__ == '__main__':
+    # Procedure that is run if executed from the command line
 
-test_DD_creation(S, "simple")
+    # define a toy problem
+    S = [[1], [1,2], [1,2], [2]]
+    test_DD_creation(S, "toy")
+
+    # define a slightly more complicated one
+    S = [[1, 4], [1, 4], [1, 4],
+         [1, 2], [1, 2],
+         [2, 3],
+         [2, 3, 5],
+         [3, 5]]
+    test_DD_creation(S, "simple")
