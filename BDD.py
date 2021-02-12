@@ -153,10 +153,18 @@ class BDD(object):
         for layer in self.layers:
             for n in layer:
                 if not n.hi is None:
-                    g.edge(str(n.id), str(n.hi.id))
+                    if self.weighted:
+                        elabel = f"{self.weights[(n.id, n.hi.id, 'hi')]}"
+                    else:
+                        elabel = ""
+                    g.edge(str(n.id), str(n.hi.id), label=elabel)
 
                 if not n.lo is None:
-                    g.edge(str(n.id), str(n.lo.id), style="dashed")
+                    if self.weighted:
+                        elabel = f"{self.weights[(n.id, n.lo.id, 'lo')]}"
+                    else:
+                        elabel = ""
+                    g.edge(str(n.id), str(n.lo.id), style="dashed", label=elabel)
 
         return g
 
@@ -395,7 +403,7 @@ class BDD(object):
 
                 V.add(n_id)
 
-    def load(self, filename):
+    def load(self, filename, weighted=False):
        """loads a BDD from an ASCII(text) file
 
        Note:
@@ -422,20 +430,33 @@ class BDD(object):
             self.vars = [v.strip() for v in line]
             self.var_pos = dict(zip(self.vars, [i for i in range(N)]))
 
+            self.weighted = weighted
+            if weighted:
+                self.weights = dict()
+
             line = f.readline()
 
             current_layer = 0
             next_layer = set()
             while line:
-                id, line = line.split(':')
+                if weighted:
+                    id, line, weights = line.split(':')
+                    weights = weights.split(",")
+                    w_hi = float(weights[0])
+                    w_lo = float(weights[1])
+                else:
+                    id, line = line.split(':')
+
                 hi_id,lo_id = line.split(',')
                 id = int(id);
                 if id!=NTRUE and id!=NFALSE:
                     hi_id = int(hi_id); lo_id = int(lo_id)
+                    if weighted:
+                        self.weights[(id, hi_id,"hi")] = w_hi
+                        self.weights[(id, lo_id,"lo")] = w_lo
                 else:
                     line = f.readline()
                     continue
-
 
                 if id in next_layer:
                     current_layer += 1
@@ -443,7 +464,7 @@ class BDD(object):
                 elif id not in self.nodes.keys():
                     self.addnode(None, node_id=id)
                     if id != 0:
-                        print(f"WARNING: during load, just added a no-parent node {id}")
+                        print(f"WARNING: during load, just added an orphan node with id: {id}")
 
                 if hi_id in next_layer:
                     F_hi = self.nodes[hi_id]
@@ -565,8 +586,8 @@ class BDD(object):
         """Shows the diagram by generating a `.dot` file and compiling it to `.pdf`.
 
         Args:
-           dir (str): directory to place files (default: "testing")
-           filename (str): `.dot` filename (default "showfunc.dot")
+            dir (str): directory to place files (default: "testing")
+            filename (str): `.dot` filename (default "showfunc.dot")
             layerCapt (bool): whether to generate layer captions
         """
 

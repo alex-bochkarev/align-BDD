@@ -1,3 +1,6 @@
 * Current version
+** [2021-02-12 Fri 16:41]: added weights to BDD class
+** [2021-02-12 Fri 16:04]: tested BDD 2 MIP with a pair of (unweighted) BDDs (passed)
+ [[file:~/projects/align-BDD/testing/BDD2MIP_1.org::*From diagram $A$:][From diagram $A$:]]
 ** [2021-02-12 Fri 14:07]: incorporated binary 'linking' variables 
 ** [2021-02-12 Fri 12:57]: added a simple BDD to MIP function (no weights)
