@@ -73,13 +73,14 @@ class BDD(object):
         T,F: pointers to `True` and `False` sink nodes
     """
 
-    def __init__(self,N=2, vars = None):
+    def __init__(self,N=2, vars = None, weighted=False):
         """defines an empty BDD with N variables"""
 
         if not vars:
             vars = [i for i in range(1,N+1)]
 
         self.vars = vars
+        self.weighted = False
         self.layers = [set() for i in range(N)]
         self.T = node(NTRUE)
         self.F = node(NFALSE)
