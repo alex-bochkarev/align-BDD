@@ -22,16 +22,17 @@ def draw_problem_dia(S, filename="run_logs/problem_dia.gv"):
 
     n = len(build_Sf(S).keys())
 
-    dot = Digraph('G', comment="Uncapacitated Facility Location")
+    dia = Digraph('G', comment="Uncapacitated Facility Location")
     for i in range(n):
-        dot.node(f"F{i+1}", shape='doublecircle', style='filled', color='lightgrey')
+        dia.node(f"F{i+1}", shape='doublecircle',
+                 style='filled', color='lightgrey')
 
     for j, S_j in enumerate(S):
-        dot.node(f"C{j+1}", shape='circle')
+        dia.node(f"C{j+1}", shape='circle')
         for i in S_j:
-            dot.edge(f"F{i}", f"C{j+1}")
+            dia.edge(f"F{i}", f"C{j+1}")
 
-    dot.view(filename=filename)
+    dia.view(filename=filename)
 
 
 
@@ -255,20 +256,112 @@ def build_MIP(S, f, c, λ):
 
     # linear overlap penalty:
     obj += λ*gp.quicksum(b[j] for j in C)
-    obj += - λ* len(S)
+    obj += - λ * len(S)
 
     m.setObjective(obj)
     m.update()
     return m
 
 
-S = [[1], [1,2], [1,2], [2]]
-f = { 1: 0.5, 2:0.7 }
-c = {(1,1):1.1, (1,2):1.2, (2,2):2.2, (1,3):1.3, (2,3):2.3, (2,4):2.4 }
-λ = 0.5
+def build_MIP_from_BDD(D, model=None):
+    """Builds a MIP (network flow) from a given BDD
 
-m = build_MIP(S, f, c, λ)
+    Args:
+       D (class BDD): the diagram object
+       model (gurobipy Model): a model to amend with vars and constraints (default None)
+
+    Returns:
+        m (gurobipy Model): resulting network flow
+        c (list): list of constraints added
+        v (dict): flow variables added, keyed as (from_id, to_id, arc_type)
+        x (dict): binary variables added (one per layer), keyed by _layer_no_.
+    """
+
+    if model is None:
+        model = gp.Model()
+        model.modelSense = GRB.MINIMIZE
+        constraints = []
+
+    v = dict()
+    x = dict()
+    incoming_flows = dict()
+
+    l_no = 0
+    for L in D.layers:
+        l_no += 1
+
+        if l_no <= len(D):
+            x[l_no] = model.addVar(vtype=GRB.BINARY, name=f"x{l_no}")
+            yes_sum = gp.LinExpr(0.0)
+
+        inc_nodes_new = dict()
+        for n in L:
+
+            if n.id == DD.NROOT:
+                inflow = gp.LinExpr(1.0)
+            else:
+                inflow = gp.quicksum(v_i for v_i in incoming_flows[n.id])
+
+            if n.id == DD.NTRUE:
+                outflow = gp.LinExpr(1.0)
+            elif n.id == DD.NFALSE:
+                outflow = gp.LinExpr(0.0)
+            else:
+                v[(n.id, n.hi.id, "hi")] = model.addVar(name=f"vh{n.id}_{n.hi.id}")
+                v[(n.id, n.lo.id, "lo")] = model.addVar(name=f"vl{n.id}_{n.lo.id}")
+                outflow = gp.LinExpr(v[(n.id, n.hi.id, "hi")] + v[(n.id, n.lo.id, "lo")])
+                yes_sum += v[(n.id, n.hi.id, "hi")]
+
+            constraints.append(model.addConstr(inflow == outflow, name=f"cont-at-{n.id}"))
+
+            if n.id != DD.NTRUE and n.id != DD.NFALSE:
+                if n.hi.id in inc_nodes_new.keys():
+                    inc_nodes_new[n.hi.id].append(v[(n.id, n.hi.id, "hi")])
+                else:
+                    inc_nodes_new[n.hi.id] = [v[(n.id, n.hi.id, "hi")]]
+
+            if n.id != DD.NTRUE and n.id != DD.NFALSE:
+                if n.lo.id in inc_nodes_new.keys():
+                    inc_nodes_new[n.lo.id].append(v[(n.id, n.lo.id, "lo")])
+                else:
+                    inc_nodes_new[n.lo.id] = [v[(n.id, n.lo.id, "lo")]]
+
+        incoming_flows = inc_nodes_new
+
+        if l_no <= len(D):
+            constraints.append(model.addConstr(
+                x[l_no] == yes_sum, name=f"bin-link-{l_no}"))
+
+
+    model.update()
+    return model, constraints, v
+
+def test_BDD_to_MIP():
+    """Tests making a MIP from a single BDD"""
+
+    # adhoc experiments
+    B = DD.BDD()
+    B.load("tests/simple_DD.bdd")
+    B.show()
+
+    m, c, v = build_MIP_from_BDD(B)
+    m.display()
+
+def test_build_simple_MIP():
+    """Tests a simple MIP building function"""
+    S = [[1], [1,2], [1,2], [2]]
+    f = { 1: 0.5, 2:0.7 }
+    c = {(1,1):1.1, (1,2):1.2, (2,2):2.2, (1,3):1.3, (2,3):2.3, (2,4):2.4 }
+    λ = 0.5
+
+    test_DD_creation(S, "toy")
+
+    m = build_MIP(S, f, c, λ)
+    m.display()
+
+
 if __name__ == '__main__':
+    """Runs when called from a command line"""
     # Procedure that is run if executed from the command line
 
     # define a toy problem
@@ -282,3 +375,6 @@ if __name__ == '__main__':
          [2, 3, 5],
          [3, 5]]
     test_DD_creation(S, "simple")
+
+    test_build_simple_MIP()
+    test_BDD_to_MIP()

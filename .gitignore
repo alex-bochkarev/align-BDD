@@ -6,3 +6,9 @@ instances/raw/R/*.bdd
 instances/raw/N/*.bdd
 instances/raw/*.bdd
 tmp
+
+run_logs/simple_avail.gv
+run_logs/simple_covering.gv
+run_logs/toy_problem.gv
+run_logs/toy_covering.gv
+run_logs/toy_avail.gv

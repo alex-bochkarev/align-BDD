@@ -1,3 +1,10 @@
+* Immediate TODOs
+  - [ ] implement MIP formulation from BDDs
+  - [ ] compare naive-MIP and BDD-MIP (solutions must coincide)
+  - [ ] make arbitrary-g BDDs (expanding covering DDs)
+  - [ ] build intersection BDDs out of two
+  - [ ] build NF from the intersection BDD
+ 
 * Current project TODOs
 ** TODO Kill already merged branches
  [2020-07-11 Sat 09:49]
