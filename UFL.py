@@ -35,6 +35,66 @@ def draw_problem_dia(S, f, filename="run_logs/problem_dia.gv"):
 
     dia.view(filename=filename)
 
+def create_covering_BDD_wg(S, c, g):
+    """Creates and returns the BDD given the instance.
+
+    Args:
+       S (list): of adjacency lists
+       c (dict): costs of covering (facility_id, consumer_id)
+       g (dict): overlapping costs (keyed by no. of overlapping covers)
+
+    Returns:
+        C (class BDD): covering BDD
+    """
+
+    m = len(S)
+
+    C = DD.BDD(
+        N=len(np.sum(S)), # number of z-variables
+        vars=[f"z{i}-{j+1}" for j in range(m) for i in S[j]],
+        weighted=True)
+
+    root = C.addnode(None)
+    current_layer = [root]
+
+    for j in range(1, m+1):
+        assert len(S[j]) > 0
+
+        print(f"Processing j={j}, Sj={S[j-1]}")
+        for i in range(1, len(S[j-1])):
+            next_layer = [C.addnode(n, "lo") for n in current_layer]
+            for q in range(len(current_layer)-1):
+                print(f"q={q},j={j},i={i}")
+                C.link(current_layer[q].id, next_layer[q+1].id, "hi", edge_weight=c[(S[j-1][i-1], j)])
+            next_layer.append(C.addnode(current_layer[-1], "hi", edge_weight=c[(S[j-1][i-1], j)]))
+            current_layer = next_layer
+
+        # process the last layer of the subnetwork corresponding
+        # to consumer `j`: that is a special case
+        if j<m:
+            next_layer = [C.addnode(current_layer[0],"lo",
+                                    edge_weight=g[(j,0)]),
+                          C.addnode(current_layer[0],"hi",
+                                    edge_weight=c[(S[j-1][-1], j)] + g[(j, 1)])]
+            target = next_layer[-1]
+        else:
+            C.link(current_layer[0].id, C.nodes[DD.NFALSE], "lo",
+                   edge_weight=g[(j, 0)])
+            C.link(current_layer[0].id, C.nodes[DD.NTRUE], "hi",
+                   edge_weight=c[(S[j-1][-1], j)] + g[(j, 1)])
+            target = C.nodes[DD.NTRUE]
+            next_layer = None
+
+        for idx, n in enumerate(current_layer[1:]):
+            print(f"j={j},idx={idx}, current layer len={len(current_layer)}, it is {[n.id for n in current_layer]}")
+            C.link(n.id, target.id, "hi",
+                   edge_weight=c[(S[j-1][-1], j)] + g[(j,1+idx)])
+            C.link(n.id, target.id, "lo",
+                   edge_weight=g[(j,1+idx)])
+
+        current_layer = next_layer
+
+    return C
 
 
 def create_covering_BDD(S, c):
@@ -46,9 +106,9 @@ def create_covering_BDD(S, c):
 
     Notes:
         - encodes the fact that all customers need to be covered
-          by at least one facility.
+            by at least one facility.
         - assumes no edge costs, does *not* allow
-        for arbitrary g(·) function.
+            for arbitrary g(·) function.
     """
 
     m = len(S)
@@ -373,6 +433,19 @@ def test_build_simple_MIP():
     m = build_MIP(S, f, c, λ)
     m.display()
 
+def test_BDD_build():
+    """Runs a simple test against a toy problem"""
+
+
+    S = [[1], [1,2], [1,2], [2]]
+    f = { 1: 0.5, 2:0.7 }
+    c = {(1,1):0.11, (1,2):0.12, (2,2):0.22, (1,3):0.13, (2,3):0.23, (2,4):0.24 }
+    g = {
+        (1,0):0, (2,0):0, (3,0):0, (4,0):0,
+        (1,1):1, (2,1):1, (3,1):1, (4,1):1,
+        (2,2):2, (2,2):2, (3,2):2, (4,2):2}
+
+    C = create_covering_BDD_wg(S, c, g)
 
 if __name__ == '__main__':
     """Runs when called from a command line"""
@@ -390,5 +463,6 @@ if __name__ == '__main__':
     #      [3, 5]]
     # test_DD_creation(S, "simple")
 
-    test_build_simple_MIP()
+    # test_build_simple_MIP()
+    test_BDD_build()
     ##test_BDD_to_MIP()
