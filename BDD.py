@@ -123,11 +123,13 @@ class BDD(object):
             self.max_id += 1
             return self.max_id
 
-    def dump_gv(self,layerCapt = True):
-        """Exports the BDD to the Graphviz format.
-
+    def dump_gv(self, layerCapt=True):
+        """Exports the BDD to the Graphviz format (`.dot`).
+        Args:
+            layerCapt (bool): whether to generate layer captions.
         Returns: a Digraph object (see `graphviz` module).
         """
+
         g = Digraph()
 
         for i, layer in enumerate(self.layers):
@@ -191,7 +193,7 @@ class BDD(object):
         """Swaps the layer with the one immediately above it
         (by _index_! in-place operation)
 
-        Arguments:
+        Args:
             layer_idx: number (index) of the layer to be ''bubbled up''
 
         Note:
@@ -480,7 +482,7 @@ class BDD(object):
     def random(cls, N=5,p=0.5):
         """generates a random BDD with `N` variables (N+1 layers)
 
-        Arguments:
+        Args:
             N:   number of variables (to result in N+1 layers, including the T,F-layer)
             p:   tree size parameter
                     0 will generate a non-random exponential-sized diagram,
@@ -559,9 +561,16 @@ class BDD(object):
 
         return p[0] + ",".join(p[1:])
 
-    def show(self, dir="testing",layerCapt=True):
-        """shows the diagram (a .dot, compiled to PDF)"""
-        self.dump_gv(layerCapt).view("showfunc.dot", directory=dir, cleanup=True)
+    def show(self, dir="testing", filename="showfunc.dot", layerCapt=True):
+        """Shows the diagram by generating a `.dot` file and compiling it to `.pdf`.
+
+        Args:
+           dir (str): directory to place files (default: "testing")
+           filename (str): `.dot` filename (default "showfunc.dot")
+            layerCapt (bool): whether to generate layer captions
+        """
+
+        self.dump_gv(layerCapt).view(filename, directory=dir, cleanup=True)
 
     def align_to(self, vars_order, inplace=False):
         """revises the BDD to a given order
@@ -639,7 +648,7 @@ class BDD(object):
     def rename_vars(self, ren_dict):
         """helper function: renames variables.
 
-        Arguments:
+        Args:
           ren_dict -- a dict of labels in the form {before: after}"""
 
         new_vars = [ren_dict[v] for v in self.vars]
@@ -911,7 +920,7 @@ def test_random_swapping(N, k, m, p=0.8, mode="swaps"):
 
     Involves brute-force enumaration of all the 2^n possible decisions (concerning all vars).
 
-    Arguments:
+    Args:
         N: no. of variables in the diagram
         k: no. of random BDDs generated)
         m: no. of consecutive test swaps per BDD
