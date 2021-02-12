@@ -1,4 +1,5 @@
 * Current version
+** [2021-02-12 Fri 21:58]: implemented weighted BDD generation for UFL (no overlap penalty)
 ** [2021-02-12 Fri 16:41]: added weights to BDD class
 ** [2021-02-12 Fri 16:04]: tested BDD 2 MIP with a pair of (unweighted) BDDs (passed)
  [[file:~/projects/align-BDD/testing/BDD2MIP_1.org::*From diagram $A$:][From diagram $A$:]]

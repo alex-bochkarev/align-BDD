@@ -52,7 +52,7 @@ class node(object):
         self.lo = lo
         self.layer = layer
 
-    def link(self, to_whom, arc="hi"):
+    def link(self, to_whom, arc="hi", edge_weight=0.0):
         """Helper function: links the node to another one"""
         if arc=="hi":
             self.hi = to_whom
@@ -73,14 +73,16 @@ class BDD(object):
         T,F: pointers to `True` and `False` sink nodes
     """
 
-    def __init__(self,N=2, vars = None, weighted=False):
+    def __init__(self,N=2, vars=None, weighted=False):
         """defines an empty BDD with N variables"""
 
         if not vars:
             vars = [i for i in range(1,N+1)]
 
         self.vars = vars
-        self.weighted = False
+        self.weighted = weighted
+        if weighted:
+            self.weights = dict()
         self.layers = [set() for i in range(N)]
         self.T = node(NTRUE)
         self.F = node(NFALSE)
@@ -92,6 +94,22 @@ class BDD(object):
         self.nodes.update({NTRUE:self.T, NFALSE:self.F})
 
     ## some helper functions
+
+    def link(self, parent, child, etype="hi", edge_weight=0.0):
+        """Creates a link between two nodes (saving aux info as appropriate)
+
+        Args:
+           self (type): description
+           parent (int): parent node id
+           child (int): child node id
+           etype (str): edge type, "hi" or "lo" (default "hi")
+           edge_weight (float): edge weight to e imposed (default 0.0)
+        """
+
+        assert parent in self.nodes.keys()
+        assert child in self.nodes.keys()
+        self.nodes[parent].link(self.nodes[child], etype, edge_weight)
+        self.weights[(parent, child, etype)] = edge_weight
 
     def __len__(self):
         """returns the no. of the layer-encoding variables (i.e., excluding the terminal one)"""
@@ -169,7 +187,7 @@ class BDD(object):
 
         return g
 
-    def addnode(self, parent_node, arc="hi", node_id=None):
+    def addnode(self, parent_node, arc="hi", node_id=None, edge_weight=0.0):
         """Adds a node and updates aux info as necessary"""
         if node_id is None:
             node_id = self.new_node_name()
@@ -184,14 +202,20 @@ class BDD(object):
             parent_node.hi = newnode
             self.layers[parent_node.layer+1].add(newnode)
             newnode.layer = parent_node.layer+1
+            if self.weighted:
+                self.weights[(parent_node.id,
+                              parent_node.hi.id, 'hi')] = edge_weight
 
         elif arc=="lo":
             parent_node.lo = newnode
             self.layers[parent_node.layer+1].add(newnode)
             newnode.layer = parent_node.layer+1
+            if self.weighted:
+                self.weights[(parent_node.id,
+                              parent_node.lo.id, 'lo')] = edge_weight
 
         else:
-            print("ERROR: Wrong arc type: {}".format(arc))
+            print("ERROR: Wrong arc type: {}\n(allowed values are 'hi' and 'lo')".format(arc))
 
 
         self.nodes.update({newnode.id: newnode})

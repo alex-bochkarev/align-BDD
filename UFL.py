@@ -17,7 +17,7 @@ from gurobipy import GRB
 import BDD as DD
 
 
-def draw_problem_dia(S, filename="run_logs/problem_dia.gv"):
+def draw_problem_dia(S, f, filename="run_logs/problem_dia.gv"):
     """Draws the bipartite graph describing the probelm"""
 
     n = len(build_Sf(S).keys())
@@ -25,7 +25,8 @@ def draw_problem_dia(S, filename="run_logs/problem_dia.gv"):
     dia = Digraph('G', comment="Uncapacitated Facility Location")
     for i in range(n):
         dia.node(f"F{i+1}", shape='doublecircle',
-                 style='filled', color='lightgrey')
+                 style='filled', color='lightgrey',
+                 label=f"F{i+1} ({f[i+1]})")
 
     for j, S_j in enumerate(S):
         dia.node(f"C{j+1}", shape='circle')
@@ -36,24 +37,26 @@ def draw_problem_dia(S, filename="run_logs/problem_dia.gv"):
 
 
 
-def create_covering_BDD(S):
+def create_covering_BDD(S, c):
     """Create and return the diagram given the instance.
+
+    Args:
+        S (list): of adjacency lists. len(S) = no. of consumers
+        c (dict): costs of covering, keyed by (facility_id, consumer_id)
 
     Notes:
         - encodes the fact that all customers need to be covered
           by at least one facility.
         - assumes no edge costs, does *not* allow
         for arbitrary g(·) function.
-
-    Args:
-      S: list -- of adjacency lists. len(S) = no. of consumers
     """
 
     m = len(S)
 
     C = DD.BDD(
         N=len(np.sum(S)), # number of z-variables
-        vars=[f"z{i}-{j+1}" for j in range(m) for i in S[j]]
+        vars=[f"z{i}-{j+1}" for j in range(m) for i in S[j]],
+        weighted=True
     )
 
     root = C.addnode(None)
@@ -73,20 +76,20 @@ def create_covering_BDD(S):
 
         for idx, i in enumerate(S_j):
             new_maybe = C.addnode(s_maybe, "lo")
-            new_yes = C.addnode(s_maybe, "hi")
+            new_yes = C.addnode(s_maybe, "hi", edge_weight=c[(i, j+1)])
 
             if s_yes is not None:
-                s_yes.link(new_yes, "hi")
-                s_yes.link(new_yes, "lo")
+                C.link(s_yes.id, new_yes.id, "hi", edge_weight=c[(i, j+1)])
+                C.link(s_yes.id, new_yes.id, "lo")
 
             if s_no is not None:
                 if idx < len(S[j])-1:
-                    new_no = C.addnode(s_no)
+                    new_no = C.addnode(s_no, edge_weight=c[(i, j+1)])
                 else:
                     new_no = new_maybe
-                    s_no.link(new_no, "hi")
+                    C.link(s_no.id, new_no.id, "hi", edge_weight=c[(i, j+1)])
 
-                s_no.link(new_no, "lo")
+                C.link(s_no.id, new_no.id, "lo")
                 s_no = new_no
 
             s_yes = new_yes
@@ -96,21 +99,21 @@ def create_covering_BDD(S):
                 # (related to customer j)
                 s_no = new_maybe
                 s_maybe = new_yes
-                s_yes.link(new_yes, "hi")
-                s_yes.link(new_yes, "lo")
+                C.link(s_yes.id, new_yes.id, "hi", edge_weight=c[(i, j+1)])
+                C.link(s_yes.id, new_yes.id, "lo")
             else:
                 s_maybe = new_maybe
 
-    s_maybe.link(C.nodes[DD.NTRUE], "hi")
-    s_maybe.link(C.nodes[DD.NFALSE], "lo")
+    C.link(s_maybe.id, DD.NTRUE, "hi", edge_weight=c[(i, j+1)])
+    C.link(s_maybe.id, DD.NFALSE, "lo")
 
     if not (s_yes is None) and (s_yes.id != s_maybe.id):
-        s_yes.link(C.nodes[DD.NTRUE], "hi")
-        s_yes.link(C.nodes[DD.NTRUE], "lo")
+        C.link(s_yes.id, DD.NTRUE, "hi", edge_weight=c[(i, j+1)])
+        C.link(s_yes.id, DD.NTRUE, "lo")
 
     if not s_no is None:
-        s_no.link(C.nodes[DD.NFALSE], "hi")
-        s_no.link(C.nodes[DD.NFALSE], "lo")
+        C.link(s_no.id, DD.NFALSE, "hi", edge_weight=c[(i, j+1)])
+        C.link(s_no.id, DD.NFALSE, "lo")
 
     return C
 
@@ -135,11 +138,12 @@ def build_Sf(S):
 
 
 
-def create_availability_BDD(S):
+def create_availability_BDD(S, f):
     """Encodes the fact that "turn-on" (x) and "cover"(z) decisions
     need to be consistent.
+    Args:
+        f (dict): facility costs
     """
-    m = len(S)
 
     Sf = build_Sf(S)
     n = len(Sf.keys())
@@ -148,19 +152,19 @@ def create_availability_BDD(S):
                                             for j in Sf[facility]]
                         for facility in Sf],[])
 
-    A = DD.BDD(N=len(var_names), vars=var_names)
+    A = DD.BDD(N=len(var_names), vars=var_names, weighted=True)
 
     s_main = A.addnode(None);
 
     s_false = None
     for i in range(1,n+1):
         # create a block per facility
-        s_yes = A.addnode(s_main, "hi")
+        s_yes = A.addnode(s_main, "hi", edge_weight=f[i])
         s_no = A.addnode(s_main, "lo")
 
         if s_false is not None:
-            new_f = A.addnode(s_false, "hi")
-            s_false.link(new_f, "lo")
+            new_f = A.addnode(s_false, "hi", edge_weight=f[i])
+            A.link(s_false.id, new_f.id, "lo")
             s_false = new_f
 
         consumers_i = list(Sf[i])
@@ -169,11 +173,11 @@ def create_availability_BDD(S):
             new_no = A.addnode(s_no, "lo")
 
             new_f = A.addnode(s_yes, "lo")
-            s_no.link(new_f, "hi")
+            A.link(s_no.id, new_f.id, "hi")
 
             if s_false is not None:
-                s_false.link(new_f, "hi")
-                s_false.link(new_f, "lo")
+               A.link(s_false.id, new_f.id, "hi")
+               A.link(s_false.id, new_f.id, "lo")
 
             s_yes = new_yes
             s_no = new_no
@@ -181,35 +185,35 @@ def create_availability_BDD(S):
 
         if i < n:
             s_main = A.addnode(s_yes, "hi")
-            s_no.link(s_main, "lo")
+            A.link(s_no.id, s_main.id, "lo")
 
             new_f = A.addnode(s_false, "hi")
-            s_false.link(new_f, "lo")
-            s_yes.link(new_f, "lo")
-            s_no.link(new_f, "hi")
+            A.link(s_false.id, new_f.id, "lo")
+            A.link(s_yes.id, new_f.id, "lo")
+            A.link(s_no.id, new_f.id, "hi")
             s_false = new_f
         else:
             # this is a special case:
             # we'd need to link to the terminal nodes
-            s_yes.link(A.nodes[DD.NTRUE], "hi");
-            s_yes.link(A.nodes[DD.NFALSE], "lo")
-            s_no.link(A.nodes[DD.NTRUE], "lo")
-            s_no.link(A.nodes[DD.NFALSE], "hi")
-            s_false.link(A.nodes[DD.NFALSE],"hi")
-            s_false.link(A.nodes[DD.NFALSE],"lo")
+            A.link(s_yes.id,DD.NTRUE, "hi");
+            A.link(s_yes.id,DD.NFALSE, "lo")
+            A.link(s_no.id,DD.NTRUE, "lo")
+            A.link(s_no.id,DD.NFALSE, "hi")
+            A.link(s_false.id,DD.NFALSE,"hi")
+            A.link(s_false.id,DD.NFALSE,"lo")
 
     return A
 
 
 # testing
-def test_DD_creation(S, name):
+def test_DD_creation(S, f, c, name):
     """Testing unit: BDD generation"""
 
     # unpack the problem from S
-    draw_problem_dia(S, filename="run_logs/"+name+"_problem.gv")
+    draw_problem_dia(S, f, filename="run_logs/"+name+"_problem.gv")
 
-    create_covering_BDD(S).dump_gv().view(filename="run_logs/"+name+"_covering.gv")
-    create_availability_BDD(S).dump_gv().view(filename="run_logs/"+name+"_avail.gv")
+    create_covering_BDD(S, c).dump_gv().view(filename="run_logs/"+name+"_covering.gv")
+    create_availability_BDD(S, f).dump_gv().view(filename="run_logs/"+name+"_avail.gv")
 
 
 def build_MIP(S, f, c, λ):
@@ -364,7 +368,7 @@ def test_build_simple_MIP():
     c = {(1,1):1.1, (1,2):1.2, (2,2):2.2, (1,3):1.3, (2,3):2.3, (2,4):2.4 }
     λ = 0.5
 
-    test_DD_creation(S, "toy")
+    test_DD_creation(S, f, c, "toy")
 
     m = build_MIP(S, f, c, λ)
     m.display()
@@ -386,5 +390,5 @@ if __name__ == '__main__':
     #      [3, 5]]
     # test_DD_creation(S, "simple")
 
-    # test_build_simple_MIP()
-    test_BDD_to_MIP()
+    test_build_simple_MIP()
+    ##test_BDD_to_MIP()
