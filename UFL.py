@@ -383,7 +383,8 @@ def add_BDD_to_MIP(D, model=None, x=None, prefix=""):
 
         if l_no <= len(D):
             if not D.vars[l_no-1] in x.keys():
-                x[D.vars[l_no-1]] = model.addVar(vtype=GRB.BINARY, name=f"x{D.vars[l_no-1]}")
+                x[D.vars[l_no-1]] = model.addVar(vtype=GRB.BINARY,
+                                                 name=f"link_{D.vars[l_no-1]}")
             yes_sum = gp.LinExpr(0.0)
 
         inc_nodes_new = dict()
@@ -399,12 +400,18 @@ def add_BDD_to_MIP(D, model=None, x=None, prefix=""):
             elif n.id == DD.NFALSE:
                 outflow = gp.LinExpr(0.0)
             else:
-                v[(n.id, n.hi.id, "hi")] = model.addVar(name=f"{prefix}vh{n.id}_{n.hi.id}")
-                v[(n.id, n.lo.id, "lo")] = model.addVar(name=f"{prefix}vl{n.id}_{n.lo.id}")
-                outflow = gp.LinExpr(v[(n.id, n.hi.id, "hi")] + v[(n.id, n.lo.id, "lo")])
+                v[(n.id, n.hi.id, "hi")] = model.addVar(
+                    name=f"{prefix}vh{n.id}_{n.hi.id}",
+                    obj=D.weights[(n.id, n.hi.id, "hi")])
+                v[(n.id, n.lo.id, "lo")] = model.addVar(
+                    name=f"{prefix}vl{n.id}_{n.lo.id}",
+                    obj=D.weights[(n.id, n.lo.id, "lo")])
+                outflow = gp.LinExpr(v[(n.id, n.hi.id, "hi")] +
+                                     v[(n.id, n.lo.id, "lo")])
                 yes_sum += v[(n.id, n.hi.id, "hi")]
 
-            constraints.append(model.addConstr(inflow == outflow, name=f"{prefix}cont-at-{n.id}"))
+            constraints.append(model.addConstr(inflow == outflow,
+                                               name=f"{prefix}cont-at-{n.id}"))
 
             if n.id != DD.NTRUE and n.id != DD.NFALSE:
                 if n.hi.id in inc_nodes_new.keys():
@@ -474,6 +481,28 @@ def test_BDD_build():
     A = create_availability_BDD(S, f)
     A.show(x_prefix='', filename="availability.dot", dir="run_logs")
 
+def test_BDD_to_MIP_wg():
+    """Runs a simple test against a toy problem"""
+
+
+    S = [[1], [1,2], [1,2], [2]]
+    f = {1: 0.5, 2: 0.7}
+    c = {(1, 1): 0.11,  (1, 2): 0.12,  (2, 2): 0.22,  (1, 3): 0.13,  (2, 3): 0.23,  (2, 4): 0.24}
+    g = {
+        (1, 0): 0,  (2, 0): 0,  (3, 0): 0,  (4, 0): 0,
+        (1, 1): 1,  (2, 1): 1,  (3, 1): 1,  (4, 1): 1,
+        (1, 2): 2,  (2, 2): 2,  (3, 2): 2,  (4, 2): 2}
+
+    draw_problem_dia(S, f, c, g)
+    C = create_covering_BDD_wg(S, c, g)
+    C.show(x_prefix='', filename="covering.dot", dir="run_logs")
+    A = create_availability_BDD(S, f)
+    A.show(x_prefix='', filename="availability.dot", dir="run_logs")
+
+    m, c, v, x = add_BDD_to_MIP(A, prefix="A_")
+    m, c, v, x = add_BDD_to_MIP(D=C, model=m, x=x, prefix="C_")
+    m.display()
+
 if __name__ == '__main__':
     """Runs when called from a command line"""
     # Procedure that is run if executed from the command line
@@ -491,5 +520,5 @@ if __name__ == '__main__':
     # test_DD_creation(S, "simple")
 
     # test_build_simple_MIP()
-    test_BDD_build()
+    test_BDD_to_MIP_wg()
     ##test_BDD_to_MIP()
