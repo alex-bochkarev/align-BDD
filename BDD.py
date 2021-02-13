@@ -142,10 +142,11 @@ class BDD(object):
             self.max_id += 1
             return self.max_id
 
-    def dump_gv(self, layerCapt=True):
+    def dump_gv(self, layerCapt=True, x_prefix="x"):
         """Exports the BDD to the Graphviz format (`.dot`).
         Args:
             layerCapt (bool): whether to generate layer captions.
+            x_prefix (str): a prefix to be shown for layer name (default 'x')
         Returns: a Digraph object (see `graphviz` module).
         """
 
@@ -163,7 +164,7 @@ class BDD(object):
 
                 if i!=len(self.layers)-1:
                     if layerCapt:
-                        s.attr(label="x{}, sz={}".format(self.vars[i], len(layer)), color="lightgrey")
+                        s.attr(label=f"{x_prefix}{self.vars[i]}, sz={len(layer)}", color="lightgrey")
                     else:
                         s.attr(color="lightgrey")
                 else:
@@ -607,7 +608,7 @@ class BDD(object):
 
         return p[0] + ",".join(p[1:])
 
-    def show(self, dir="testing", filename="showfunc.dot", layerCapt=True):
+    def show(self, dir="testing", filename="showfunc.dot", layerCapt=True, x_prefix="x"):
         """Shows the diagram by generating a `.dot` file and compiling it to `.pdf`.
 
         Args:
@@ -616,7 +617,7 @@ class BDD(object):
             layerCapt (bool): whether to generate layer captions
         """
 
-        self.dump_gv(layerCapt).view(filename, directory=dir, cleanup=True)
+        self.dump_gv(layerCapt, x_prefix).view(filename, directory=dir, cleanup=True)
 
     def align_to(self, vars_order, inplace=False):
         """revises the BDD to a given order

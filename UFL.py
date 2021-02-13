@@ -17,8 +17,8 @@ from gurobipy import GRB
 import BDD as DD
 
 
-def draw_problem_dia(S, f, filename="run_logs/problem_dia.gv"):
-    """Draws the bipartite graph describing the probelm"""
+def draw_problem_dia(S, f, c, g, filename="run_logs/problem_dia.gv"):
+    """Draws the bipartite graph describing the problem"""
 
     n = len(build_Sf(S).keys())
 
@@ -28,20 +28,25 @@ def draw_problem_dia(S, f, filename="run_logs/problem_dia.gv"):
                  style='filled', color='lightgrey',
                  label=f"F{i+1} ({f[i+1]})")
 
+    for j in range(len(S)):
+        dia.node(f"C{j+1}", shape='circle',
+                 label=f"C{j+1}\ng=({','.join([str(g[(k, l)]) for (k, l) in g.keys() if k==i])})")
+
     for j, S_j in enumerate(S):
-        dia.node(f"C{j+1}", shape='circle')
         for i in S_j:
-            dia.edge(f"F{i}", f"C{j+1}")
+            dia.edge(f"F{i}", f"C{j+1}", label=f"{c[(i, j+1)]}")
 
     dia.view(filename=filename)
 
-def create_covering_BDD_wg(S, c, g):
+
+def create_covering_BDD_wg(S, c, g):  # pylint: disable=all
     """Creates and returns the BDD given the instance.
 
     Args:
-       S (list): of adjacency lists
-       c (dict): costs of covering (facility_id, consumer_id)
-       g (dict): overlapping costs (keyed by no. of overlapping covers)
+        S (list): of adjacency lists
+        c (dict): costs of covering (facility_id, consumer_id)
+        g (dict): overlapping costs (g(k,n) is a cost of `n`
+            overlaps for consumer `k`)
 
     Returns:
         C (class BDD): covering BDD
@@ -56,43 +61,61 @@ def create_covering_BDD_wg(S, c, g):
 
     root = C.addnode(None)
     current_layer = [root]
+    s_false = None
 
     for j in range(1, m+1):
-        assert len(S[j]) > 0
+        assert len(S[j-1]) > 0
 
         print(f"Processing j={j}, Sj={S[j-1]}")
         for i in range(1, len(S[j-1])):
             next_layer = [C.addnode(n, "lo") for n in current_layer]
+            if s_false is not None:
+                new_f = C.addnode(s_false, "hi")
+                C.link(s_false.id, new_f.id, "lo")
+                s_false = new_f
+
             for q in range(len(current_layer)-1):
                 print(f"q={q},j={j},i={i}")
-                C.link(current_layer[q].id, next_layer[q+1].id, "hi", edge_weight=c[(S[j-1][i-1], j)])
-            next_layer.append(C.addnode(current_layer[-1], "hi", edge_weight=c[(S[j-1][i-1], j)]))
+                C.link(current_layer[q].id, next_layer[q+1].id, "hi",
+                       edge_weight=c[(S[j-1][i-1], j)])
+            next_layer.append(C.addnode(current_layer[-1], "hi",
+                                        edge_weight=c[(S[j-1][i-1], j)]))
             current_layer = next_layer
 
         # process the last layer of the subnetwork corresponding
-        # to consumer `j`: that is a special case
-        if j<m:
-            next_layer = [C.addnode(current_layer[0],"lo",
-                                    edge_weight=g[(j,0)]),
-                          C.addnode(current_layer[0],"hi",
-                                    edge_weight=c[(S[j-1][-1], j)] + g[(j, 1)])]
-            target = next_layer[-1]
+        # to consumer `j`: that is always a special case
+        # FIXME: a tiny optimization possible (redundant lines)
+        if j < m:
+            if s_false is not None:
+                new_f = C.addnode(s_false, "hi")
+                C.link(s_false.id, new_f.id, "lo")
+                C.link(current_layer[0].id, new_f.id, "lo")
+            else:
+                new_f = C.addnode(current_layer[0], "lo")
+
+            target = C.addnode(current_layer[0], "hi",
+                               edge_weight=c[(S[j-1][-1], j)] + g[(j, 1)])
+            next_layer = [target]
         else:
-            C.link(current_layer[0].id, C.nodes[DD.NFALSE], "lo",
-                   edge_weight=g[(j, 0)])
-            C.link(current_layer[0].id, C.nodes[DD.NTRUE], "hi",
-                   edge_weight=c[(S[j-1][-1], j)] + g[(j, 1)])
+            new_f = C.nodes[DD.NFALSE]
+            if s_false is not None:
+                C.link(s_false.id, new_f.id, "lo")
+                C.link(s_false.id, new_f.id, "hi")
+                C.link(current_layer[0].id, new_f.id, "lo")
+            else:
+                new_f = C.addnode(current_layer[0], "lo")
+
             target = C.nodes[DD.NTRUE]
-            next_layer = None
+            C.link(current_layer[0].id, target.id, "hi",
+                   edge_weight=c[(S[j-1][-1], j)] + g[(j, 1)])
 
         for idx, n in enumerate(current_layer[1:]):
-            print(f"j={j},idx={idx}, current layer len={len(current_layer)}, it is {[n.id for n in current_layer]}")
             C.link(n.id, target.id, "hi",
-                   edge_weight=c[(S[j-1][-1], j)] + g[(j,1+idx)])
-            C.link(n.id, target.id, "lo",
-                   edge_weight=g[(j,1+idx)])
+                   edge_weight=c[(S[j-1][-1], j)] + g[(j, 2+idx)])
+            C.link(n.id, target.id, "lo")
 
         current_layer = next_layer
+        s_false = new_f
 
     return C
 
@@ -270,7 +293,7 @@ def test_DD_creation(S, f, c, name):
     """Testing unit: BDD generation"""
 
     # unpack the problem from S
-    draw_problem_dia(S, f, filename="run_logs/"+name+"_problem.gv")
+    draw_problem_dia(S, f, c, filename="run_logs/"+name+"_problem.gv")
 
     create_covering_BDD(S, c).dump_gv().view(filename="run_logs/"+name+"_covering.gv")
     create_availability_BDD(S, f).dump_gv().view(filename="run_logs/"+name+"_avail.gv")
@@ -438,14 +461,18 @@ def test_BDD_build():
 
 
     S = [[1], [1,2], [1,2], [2]]
-    f = { 1: 0.5, 2:0.7 }
-    c = {(1,1):0.11, (1,2):0.12, (2,2):0.22, (1,3):0.13, (2,3):0.23, (2,4):0.24 }
+    f = {1: 0.5, 2: 0.7}
+    c = {(1, 1): 0.11,  (1, 2): 0.12,  (2, 2): 0.22,  (1, 3): 0.13,  (2, 3): 0.23,  (2, 4): 0.24}
     g = {
-        (1,0):0, (2,0):0, (3,0):0, (4,0):0,
-        (1,1):1, (2,1):1, (3,1):1, (4,1):1,
-        (2,2):2, (2,2):2, (3,2):2, (4,2):2}
+        (1, 0): 0,  (2, 0): 0,  (3, 0): 0,  (4, 0): 0,
+        (1, 1): 1,  (2, 1): 1,  (3, 1): 1,  (4, 1): 1,
+        (1, 2): 2,  (2, 2): 2,  (3, 2): 2,  (4, 2): 2}
 
+    draw_problem_dia(S, f, c, g)
     C = create_covering_BDD_wg(S, c, g)
+    C.show(x_prefix='', filename="covering.dot", dir="run_logs")
+    A = create_availability_BDD(S, f)
+    A.show(x_prefix='', filename="availability.dot", dir="run_logs")
 
 if __name__ == '__main__':
     """Runs when called from a command line"""
