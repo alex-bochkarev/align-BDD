@@ -2,14 +2,18 @@
 digraph G {
 	F1 [label="F1 (0.5)" color=lightgrey shape=doublecircle style=filled]
 	F2 [label="F2 (0.7)" color=lightgrey shape=doublecircle style=filled]
-	C1 [shape=circle]
-	F1 -> C1
-	C2 [shape=circle]
-	F1 -> C2
-	F2 -> C2
-	C3 [shape=circle]
-	F1 -> C3
-	F2 -> C3
-	C4 [shape=circle]
-	F2 -> C4
+	C1 [label="C1
+g=(0,1,2)" shape=circle]
+	C2 [label="C2
+g=(0,1,2)" shape=circle]
+	C3 [label="C3
+g=(0,1,2)" shape=circle]
+	C4 [label="C4
+g=(0,1,2)" shape=circle]
+	F1 -> C1 [label=0.11]
+	F1 -> C2 [label=0.12]
+	F2 -> C2 [label=0.22]
+	F1 -> C3 [label=0.13]
+	F2 -> C3 [label=0.23]
+	F2 -> C4 [label=0.24]
 }

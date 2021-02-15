@@ -10,6 +10,7 @@ run_logs/simple_problem.gv
 run_logs/simple_avail.gv
 run_logs/simple_covering.gv
 run_logs/toy_problem.gv
+run_logs/problem_dia.gv
 run_logs/toy_covering.gv
 run_logs/toy_avail.gv
 testing/showfunc.dot.*

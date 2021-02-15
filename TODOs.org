@@ -1,6 +1,8 @@
 * Immediate TODOs
-  - [ ] make arbitrary-g BDDs (expanding covering DDs)
-  - [ ] implement MIP formulation from BDDs : FIXME: won't work with weighted BDDs! (trivial changes needed)
+  - [X] make arbitrary-g BDDs (expanding covering DDs)
+  - [X] implement MIP formulation from BDDs : FIXME: won't work with weighted BDDs! (trivial changes needed)
+  - [ ] implement reduction procedure by cite:hooker2013. 
+  - [ ] build a naive-MIP (for arbitrary g)
   - [ ] compare naive-MIP and BDD-MIP (solutions must coincide)
   - [ ] build intersection BDDs out of two
   - [ ] build NF from the intersection BDD

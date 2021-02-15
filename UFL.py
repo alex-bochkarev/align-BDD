@@ -66,7 +66,6 @@ def create_covering_BDD_wg(S, c, g):  # pylint: disable=all
     for j in range(1, m+1):
         assert len(S[j-1]) > 0
 
-        print(f"Processing j={j}, Sj={S[j-1]}")
         for i in range(1, len(S[j-1])):
             next_layer = [C.addnode(n, "lo") for n in current_layer]
             if s_false is not None:
@@ -481,17 +480,8 @@ def test_BDD_build():
     A = create_availability_BDD(S, f)
     A.show(x_prefix='', filename="availability.dot", dir="run_logs")
 
-def test_BDD_to_MIP_wg():
+def test_BDD_to_MIP_wg(S, f, c, g):
     """Runs a simple test against a toy problem"""
-
-
-    S = [[1], [1,2], [1,2], [2]]
-    f = {1: 0.5, 2: 0.7}
-    c = {(1, 1): 0.11,  (1, 2): 0.12,  (2, 2): 0.22,  (1, 3): 0.13,  (2, 3): 0.23,  (2, 4): 0.24}
-    g = {
-        (1, 0): 0,  (2, 0): 0,  (3, 0): 0,  (4, 0): 0,
-        (1, 1): 1,  (2, 1): 1,  (3, 1): 1,  (4, 1): 1,
-        (1, 2): 2,  (2, 2): 2,  (3, 2): 2,  (4, 2): 2}
 
     draw_problem_dia(S, f, c, g)
     C = create_covering_BDD_wg(S, c, g)
@@ -503,22 +493,51 @@ def test_BDD_to_MIP_wg():
     m, c, v, x = add_BDD_to_MIP(D=C, model=m, x=x, prefix="C_")
     m.display()
 
+def generate_test_figures():
+    """Generates a simple test instance and creates PDFs."""
+
+
+    S = [[1,2], [1,2,3], [2,3,4], [2,4]]
+    f = {1: 0.1, 2: 0.2, 3: 0.3, 4: 0.4}
+    c = {(1, 1): 0.11,  (1, 2): 0.12,  (2, 1): 0.21,  (2, 2): 0.22, (2, 3): 0.23,
+         (2, 4): 0.24, (3, 2): 0.32,  (3, 3): 0.33,  (3, 4): 0.34,
+         (4, 3): 0.43, (4, 4): 0.44}
+    g = {
+        (1, 0): 0,  (2, 0): 0,  (3, 0): 0,  (4, 0): 0,
+        (1, 1): 1,  (2, 1): 1,  (3, 1): 1,  (4, 1): 1,
+        (1, 3): 1,  (2, 3): 1,  (3, 3): 1,  (4, 3): 1,
+        (1, 2): 2,  (2, 2): 2,  (3, 2): 2,  (4, 2): 2}
+
+    draw_problem_dia(S, f, c, g)
+
+    C = create_covering_BDD_wg(S, c, g)
+    C.show(x_prefix='', filename="tst_covering.dot", dir="run_logs")
+    A = create_availability_BDD(S, f)
+    A.show(x_prefix='', filename="tst_availability.dot", dir="run_logs")
+
+    m, c, v, x = add_BDD_to_MIP(A, prefix="A_")
+    m, c, v, x = add_BDD_to_MIP(D=C, model=m, x=x, prefix="C_")
+    m.display()
+
 if __name__ == '__main__':
     """Runs when called from a command line"""
     # Procedure that is run if executed from the command line
 
-    # define a toy problem
-    # S = [[1], [1,2], [1,2], [2]]
-    # test_DD_creation(S, "toy")
+    S = [[1], [1,2], [1,2], [2]]
+    f = {1: 0.5, 2: 0.7}
+    c = {(1, 1): 0.11,  (1, 2): 0.12,  (2, 2): 0.22,  (1, 3): 0.13,  (2, 3): 0.23,  (2, 4): 0.24}
+    g = {
+        (1, 0): 0,  (2, 0): 0,  (3, 0): 0,  (4, 0): 0,
+        (1, 1): 1,  (2, 1): 1,  (3, 1): 1,  (4, 1): 1,
+        (1, 2): 2,  (2, 2): 2,  (3, 2): 2,  (4, 2): 2}
 
-    # # define a slightly more complicated one
-    # S = [[1, 4], [1, 4], [1, 4],
-    #      [1, 2], [1, 2],
-    #      [2, 3],
-    #      [2, 3, 5],
-    #      [3, 5]]
-    # test_DD_creation(S, "simple")
+    # m = build_MIP(S, f, c, g)
+    # print("*==============================================================*")
+    # print("* A MIP for the problem:                                       *")
+    # print("*==============================================================*")
+    # m.display()
 
     # test_build_simple_MIP()
-    test_BDD_to_MIP_wg()
+    test_BDD_to_MIP_wg(S, f, c, g)
+    # generate_test_figures()
     ##test_BDD_to_MIP()
