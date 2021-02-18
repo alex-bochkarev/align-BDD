@@ -271,20 +271,18 @@ def test_DD_creation(S, f, c, name):
                                                  name+"_avail.gv")
 
 
-def build_MIP(S, f, c, λ):
+def build_MIP(S, f, g):
     """Builds 'plain-vanilla' MIP instance for UFL
-    (linear overlap penalty)
+    (arbitrary penalty function g(·))
 
     Args:
-    ----------
-    S (list): -- list of customer neighborhoods
-    f (dict): -- facility costs
-    c (dict): -- covering costs ((i,j) for covering customer j with facility i)
-    λ (num): -- coefficient for overlapping costs.
+        S (list): list of customer neighborhoods
+        f (dict): facility costs
+        g (dict): values for overlap penalties, `(j, n)`
+                    for `n` overlaps at consumer `j`
 
     Returns:
-    ---------
-    Gurobipy model (`gp.Model`)
+        `gurobipy` model (`gp.Model`)
     """
 
     m = gp.Model()
@@ -295,9 +293,11 @@ def build_MIP(S, f, c, λ):
     x = dict()
     z = dict()
     b = dict()
+    v = dict()
 
     F = range(1, len(Sf.keys())+1)
     C = range(1, len(S)+1)
+
     for i in F:
         x[i] = m.addVar(vtype=GRB.BINARY, name=f"x{i}")
         for j in Sf[i]:
@@ -307,15 +307,22 @@ def build_MIP(S, f, c, λ):
     for j in C:
         b[j] = m.addVar(name=f"b{j}")
         m.addConstr(b[j] == gp.quicksum(z[(i, j)] for i in S[j-1]))
-        m.addConstr(b[j] >= 1)
 
     # set the Objective
     obj = gp.quicksum(f[i]*x[i] for i in F)
-    obj += gp.quicksum(c[(i, j)]*z[(i, j)] for j in C for i in S[j-1])
 
-    # linear overlap penalty:
-    obj += λ*gp.quicksum(b[j] for j in C)
-    obj += - λ * len(S)
+    # overlap penalty
+    for j in C:
+        for k in range(1, len(S[j-1])+1):
+            v[(j, k)] = m.addVar(vtype=GRB.BINARY, name=f"v{j}_{k}")
+            if k > 1:
+                m.addConstr(v[(j, k)] <= v[(j, k-1)])
+
+        m.addConstr(b[j] == gp.quicksum(v[(j, k)]
+                    for k in range(1, len(S[j-1])+1)))
+
+        obj += g[(j, 0)] + gp.quicksum((g[(j, k)] - g[(j, k-1)])*v[(j, k)]
+                                       for k in range(1, len(S[j-1])+1))
 
     m.setObjective(obj)
     m.update()
@@ -425,17 +432,21 @@ def test_BDD_to_MIP():
     m.display()
 
 
-def test_build_simple_MIP():
+def test_build_MIP():
     """Tests a simple MIP building function"""
-    S = [[1], [1, 2], [1, 2], [2]]
-    f = {1: 0.5, 2: 0.7}
-    c = {(1, 1): 1.1, (1, 2): 1.2, (2, 2): 2.2, (1, 3): 1.3,
-         (2, 3): 2.3, (2, 4): 2.4}
-    λ = 0.5
 
-    test_DD_creation(S, f, c, "toy")
+    S = [[1], [1, 2], [1, 2, 3], [2, 3]]
+    f = {1: 0.1, 2: 0.2, 3: 0.3}
+    g = {
+        (1, 0): 1.0,  (2, 0): 2.0,  (3, 0): 3.0,  (4, 0): 4.0,
+        (1, 1): 1.1,  (2, 1): 2.1,  (3, 1): 3.1,  (4, 1): 4.1,
+        (1, 2): 1.21,  (2, 2): 2.22,  (3, 2): 3.23,  (4, 2): 4.24,
+        (3, 3): 3.33}
 
-    m = build_MIP(S, f, c, λ)
+    print(f"S={S},\n f={f},\n g={g}")
+    print("===")
+    print("The resulting MIP is:")
+    m = build_MIP(S, f, g)
     m.display()
 
 
@@ -503,13 +514,13 @@ def main():
     """Runs when called from a command line"""
     # Procedure that is run if executed from the command line
 
-    S = [[1], [1, 2], [1, 2, 3], [2, 3]]
-    f = {1: 0.1, 2: 0.2, 3: 0.3}
-    g = {
-        (1, 0): 0,  (2, 0): 0,  (3, 0): 0,  (4, 0): 0,
-        (1, 1): 1,  (2, 1): 1,  (3, 1): 1,  (4, 1): 1,
-        (1, 2): 2,  (2, 2): 2,  (3, 2): 2,  (4, 2): 2,
-        (3, 3): 3}
+    # S = [[1], [1, 2], [1, 2, 3], [2, 3]]
+    # f = {1: 0.1, 2: 0.2, 3: 0.3}
+    # g = {
+    #     (1, 0): 0,  (2, 0): 0,  (3, 0): 0,  (4, 0): 0,
+    #     (1, 1): 1,  (2, 1): 1,  (3, 1): 1,  (4, 1): 1,
+    #     (1, 2): 2,  (2, 2): 2,  (3, 2): 2,  (4, 2): 2,
+    #     (3, 3): 3}
 
     # m = build_MIP(S, f, c, g)
     # print("*==============================================================*")
@@ -517,8 +528,8 @@ def main():
     # print("*==============================================================*")
     # m.display()
 
-    # test_build_simple_MIP()
-    test_BDD_to_MIP_wg(S, f, g)
+    test_build_MIP()
+    # test_BDD_to_MIP_wg(S, f, g)
     # generate_test_figures()
     # test_BDD_to_MIP()
 

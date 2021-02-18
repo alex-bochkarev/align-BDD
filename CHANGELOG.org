@@ -1,4 +1,5 @@
 * Current version
+** [2021-02-18 Thu 14:40]: implemented MIP generation (for arbitrary g, dict) 
 ** [2021-02-18 Thu 13:51]: removed $x_i$ variables
    (following the recommendation of JCS: indeed, these are unnecessary to encode
    the decision, if I have $z_{ij}$.

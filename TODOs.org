@@ -3,7 +3,7 @@
   - [X] remove hard constraint on "cover everyone"
   - [X] remove c_ij weights from /problem generation/
   - [X] remove $x_i$ variables at all (for /availability/ BDD)
-  - [ ] build a naive-MIP (for arbitrary g)
+  - [X] build a naive-MIP (for arbitrary g)
   - [ ] compare naive-MIP and BDD-MIP (solutions must coincide)
   - [ ] think about reduction procedure by cite:hooker2013 (would it ever work?)
   - [ ] build intersection BDDs out of two
