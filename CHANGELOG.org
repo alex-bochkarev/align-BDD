@@ -1,4 +1,9 @@
 * Current version
+** [2021-02-18 Thu 13:51]: removed $x_i$ variables
+   (following the recommendation of JCS: indeed, these are unnecessary to encode
+   the decision, if I have $z_{ij}$.
+** [2021-02-16 Tue 14:03]: removed hard "cover all" constraint (covering DD generation)
+** [2021-02-16 Tue 11:57]: dealt with linting (=flake8=) for =UFL.py=
 ** [2021-02-13 Sat 13:29]: creating (weighted) covering BDD with arbitrary overlap penalties
 ** [2021-02-13 Sat 13:04]: implemented (unweighted) covering BDD for arbitrary g(·) 
 ** [2021-02-12 Fri 21:58]: implemented weighted BDD generation for UFL (no overlap penalty)

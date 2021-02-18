@@ -1,0 +1,151 @@
+% Created 2021-02-16 Tue 16:32
+% Intended LaTeX compiler: pdflatex
+\documentclass[11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{graphicx}
+\usepackage{grffile}
+\usepackage{longtable}
+\usepackage{wrapfig}
+\usepackage{rotating}
+\usepackage[normalem]{ulem}
+\usepackage{amsmath}
+\usepackage{textcomp}
+\usepackage{amssymb}
+\usepackage{capt-of}
+\usepackage{hyperref}
+\usepackage{minted}
+\usepackage[margin=1in]{geometry}
+\date{}
+\title{\textbf{\today:} CPP from BDDs (simple example), updated.}
+\hypersetup{
+ pdfauthor={Alexey Bochkarev},
+ pdftitle={\textbf{\today:} CPP from BDDs (simple example), updated.},
+ pdfkeywords={},
+ pdfsubject={},
+ pdfcreator={Emacs 28.0.50 (Org mode 9.4.3)}, 
+ pdflang={English}}
+\begin{document}
+
+\maketitle
+
+\section{Objective and general notes.}
+\label{sec:org0b445aa}
+\begin{flalign*}
+\textrm{Minimize:}\quad\quad     & 0.1 v^A_{0 \rightarrow 1, h} + 0.2 v^A_{9 \rightarrow 11, h} + 0.2 v^A_{10 \rightarrow 13, h} + 0.3 v^A_{20 \rightarrow 22, h} + 0.3 v^A_{21 \rightarrow 24, h} + \\
+& v^C_{0 \rightarrow 1, h} + 2.0 v^C_{3 \rightarrow 4, h} + v^C_{3 \rightarrow 4, l} + v^C_{2 \rightarrow 4, h} + \\
+& 2.0 v^C_{8 \rightarrow 10, h} + v^C_{8 \rightarrow 10, l} + 3.0 v^C_{9 \rightarrow 10, h} + 2.0 v^C_{9 \rightarrow 10, l} + v^C_{7 \rightarrow 10, h} + \\
+& v^C_{11 \rightarrow T, h} + 2.0 v^C_{12 \rightarrow T, h} + v^C_{12 \rightarrow T, l}
+\end{flalign*}
+Here, for example, variable \(v^A_{0\rightarrow 1,h}\) corresponds to the flow
+from node \textcircled{0} to node \textcircled{1} of diagram \(A\) (availability),
+along the "hi" ("yes") arc.\\
+
+
+\textbf{Legend.}
+\begin{itemize}
+\item From each diagram, two types of constraints are generated:
+\begin{itemize}
+\item \emph{cont-at-\textcircled{.}} are flow continuity constraints at a given node.
+\item \emph{bin-link-<k>} are binary linking constraints (needed to link two BDDs -- i.e.,
+tangle network flow problems), one per layer, indexed with \(k\).
+\end{itemize}
+\item \(A\) denotes "Availability" diagram, \(C\) denotes "Covering"
+diagram.
+\end{itemize}
+
+All node numbers correspond to the diagrams and have nothing to do with
+customer and facility indices.
+
+\begin{itemize}
+\item Arc flow variables (continuous) \(v\).
+\item Linking variables (binary): \([\lambda_{x1}, \lambda_{z1-1}, \lambda_{z1-2}, \lambda_{z1-3}, \lambda_{x2}, \lambda_{z2-2}, \lambda_{z2-3}, \lambda_{z2-4}, \lambda_{x3}, \lambda_{z3-3}, \lambda_{z3-4}]\).
+
+\textbf{Note:} All this is generated automatically. That is,
+\begin{itemize}
+\item \textbf{Input:} "customer proximity" lists \(S_j\) (customers vs. facility
+proximity), (no covering costs \(c_{ij}\) anymore), switch-on costs \(f_i\), overlap penalty \(g_j(n_j)\).
+\item \textbf{Output:} (weighted) BDDs: covering and availability. CPP MiP (what is
+below: already a snapshot of a Gurobi model object: output of
+\texttt{gurobipy.Model.display()} converted to \LaTeX{} with a semi-automatic
+procedure.
+\end{itemize}
+\end{itemize}
+
+\section{Constraints from Availability diagram.}
+\label{sec:org2ccc074}
+
+\begin{tabular}{l l}
+\textbf{Type} & \textbf{Constraint}\\\hline\\
+    A: cont-at-0 & $-1.0 v^A_{0 \rightarrow 1, h} -1.0 v^A_{0 \rightarrow 2, l} = -1.0$\\
+    A: bin-link-1 & $\lambda_{x1} -1.0 v^A_{0 \rightarrow 1, h} = 0.0$\\
+    A: cont-at-1 & $v^A_{0 \rightarrow 1, h} -1.0 v^A_{1 \rightarrow 3, h} -1.0 v^A_{1 \rightarrow 5, l} = 0.0$\\
+    A: cont-at-2 & $v^A_{0 \rightarrow 2, l} -1.0 v^A_{2 \rightarrow 5, h} -1.0 v^A_{2 \rightarrow 4, l} = 0.0$\\
+    A: bin-link-2 & $\lambda_{z1-1} -1.0 v^A_{1 \rightarrow 3, h} -1.0 v^A_{2 \rightarrow 5, h} = 0.0$\\
+    A: cont-at-3 & $v^A_{1 \rightarrow 3, h} -1.0 v^A_{3 \rightarrow 6, h} -1.0 v^A_{3 \rightarrow 8, l} = 0.0$\\
+    A: cont-at-4 & $v^A_{2 \rightarrow 4, l} -1.0 v^A_{4 \rightarrow 8, h} -1.0 v^A_{4 \rightarrow 7, l} = 0.0$\\
+    A: cont-at-5 & $v^A_{1 \rightarrow 5, l} + v^A_{2 \rightarrow 5, h} -1.0 v^A_{5 \rightarrow 8, h} -1.0 v^A_{5 \rightarrow 8, l} = 0.0$\\
+    A: bin-link-3 & $\lambda_{z1-2} -1.0 v^A_{3 \rightarrow 6, h} -1.0 v^A_{4 \rightarrow 8, h} -1.0 v^A_{5 \rightarrow 8, h} = 0.0$\\
+    A: cont-at-8 & $v^A_{3 \rightarrow 8, l} + v^A_{4 \rightarrow 8, h} + v^A_{5 \rightarrow 8, h} + v^A_{5 \rightarrow 8, l} -1.0 v^A_{8 \rightarrow 10, h} -1.0 v^A_{8 \rightarrow 10, l} = 0.0$\\
+    A: cont-at-6 & $v^A_{3 \rightarrow 6, h} -1.0 v^A_{6 \rightarrow 9, h} -1.0 v^A_{6 \rightarrow 10, l} = 0.0$\\
+    A: cont-at-7 & $v^A_{4 \rightarrow 7, l} -1.0 v^A_{7 \rightarrow 10, h} -1.0 v^A_{7 \rightarrow 9, l} = 0.0$\\
+    A: bin-link-4 & $\lambda_{z1-3} -1.0 v^A_{8 \rightarrow 10, h} -1.0 v^A_{6 \rightarrow 9, h} -1.0 v^A_{7 \rightarrow 10, h} = 0.0$\\
+    A: cont-at-9 & $v^A_{6 \rightarrow 9, h} + v^A_{7 \rightarrow 9, l} -1.0 v^A_{9 \rightarrow 11, h} -1.0 v^A_{9 \rightarrow 12, l} = 0.0$\\
+    A: cont-at-10 & $v^A_{8 \rightarrow 10, h} + v^A_{8 \rightarrow 10, l} + v^A_{6 \rightarrow 10, l} + v^A_{7 \rightarrow 10, h} -1.0 v^A_{10 \rightarrow 13, h} -1.0 v^A_{10 \rightarrow 13, l} = 0.0$\\
+    A: bin-link-5 & $\lambda_{x2} -1.0 v^A_{9 \rightarrow 11, h} -1.0 v^A_{10 \rightarrow 13, h} = 0.0$\\
+    A: cont-at-11 & $v^A_{9 \rightarrow 11, h} -1.0 v^A_{11 \rightarrow 14, h} -1.0 v^A_{11 \rightarrow 16, l} = 0.0$\\
+    A: cont-at-12 & $v^A_{9 \rightarrow 12, l} -1.0 v^A_{12 \rightarrow 16, h} -1.0 v^A_{12 \rightarrow 15, l} = 0.0$\\
+    A: cont-at-13 & $v^A_{10 \rightarrow 13, h} + v^A_{10 \rightarrow 13, l} -1.0 v^A_{13 \rightarrow 16, h} -1.0 v^A_{13 \rightarrow 16, l} = 0.0$\\
+    A: bin-link-6 & $\lambda_{z2-2} -1.0 v^A_{11 \rightarrow 14, h} -1.0 v^A_{12 \rightarrow 16, h} -1.0 v^A_{13 \rightarrow 16, h} = 0.0$\\
+    A: cont-at-14 & $v^A_{11 \rightarrow 14, h} -1.0 v^A_{14 \rightarrow 17, h} -1.0 v^A_{14 \rightarrow 19, l} = 0.0$\\
+    A: cont-at-16 & $v^A_{11 \rightarrow 16, l} + v^A_{12 \rightarrow 16, h} + v^A_{13 \rightarrow 16, h} + v^A_{13 \rightarrow 16, l} -1.0 v^A_{16 \rightarrow 19, h} -1.0 v^A_{16 \rightarrow 19, l} = 0.0$\\
+    A: cont-at-15 & $v^A_{12 \rightarrow 15, l} -1.0 v^A_{15 \rightarrow 19, h} -1.0 v^A_{15 \rightarrow 18, l} = 0.0$\\
+    A: bin-link-7 & $\lambda_{z2-3} -1.0 v^A_{14 \rightarrow 17, h} -1.0 v^A_{16 \rightarrow 19, h} -1.0 v^A_{15 \rightarrow 19, h} = 0.0$\\
+    A: cont-at-17 & $v^A_{14 \rightarrow 17, h} -1.0 v^A_{17 \rightarrow 20, h} -1.0 v^A_{17 \rightarrow 21, l} = 0.0$\\
+    A: cont-at-18 & $v^A_{15 \rightarrow 18, l} -1.0 v^A_{18 \rightarrow 21, h} -1.0 v^A_{18 \rightarrow 20, l} = 0.0$\\
+    A: cont-at-19 & $v^A_{14 \rightarrow 19, l} + v^A_{16 \rightarrow 19, h} + v^A_{16 \rightarrow 19, l} + v^A_{15 \rightarrow 19, h} -1.0 v^A_{19 \rightarrow 21, h} -1.0 v^A_{19 \rightarrow 21, l} = 0.0$\\
+    A: bin-link-8 & $\lambda_{z2-4} -1.0 v^A_{17 \rightarrow 20, h} -1.0 v^A_{18 \rightarrow 21, h} -1.0 v^A_{19 \rightarrow 21, h} = 0.0$\\
+    A: cont-at-20 & $v^A_{17 \rightarrow 20, h} + v^A_{18 \rightarrow 20, l} -1.0 v^A_{20 \rightarrow 22, h} -1.0 v^A_{20 \rightarrow 23, l} = 0.0$\\
+    A: cont-at-21 & $v^A_{17 \rightarrow 21, l} + v^A_{18 \rightarrow 21, h} + v^A_{19 \rightarrow 21, h} + v^A_{19 \rightarrow 21, l} -1.0 v^A_{21 \rightarrow 24, h} -1.0 v^A_{21 \rightarrow 24, l} = 0.0$\\
+    A: bin-link-9 & $\lambda_{x3} -1.0 v^A_{20 \rightarrow 22, h} -1.0 v^A_{21 \rightarrow 24, h} = 0.0$\\
+    A: cont-at-24 & $v^A_{21 \rightarrow 24, h} + v^A_{21 \rightarrow 24, l} -1.0 v^A_{24 \rightarrow 27, h} -1.0 v^A_{24 \rightarrow 27, l} = 0.0$\\
+    A: cont-at-23 & $v^A_{20 \rightarrow 23, l} -1.0 v^A_{23 \rightarrow 27, h} -1.0 v^A_{23 \rightarrow 26, l} = 0.0$\\
+    A: cont-at-22 & $v^A_{20 \rightarrow 22, h} -1.0 v^A_{22 \rightarrow 25, h} -1.0 v^A_{22 \rightarrow 27, l} = 0.0$\\
+    A: bin-link-10 & $\lambda_{z3-3} -1.0 v^A_{24 \rightarrow 27, h} -1.0 v^A_{23 \rightarrow 27, h} -1.0 v^A_{22 \rightarrow 25, h} = 0.0$\\
+    A: cont-at-25 & $v^A_{22 \rightarrow 25, h} -1.0 v^A_{25 \rightarrow T, h} -1.0 v^A_{25 \rightarrow F, l} = 0.0$\\
+    A: cont-at-26 & $v^A_{23 \rightarrow 26, l} -1.0 v^A_{26 \rightarrow F, h} -1.0 v^A_{26 \rightarrow T, l} = 0.0$\\
+    A: cont-at-27 & $v^A_{24 \rightarrow 27, h} + v^A_{24 \rightarrow 27, l} + v^A_{23 \rightarrow 27, h} + v^A_{22 \rightarrow 27, l} -1.0 v^A_{27 \rightarrow F, h} -1.0 v^A_{27 \rightarrow F, l} = 0.0$\\
+    A: bin-link-11 & $\lambda_{z3-4} -1.0 v^A_{25 \rightarrow T, h} -1.0 v^A_{26 \rightarrow F, h} -1.0 v^A_{27 \rightarrow F, h} = 0.0$\\
+    A: cont-at-T & $v^A_{25 \rightarrow T, h} + v^A_{26 \rightarrow T, l} = 1.0$\\
+    A: cont-at-F & $v^A_{25 \rightarrow F, l} + v^A_{26 \rightarrow F, h} + v^A_{27 \rightarrow F, h} + v^A_{27 \rightarrow F, l} = 0.0$
+\end{tabular}
+
+\section{Constraints from Covering diagram.}
+\label{sec:org8e38395}
+\begin{tabular}{l l}
+\textbf{Type} & \textbf{Constraint}\\\hline\\
+    C: cont-at-0 & $-1.0 v^C_{0 \rightarrow 1, h} -1.0 v^C_{0 \rightarrow 1, l} = -1.0$\\
+    C: bin-link-1 & $\lambda_{z1-1} -1.0 v^C_{0 \rightarrow 1, h} = 0.0$\\
+    C: cont-at-1 & $v^C_{0 \rightarrow 1, h} + v^C_{0 \rightarrow 1, l} -1.0 v^C_{1 \rightarrow 3, h} -1.0 v^C_{1 \rightarrow 2, l} = 0.0$\\
+    C: bin-link-2 & $\lambda_{z1-2} -1.0 v^C_{1 \rightarrow 3, h} = 0.0$\\
+    C: cont-at-3 & $v^C_{1 \rightarrow 3, h} -1.0 v^C_{3 \rightarrow 4, h} -1.0 v^C_{3 \rightarrow 4, l} = 0.0$\\
+    C: cont-at-2 & $v^C_{1 \rightarrow 2, l} -1.0 v^C_{2 \rightarrow 4, h} -1.0 v^C_{2 \rightarrow 4, l} = 0.0$\\
+    C: bin-link-3 & $\lambda_{z2-2} -1.0 v^C_{3 \rightarrow 4, h} -1.0 v^C_{2 \rightarrow 4, h} = 0.0$\\
+    C: cont-at-4 & $v^C_{3 \rightarrow 4, h} + v^C_{3 \rightarrow 4, l} + v^C_{2 \rightarrow 4, h} + v^C_{2 \rightarrow 4, l} -1.0 v^C_{4 \rightarrow 6, h} -1.0 v^C_{4 \rightarrow 5, l} = 0.0$\\
+    C: bin-link-4 & $\lambda_{z1-3} -1.0 v^C_{4 \rightarrow 6, h} = 0.0$\\
+    C: cont-at-6 & $v^C_{4 \rightarrow 6, h} -1.0 v^C_{6 \rightarrow 9, h} -1.0 v^C_{6 \rightarrow 8, l} = 0.0$\\
+    C: cont-at-5 & $v^C_{4 \rightarrow 5, l} -1.0 v^C_{5 \rightarrow 8, h} -1.0 v^C_{5 \rightarrow 7, l} = 0.0$\\
+    C: bin-link-5 & $\lambda_{z2-3} -1.0 v^C_{6 \rightarrow 9, h} -1.0 v^C_{5 \rightarrow 8, h} = 0.0$\\
+    C: cont-at-8 & $v^C_{6 \rightarrow 8, l} + v^C_{5 \rightarrow 8, h} -1.0 v^C_{8 \rightarrow 10, h} -1.0 v^C_{8 \rightarrow 10, l} = 0.0$\\
+    C: cont-at-9 & $v^C_{6 \rightarrow 9, h} -1.0 v^C_{9 \rightarrow 10, h} -1.0 v^C_{9 \rightarrow 10, l} = 0.0$\\
+    C: cont-at-7 & $v^C_{5 \rightarrow 7, l} -1.0 v^C_{7 \rightarrow 10, h} -1.0 v^C_{7 \rightarrow 10, l} = 0.0$\\
+    C: bin-link-6 & $\lambda_{z3-3} -1.0 v^C_{8 \rightarrow 10, h} -1.0 v^C_{9 \rightarrow 10, h} -1.0 v^C_{7 \rightarrow 10, h} = 0.0$\\
+    C: cont-at-10 & $v^C_{8 \rightarrow 10, h} + v^C_{8 \rightarrow 10, l} + v^C_{9 \rightarrow 10, h} + v^C_{9 \rightarrow 10, l} + v^C_{7 \rightarrow 10, h} + v^C_{7 \rightarrow 10, l} -1.0 v^C_{10 \rightarrow 12, h} -1.0 v^C_{10 \rightarrow 11, l} = 0.0$\\
+    C: bin-link-7 & $\lambda_{z2-4} -1.0 v^C_{10 \rightarrow 12, h} = 0.0$\\
+    C: cont-at-11 & $v^C_{10 \rightarrow 11, l} -1.0 v^C_{11 \rightarrow T, h} -1.0 v^C_{11 \rightarrow T, l} = 0.0$\\
+    C: cont-at-12 & $v^C_{10 \rightarrow 12, h} -1.0 v^C_{12 \rightarrow T, h} -1.0 v^C_{12 \rightarrow T, l} = 0.0$\\
+    C: bin-link-8 & $\lambda_{z3-4} -1.0 v^C_{11 \rightarrow T, h} -1.0 v^C_{12 \rightarrow T, h} = 0.0$\\
+    C: cont-at-T & $v^C_{11 \rightarrow T, h} + v^C_{11 \rightarrow T, l} + v^C_{12 \rightarrow T, h} + v^C_{12 \rightarrow T, l} = 1.0$\\
+    C: cont-at-F & $0.0 = 0.0$
+\end{tabular}
+\end{document}
