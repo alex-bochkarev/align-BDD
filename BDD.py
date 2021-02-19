@@ -67,10 +67,11 @@ class BDD(object):
     Encodes a BDD and implements layer-ordering (revision) methods
 
     Attributes:
-        layers: a list of layers (sets/hashes), including {T, F}-nodes
-        nodes: a set/hash of nodes
-        vars: variables associated with layers
-        T,F: pointers to `True` and `False` sink nodes
+        layers (list): a list of layers (sets/hashes), including {T, F}-nodes
+        nodes (dict): a set/hash of nodes, key by node ID
+        vars (list): variables associated with layers
+        T,F (node): pointers to `True` and `False` sink nodes
+        weighted (bool): a flag whether arcs have weights
     """
 
     def __init__(self, N=2, vars=None, weighted=False):
@@ -95,7 +96,9 @@ class BDD(object):
     ## some helper functions
 
     def link(self, parent, child, etype="hi", edge_weight=0.0):
-        """Creates a link between two nodes (saving aux info as appropriate)
+        """Creates a link between two nodes.
+
+        (Saving auxiliary info as appropriate)
 
         Args:
            self (type): description
@@ -115,7 +118,6 @@ class BDD(object):
 
     def n(self, i):
         """Returns size of the i-th layer."""
-
         return len(self.layers[i])
 
     def p(self, a):
@@ -123,7 +125,7 @@ class BDD(object):
         return self.var_pos[a]
 
     def size(self):
-        """returns the size of the BDD (total no. of nodes)"""
+        """Returns the size of the BDD (total no. of nodes)."""
         return len(self.nodes)-2
 
     def new_node_name(self):
@@ -145,7 +147,6 @@ class BDD(object):
             x_prefix (str): a prefix to be shown for layer name (default 'x')
         Returns: a Digraph object (see `graphviz` module).
         """
-
         g = Digraph()
 
         for i, layer in enumerate(self.layers):
@@ -185,7 +186,7 @@ class BDD(object):
         return g
 
     def addnode(self, parent_node, arc="hi", node_id=None, edge_weight=0.0):
-        """Adds a node and updates aux info as necessary"""
+        """Adds a node and updates aux info as necessary."""
         if node_id is None:
             node_id = self.new_node_name()
 
@@ -220,11 +221,12 @@ class BDD(object):
         return newnode
 
     def swap_up(self, layer_idx):
-        """Swaps the layer with the one immediately above it
+        """Swaps the layer with the one immediately above it.
+
         (by _index_! in-place operation)
 
         Args:
-            layer_idx: number (index) of the layer to be ''bubbled up''
+            layer_idx (int): number (index) of the layer to be ''bubbled up''
 
         Note:
             Operation takes O (no-of-nodes in the upper layer) time.
@@ -232,7 +234,6 @@ class BDD(object):
             immediately above it and creates nodes as necessary (re-cycling new nodes to avoid
             redundancy in terms of logical functions)
         """
-
         assert layer_idx >= 1 # otherwise there's no layer to swap to
         assert layer_idx <= len(self.layers)-2 # we can't swap-up the terminal layer
 
@@ -291,8 +292,7 @@ class BDD(object):
 
 
     def sift(self, var, pos):
-        """Sifts a variable `var`(name, not index) to position `pos`, in-place"""
-
+        """Sifts variable `var` (name) to position `pos`, in-place."""
         assert pos >= 0 and pos < len(self.layers)-1
         assert var in self.vars
 
@@ -311,13 +311,12 @@ class BDD(object):
                 self.swap_up(self.p(var)+1)
 
     def gsifts(self, with_whom,start_order=None):
-        """
+        """Perform greedy sifts to align with `with_whom`.
         Runs a simplistic implementation of Rudell'93
         sifting alorithm extension to minimize |A|+|B|
 
         starts with aligning to self or start_order (if given)
         """
-
         N = len(self.layers)-1
         if start_order is None:
             start_order = self.vars
@@ -382,7 +381,7 @@ class BDD(object):
 
     # file manipulation procedures
     def save(self, filename):
-        """saves a BDD to an ASCII(text) file
+        """Saves a BDD to an ASCII(text) file.
 
         Note:
             File format is as follows.
@@ -396,7 +395,6 @@ class BDD(object):
             to hi and lo pointers of the node "ID"
             The procedure performs breadth-first search and just saves all the nodes
         """
-
         S = deque() # a deque of node IDs to explore (FIFO)
         V = set() # set of visited (saved) nodes (by ID)
 
@@ -426,12 +424,11 @@ class BDD(object):
                 V.add(n_id)
 
     def load(self, filename, weighted=False):
-       """loads a BDD from an ASCII(text) file
+       """Loads a BDD from an ASCII(text) file.
 
        Note:
             The format corresponds to the one described in the `save` function
        """
-
        with open(filename, "r") as f:
             line = f.readline()
             while line[0]=="#" or line=="":
@@ -492,14 +489,22 @@ class BDD(object):
                     F_hi = self.nodes[hi_id]
                     self.nodes[id].link(F_hi, "hi")
                 else:
-                    F_hi = self.addnode(self.nodes[id],"hi",node_id=hi_id)
+                    if self.weighted:
+                        e_w = w_hi
+                    else:
+                        e_w = 0.0
+                    F_hi = self.addnode(self.nodes[id],"hi",node_id=hi_id, edge_weight=e_w)
                     next_layer.add(hi_id)
 
                 if lo_id in next_layer:
                     F_lo = self.nodes[lo_id]
                     self.nodes[id].link(F_lo, "lo")
                 else:
-                    F_lo = self.addnode(self.nodes[id],"lo", node_id=lo_id)
+                    if self.weighted:
+                        e_w = w_lo
+                    else:
+                        e_w = 0.0
+                    F_lo = self.addnode(self.nodes[id],"lo", node_id=lo_id, edge_weight=e_w)
                     next_layer.add(lo_id)
 
                 if not id in self.nodes.keys():
@@ -523,7 +528,7 @@ class BDD(object):
 
     @classmethod
     def random(cls, N=5,p=0.5):
-        """generates a random BDD with `N` variables (N+1 layers)
+        """Generates a random BDD with `N` variables (N+1 layers).
 
         Args:
             N:   number of variables (to result in N+1 layers, including the T,F-layer)
@@ -533,7 +538,6 @@ class BDD(object):
         Returns:
             A generated BDD
         """
-
         bdd = BDD(N)
 
         assert N>1
@@ -563,14 +567,13 @@ class BDD(object):
 
 
     def profile(self):
-        """returns a BDD ``profile'' -- an (almost) BFS-ordered list of nodes
+        """Returns a BDD ``profile'' -- an (almost) BFS-ordered list of nodes.
 
         A string of the format <vars>:<BFS-nodes>, where:
         <vars>      --  comma-separated variable names by layer;
         <BFS-nodes> --  comma-separated list of node-numbers (not IDs!)
                         in a BFS-traverse order
         """
-
         Q = deque()
         V = set()
         node_nums = dict();
@@ -616,9 +619,10 @@ class BDD(object):
         self.dump_gv(layerCapt, x_prefix).view(filename, directory=dir, cleanup=True)
 
     def align_to(self, vars_order, inplace=False):
-        """revises the BDD to a given order
-        (with a series of consecutive sifts)"""
+        """Revises the BDD to a given order.
 
+        (with a series of consecutive sifts)
+        """
         if inplace:
             aligned = self
         else:
@@ -630,13 +634,14 @@ class BDD(object):
         return aligned;
 
     def OA_bruteforce(self, with_what, LR=False):
-        """finds the best (smallest) alignment with BDD `with_what`
-        by brute-force enumeration.
+        """Finds the best (smallest) alignment with BDD `with_what`.
 
-        `with_what` is assumed to be a BDD object.
-        If `LR` is set, layer-reduces each candidate BDD.
+        Uses brute-force enumeration.
+
+        Args:
+            with_what (BDD): target diagram.
+            LR (bool): if set, layer-reduces each candidate BDD.
         """
-
         # generate all possible permutations
         perms = iters.permutations(self.vars)
         min_size = math.inf
@@ -665,8 +670,7 @@ class BDD(object):
         return [alternatives, A_aligned, B_aligned]
 
     def is_reduced(self):
-        """checks if the BDD is reduced (no ``redundant'' nodes)"""
-
+        """Checks if the BDD is reduced (no ``redundant'' nodes)."""
         checked_nodes = set()
 
         for layer in range(len(self.layers)-2,-1,-1):
@@ -689,11 +693,11 @@ class BDD(object):
             self.swap_up(i)
 
     def rename_vars(self, ren_dict):
-        """helper function: renames variables.
+        """Helper function: renames variables.
 
         Args:
-          ren_dict -- a dict of labels in the form {before: after}"""
-
+          ren_dict -- a dict of labels in the form {before: after}
+        """
         new_vars = [ren_dict[v] for v in self.vars]
         self.vars = new_vars
         self.var_pos = dict(zip(self.vars,[i for i in range(len(self.vars))]))
@@ -704,15 +708,16 @@ class BDD(object):
 
     ## functions related to testing equivalence and finding truth tables
     def get_value(self, x):
-        """Finds the terminal node (T or F) corresponding to the variable choices in x
+        """Finds the terminal node (T or F) -- an endpoint for `x`.
+
+        Finds a terminal node corresponding to the variable choices in `x`.
 
         Args:
-            x: a dict of {var_name: value}, where value is in {0,1}.
+            x (dict): of {var_name: value}, where value is in {0,1}.
 
         Returns:
             True/False/-1: terminal node corresponding to the path implied by x, encoded as Boolean (or -1 if error)
         """
-
         (node,) = self.layers[0]
 
         for i in range(len(x)):
@@ -749,11 +754,10 @@ class BDD(object):
         """Checks if two BDDs (A and B) are equivalent in the sense that they define the same Boolean function,
         by checking if the corresponding truth tables coincide. Returns Bool
         """
-
         msg = None
         tt_self = self.truth_table(); tt_B = B.truth_table()
         tt_B = tt_B[self.vars + ['Value']]
-        tt_B['new_index'] = [c for c in tt_B.apply(lambda row: "".join([str(x) for x in row[:-1]]), axis=1) ]
+        tt_B['new_index'] = [c for c in tt_B.apply(lambda row: "".join([str(x) for x in row[:-1]]), axis=1)]
         tt_B.set_index('new_index', inplace=True)
 
         for idx, row in tt_self.iterrows():
@@ -762,25 +766,109 @@ class BDD(object):
                 return [False, msg]
 
         return [True, msg]
-######################################################################
-## testing code
 
-## BDD creation and rendering (with graphviz)
+
+def intersect(A, B):
+    """Produces an intersection BDD of `A` and `B`.
+
+    Notes:
+        BDDs need to be order-associated (same vars in the same order).
+    """
+    assert A.vars == B.vars
+    assert A.weighted == B.weighted
+
+    weighted = A.weighted
+    C = BDD(vars=A.vars, N=len(A.vars), weighted=weighted)
+    root = C.addnode(parent_node=None)
+    current_layer = {(NROOT, NROOT): root}
+
+    # for all layers but the last one
+    for i in range(len(A.vars)-1):
+        new_layer = dict()
+        for n in current_layer:
+            niA, niB = n
+            nA = A.nodes[niA]
+            nB = B.nodes[niB]
+            nC = current_layer[n]
+            # yes-arc
+            new_yes = (nA.hi.id, nB.hi.id)
+            wA = A.weights[(nA.id, nA.hi.id, "hi")]
+            wB = B.weights[(nB.id, nB.hi.id, "hi")]
+            if new_yes in new_layer:
+                C.link(nC.id, new_layer[new_yes].id,
+                       "hi", edge_weight=wA+wB)
+            else:
+                new_layer[new_yes] = C.addnode(nC,
+                                               "hi", edge_weight=wA+wB)
+            # no-arc
+            new_no = (nA.lo.id, nB.lo.id)
+            wA = A.weights[(nA.id, nA.lo.id, "lo")]
+            wB = B.weights[(nB.id, nB.lo.id, "lo")]
+            if new_no in new_layer:
+                C.link(nC.id, new_layer[new_no].id,
+                       "lo", edge_weight=wA+wB)
+            else:
+                new_layer[new_no] = C.addnode(nC,
+                                              "lo", edge_weight=wA+wB)
+
+        current_layer = new_layer
+
+    # a special case of the last layer
+    for n in current_layer:
+        niA, niB = n
+        nA = A.nodes[niA]
+        nB = B.nodes[niB]
+        nC = current_layer[n]
+        # yes-arc
+        wA = A.weights[(nA.id, nA.hi.id, "hi")]
+        wB = B.weights[(nB.id, nB.hi.id, "hi")]
+        if nA.hi.id == NTRUE and nB.hi.id == NTRUE:
+            C.link(nC.id, NTRUE, "hi", edge_weight=wA+wB)
+        else:
+            C.link(nC.id, NFALSE, "hi", edge_weight=wA+wB)
+        # no-arc
+        wA = A.weights[(nA.id, nA.lo.id, "lo")]
+        wB = B.weights[(nB.id, nB.lo.id, "lo")]
+        if nA.lo.id == NTRUE and nB.lo.id == NTRUE:
+            C.link(nC.id, NTRUE, "lo", edge_weight=wA+wB)
+        else:
+            C.link(nC.id, NFALSE, "lo", edge_weight=wA+wB)
+
+    return C
+
+
+# =====================================================================
+# testing code
+# =====================================================================
+def test_intersections():
+    """Tests intersection function."""
+    A = BDD()
+    A.load("./tests/int_A.wbdd", weighted=True)
+    B = BDD()
+    B.load("./tests/int_B.wbdd", weighted=True)
+
+    C = intersect(A, B)
+    A.show(dir="testing", filename="A.dot")
+    B.show(dir="testing", filename="B.dot")
+    C.show(dir="testing", filename="C.dot")
+
+
+# BDD creation and rendering (with graphviz)
 def test_create_render():
-    """tests the BDD creation and rendering code"""
+    """Tests the BDD creation and rendering code."""
     bdd = BDD(4)
     root = bdd.addnode(None)
-    nh = bdd.addnode(root,"hi")
-    nl = bdd.addnode(root,"lo")
+    nh = bdd.addnode(root, "hi")
+    nl = bdd.addnode(root, "lo")
 
-    nh2 = bdd.addnode(nh,"hi")
+    nh2 = bdd.addnode(nh, "hi")
     bdd.nodes[nh.id].lo = nh2
 
     nl2 = bdd.addnode(nl, "hi")
     nl.link(nl2,"lo")
 
-    nl = bdd.addnode(nl2,"hi")
-    nl2.link(nl,"lo")
+    nl = bdd.addnode(nl2, "hi")
+    nl2.link(nl, "lo")
 
     nh = bdd.addnode(nh2,"lo")
     nh2.link(nh,"hi")
