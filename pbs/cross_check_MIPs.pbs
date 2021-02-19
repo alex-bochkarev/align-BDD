@@ -1,0 +1,26 @@
+#PBS -N MIPs
+#PBS -l select=1:ncpus=1:mem=8gb,walltime=05:00:00
+#PBS -j oe
+#PBS -o run_logs/MIPs_cross_check.pbs.log
+#PBS -M abochka@clemson.edu
+#PBS -m abe
+
+# boilerplate things
+STARTMSG="START: cross-checking MIPs (plain MIP and CPP MIP)"
+ENDMSG="END: done cross-checking"
+
+module add anaconda3/5.1.0-gcc/8.3.1
+module add gurobi/9.0.0
+source activate ab-local
+
+cd /home/abochka/BDD/2021-02-19_aBDD_review
+
+echo $STARTMSG | tgs -m -
+python ./UFL.py | tee run_logs/MIPs_cross_check.log
+tgs -s happycat > /dev/null
+tgs -m "CROSS CHECK RESULTS (dots omitted):"
+cat run_logs/MIPs_cross_check.log | sed -e's/^[.]*//g' | tgs -m -
+echo $ENDMSG | tgs -m -
+
+# deactivate the env
+source deactivate ab-local
