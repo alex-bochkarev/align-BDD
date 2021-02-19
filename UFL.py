@@ -17,6 +17,8 @@ from gurobipy import GRB
 import sys
 from time import time
 
+import varseq as vs
+import BB_search as bb
 import BDD as DD
 
 
@@ -439,6 +441,109 @@ def add_BDD_to_MIP(D, model=None, x=None, prefix=""):
 
     model.update()
     return model, constraints, v, x
+
+
+def create_NF(D):
+    """Generates a network flow instance for diagram `D`.
+
+    Args:
+       D (class BDD): the underlying diagram.
+
+    Returns:
+        model (`gurobipy` model): resulting model,
+        constraints (list),
+        v(dict): variables.
+    """
+    model = gp.Model()
+    model.modelSense = GRB.MINIMIZE
+
+    constraints = []
+    v = dict()
+    incoming_flows = dict()
+
+    l_no = 0
+
+    for L in D.layers:
+        l_no += 1
+
+        inc_nodes_new = dict()
+        for n in L:
+            # determine node inflow
+            inflow = gp.LinExpr(0.0)
+            if n.id == DD.NROOT:
+                inflow = gp.LinExpr(1.0)
+            else:
+                if n.id in incoming_flows.keys():
+                    inflow = gp.quicksum(v_i for v_i in incoming_flows[n.id])
+
+            # determine node outflow and add a linking constraint
+            if n.id == DD.NTRUE:
+                outflow = gp.LinExpr(1.0)
+
+            elif n.id == DD.NFALSE:
+                outflow = gp.LinExpr(0.0)
+            else:
+                v[(n.id, n.hi.id, "hi")] = model.addVar(
+                    name=f"vh{n.id}_{n.hi.id}",
+                    obj=D.weights[(n.id, n.hi.id, "hi")])
+                v[(n.id, n.lo.id, "lo")] = model.addVar(
+                    name=f"vl{n.id}_{n.lo.id}",
+                    obj=D.weights[(n.id, n.lo.id, "lo")])
+                outflow = gp.LinExpr(v[(n.id, n.hi.id, "hi")] +
+                                     v[(n.id, n.lo.id, "lo")])
+
+            constraints.append(model.addConstr(inflow == outflow,
+                                               name=f"cont-at-{n.id}"))
+
+            if n.id != DD.NTRUE and n.id != DD.NFALSE:
+                if n.hi.id in inc_nodes_new.keys():
+                    inc_nodes_new[n.hi.id].append(v[(n.id, n.hi.id, "hi")])
+                else:
+                    inc_nodes_new[n.hi.id] = [v[(n.id, n.hi.id, "hi")]]
+
+            if n.id != DD.NTRUE and n.id != DD.NFALSE:
+                if n.lo.id in inc_nodes_new.keys():
+                    inc_nodes_new[n.lo.id].append(v[(n.id, n.lo.id, "lo")])
+                else:
+                    inc_nodes_new[n.lo.id] = [v[(n.id, n.lo.id, "lo")]]
+
+        incoming_flows = inc_nodes_new
+
+    model.update()
+    return model, constraints, v
+
+
+def solve_with_intBDD(S, f, g):
+    """Solves the UFL instance by aligning two BDDs.
+
+    Args:
+       S (list): neighborhood list
+       f (dict): facility location costs
+       g (dict): overlap penalty dict.
+
+    Returns:
+        Resulting variables and the model.
+    """
+    A = create_availability_BDD(S, f)
+    C = create_covering_BDD_wg(S, g)
+    vs_A = vs.VarSeq(A.vars, [len(L) for L in A.layers[:-1]])
+    vs_C = vs.VarSeq(C.vars, [len(L) for L in C.layers[:-1]])
+
+    b = bb.BBSearch(vs_A, vs_C)
+
+    status = b.search()
+    assert status == "optimal"
+
+    A.align_to(b.Ap_cand.layer_var, inplace=True)
+    C.align_to(b.Ap_cand.layer_var, inplace=True)
+    int_DD = DD.intersect(A, C)
+    m, c, v = create_NF(int_DD)
+    m.solve()
+    print(f"Status = {m.status}. Objective = {m.objVal}")
+
+# =====================================================================
+# Testing code
+# =====================================================================
 
 
 def test_BDD_to_MIP():
