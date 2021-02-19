@@ -1,5 +1,5 @@
-"""
-UFL -- Uncapacitated Facility Location
+"""UFL -- Uncapacitated Facility Location.
+
 (testing align-BDD machinery for specific applications)
 
 General notes:
@@ -14,13 +14,14 @@ from graphviz import Digraph
 import numpy as np
 import gurobipy as gp
 from gurobipy import GRB
+import sys
+from time import time
 
 import BDD as DD
 
 
 def draw_problem_dia(S, f, g, filename="run_logs/problem_dia.gv"):
-    """Draws the bipartite graph describing the problem"""
-
+    """Draws the bipartite graph describing the problem."""
     n = len(build_Sf(S).keys())
 
     dia = Digraph('G', comment="Uncapacitated Facility Location")
@@ -51,12 +52,12 @@ def create_covering_BDD_wg(S, g):  # pylint: disable=all
     Returns:
         C (class BDD): covering BDD
     """
-
     m = len(S)
 
+    var_names = [f"z{i}-{j+1}" for j in range(m) for i in S[j]]
     C = DD.BDD(
-        N=len(np.sum(S)),  # number of z-variables
-        vars=[f"z{i}-{j+1}" for j in range(m) for i in S[j]],
+        N=len(var_names),  # number of z-variables
+        vars=var_names,
         weighted=True)
 
     root = C.addnode(None)
@@ -105,7 +106,6 @@ def create_covering_BDD(S, c):
         - assumes no edge costs, does *not* allow
             for arbitrary g(·) function.
     """
-
     m = len(S)
 
     C = DD.BDD(
@@ -174,13 +174,11 @@ def create_covering_BDD(S, c):
 
 
 def build_Sf(S):
-    """returns the list of facility neighborhoods
+    """Returns the list of facility neighborhoods.
 
-    Arguments
-    ---------
-    S: list -- of consumer neighborhoods (facility IDs)
+    Args:
+        S (list): of consumer neighborhoods (facility IDs)
     """
-
     Sf = dict()
     for j in range(len(S)):
         for facility in S[j]:
@@ -193,75 +191,100 @@ def build_Sf(S):
 
 
 def create_availability_BDD(S, f):
-    """Encodes the fact that "turn-on" (x) and "cover"(z) decisions
-    need to be consistent.
+    """Encodes consistency of "cover"(z) decisions.
+
+    Either all "yes", or all "no" for a specific facility.
+
     Args:
+        S (list): neighborhood list
         f (dict): facility costs
     """
-
     Sf = build_Sf(S)
     n = len(Sf.keys())
+    F = range(1, n+1)
 
     var_names = [f"z{facility}-{j}"
-                 for facility in Sf for j in Sf[facility]]
+                 for facility in F for j in Sf[facility]]
 
     A = DD.BDD(N=len(var_names), vars=var_names, weighted=True)
 
     s_main = A.addnode(None)
-
     s_false = None
-    for i in range(1, n+1):
-        # create a block per facility
-        s_yes = A.addnode(s_main, "hi", edge_weight=f[i])
-        s_no = A.addnode(s_main, "lo")
 
-        if s_false is not None:
-            new_f = A.addnode(s_false, "hi")
-            A.link(s_false.id, new_f.id, "lo")
-            s_false = new_f
-
+    for i in F:
+        s_yes = None
+        s_no = None
+        y_weight = f[i]
         consumers_i = list(Sf[i])
-        for j in consumers_i[1:-1]:
-            new_yes = A.addnode(s_yes, "hi")
-            new_no = A.addnode(s_no, "lo")
 
-            new_f = A.addnode(s_yes, "lo")
-            A.link(s_no.id, new_f.id, "hi")
+        for j in consumers_i:
+            if i == n and j == consumers_i[-1]:
+                # this is the very last layer
+                if s_yes is not None:
+                    A.link(s_yes.id, DD.NTRUE, "hi", edge_weight=y_weight)
+                    A.link(s_yes.id, DD.NFALSE, "lo")
 
-            if s_false is not None:
-                A.link(s_false.id, new_f.id, "hi")
-                A.link(s_false.id, new_f.id, "lo")
+                if s_no is not None:
+                    A.link(s_no.id, DD.NTRUE, "lo")
+                    A.link(s_no.id, DD.NFALSE, "hi", edge_weight=y_weight)
 
-            s_yes = new_yes
-            s_no = new_no
-            s_false = new_f
+                if s_main is not None:
+                    A.link(s_main.id, DD.NTRUE, "hi", edge_weight=y_weight)
+                    A.link(s_main.id, DD.NTRUE, "lo")
 
-        if i < n:
-            s_main = A.addnode(s_yes, "hi")
-            A.link(s_no.id, s_main.id, "lo")
+                if s_false is not None:
+                    A.link(s_false.id, DD.NFALSE, "hi")
+                    A.link(s_false.id, DD.NFALSE, "lo")
+            else:
+                # this is not the very last layer
+                # ( so we need to create a layer )
+                if s_main is not None:
+                    # this is the first decision for a facility
+                    new_yes = A.addnode(s_main, "hi", edge_weight=y_weight)
+                else:
+                    new_yes = A.addnode(s_yes, "hi", edge_weight=y_weight)
 
-            new_f = A.addnode(s_false, "hi")
-            A.link(s_false.id, new_f.id, "lo")
-            A.link(s_yes.id, new_f.id, "lo")
-            A.link(s_no.id, new_f.id, "hi")
-            s_false = new_f
-        else:
-            # this is a special case:
-            # we'd need to link to the terminal nodes
-            A.link(s_yes.id, DD.NTRUE, "hi")
-            A.link(s_yes.id, DD.NFALSE, "lo")
-            A.link(s_no.id, DD.NTRUE, "lo")
-            A.link(s_no.id, DD.NFALSE, "hi")
-            A.link(s_false.id, DD.NFALSE, "hi")
-            A.link(s_false.id, DD.NFALSE, "lo")
+                if j == consumers_i[-1]:
+                    # this is the last decision for a facility
+                    new_no = new_yes
+                    if s_main is not None:
+                        A.link(s_main.id, new_no.id, "lo")
+                    s_main = new_yes
+                else:
+                    if s_main is not None:
+                        new_no = A.addnode(s_main, "lo")
+                        s_main = None
+                    else:
+                        new_no = A.addnode(s_no, "lo")
+
+                if s_false is None and s_yes is not None:
+                    new_f = A.addnode(s_yes, "lo")
+                elif s_false is not None:
+                    new_f = A.addnode(s_false, "hi")
+                    A.link(s_false.id, new_f.id, "lo")
+                else:
+                    new_f = None
+
+                if s_yes is not None:
+                    A.link(s_yes.id, new_yes.id, "hi", edge_weight=y_weight)
+                    A.link(s_yes.id, new_f.id, "lo")
+
+                if s_no is not None:
+                    A.link(s_no.id, new_no.id, "lo")
+                    A.link(s_no.id, new_f.id, "hi")
+
+                s_yes = new_yes
+                s_no = new_no
+                s_false = new_f
+
+            y_weight = 0
 
     return A
 
 
 # testing
 def test_DD_creation(S, f, c, name):
-    """Testing unit: BDD generation"""
-
+    """Testing unit: BDD generation."""
     # unpack the problem from S
     draw_problem_dia(S, f, c, filename="run_logs/"+name+"_problem.gv")
 
@@ -272,8 +295,9 @@ def test_DD_creation(S, f, c, name):
 
 
 def build_MIP(S, f, g):
-    """Builds 'plain-vanilla' MIP instance for UFL
-    (arbitrary penalty function g(·))
+    """Builds 'plain-vanilla' MIP instance for UFL.
+
+    Encodes arbitrary penalty function g(·).
 
     Args:
         S (list): list of customer neighborhoods
@@ -284,7 +308,6 @@ def build_MIP(S, f, g):
     Returns:
         `gurobipy` model (`gp.Model`)
     """
-
     m = gp.Model()
     m.modelSense = GRB.MINIMIZE
 
@@ -302,7 +325,7 @@ def build_MIP(S, f, g):
         x[i] = m.addVar(vtype=GRB.BINARY, name=f"x{i}")
         for j in Sf[i]:
             z[(i, j)] = m.addVar(vtype=GRB.BINARY, name=f"z{i}_{j}")
-            m.addConstr(z[(i, j)] <= x[i])
+            m.addConstr(z[(i, j)] == x[i])
 
     for j in C:
         b[j] = m.addVar(name=f"b{j}")
@@ -330,7 +353,7 @@ def build_MIP(S, f, g):
 
 
 def add_BDD_to_MIP(D, model=None, x=None, prefix=""):
-    """Builds a MIP (network flow) from a given BDD
+    """Builds a MIP (network flow) from a given BDD.
 
     Args:
         D (class BDD): the diagram object
@@ -345,7 +368,6 @@ def add_BDD_to_MIP(D, model=None, x=None, prefix=""):
         v (dict): flow variables added, keyed as (from_id, to_id, arc_type)
         x (dict): binary variables added (one per layer), keyed by _layer_no_.
     """
-
     if model is None:
         model = gp.Model()
         model.modelSense = GRB.MINIMIZE
@@ -357,6 +379,7 @@ def add_BDD_to_MIP(D, model=None, x=None, prefix=""):
     incoming_flows = dict()
 
     l_no = 0
+
     for L in D.layers:
         l_no += 1
 
@@ -368,6 +391,7 @@ def add_BDD_to_MIP(D, model=None, x=None, prefix=""):
 
         inc_nodes_new = dict()
         for n in L:
+            # determine node inflow
             inflow = gp.LinExpr(0.0)
             if n.id == DD.NROOT:
                 inflow = gp.LinExpr(1.0)
@@ -375,8 +399,10 @@ def add_BDD_to_MIP(D, model=None, x=None, prefix=""):
                 if n.id in incoming_flows.keys():
                     inflow = gp.quicksum(v_i for v_i in incoming_flows[n.id])
 
+            # determine node outflow and add a linking constraint
             if n.id == DD.NTRUE:
                 outflow = gp.LinExpr(1.0)
+
             elif n.id == DD.NFALSE:
                 outflow = gp.LinExpr(0.0)
             else:
@@ -416,8 +442,7 @@ def add_BDD_to_MIP(D, model=None, x=None, prefix=""):
 
 
 def test_BDD_to_MIP():
-    """Tests making a MIP from a single BDD"""
-
+    """Tests making a MIP from a single BDD."""
     # adhoc experiments
     A = DD.BDD()
     A.load("tests/simple_DD.bdd")
@@ -433,8 +458,7 @@ def test_BDD_to_MIP():
 
 
 def test_build_MIP():
-    """Tests a simple MIP building function"""
-
+    """Tests a simple MIP building function."""
     S = [[1], [1, 2], [1, 2, 3], [2, 3]]
     f = {1: 0.1, 2: 0.2, 3: 0.3}
     g = {
@@ -451,8 +475,7 @@ def test_build_MIP():
 
 
 def test_BDD_build():
-    """Runs a simple test against a toy problem"""
-
+    """Runs a simple test against a toy problem."""
     S = [[1], [1, 2], [1, 2], [2]]
     f = {1: 0.5, 2: 0.7}
     c = {(1, 1): 0.11,  (1, 2): 0.12,  (2, 2): 0.22,  (1, 3): 0.13,
@@ -470,8 +493,7 @@ def test_BDD_build():
 
 
 def test_BDD_to_MIP_wg(S, f, g):
-    """Runs a simple test against a toy problem"""
-
+    """Runs a simple test against a toy problem."""
     draw_problem_dia(S, f, g)
     C = create_covering_BDD_wg(S, g)
     C.show(x_prefix='', filename="covering.dot", dir="run_logs")
@@ -485,7 +507,6 @@ def test_BDD_to_MIP_wg(S, f, g):
 
 def generate_test_figures():
     """Generates a simple test instance and creates PDFs."""
-
     S = [[1, 2], [1, 2, 3], [2, 3, 4], [2, 4]]
     f = {1: 0.1, 2: 0.2, 3: 0.3, 4: 0.4}
     c = {(1, 1): 0.11, (1, 2): 0.12,
@@ -510,8 +531,136 @@ def generate_test_figures():
     m.display()
 
 
+def generate_test_instance(n, m):
+    """Generates a test facility location instance.
+
+    Args:
+       n (int): number of facilities
+       m (int): number of customers
+
+    Returns:
+        S (list): neighborhood list
+        f (dict): costs of facility location
+                    (generated uniformly random int from `f_min` to `f_max`)
+        g (dict): overlap costs, keys: (customer, overlap)
+    """
+    N = [i for i in range(1, n+1)]
+    M = [j for j in range(1, m+1)]
+
+    good_instance = False
+    while not good_instance:
+        S = [np.random.choice(N, np.random.randint(1, n+1),
+                              replace=False).tolist()
+             for j in M]
+        f = {i: np.random.randint(5, 10) for i in N}
+
+        g = dict()
+        for j in M:
+            g[(j, 0)] = np.random.randint(2*n, 4*n)
+            g[(j, 1)] = 0
+            for k in range(2, len(S[j-1])+1):
+                g[(j, k)] = g[(j, k-1)] + \
+                    np.random.randint(low=1, high=2+int(5*len(S[j-1])/j))
+
+        Sf = build_Sf(S)
+        if np.sum([1 for i in N if i not in Sf]) == 0:
+            good_instance = True
+
+    return S, f, g
+
+
+def test_MIPs_protocol():
+    """Runs a series of cross-checks.
+
+    Covers functions:
+        - build_MIP
+        - create_covering_BDD_wg
+        - create_availability_BDD
+        - add_BDD_to_MIP
+    Uses:
+    - generate_test_instance
+    """
+    test_protocol = [(1000, 10, 20), (1000, 20, 10),
+                     (500, 20, 20), (500, 50, 100),
+                     (100, 100, 50), (100, 100, 100)]
+
+    for test in test_protocol:
+        print(f"Testing {test[0]} instances with n={test[1]}, m={test[2]}")
+        test_BDD_and_plain_MIPs(K=test[0], n=test[1], m=test[2])
+
+    print("Test finished.")
+
+
+def test_BDD_and_plain_MIPs(K=500, TOL=1e-3, n=3, m=4):
+    """Tests that objectives for the two MIPs coincide.
+
+    Args:
+        K (int): number of instances to generate (default 500)
+        TOL (float): objective tolerance (for comparison) (default 1e-3)
+        n (int): number of facilities (default 3)
+        m (type): number of customers (default 4)
+
+    Returns:
+        Nothing (outputs the success rate to the screen)
+    """
+    # define a problem
+    no_success = 0
+
+    plain_MIP_time = 0
+    CPP_MIP_time = 0
+
+    for k in range(K):
+        S, f, g = generate_test_instance(n=n, m=m)
+
+        # Generate and solve plain MIP
+        t0 = time()
+        model = build_MIP(S, f, g)
+        model.setParam("OutputFlag", 0)
+        model.optimize()
+        t1 = time()
+        plain_MIP_time += (t1 - t0)
+
+        if model.status != GRB.OPTIMAL:
+            print(f"Plain MIP status is: {model.status}")
+            print(f"\nS={S}; f={f}; g={g}")
+            continue
+        plain_MIP_obj = model.objVal
+
+        # Generate and solve CPP MIP
+        t0 = time()
+        C = create_covering_BDD_wg(S, g)
+        A = create_availability_BDD(S, f)
+
+        model, c, v, x = add_BDD_to_MIP(A, prefix="A_")
+        model, c, v, x = add_BDD_to_MIP(C, model=model, x=x, prefix="C_")
+        model.update()
+        model.setParam("OutputFlag", 0)
+        model.optimize()
+        t1 = time()
+        CPP_MIP_time += (t1 - t0)
+        if model.status != GRB.OPTIMAL:
+            print(f"CPP MIP status is: {model.status}")
+            print(f"\nS={S}; f={f}; g={g}")
+            continue
+
+        CPP_MIP_obj = model.objVal
+        if abs(CPP_MIP_obj - plain_MIP_obj) < TOL:
+            no_success += 1
+            print(".", end="")
+        else:
+            print("!")
+            print(f"\nS={S}; f={f}; g={g}")
+
+        sys.stdout.flush()
+
+    print(f"Testing finished. Success rate: {no_success*100/K:.1f}%")
+    print(f"Mean times (per instance), construction + solving:")
+    print(f"Plain MIP: {plain_MIP_time / K:.1f} sec.")
+    print(f"CPP MIP: {CPP_MIP_time / K:.1f} sec.")
+
+
 def main():
-    """Runs when called from a command line"""
+    """Runs when called from a command line."""
     # Procedure that is run if executed from the command line
 
     # S = [[1], [1, 2], [1, 2, 3], [2, 3]]
@@ -528,7 +677,8 @@ def main():
     # print("*==============================================================*")
     # m.display()
 
-    test_build_MIP()
+    test_MIPs_protocol()
+    # test_build_MIP()
     # test_BDD_to_MIP_wg(S, f, g)
     # generate_test_figures()
     # test_BDD_to_MIP()

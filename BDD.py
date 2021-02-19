@@ -67,15 +67,14 @@ class BDD(object):
     Encodes a BDD and implements layer-ordering (revision) methods
 
     Attributes:
-        layers: a list of layers (sets/hashes)
+        layers: a list of layers (sets/hashes), including {T, F}-nodes
         nodes: a set/hash of nodes
         vars: variables associated with layers
         T,F: pointers to `True` and `False` sink nodes
     """
 
-    def __init__(self,N=2, vars=None, weighted=False):
-        """defines an empty BDD with N variables"""
-
+    def __init__(self, N=2, vars=None, weighted=False):
+        """Defines an empty BDD with N variables."""
         if not vars:
             vars = [i for i in range(1,N+1)]
 
@@ -86,11 +85,11 @@ class BDD(object):
         self.layers = [set() for i in range(N)]
         self.T = node(NTRUE)
         self.F = node(NFALSE)
-        self.layers.append(set([self.T,self.F]))
+        self.layers.append(set([self.T, self.F]))
         self.max_id = -1
         self.av_node_ids = deque()
         self.nodes = dict()
-        self.var_pos = dict(zip(vars,[i for i in range(len(self.layers))]))
+        self.var_pos = dict(zip(vars, [i for i in range(len(self.layers))]))
         self.nodes.update({NTRUE:self.T, NFALSE:self.F})
 
     ## some helper functions
@@ -105,24 +104,22 @@ class BDD(object):
            etype (str): edge type, "hi" or "lo" (default "hi")
            edge_weight (float): edge weight to e imposed (default 0.0)
         """
-
         assert parent in self.nodes.keys()
         assert child in self.nodes.keys()
         self.nodes[parent].link(self.nodes[child], etype, edge_weight)
         self.weights[(parent, child, etype)] = edge_weight
 
     def __len__(self):
-        """returns the no. of the layer-encoding variables (i.e., excluding the terminal one)"""
+        """Returns no. of variables (layers, except the terminal)."""
         return len(self.vars)
 
     def n(self, i):
-        """returns size of the i-th layer"""
+        """Returns size of the i-th layer."""
 
         return len(self.layers[i])
 
     def p(self, a):
-        """returns the position (layer index) of the variable `a`"""
-
+        """Returns the position (layer index) of the variable `a`."""
         return self.var_pos[a]
 
     def size(self):
@@ -130,13 +127,12 @@ class BDD(object):
         return len(self.nodes)-2
 
     def new_node_name(self):
-        """returns a unique name for the next node to be created
+        """Returns a unique name for the next node to be created.
 
         Picks the one to re-cycle after some node deletions, when available;
         when it is not -- just takes the `max_id+1` (adjusting the `max_id` itself)
         """
-
-        if len(self.av_node_ids)>0:
+        if len(self.av_node_ids) > 0:
             return self.av_node_ids.popleft()
         else:
             self.max_id += 1

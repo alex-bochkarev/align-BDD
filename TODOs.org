@@ -4,7 +4,7 @@
   - [X] remove c_ij weights from /problem generation/
   - [X] remove $x_i$ variables at all (for /availability/ BDD)
   - [X] build a naive-MIP (for arbitrary g)
-  - [ ] compare naive-MIP and BDD-MIP (solutions must coincide)
+  - [X] compare naive-MIP and BDD-MIP (solutions must coincide)
   - [ ] think about reduction procedure by cite:hooker2013 (would it ever work?)
   - [ ] build intersection BDDs out of two
   - [ ] build NF from the intersection BDD
@@ -30,5 +30,8 @@ As of beginning of the day <2020-07-11> all of these are merged into =master=
  [2021-02-06 Sat 17:40]
  [[file:~/projects/align-BDD/UFL.py][file:~/projects/align-BDD/UFL.py]]
 ** TODO Maybe look into Sphinx?.. Or what is the best practice? :doc:
+** TODO Clean-up testing code (remove unnecessary, add separate testing)
+ [2021-02-19 Fri 12:47]
+ [[file:~/projects/align-BDD/UFL.py]]
 * Notes
   - first submission corresponds to =master= commit =04a5b38=
