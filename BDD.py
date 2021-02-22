@@ -22,16 +22,20 @@ from collections import deque
 import copy
 import math
 
+# Module-level constants
 GSIFTS_MAX_INCREASE_MUL = 100000  # max increase of the BDD size (e.g., 100 times) during greedy sifts
+WEIGHT_TOL = 3  # number of decimal points for the arc weights tolerance (swap_up)
+C_MAX = 50  # max edge cost (for random generation, non-inclusive)
 
-## special node IDs (see the node class docstring)
+# special node IDs (see the node class docstring)
 NROOT = 0
 NTRUE = -1
 NFALSE = -2
 ######################################################################
+
+
 class node(object):
-    """
-    Encodes a node of the BDD
+    """Encodes a node of the BDD.
 
     Attributes:
         id: an int node ID
@@ -46,25 +50,26 @@ class node(object):
         -2  for the False sink
     """
 
-    def __init__(self, id, hi=None,lo=None, layer=-1):
+    def __init__(self, id, hi=None, lo=None, layer=-1):
         self.id = id
         self.hi = hi
         self.lo = lo
         self.layer = layer
 
-    def link(self, to_whom, arc="hi", edge_weight=0.0):
-        """Helper function: links the node to another one"""
-        if arc=="hi":
+    def link(self, to_whom, arc="hi"):
+        """Helper function: links the node to another one."""
+        if arc == "hi":
             self.hi = to_whom
-        elif arc=="lo":
+        elif arc == "lo":
             self.lo = to_whom
         else:
             print("ERROR: wrong arc specifier while creating an edge -- {} (expected 'hi' or 'lo')".format(arc))
 
 ######################################################################
+
+
 class BDD(object):
-    """
-    Encodes a BDD and implements layer-ordering (revision) methods
+    """Encodes a BDD and implements layer-ordering (revision) methods.
 
     Attributes:
         layers (list): a list of layers (sets/hashes), including {T, F}-nodes
@@ -72,12 +77,14 @@ class BDD(object):
         vars (list): variables associated with layers
         T,F (node): pointers to `True` and `False` sink nodes
         weighted (bool): a flag whether arcs have weights
+        weights (dict): arc weights, keys: `(id_from, id_to, arc_type)`
+                        (with the latter either 'hi', or 'lo')
     """
 
     def __init__(self, N=2, vars=None, weighted=False):
         """Defines an empty BDD with N variables."""
         if not vars:
-            vars = [i for i in range(1,N+1)]
+            vars = [i for i in range(1, N+1)]
 
         self.vars = vars
         self.weighted = weighted
@@ -91,9 +98,9 @@ class BDD(object):
         self.av_node_ids = deque()
         self.nodes = dict()
         self.var_pos = dict(zip(vars, [i for i in range(len(self.layers))]))
-        self.nodes.update({NTRUE:self.T, NFALSE:self.F})
+        self.nodes.update({NTRUE: self.T, NFALSE: self.F})
 
-    ## some helper functions
+    # some helper functions
 
     def link(self, parent, child, etype="hi", edge_weight=0.0):
         """Creates a link between two nodes.
@@ -109,8 +116,25 @@ class BDD(object):
         """
         assert parent in self.nodes.keys()
         assert child in self.nodes.keys()
-        self.nodes[parent].link(self.nodes[child], etype, edge_weight)
-        self.weights[(parent, child, etype)] = edge_weight
+        self.nodes[parent].link(self.nodes[child], etype)
+        if self.weighted:
+            self.weights[(parent, child, etype)] = edge_weight
+
+    def llink(self, parent, child, etype="hi", edge_weight=0.0):
+        """Creates a link between two nodes.
+
+        (Saving auxiliary info as appropriate)
+
+        Args:
+           self (type): description
+           parent (class node): parent node
+           child (class node): child node
+           etype (str): edge type, "hi" or "lo" (default "hi")
+           edge_weight (float): edge weight to e imposed (default 0.0)
+        """
+        parent.link(child, etype)
+        if self.weighted:
+            self.weights[(parent.id, child.id, etype)] = edge_weight
 
     def __len__(self):
         """Returns no. of variables (layers, except the terminal)."""
@@ -220,7 +244,7 @@ class BDD(object):
         return newnode
 
     def swap_up(self, layer_idx):
-        """Swaps the layer with the one immediately above it.
+        """Swaps the layer with the one immediately above it (in-place).
 
         (by _index_! in-place operation)
 
@@ -240,13 +264,6 @@ class BDD(object):
         new_nodes = dict()
 
         for n in self.layers[layer_idx]:
-            if n.id not in self.nodes.keys():
-                print("Node {} not found in layer {}, among:".format(
-                    n.id, layer_idx))
-                for k in self.layers[layer_idx]:
-                    print(k.id)
-                print("The set is: {}".format(self.layers[layer_idx]))
-
             del self.nodes[n.id]
             self.av_node_ids.append(n.id)
 
@@ -254,39 +271,104 @@ class BDD(object):
 
         prev_layer = self.layers[layer_idx-1]
 
-        for F in prev_layer:
-            # iterating throuhg the nodes of the upper layer
+        if not self.weighted:
+            for F in prev_layer:
+                # iterating through the nodes of the upper layer
 
-            # save the pointers
-            F_hi_hi = F.hi.hi
-            F_hi_lo = F.hi.lo
-            F_lo_hi = F.lo.hi
-            F_lo_lo = F.lo.lo
+                # save the pointers
+                F_hi_hi = F.hi.hi
+                F_hi_lo = F.hi.lo
+                F_lo_hi = F.lo.hi
+                F_lo_lo = F.lo.lo
 
-            # creating the "hi"-node
-            if not (F_hi_hi.id, F_lo_hi.id) in new_nodes.keys():
-                F_hi = self.addnode(F, "hi")
-                F_hi.link(F_hi_hi, "hi")
-                F_hi.link(F_lo_hi, "lo")
-                new_nodes.update({(F_hi.hi.id, F_hi.lo.id): F_hi})
-            else:
-                F_hi = new_nodes[(F_hi_hi.id,
-                                  F_lo_hi.id)]  # re-cycle the old node
-                F.link(F_hi, "hi")
+                # creating the "hi"-node
+                if not (F_hi_hi.id, F_lo_hi.id) in new_nodes.keys():
+                    F_hi = self.addnode(F, "hi")
+                    F_hi.link(F_hi_hi, "hi")
+                    F_hi.link(F_lo_hi, "lo")
+                    new_nodes.update({(F_hi.hi.id, F_hi.lo.id): F_hi})
+                else:
+                    F_hi = new_nodes[(F_hi_hi.id,
+                                    F_lo_hi.id)]  # re-cycle the old node
+                    F.link(F_hi, "hi")
 
-            # creating the "lo"-node
-            if not (F_hi_lo.id, F_lo_lo.id) in new_nodes.keys():
-                F_lo = self.addnode(F, "lo")
-                F_lo.link(F_hi_lo, "hi")
-                F_lo.link(F_lo_lo, "lo")
-                new_nodes.update({(F_lo.hi.id, F_lo.lo.id): F_lo})
-            else:
-                F_lo = new_nodes[(F_hi_lo.id,
-                                  F_lo_lo.id)]  # re-cycle the old node
-                F.link(F_lo, "lo")
+                # creating the "lo"-node
+                if not (F_hi_lo.id, F_lo_lo.id) in new_nodes.keys():
+                    F_lo = self.addnode(F, "lo")
+                    F_lo.link(F_hi_lo, "hi")
+                    F_lo.link(F_lo_lo, "lo")
+                    new_nodes.update({(F_lo.hi.id, F_lo.lo.id): F_lo})
+                else:
+                    F_lo = new_nodes[(F_hi_lo.id,
+                                    F_lo_lo.id)]  # re-cycle the old node
+                    F.link(F_lo, "lo")
 
-        self.layers[layer_idx] = set(new_nodes.values())
+            self.layers[layer_idx] = set(new_nodes.values())
 
+        else:
+            # weighted version (with arc costs)
+            old_weights = copy.copy(self.weights)
+            for F in prev_layer:
+                # save the pointers
+                F_hi_hi = F.hi.hi
+                F_hi_lo = F.hi.lo
+                F_lo_hi = F.lo.hi
+                F_lo_lo = F.lo.lo
+
+                # calculating the necessary costs
+                cF_hi = old_weights[(F.id, F.hi.id, "hi")]
+                cF_lo = old_weights[(F.id, F.lo.id, "lo")]
+                cF_hi_hi = old_weights[(F.hi.id, F.hi.hi.id, "hi")]
+                cF_lo_hi = old_weights[(F.lo.id, F.lo.hi.id, "hi")]
+                cF_hi_lo = old_weights[(F.hi.id, F.hi.lo.id, "lo")]
+                cF_lo_lo = old_weights[(F.lo.id, F.lo.lo.id, "lo")]
+
+                cH_min = np.round(min(cF_hi + cF_hi_hi, cF_lo + cF_lo_hi),
+                                  decimals=WEIGHT_TOL)
+                cH_hi = np.round((cF_hi + cF_hi_hi) - cH_min,
+                                 decimals=WEIGHT_TOL)
+                cH_lo = np.round((cF_lo + cF_lo_hi) - cH_min,
+                                 decimals=WEIGHT_TOL)
+
+                cL_min = np.round(min(cF_hi + cF_hi_lo, cF_lo + cF_lo_lo),
+                                  decimals=WEIGHT_TOL)
+                cL_hi = np.round((cF_hi + cF_hi_lo) - cL_min,
+                                 decimals=WEIGHT_TOL)
+                cL_lo = np.round((cF_lo + cF_lo_lo) - cL_min,
+                                 decimals=WEIGHT_TOL)
+
+                # ----------------------------------------------------
+                # creating the "hi"-node
+
+                if not (F_hi_hi.id, F_lo_hi.id,
+                        cH_hi, cH_lo) in new_nodes.keys():
+                    F_hi = self.addnode(F, "hi", edge_weight=cH_min)
+                    self.llink(F_hi, F_hi_hi, "hi", edge_weight=cH_hi)
+                    self.llink(F_hi, F_lo_hi, "lo", edge_weight=cH_lo)
+                    new_nodes.update({(F_hi.hi.id, F_hi.lo.id,
+                                       cH_hi, cH_lo): F_hi})
+                else:
+                    F_hi = new_nodes[(F_hi_hi.id, F_lo_hi.id,
+                                      cH_hi, cH_lo)]  # re-cycle the old node
+                    self.llink(F, F_hi, "hi", edge_weight=cH_min)
+
+                # ----------------------------------------------------
+                # creating the "lo"-node
+
+                if (F_hi_lo.id, F_lo_lo.id,
+                        cL_hi, cL_lo) not in new_nodes.keys():
+                    F_lo = self.addnode(F, "lo", edge_weight=cL_min)
+                    self.llink(F_lo, F_hi_lo, "hi", edge_weight=cL_hi)
+                    self.llink(F_lo, F_lo_lo, "lo", edge_weight=cL_lo)
+
+                    new_nodes.update({(F_hi_lo.id, F_lo_lo.id,
+                                       cL_hi, cL_lo): F_lo})
+                else:
+                    # re-cycle the old node
+                    F_lo = new_nodes[(F_hi_lo.id, F_lo_lo.id, cL_hi, cL_lo)]
+                    self.llink(F, F_lo, "lo", edge_weight=cL_min)
+
+            self.layers[layer_idx] = set(new_nodes.values())
         # NOTE: old nodes in the source layer must be (physically) deleted
         # by the Python garbage collection
 
@@ -550,41 +632,47 @@ class BDD(object):
                 ])
 
     @classmethod
-    def random(cls, N=5, p=0.5):
+    def random(cls, N=5, p=0.5, weighted=False):
         """Generates a random BDD with `N` variables (N+1 layers).
 
         Args:
-            N:   number of variables (results in N+1 layers, incl. T,F)
-            p:   tree size parameter
+            N (int):   number of variables (results in N+1 layers, incl. T,F)
+            p (float):   tree size parameter
                     0 will generate a non-random exponential-sized diagram,
-                    1 will result in a single node per layer
+                    1 will result in a single node per layer.
+            weighted (bool): whether to generate a weighted diagram.
         Returns:
             A generated BDD
         """
-        bdd = BDD(N)
+        bdd = BDD(N, weighted=weighted)
 
         assert N > 1
         bdd.addnode(parent_node=None)  # create a root node
 
-        profile = []
         for layer in range(1, N):
             # generate nodes (and edges) for the layer
 
             for n in bdd.layers[layer-1]:
-                if rnd() <= p or len(bdd.layers[layer])==0:
-                    newnode = bdd.addnode(n, arc="hi")
+                ch = np.random.randint(0, 1+C_MAX)
+                cl = np.random.randint(0, 1+C_MAX)
+                if rnd() <= p or len(bdd.layers[layer]) == 0:
+                    newnode = bdd.addnode(n, arc="hi", edge_weight=ch)
                 else:
-                    n.link(rnd_choose(tuple(bdd.layers[layer])),"hi")
+                    bdd.link(n.id, rnd_choose(tuple(bdd.layers[layer])).id,
+                             "hi", edge_weight=ch)
 
                 if rnd() <= p:
-                    newnode = bdd.addnode(n, arc="lo")
+                    newnode = bdd.addnode(n, arc="lo", edge_weight=cl)
                 else:
-                    n.link(rnd_choose(tuple(bdd.layers[layer])),"lo")
+                    bdd.link(n.id, rnd_choose(tuple(bdd.layers[layer])).id,
+                           "lo", edge_weight=cl)
 
         # separately process the last layer
         for n in bdd.layers[-2]:
-            n.link(rnd_choose(tuple(bdd.layers[-1])), "hi")
-            n.link(rnd_choose(tuple(bdd.layers[-1])), "lo")
+            bdd.link(n.id, rnd_choose(tuple(bdd.layers[-1])).id,
+                     "hi", edge_weight=np.random.randint(0, 1+C_MAX))
+            bdd.link(n.id, rnd_choose(tuple(bdd.layers[-1])).id,
+                     "lo", edge_weight=np.random.randint(0, 1+C_MAX))
 
         return bdd
 
@@ -724,9 +812,12 @@ class BDD(object):
     def rename_vars(self, ren_dict):
         """Helper function: renames variables.
 
+        Note: expects the *full* dict of variables (of length `N`)
+
         Args:
           ren_dict (dict): a dict of labels in the form {before: after}
         """
+        assert len(ren_dict) == len(self)
         new_vars = [ren_dict[v] for v in self.vars]
         self.vars = new_vars
         self.var_pos = dict(zip(self.vars, [i for i in range(len(self.vars))]))
@@ -745,14 +836,21 @@ class BDD(object):
             x (dict): of {var_name: value}, where value is in {0,1}.
 
         Returns:
-            True/False/-1: terminal node corresponding to the path implied by x, encoded as Boolean (or -1 if error)
+            terminal (bool or `-1`): terminal node corresponding to the path
+                            implied by x, encoded as Boolean (or -1 if error)
+            cost (float): if the BDD is weighted, cost of the path.
         """
         (node,) = self.layers[0]
+        cost = 0.0
 
         for i in range(len(x)):
             if x[self.vars[i]] == 0:
+                if self.weighted:
+                    cost += self.weights[(node.id, node.lo.id, "lo")]
                 node = node.lo
             elif x[self.vars[i]] == 1:
+                if self.weighted:
+                    cost += self.weights[(node.id, node.hi.id, "hi")]
                 node = node.hi
             else:
                 print(
@@ -761,9 +859,15 @@ class BDD(object):
                 return -1
 
         if node.id == self.T.id:
-            return True
+            if self.weighted:
+                return [True, cost]
+            else:
+                return True
         elif node.id == self.F.id:
-            return False
+            if self.weighted:
+                return [False, cost]
+            else:
+                return False
         else:
             print("Error not a True or False node reached!")
             print("node is {}, T is {}, F is {}".format(
@@ -776,33 +880,61 @@ class BDD(object):
         ind = []
         for x_num in range(2**len(self)):
             x = [int(j) for j in np.binary_repr(x_num, width=len(self.vars))]
-            tt.append(x + [self.get_value(dict(zip(self.vars, x)))])
+            if not self.weighted:
+                tt.append(x + [self.get_value(dict(zip(self.vars, x)))])
+            else:
+                tt.append(x + self.get_value(dict(zip(self.vars, x))))
             ind.append(np.binary_repr(x_num, width=len(self.vars)))
 
-        tt = pd.DataFrame(tt, columns=self.vars + ["Value"], index=ind)
-        return tt
+        if not self.weighted:
+            return pd.DataFrame(tt, columns=[str(x) for x in self.vars] + ["Terminal"], index=ind)
+        else:
+            return pd.DataFrame(tt,
+                                columns=[str(x) for x in self.vars] + ["Terminal", "Cost"],
+                                index=ind)
 
     def is_equivalent(self, B):
         """Checks if two BDDs (A and B) are equivalent.
 
         Equivalent in the sense that they define the same Boolean function,
-        by checking if the corresponding truth tables coincide. Returns Bool
+        by checking:
+        - if the corresponding truth tables coincide.
+        - (if the BDD is weighted) if all paths have the same costs.
+
+        Returns Bool.
         """
+        assert self.weighted == B.weighted
+
         msg = None
         tt_self = self.truth_table()
         tt_B = B.truth_table()
-        tt_B = tt_B[self.vars + ['Value']]
-        tt_B['new_index'] = [
-            c for c in tt_B.apply(
-                lambda row: "".join([str(x) for x in row[:-1]]), axis=1)
-        ]
+        if self.weighted:
+            tt_B = tt_B[[str(x) for x in self.vars] + ['Terminal', 'Cost']]
+        else:
+            tt_B = tt_B[[str(x) for x in self.vars] + ['Terminal']]
+
+        if self.weighted:
+            tt_B['new_index'] = [
+                c for c in tt_B.apply(
+                    lambda row: "".join([str(x) for x in row[:-2]]), axis=1)
+            ]
+        else:
+            tt_B['new_index'] = [
+                c for c in tt_B.apply(
+                    lambda row: "".join([str(x) for x in row[:-1]]), axis=1)
+            ]
         tt_B.set_index('new_index', inplace=True)
 
         for idx, row in tt_self.iterrows():
-            if row['Value'] != tt_B.loc[idx]['Value']:
+            if row['Terminal'] != tt_B.loc[idx]['Terminal']:
                 msg = "\nINFO: Discrepancy found. For x={}, value(self)={}, value(B)={}".format(
-                    idx, row['Value'], tt_B.loc[idx]['Value'])
+                    idx, row['Terminal'], tt_B.loc[idx]['Terminal'])
                 return [False, msg]
+            if self.weighted:
+                if abs(row['Cost'] - tt_B.loc[idx]['Cost']) >= WEIGHT_TOL:
+                    msg = "\nINFO: Discrepancy found. For x={}, cost(self)={}, cost(B)={}".format(
+                        idx, row['Cost'], tt_B.loc[idx]['Cost'])
+                    return [False, msg]
 
         return [True, msg]
 
@@ -1078,44 +1210,51 @@ def test_swapping_2():
 
     bdds = copy.deepcopy(mybdd)
     bdds.swap_up(3)
-    bdds.dump_gv().render("./testing/after_swap.dot",view=True, cleanup=True)
+    bdds.dump_gv().render("./testing/after_swap.dot", view=True, cleanup=True)
+
 
 def test_random_swapping(N, k, m, p=0.8, mode="swaps"):
-    """TEST: checks if swaps work correctly (random problems)
+    """TEST: checks if swaps work correctly (random problems).
 
     Generates a random BDD, makes some random swaps (or sifts),
     and then checks that the function encoded by the BDD remained the same
     (that is, every set of var values result in the same terminal node for
     the original BDD and for the randomly changed BDD).
 
-    Involves brute-force enumaration of all the 2^n possible decisions (concerning all vars).
+    Involves brute-force enumaration of all the 2^n possible decisions
+    (concerning all vars).
 
     Args:
         N: no. of variables in the diagram
         k: no. of random BDDs generated)
         m: no. of consecutive test swaps per BDD
         p: BDD expansion prob parameter
-        mode: 'swaps' or 'sifts', determines what kind of events are to be generated
+        mode: 'swaps' or 'sifts', determines what kind of events
+                are to be generated
 
     Example:
         test_random_swapping(8,500,20,0.8,sys.argv[1])
     """
-
     status = "OK"
 
     for n in range(k):
-        bdd = BDD.random(N,p)
+        bdd = BDD.random(N, p)
         bdd_s = copy.deepcopy(bdd)
 
         # make some random layer swaps
-        if mode=='swaps':
+        if mode == 'swaps':
             for t in range(m):
-                bdd_s.swap_up(randint(1,len(bdd.vars)-1))
-        elif mode=='sifts':
+                bdd_s.swap_up(randint(1, len(bdd.vars) - 1))
+        elif mode == 'sifts':
             for t in range(m):
-                bdd_s.sift(bdd_s.vars[randint(0,len(bdd.vars)-1)],randint(0,len(bdd.vars)-1))
+                bdd_s.sift(bdd_s.vars[randint(0,
+                                              len(bdd.vars) - 1)],
+                           randint(0,
+                                   len(bdd.vars) - 1))
         else:
-            print("ERROR: wrong mode -- {}. Only 'swaps' and 'sifts' are allowed".format(mode))
+            print(
+                "ERROR: wrong mode -- {}. Only 'swaps' and 'sifts' are allowed"
+                .format(mode))
 
         # now check that everything remained the same
         no_of_bits = len(bdd.vars)
@@ -1123,20 +1262,21 @@ def test_random_swapping(N, k, m, p=0.8, mode="swaps"):
         for bit_path in range(0, 2**no_of_bits):
 
             # unpack the var values in the original order (1=hi, 0=lo)
-            var_vals = [(bit_path >> bit) & 1 for bit in range(no_of_bits-1,-1,-1)]
+            var_vals = [(bit_path >> bit) & 1
+                        for bit in range(no_of_bits - 1, -1, -1)]
 
             # get the correct answer (T or F)
             cur_node_src = list(bdd.layers[0])[0]
             cur_node_swd = list(bdd_s.layers[0])[0]
 
             i = 0
-            while i<len(bdd.vars):
-                if var_vals[i]==0:
+            while i < len(bdd.vars):
+                if var_vals[i] == 0:
                     cur_node_src = cur_node_src.lo
                 else:
                     cur_node_src = cur_node_src.hi
 
-                if var_vals[ bdd.p(bdd_s.vars[i]) ]==0:
+                if var_vals[bdd.p(bdd_s.vars[i])] == 0:
                     cur_node_swd = cur_node_swd.lo
                 else:
                     cur_node_swd = cur_node_swd.hi
@@ -1144,13 +1284,97 @@ def test_random_swapping(N, k, m, p=0.8, mode="swaps"):
                 i += 1
 
             corr_answer = cur_node_src.id
-            assert corr_answer==NTRUE or corr_answer==NFALSE
+            assert corr_answer == NTRUE or corr_answer == NFALSE
             if cur_node_swd.id != corr_answer:
-                status = "\nERROR: {}, not {}".format(cur_node_swd.id, cur_node_src)
-                print("path {}: {}".format(var_vals,status))
+                status = "\nERROR: {}, not {}".format(cur_node_swd.id,
+                                                      cur_node_src)
+                print("path {}: {}".format(var_vals, status))
 
-        if status!="OK":
+        if status != "OK":
             print("ERROR encountered!")
         else:
-            print(".",end="")
-    print("\n{} instances processed, status: {}".format(k,status))
+            print(".", end="")
+    print("\n{} instances processed, status: {}".format(k, status))
+
+
+def test_swaps_w():
+    """Tests if swaps are implemented correctly for a weighted BDD.
+
+    (All paths costs and terminals must coincide after a series of swaps.)
+
+    Returns:
+        Nothing (prints on the screen)
+    """
+    A = BDD()
+    A.load("./tests/simple_DD.wbdd", weighted=True)
+
+    B = BDD()
+    B.load("./tests/simple_DD.wbdd", weighted=True)
+    eq, msg = A.is_equivalent(B)
+    assert eq, msg
+
+    B.swap_up(1)
+    eq, msg = A.is_equivalent(B)
+    assert eq, msg
+
+    B.swap_up(1)
+    eq, msg = A.is_equivalent(B)
+    assert eq, msg
+
+    B.swap_up(1)
+    B.swap_up(2)
+    eq, msg = A.is_equivalent(B)
+    assert eq, msg
+
+def test_swaps_weighted():
+    for i in range(1000):
+        A = BDD.random(N=5, weighted=True)
+        B = copy.deepcopy(A)
+
+        B.swap_up(1)
+        eq, msg = A.is_equivalent(B)
+        assert eq, msg
+
+        B.swap_up(len(A)-1)
+        eq, msg = A.is_equivalent(B)
+        assert eq, msg
+
+        for k in range(5):
+            C = copy.deepcopy(B)
+            what = np.random.randint(2, len(A))
+            B.swap_up(what)
+            eq, msg = A.is_equivalent(B)
+            assert eq, f"for swap at {pos}: {msg}"
+
+        print(".", end="")
+        sys.stdout.flush()
+
+def test_swaps_uweighted():
+    for i in range(100):
+        A = BDD.random(N=10, weighted=False)
+        B = copy.deepcopy(A)
+
+        B.swap_up(1)
+        eq, msg = A.is_equivalent(B)
+        assert eq, msg
+
+        B.swap_up(len(A)-1)
+        eq, msg = A.is_equivalent(B)
+        assert eq, msg
+
+        for k in range(5):
+            C = copy.deepcopy(B)
+            what = np.random.randint(2, len(A))
+            print(f"swapping up {what}")
+            B.swap_up(what)
+            eq, msg = A.is_equivalent(B)
+            assert eq, msg
+
+        print(".", end="")
+        sys.stdout.flush()
+
+def main():
+    test_swaps_weighted()
+
+if __name__ == '__main__':
+    main()

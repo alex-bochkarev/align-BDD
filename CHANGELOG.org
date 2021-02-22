@@ -1,4 +1,8 @@
 * Current version
+** [2021-02-22 Mon 17:42]: implemented =swap_up= for weighted DDs 
+   (simple tests passsing)
+** [2021-02-22 Mon 12:30]: drafted =swap_up= for a weighted BDD
+** [2021-02-22 Mon 12:29]:  drafted =truth_table= for a weighted BDD
 ** [2021-02-19 Fri 16:21]: drafted the implementation of =intersect= 
 ** [2021-02-19 Fri 13:16]: implemented availability, covering BDDs + naive MIPs (tests passing)
 ** [2021-02-18 Thu 14:40]: implemented MIP generation (for arbitrary g, dict) 

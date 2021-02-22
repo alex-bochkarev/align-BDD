@@ -31,8 +31,15 @@ As of beginning of the day <2020-07-11> all of these are merged into =master=
  [2021-02-06 Sat 17:40]
  [[file:~/projects/align-BDD/UFL.py][file:~/projects/align-BDD/UFL.py]]
 ** TODO Maybe look into Sphinx?.. Or what is the best practice? :doc:
+** TODO Structure the code into a package + submodules
 ** TODO Clean-up testing code (remove unnecessary, add separate testing)
  [2021-02-19 Fri 12:47]
- [[file:~/projects/align-BDD/UFL.py]]
+** TODO implement =BDD.save()= for a weighted BDD
+ [2021-02-22 Mon 12:29]
+** TODO Perhaps, =is_equivalent= is a bad name?
+ [2021-02-22 Mon 13:48]
+ [[file:~/projects/align-BDD/BDD.py]]
+
+ Like, maybe rename to =test_equivalence=. And then =is_equivalent <- test_equivalence()[0]=
 * Notes
   - first submission corresponds to =master= commit =04a5b38=

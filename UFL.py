@@ -522,7 +522,7 @@ def solve_with_intBDD(S, f, g):
        g (dict): overlap penalty dict.
 
     Returns:
-        Resulting variables and the model.
+        Resulting model, constraints, and variables.
     """
     A = create_availability_BDD(S, f)
     C = create_covering_BDD_wg(S, g)
@@ -538,8 +538,9 @@ def solve_with_intBDD(S, f, g):
     C.align_to(b.Ap_cand.layer_var, inplace=True)
     int_DD = DD.intersect(A, C)
     m, c, v = create_NF(int_DD)
-    m.solve()
-    print(f"Status = {m.status}. Objective = {m.objVal}")
+    m.setParam("OutputFlag", 0)
+    m.optimize()
+    return m, c, v
 
 # =====================================================================
 # Testing code
@@ -762,6 +763,90 @@ def test_BDD_and_plain_MIPs(K=500, TOL=1e-3, n=3, m=4):
     print(f"Mean times (per instance), construction + solving:")
     print(f"Plain MIP: {plain_MIP_time / K:.1f} sec.")
     print(f"CPP MIP: {CPP_MIP_time / K:.1f} sec.")
+
+
+def benchmark(K=100, TOL=1e-3, n=3, m=4):
+    """Runs the solution for three different methods.
+
+    Compares plain MIP, CPP MIP, and CPP align+NF (LP) in terms of
+    objectives and time.
+
+    Args:
+        K (int): number of instances to generate (default 500)
+        TOL (float): objective tolerance (for comparison) (default 1e-3)
+        n (int): number of facilities (default 3)
+        m (type): number of customers (default 4)
+
+    Returns:
+        Nothing (outputs the success rate to the screen)
+    """
+    # define a problem
+    no_success = 0
+
+    plain_MIP_time = 0
+    CPP_MIP_time = 0
+    aBDD_time = 0
+
+    for k in range(K):
+        S, f, g = generate_test_instance(n=n, m=m)
+
+        # Generate and solve plain MIP
+        t0 = time()
+        model = build_MIP(S, f, g)
+        model.setParam("OutputFlag", 0)
+        model.optimize()
+        t1 = time()
+        plain_MIP_time += (t1 - t0)
+
+        if model.status != GRB.OPTIMAL:
+            print(f"Plain MIP status is: {model.status}")
+            print(f"\nS={S}; f={f}; g={g}")
+            continue
+        plain_MIP_obj = model.objVal
+
+        # Generate and solve CPP MIP
+        t0 = time()
+        C = create_covering_BDD_wg(S, g)
+        A = create_availability_BDD(S, f)
+
+        model, c, v, x = add_BDD_to_MIP(A, prefix="A_")
+        model, c, v, x = add_BDD_to_MIP(C, model=model, x=x, prefix="C_")
+        model.update()
+        model.setParam("OutputFlag", 0)
+        model.optimize()
+        t1 = time()
+        CPP_MIP_time += (t1 - t0)
+        if model.status != GRB.OPTIMAL:
+            print(f"CPP MIP status is: {model.status}")
+            print(f"\nS={S}; f={f}; g={g}")
+            continue
+
+        CPP_MIP_obj = model.objVal
+
+        t0 = time()
+        model, c, v = solve_with_intBDD(S, f, g)
+        t1 = time()
+        aBDD_time += (t1 - t0)
+        aBDD_obj = model.objVal
+
+        if abs(CPP_MIP_obj - plain_MIP_obj) >= TOL:
+            print("! (plain vs CPP)")
+            print(f"\nS={S}; f={f}; g={g}")
+        elif (abs(plain_MIP_obj - aBDD_obj) >= TOL):
+            print("! (plain vs aDD)")
+            print(f"plain obj={plain_MIP_obj}, while aBDD obj={aBDD_obj}")
+            print(f"\nS={S}; f={f}; g={g}")
+        else:
+            no_success += 1
+            print(".", end="")
+
+        sys.stdout.flush()
+
+    print(f"Testing finished. Success rate: {no_success*100/K:.1f}%")
+    print(f"Mean times (per instance), construction + solving:")
+    print(f"Plain MIP: {plain_MIP_time / K:.1f} sec.")
+    print(f"CPP MIP: {CPP_MIP_time / K:.1f} sec.")
+    print(f"CPP->aBDD->NF: {aBDD_time / K:.1f} sec.")
 
 
 def main():
