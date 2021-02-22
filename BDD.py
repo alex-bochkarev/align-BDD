@@ -196,7 +196,7 @@ class BDD(object):
             newnode.layer = 0
             self.layers[0].add(newnode)
 
-        elif arc=="hi":
+        elif arc == "hi":
             parent_node.hi = newnode
             self.layers[parent_node.layer+1].add(newnode)
             newnode.layer = parent_node.layer+1
@@ -204,7 +204,7 @@ class BDD(object):
                 self.weights[(parent_node.id,
                               parent_node.hi.id, 'hi')] = edge_weight
 
-        elif arc=="lo":
+        elif arc == "lo":
             parent_node.lo = newnode
             self.layers[parent_node.layer+1].add(newnode)
             newnode.layer = parent_node.layer+1
@@ -214,7 +214,6 @@ class BDD(object):
 
         else:
             print("ERROR: Wrong arc type: {}\n(allowed values are 'hi' and 'lo')".format(arc))
-
 
         self.nodes.update({newnode.id: newnode})
 
@@ -230,18 +229,20 @@ class BDD(object):
 
         Note:
             Operation takes O (no-of-nodes in the upper layer) time.
-            Drops the layer being swapped. Then iterates through the nodes of the layer
-            immediately above it and creates nodes as necessary (re-cycling new nodes to avoid
-            redundancy in terms of logical functions)
+            Drops the layer being swapped. Then iterates through the nodes
+            of the layer immediately above it and creates nodes as necessary
+            (re-cycling new nodes to avoid redundancy in terms of logical
+            functions)
         """
-        assert layer_idx >= 1 # otherwise there's no layer to swap to
-        assert layer_idx <= len(self.layers)-2 # we can't swap-up the terminal layer
+        assert layer_idx >= 1  # otherwise there's no layer to swap to
+        assert layer_idx <= len(self.layers)-2  # can't swap-up the last layer
 
         new_nodes = dict()
 
         for n in self.layers[layer_idx]:
-            if not n.id in self.nodes.keys():
-                print("Node {} not found in layer {}, among:".format(n.id,layer_idx))
+            if n.id not in self.nodes.keys():
+                print("Node {} not found in layer {}, among:".format(
+                    n.id, layer_idx))
                 for k in self.layers[layer_idx]:
                     print(k.id)
                 print("The set is: {}".format(self.layers[layer_idx]))
@@ -257,26 +258,32 @@ class BDD(object):
             # iterating throuhg the nodes of the upper layer
 
             # save the pointers
-            F_hi_hi = F.hi.hi; F_hi_lo = F.hi.lo
-            F_lo_hi = F.lo.hi; F_lo_lo = F.lo.lo
+            F_hi_hi = F.hi.hi
+            F_hi_lo = F.hi.lo
+            F_lo_hi = F.lo.hi
+            F_lo_lo = F.lo.lo
 
             # creating the "hi"-node
-            if not ( F_hi_hi.id, F_lo_hi.id ) in new_nodes.keys():
-                F_hi = self.addnode(F,"hi")
-                F_hi.link(F_hi_hi, "hi"); F_hi.link(F_lo_hi, "lo")
-                new_nodes.update({( F_hi.hi.id, F_hi.lo.id ):F_hi})
+            if not (F_hi_hi.id, F_lo_hi.id) in new_nodes.keys():
+                F_hi = self.addnode(F, "hi")
+                F_hi.link(F_hi_hi, "hi")
+                F_hi.link(F_lo_hi, "lo")
+                new_nodes.update({(F_hi.hi.id, F_hi.lo.id): F_hi})
             else:
-                F_hi = new_nodes[( F_hi_hi.id, F_lo_hi.id )] # re-cycle the old node
+                F_hi = new_nodes[(F_hi_hi.id,
+                                  F_lo_hi.id)]  # re-cycle the old node
                 F.link(F_hi, "hi")
 
             # creating the "lo"-node
-            if not ( F_hi_lo.id, F_lo_lo.id ) in new_nodes.keys():
-                F_lo = self.addnode(F,"lo")
-                F_lo.link(F_hi_lo, "hi"); F_lo.link(F_lo_lo,"lo")
-                new_nodes.update({( F_lo.hi.id, F_lo.lo.id ):F_lo})
+            if not (F_hi_lo.id, F_lo_lo.id) in new_nodes.keys():
+                F_lo = self.addnode(F, "lo")
+                F_lo.link(F_hi_lo, "hi")
+                F_lo.link(F_lo_lo, "lo")
+                new_nodes.update({(F_lo.hi.id, F_lo.lo.id): F_lo})
             else:
-                F_lo = new_nodes[( F_hi_lo.id, F_lo_lo.id )] # re-cycle the old node
-                F.link(F_lo,"lo")
+                F_lo = new_nodes[(F_hi_lo.id,
+                                  F_lo_lo.id)]  # re-cycle the old node
+                F.link(F_lo, "lo")
 
         self.layers[layer_idx] = set(new_nodes.values())
 
@@ -284,12 +291,14 @@ class BDD(object):
         # by the Python garbage collection
 
         # rename layers and update aux structures as necessary
-        self.var_pos.update({self.vars[layer_idx]:layer_idx-1, self.vars[layer_idx-1]:layer_idx})
+        self.var_pos.update({
+            self.vars[layer_idx]: layer_idx - 1,
+            self.vars[layer_idx - 1]: layer_idx
+        })
 
         v_1 = self.vars[layer_idx-1]
         self.vars[layer_idx-1] = self.vars[layer_idx]
         self.vars[layer_idx] = v_1
-
 
     def sift(self, var, pos):
         """Sifts variable `var` (name) to position `pos`, in-place."""
@@ -310,8 +319,9 @@ class BDD(object):
             while pos > self.p(var):
                 self.swap_up(self.p(var)+1)
 
-    def gsifts(self, with_whom,start_order=None):
+    def gsifts(self, with_whom, start_order=None):
         """Perform greedy sifts to align with `with_whom`.
+
         Runs a simplistic implementation of Rudell'93
         sifting alorithm extension to minimize |A|+|B|
 
@@ -322,10 +332,10 @@ class BDD(object):
             start_order = self.vars
         else:
             for i in range(N):
-                self.sift(start_order[i],i)
+                self.sift(start_order[i], i)
 
         for i in range(N):
-            with_whom.sift(start_order[i],i)
+            with_whom.sift(start_order[i], i)
 
         # now the pair is aligned, but possibly huge
         # let us see if we can compress it:
@@ -335,7 +345,7 @@ class BDD(object):
         while len(processed_vars) < N:
             i = 0
             while self.vars[i] in processed_vars:
-                i += 1 # skip processed variables
+                i += 1  # skip processed variables
 
             best_pos = i
             active_var = self.vars[i]
@@ -343,8 +353,8 @@ class BDD(object):
 
             cur_size = best_size
 
-            ## try moving the var down
-            for j in range(i+1,N):
+            # try moving the var down
+            for j in range(i+1, N):
                 #if self.size()+with_whom.size() > cur_size*GSIFTS_MAX_INCREASE_MUL:
                 #    break
 
@@ -356,7 +366,7 @@ class BDD(object):
                     best_size = cur_size
                     best_pos = j
 
-            ## try moving the var up
+            # try moving the var up
             self.sift(active_var, i)
             with_whom.sift(active_var, i)
             cur_size = self.size()+with_whom.size()
@@ -374,8 +384,8 @@ class BDD(object):
                     best_pos = j-1
 
             # now choose the best position for the variable
-            self.sift(active_var,best_pos)
-            with_whom.sift(active_var,best_pos)
+            self.sift(active_var, best_pos)
+            with_whom.sift(active_var, best_pos)
 
             processed_vars.add(active_var)
 
@@ -391,24 +401,26 @@ class BDD(object):
             Then, one node description = one line of the format:
                 id:hi,lo
 
-            where `id` is node's ID, `hi` and `lo` are IDs(!) of the nodes corresponding
-            to hi and lo pointers of the node "ID"
-            The procedure performs breadth-first search and just saves all the nodes
+            where `id` is node's ID, `hi` and `lo` are IDs(!) of the
+            nodes corresponding to hi and lo pointers of the node "ID"
+            The procedure performs breadth-first search and just saves
+            all the nodes.
         """
-        S = deque() # a deque of node IDs to explore (FIFO)
-        V = set() # set of visited (saved) nodes (by ID)
+        S = deque()  # a deque of node IDs to explore (FIFO)
+        V = set()  # set of visited (saved) nodes (by ID)
 
         for n in self.layers[0]:
             S.append(n.id)
 
-        with open(filename,"w") as f:
+        with open(filename, "w") as f:
             f.write("N={}\n".format(len(self.layers)))
             f.write("vars={}\n".format(', '.join([str(v) for v in self.vars])))
 
-            while len(S)>0:
+            while len(S) > 0:
                 n_id = S.popleft()
                 # this is a new node
-                if not (self.nodes[n_id].hi is None or self.nodes[n_id].hi is None):
+                if not (self.nodes[n_id].hi is None
+                        or self.nodes[n_id].hi is None):
                     n_hi = self.nodes[n_id].hi.id
                     n_lo = self.nodes[n_id].lo.id
                     f.write("{}:{},{}\n".format(n_id, n_hi, n_lo))
@@ -424,22 +436,22 @@ class BDD(object):
                 V.add(n_id)
 
     def load(self, filename, weighted=False):
-       """Loads a BDD from an ASCII(text) file.
+        """Loads a BDD from an ASCII(text) file.
 
-       Note:
+        Note:
             The format corresponds to the one described in the `save` function
-       """
-       with open(filename, "r") as f:
+        """
+        with open(filename, "r") as f:
             line = f.readline()
-            while line[0]=="#" or line=="":
+            while line[0] == "#" or line == "":
                 line = f.readline()
 
-            assert line[:2]=='N='
+            assert line[:2] == 'N='
             N = int(line[2:])
-            assert N>1
+            assert N > 1
 
             line = f.readline()
-            assert line[:5]=='vars='
+            assert line[:5] == 'vars='
             line = line[5:].split(',')
             assert len(line) == N-1
 
@@ -466,13 +478,14 @@ class BDD(object):
                 else:
                     id, line = line.split(':')
 
-                hi_id,lo_id = line.split(',')
-                id = int(id);
-                if id!=NTRUE and id!=NFALSE:
-                    hi_id = int(hi_id); lo_id = int(lo_id)
+                hi_id, lo_id = line.split(',')
+                id = int(id)
+                if id != NTRUE and id != NFALSE:
+                    hi_id = int(hi_id)
+                    lo_id = int(lo_id)
                     if weighted:
-                        self.weights[(id, hi_id,"hi")] = w_hi
-                        self.weights[(id, lo_id,"lo")] = w_lo
+                        self.weights[(id, hi_id, "hi")] = w_hi
+                        self.weights[(id, lo_id, "lo")] = w_lo
                 else:
                     line = f.readline()
                     continue
@@ -493,7 +506,10 @@ class BDD(object):
                         e_w = w_hi
                     else:
                         e_w = 0.0
-                    F_hi = self.addnode(self.nodes[id],"hi",node_id=hi_id, edge_weight=e_w)
+                    F_hi = self.addnode(self.nodes[id],
+                                        "hi",
+                                        node_id=hi_id,
+                                        edge_weight=e_w)
                     next_layer.add(hi_id)
 
                 if lo_id in next_layer:
@@ -504,16 +520,20 @@ class BDD(object):
                         e_w = w_lo
                     else:
                         e_w = 0.0
-                    F_lo = self.addnode(self.nodes[id],"lo", node_id=lo_id, edge_weight=e_w)
+                    F_lo = self.addnode(self.nodes[id],
+                                        "lo",
+                                        node_id=lo_id,
+                                        edge_weight=e_w)
                     next_layer.add(lo_id)
 
-                if not id in self.nodes.keys():
-                    if current_layer>0:
-                        print("WARNING: a node with no source at layer {}".format(current_layer))
+                if id not in self.nodes.keys():
+                    if current_layer > 0:
+                        print("WARNING: a node with no source at layer {}".
+                              format(current_layer))
 
-                    F = node(id,F_hi,F_lo)
+                    F = node(id, F_hi, F_lo)
                     self.layers[current_layer].add(F)
-                    self.nodes.update({id:F})
+                    self.nodes.update({id: F})
 
                 if id == NTRUE:
                     self.T = self.nodes[id]
@@ -524,14 +544,17 @@ class BDD(object):
                 line = f.readline()
 
                 self.max_id = max([n.id for n in self.nodes.values()])
-                self.av_node_ids = deque([i for i in range(1,self.max_id+1) if not i in self.nodes.keys()])
+                self.av_node_ids = deque([
+                    i for i in range(1, self.max_id + 1)
+                    if i not in self.nodes.keys()
+                ])
 
     @classmethod
-    def random(cls, N=5,p=0.5):
+    def random(cls, N=5, p=0.5):
         """Generates a random BDD with `N` variables (N+1 layers).
 
         Args:
-            N:   number of variables (to result in N+1 layers, including the T,F-layer)
+            N:   number of variables (results in N+1 layers, incl. T,F)
             p:   tree size parameter
                     0 will generate a non-random exponential-sized diagram,
                     1 will result in a single node per layer
@@ -540,31 +563,30 @@ class BDD(object):
         """
         bdd = BDD(N)
 
-        assert N>1
-        bdd.addnode(parent_node=None) # create a root node
+        assert N > 1
+        bdd.addnode(parent_node=None)  # create a root node
 
         profile = []
-        for layer in range(1,N):
+        for layer in range(1, N):
             # generate nodes (and edges) for the layer
 
             for n in bdd.layers[layer-1]:
                 if rnd() <= p or len(bdd.layers[layer])==0:
-                    newnode = bdd.addnode(n,arc="hi")
+                    newnode = bdd.addnode(n, arc="hi")
                 else:
                     n.link(rnd_choose(tuple(bdd.layers[layer])),"hi")
 
                 if rnd() <= p:
-                    newnode = bdd.addnode(n,arc="lo")
+                    newnode = bdd.addnode(n, arc="lo")
                 else:
                     n.link(rnd_choose(tuple(bdd.layers[layer])),"lo")
 
         # separately process the last layer
         for n in bdd.layers[-2]:
-            n.link(rnd_choose(tuple(bdd.layers[-1])),"hi")
-            n.link(rnd_choose(tuple(bdd.layers[-1])),"lo")
+            n.link(rnd_choose(tuple(bdd.layers[-1])), "hi")
+            n.link(rnd_choose(tuple(bdd.layers[-1])), "lo")
 
         return bdd
-
 
     def profile(self):
         """Returns a BDD ``profile'' -- an (almost) BFS-ordered list of nodes.
@@ -576,13 +598,13 @@ class BDD(object):
         """
         Q = deque()
         V = set()
-        node_nums = dict();
+        node_nums = dict()
         cur_node = 0
 
         p = []
 
         for n in self.layers[0]:
-            node_nums.update({n.id:cur_node})
+            node_nums.update({n.id: cur_node})
             Q.append(n)
             p.append(str(cur_node))
             cur_node += 1
@@ -596,27 +618,35 @@ class BDD(object):
                 if successor is None:
                     continue
 
-                if not successor.id in node_nums.keys():
+                if successor.id not in node_nums.keys():
                     node_nums.update({successor.id: cur_node})
                     cur_node += 1
 
                 p.append(str(node_nums[successor.id]))
-                if not successor.id in V:
+                if successor.id not in V:
                     Q.append(successor)
                     V.add(successor.id)
 
         return p[0] + ",".join(p[1:])
 
-    def show(self, dir="testing", filename="showfunc.dot", layerCapt=True, x_prefix="x"):
-        """Shows the diagram by generating a `.dot` file and compiling it to `.pdf`.
+    def show(self,
+             dir="testing",
+             filename="showfunc.dot",
+             layerCapt=True,
+             x_prefix="x"):
+        """Shows the diagram.
+
+        Generates a `.dot` file and compiles it to `.pdf`.
 
         Args:
             dir (str): directory to place files (default: "testing")
-            filename (str): `.dot` filename (default "showfunc.dot")
-            layerCapt (bool): whether to generate layer captions
+            filename (str): `.dot` filename (default: "showfunc.dot")
+            layerCapt (bool): whether to show layer captions (default: True)
+            x_prefix(str): a prefix for variable captions (default:'x')
         """
-
-        self.dump_gv(layerCapt, x_prefix).view(filename, directory=dir, cleanup=True)
+        self.dump_gv(layerCapt, x_prefix).view(filename,
+                                               directory=dir,
+                                               cleanup=True)
 
     def align_to(self, vars_order, inplace=False):
         """Revises the BDD to a given order.
@@ -626,12 +656,12 @@ class BDD(object):
         if inplace:
             aligned = self
         else:
-            aligned = copy.deepcopy(self);
+            aligned = copy.deepcopy(self)
 
         for i in range(len(vars_order)):
-            aligned.sift(vars_order[i],i)
+            aligned.sift(vars_order[i], i)
 
-        return aligned;
+        return aligned
 
     def OA_bruteforce(self, with_what, LR=False):
         """Finds the best (smallest) alignment with BDD `with_what`.
@@ -673,7 +703,7 @@ class BDD(object):
         """Checks if the BDD is reduced (no ``redundant'' nodes)."""
         checked_nodes = set()
 
-        for layer in range(len(self.layers)-2,-1,-1):
+        for layer in range(len(self.layers)-2, -1, -1):
             for n in self.layers[layer]:
                 if (n.hi.id, n.lo.id) in checked_nodes:
                     return False
@@ -683,12 +713,11 @@ class BDD(object):
         return True
 
     def make_reduced(self):
-        """makes the BDD reduced
+        """Makes the BDD reduced.
 
         Swaps each layer back and forth, starting from the last one.
         """
-
-        for i in range(len(self.vars)-1,0,-1):
+        for i in range(len(self.vars)-1, 0, -1):
             self.swap_up(i)
             self.swap_up(i)
 
@@ -696,17 +725,17 @@ class BDD(object):
         """Helper function: renames variables.
 
         Args:
-          ren_dict -- a dict of labels in the form {before: after}
+          ren_dict (dict): a dict of labels in the form {before: after}
         """
         new_vars = [ren_dict[v] for v in self.vars]
         self.vars = new_vars
-        self.var_pos = dict(zip(self.vars,[i for i in range(len(self.vars))]))
+        self.var_pos = dict(zip(self.vars, [i for i in range(len(self.vars))]))
 
     def is_aligned(self, to_what):
-        """helper function: checks if the BDD is aligned w/ to_what"""
+        """Helper function: checks if the BDD is aligned w/ to_what."""
         return np.array_equal(self.vars, to_what.vars)
 
-    ## functions related to testing equivalence and finding truth tables
+    # functions related to testing equivalence and finding truth tables
     def get_value(self, x):
         """Finds the terminal node (T or F) -- an endpoint for `x`.
 
@@ -726,7 +755,9 @@ class BDD(object):
             elif x[self.vars[i]] == 1:
                 node = node.hi
             else:
-                print("Wrong value ({}) for variabe {}: 0 or 1 expected".format(x[self.vars[i]], self.vars[i]))
+                print(
+                    "Wrong value ({}) for variabe {}: 0 or 1 expected".format(
+                        x[self.vars[i]], self.vars[i]))
                 return -1
 
         if node.id == self.T.id:
@@ -735,34 +766,42 @@ class BDD(object):
             return False
         else:
             print("Error not a True or False node reached!")
-            print("node is {}, T is {}, F is {}".format(node.id, self.T.id, self.F.id))
+            print("node is {}, T is {}, F is {}".format(
+                node.id, self.T.id, self.F.id))
             return -1
 
     def truth_table(self):
-        """Returns a truth table for the Boolean function defined by the BDD"""
+        """Returns a truth table for the BDD (as a Boolean function)."""
         tt = []
         ind = []
         for x_num in range(2**len(self)):
-            x = [int(j) for j in np.binary_repr(x_num, width = len(self.vars))]
-            tt.append(x + [ self.get_value(dict( zip(self.vars, x) )) ])
-            ind.append(np.binary_repr(x_num, width = len(self.vars)))
+            x = [int(j) for j in np.binary_repr(x_num, width=len(self.vars))]
+            tt.append(x + [self.get_value(dict(zip(self.vars, x)))])
+            ind.append(np.binary_repr(x_num, width=len(self.vars)))
 
-        tt = pd.DataFrame(tt, columns = self.vars + ["Value"], index = ind)
+        tt = pd.DataFrame(tt, columns=self.vars + ["Value"], index=ind)
         return tt
 
     def is_equivalent(self, B):
-        """Checks if two BDDs (A and B) are equivalent in the sense that they define the same Boolean function,
+        """Checks if two BDDs (A and B) are equivalent.
+
+        Equivalent in the sense that they define the same Boolean function,
         by checking if the corresponding truth tables coincide. Returns Bool
         """
         msg = None
-        tt_self = self.truth_table(); tt_B = B.truth_table()
+        tt_self = self.truth_table()
+        tt_B = B.truth_table()
         tt_B = tt_B[self.vars + ['Value']]
-        tt_B['new_index'] = [c for c in tt_B.apply(lambda row: "".join([str(x) for x in row[:-1]]), axis=1)]
+        tt_B['new_index'] = [
+            c for c in tt_B.apply(
+                lambda row: "".join([str(x) for x in row[:-1]]), axis=1)
+        ]
         tt_B.set_index('new_index', inplace=True)
 
         for idx, row in tt_self.iterrows():
             if row['Value'] != tt_B.loc[idx]['Value']:
-                msg = "\nINFO: Discrepancy found. For x={}, value(self)={}, value(B)={}".format(idx, row['Value'], tt_B.loc[idx]['Value'])
+                msg = "\nINFO: Discrepancy found. For x={}, value(self)={}, value(B)={}".format(
+                    idx, row['Value'], tt_B.loc[idx]['Value'])
                 return [False, msg]
 
         return [True, msg]
