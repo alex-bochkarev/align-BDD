@@ -6,9 +6,9 @@
   - [X] build a naive-MIP (for arbitrary g)
   - [X] compare naive-MIP and BDD-MIP (solutions must coincide)
   - [X] build intersection BDDs out of two
-  - [ ] modify =swap_up= to account for edge costs!
-  - [ ] build NF from the intersection BDD
-  - [ ] think about reduction procedure by cite:hooker2013 (would it ever work?)
+  - [X] modify =swap_up= to account for edge costs!
+  - [X] build NF from the intersection BDD
+  - [X] think about reduction procedure by cite:hooker2013 (would it ever work?)
   - [X] implement MIP formulation from BDDs : FIXME: won't work with weighted BDDs! (trivial changes needed)
   - [X] make arbitrary-g BDDs (expanding covering DDs)
  
@@ -41,5 +41,7 @@ As of beginning of the day <2020-07-11> all of these are merged into =master=
  [[file:~/projects/align-BDD/BDD.py]]
 
  Like, maybe rename to =test_equivalence=. And then =is_equivalent <- test_equivalence()[0]=
+** TODO rename =VarSeq.layer_var= into =vars=, I suppose...
+ [2021-02-22 Mon 17:52]
 * Notes
   - first submission corresponds to =master= commit =04a5b38=

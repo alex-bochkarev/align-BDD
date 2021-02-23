@@ -529,14 +529,17 @@ def solve_with_intBDD(S, f, g):
     vs_A = vs.VarSeq(A.vars, [len(L) for L in A.layers[:-1]])
     vs_C = vs.VarSeq(C.vars, [len(L) for L in C.layers[:-1]])
 
+    assert set(vs_A.layer_var) == set(vs_C.layer_var)
     b = bb.BBSearch(vs_A, vs_C)
 
+    # bb.TIMEOUT_ITERATIONS=10000
     status = b.search()
-    assert status == "optimal"
+    assert status == "optimal" or status == "timeout"
 
-    A.align_to(b.Ap_cand.layer_var, inplace=True)
-    C.align_to(b.Ap_cand.layer_var, inplace=True)
-    int_DD = DD.intersect(A, C)
+    Ap = A.align_to(b.Ap_cand.layer_var, inplace=False)
+    Cp = C.align_to(b.Ap_cand.layer_var, inplace=False)
+
+    int_DD = DD.intersect(Ap, Cp)
     m, c, v = create_NF(int_DD)
     m.setParam("OutputFlag", 0)
     m.optimize()
@@ -765,7 +768,7 @@ def test_BDD_and_plain_MIPs(K=500, TOL=1e-3, n=3, m=4):
     print(f"CPP MIP: {CPP_MIP_time / K:.1f} sec.")
 
 
-def benchmark(K=100, TOL=1e-3, n=3, m=4):
+def benchmark(K=100, TOL=1e-3, n=5, m=7):
     """Runs the solution for three different methods.
 
     Compares plain MIP, CPP MIP, and CPP align+NF (LP) in terms of
@@ -790,6 +793,8 @@ def benchmark(K=100, TOL=1e-3, n=3, m=4):
     for k in range(K):
         S, f, g = generate_test_instance(n=n, m=m)
 
+        with open("run_logs/current_problem.txt", "w") as current_instance:
+            current_instance.write(f"S={S}; f={f}; g={g}")
         # Generate and solve plain MIP
         t0 = time()
         model = build_MIP(S, f, g)
@@ -861,13 +866,14 @@ def main():
     #     (1, 2): 2,  (2, 2): 2,  (3, 2): 2,  (4, 2): 2,
     #     (3, 3): 3}
 
+    benchmark()
     # m = build_MIP(S, f, c, g)
     # print("*==============================================================*")
     # print("* A MIP for the problem:                                       *")
     # print("*==============================================================*")
     # m.display()
 
-    test_MIPs_protocol()
+    # test_MIPs_protocol()
     # test_build_MIP()
     # test_BDD_to_MIP_wg(S, f, g)
     # generate_test_figures()
