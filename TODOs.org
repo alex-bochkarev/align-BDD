@@ -1,17 +1,9 @@
 * Immediate TODOs
-  - [X] fix weights at zero arcs (they were wrong, I suppose)
-  - [X] remove hard constraint on "cover everyone"
-  - [X] remove c_ij weights from /problem generation/
-  - [X] remove $x_i$ variables at all (for /availability/ BDD)
-  - [X] build a naive-MIP (for arbitrary g)
-  - [X] compare naive-MIP and BDD-MIP (solutions must coincide)
-  - [X] build intersection BDDs out of two
-  - [X] modify =swap_up= to account for edge costs!
-  - [X] build NF from the intersection BDD
-  - [X] think about reduction procedure by cite:hooker2013 (would it ever work?)
-  - [X] implement MIP formulation from BDDs : FIXME: won't work with weighted BDDs! (trivial changes needed)
-  - [X] make arbitrary-g BDDs (expanding covering DDs)
- 
+ - [ ] mini bench
+ - [ ] prepare a PBS
+ - [ ] run a proper bench
+ - [ ] prepare a status update note
+
 * Current project TODOs
 ** TODO Kill already merged branches
  [2020-07-11 Sat 09:49]
@@ -21,19 +13,16 @@
 - scal_update (major scal update)
 
 As of beginning of the day <2020-07-11> all of these are merged into =master=
-** TODO Revise tests for key functions
+** TODO Introduce a proper testing framework
+** TODO Clean-up testing code (remove unnecessary, add separate testing)
+ [2021-02-19 Fri 12:47]
 ** TODO add diagram generation tests :UFL:
-** DONE Move =are_equivalent= method to =BDD.py=
-   CLOSED: [2020-08-13 Thu 11:14]
- [2020-08-12 Wed 12:07]
- [[file:~/projects/align-BDD/experiments/BDD_size_illustration/BDD_size_illustration.py::B.load("./sample_5var_inst.bdd")]]
+** TODO Structure the code into a package + submodules
+** TODO Maybe look into Sphinx?.. Or what is the best practice? :doc:
+** TODO Revise tests for key functions
 ** TODO Requires =gurobi= to run examples :doc:
  [2021-02-06 Sat 17:40]
  [[file:~/projects/align-BDD/UFL.py][file:~/projects/align-BDD/UFL.py]]
-** TODO Maybe look into Sphinx?.. Or what is the best practice? :doc:
-** TODO Structure the code into a package + submodules
-** TODO Clean-up testing code (remove unnecessary, add separate testing)
- [2021-02-19 Fri 12:47]
 ** TODO implement =BDD.save()= for a weighted BDD
  [2021-02-22 Mon 12:29]
 ** TODO Perhaps, =is_equivalent= is a bad name?
@@ -43,5 +32,9 @@ As of beginning of the day <2020-07-11> all of these are merged into =master=
  Like, maybe rename to =test_equivalence=. And then =is_equivalent <- test_equivalence()[0]=
 ** TODO rename =VarSeq.layer_var= into =vars=, I suppose...
  [2021-02-22 Mon 17:52]
+** DONE Move =are_equivalent= method to =BDD.py=
+   CLOSED: [2020-08-13 Thu 11:14]
+ [2020-08-12 Wed 12:07]
+ [[file:~/projects/align-BDD/experiments/BDD_size_illustration/BDD_size_illustration.py::B.load("./sample_5var_inst.bdd")]]
 * Notes
   - first submission corresponds to =master= commit =04a5b38=
