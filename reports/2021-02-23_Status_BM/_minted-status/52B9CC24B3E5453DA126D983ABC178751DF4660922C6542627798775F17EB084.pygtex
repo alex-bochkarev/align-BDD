@@ -1,0 +1,21 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{k+kn}{import} \PYG{n+nn}{varseq} \PYG{k}{as} \PYG{n+nn}{vs}
+\PYG{k+kn}{from} \PYG{n+nn}{BB\PYGZus{}search} \PYG{k+kn}{import} \PYG{n}{BBSearch}
+
+\PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+sa}{f}\PYG{l+s+s2}{\PYGZdq{}Size *before* alignment: \PYGZob{}A.size()\PYGZcb{} + \PYGZob{}C.size()\PYGZcb{} = \PYGZob{}A.size() + C.size()\PYGZcb{} nodes.\PYGZdq{}}\PYG{p}{)}
+\PYG{n}{vs\PYGZus{}A} \PYG{o}{=} \PYG{n}{vs}\PYG{o}{.}\PYG{n}{VarSeq}\PYG{p}{(}\PYG{n}{A}\PYG{o}{.}\PYG{n}{vars}\PYG{p}{,} \PYG{p}{[}\PYG{n+nb}{len}\PYG{p}{(}\PYG{n}{L}\PYG{p}{)} \PYG{k}{for} \PYG{n}{L} \PYG{o+ow}{in} \PYG{n}{A}\PYG{o}{.}\PYG{n}{layers}\PYG{p}{[:}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{p}{]])}
+\PYG{n}{vs\PYGZus{}C} \PYG{o}{=} \PYG{n}{vs}\PYG{o}{.}\PYG{n}{VarSeq}\PYG{p}{(}\PYG{n}{C}\PYG{o}{.}\PYG{n}{vars}\PYG{p}{,} \PYG{p}{[}\PYG{n+nb}{len}\PYG{p}{(}\PYG{n}{L}\PYG{p}{)} \PYG{k}{for} \PYG{n}{L} \PYG{o+ow}{in} \PYG{n}{C}\PYG{o}{.}\PYG{n}{layers}\PYG{p}{[:}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{p}{]])}
+\PYG{n}{b} \PYG{o}{=} \PYG{n}{BBSearch}\PYG{p}{(}\PYG{n}{vs\PYGZus{}A}\PYG{p}{,} \PYG{n}{vs\PYGZus{}C}\PYG{p}{)}
+
+\PYG{n}{status} \PYG{o}{=} \PYG{n}{b}\PYG{o}{.}\PYG{n}{search}\PYG{p}{()}
+\PYG{k}{assert} \PYG{n}{status} \PYG{o}{==} \PYG{l+s+s2}{\PYGZdq{}optimal\PYGZdq{}} \PYG{o+ow}{or} \PYG{n}{status} \PYG{o}{==} \PYG{l+s+s2}{\PYGZdq{}timeout\PYGZdq{}}
+
+\PYG{n}{Ap} \PYG{o}{=} \PYG{n}{A}\PYG{o}{.}\PYG{n}{align\PYGZus{}to}\PYG{p}{(}\PYG{n}{b}\PYG{o}{.}\PYG{n}{Ap\PYGZus{}cand}\PYG{o}{.}\PYG{n}{layer\PYGZus{}var}\PYG{p}{,} \PYG{n}{inplace}\PYG{o}{=}\PYG{k+kc}{False}\PYG{p}{)}
+\PYG{n}{Cp} \PYG{o}{=} \PYG{n}{C}\PYG{o}{.}\PYG{n}{align\PYGZus{}to}\PYG{p}{(}\PYG{n}{b}\PYG{o}{.}\PYG{n}{Ap\PYGZus{}cand}\PYG{o}{.}\PYG{n}{layer\PYGZus{}var}\PYG{p}{,} \PYG{n}{inplace}\PYG{o}{=}\PYG{k+kc}{False}\PYG{p}{)}
+
+\PYG{n}{Ap}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{n+nb}{dir}\PYG{o}{=}\PYG{l+s+s2}{\PYGZdq{}reports/2021\PYGZhy{}02\PYGZhy{}23\PYGZus{}Status\PYGZus{}BM/\PYGZdq{}}\PYG{p}{,} \PYG{n}{filename}\PYG{o}{=}\PYG{l+s+s2}{\PYGZdq{}A\PYGZus{}aligned.dot\PYGZdq{}}\PYG{p}{,} \PYG{n}{x\PYGZus{}prefix}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}\PYGZsq{}}\PYG{p}{)}
+\PYG{n}{Cp}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{n+nb}{dir}\PYG{o}{=}\PYG{l+s+s2}{\PYGZdq{}reports/2021\PYGZhy{}02\PYGZhy{}23\PYGZus{}Status\PYGZus{}BM/\PYGZdq{}}\PYG{p}{,} \PYG{n}{filename}\PYG{o}{=}\PYG{l+s+s2}{\PYGZdq{}C\PYGZus{}aligned.dot\PYGZdq{}}\PYG{p}{,} \PYG{n}{x\PYGZus{}prefix}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}\PYGZsq{}}\PYG{p}{)}
+\PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+sa}{f}\PYG{l+s+s2}{\PYGZdq{}Size *after* alignment: \PYGZob{}Ap.size()\PYGZcb{} + \PYGZob{}Cp.size()\PYGZcb{} = \PYGZob{}Ap.size() + Cp.size()\PYGZcb{} nodes.\PYGZdq{}}\PYG{p}{)}
+\PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+sa}{f}\PYG{l+s+s2}{\PYGZdq{}The order revised from }\PYG{l+s+se}{\PYGZbs{}n}\PYG{l+s+s2}{ A: }\PYG{l+s+si}{\PYGZob{}A.vars\PYGZcb{}}\PYG{l+s+s2}{, and}\PYG{l+s+se}{\PYGZbs{}n}\PYG{l+s+s2}{ C: }\PYG{l+s+si}{\PYGZob{}C.vars\PYGZcb{}}\PYG{l+s+s2}{...\PYGZdq{}}\PYG{p}{)}
+\PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+sa}{f}\PYG{l+s+s2}{\PYGZdq{}...to }\PYG{l+s+si}{\PYGZob{}Ap.vars\PYGZcb{}}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
+\end{Verbatim}
