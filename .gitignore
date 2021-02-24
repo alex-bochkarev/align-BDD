@@ -14,3 +14,4 @@ run_logs/problem_dia.gv
 run_logs/toy_covering.gv
 run_logs/toy_avail.gv
 testing/showfunc.dot.*
+.ipynb_checkpoints/
