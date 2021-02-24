@@ -1,0 +1,766 @@
+#+TITLE: Status update
+#+OPTIONS: toc:nil author:nil date:nil H:3
+#+LATEX_HEADER: \usepackage[margin=1in]{geometry}
+#+LATEX_EADER: \usepackage{caption}
+#+LATEX_HEADER: \usepackage{subcaption}
+#+PROPERTY: header-args :eval never-export
+
+* Status
+  - I have implemented some of the key machinery, so now I can play with it:
+    weighted BDD transformations, building a simple MIP, creating BDDs
+    (availability, covering, and their intersection), building CPP MIP and a
+    network flow based on the intersection BDD.
+  - I ran several really simple examples, and stumbled upon a problem: I think
+    my intersection BDD (unsurprisingly) blows up. It is just a little more
+    dramatic than I expected -- see the last section here.
+
+* A toy example (updated, again)
+  This is the same example updated according to our recent discussions.
+** Problem description
+Let us consider a simple problem with two facilities and three customers, as
+depicted in Figure \ref{fig:problem}.
+
+#+begin_src python :results output :exports none :header-args :dir ../.. :session *pyOrg*
+import UFL
+
+S = [[1], [1, 2], [1, 2, 3], [2, 3]]
+f = {1: 1, 2: 2, 3: 3}
+g = {
+    (1, 0): 0.1,  (2, 0): 0.2,  (3, 0): 0.3,  (4, 0): 0.4,
+    (1, 1): 1.1,  (2, 1): 1.2,  (3, 1): 1.3,  (4, 1): 1.4,
+    (1, 2): 2.1,  (2, 2): 2.2,  (3, 2): 2.3,  (4, 2): 2.4,
+    (3, 3): 3.3}
+
+UFL.draw_problem_dia(S, f, g, filename="reports/2021-02-23_Status_BM/problem_dia.gv")
+#+end_src
+
+#+begin_export latex
+\begin{figure}[h!]
+\center
+\includegraphics[width=0.8\textwidth]{./problem_dia.gv.pdf}
+\caption{Problem description: facilty location with overlaps. \\
+\textbf{Facilities:} numbers in parentheses indicate switch-on costs.\\
+\textbf{Consumers:} overlap penalies are shown, $g=(0,1,2)$ would mean that for this consumer zero
+overlapping coverings imposed no additional cost, covering with one facility brought additional cost $1$,
+with two facilities (i.e., actual overlap) brought cost $2$. These numbers are chosen to be the same for
+all consumers (no restrictions to change this, just for simplicity).}
+\label{fig:problem}
+\end{figure}
+#+end_export
+
+   I am representing this (or any other) problem in the following three ways.
+** Simple MIP
+    I generate a "naive" MIP right away:
+    #+name: simpleMIP
+    #+begin_src python :exports none :results output :session *pyOrg* :cache yes
+m_simple = UFL.build_MIP(S, f, g)
+m_simple.display()
+    #+end_src
+
+    #+RESULTS[9fc5f52dec34cdc4ebdcf9b15a28c392983c5b0d]: simpleMIP
+    #+begin_example
+    Minimize
+       <gurobi.LinExpr: 1.0 + x1 + 2.0 x2 + 3.0 x3 + v1_1 + v2_1 + 1.0000000000000002 v2_2 + v3_1 + 0.9999999999999998 v3_2 + v3_3 + 0.9999999999999999 v4_1 + v4_2>
+    Subject To
+       R0 : <gurobi.LinExpr: -1.0 x1 + z1_1> = 0.0
+       R1 : <gurobi.LinExpr: -1.0 x1 + z1_2> = 0.0
+       R2 : <gurobi.LinExpr: -1.0 x1 + z1_3> = 0.0
+       R3 : <gurobi.LinExpr: -1.0 x2 + z2_2> = 0.0
+       R4 : <gurobi.LinExpr: -1.0 x2 + z2_3> = 0.0
+       R5 : <gurobi.LinExpr: -1.0 x2 + z2_4> = 0.0
+       R6 : <gurobi.LinExpr: -1.0 x3 + z3_3> = 0.0
+       R7 : <gurobi.LinExpr: -1.0 x3 + z3_4> = 0.0
+       R8 : <gurobi.LinExpr: -1.0 z1_1 + b1> = 0.0
+       R9 : <gurobi.LinExpr: -1.0 z1_2 + -1.0 z2_2 + b2> = 0.0
+       R10 : <gurobi.LinExpr: -1.0 z1_3 + -1.0 z2_3 + -1.0 z3_3 + b3> = 0.0
+       R11 : <gurobi.LinExpr: -1.0 z2_4 + -1.0 z3_4 + b4> = 0.0
+       R12 : <gurobi.LinExpr: b1 + -1.0 v1_1> = 0.0
+       R13 : <gurobi.LinExpr: -1.0 v2_1 + v2_2> <= 0.0
+       R14 : <gurobi.LinExpr: b2 + -1.0 v2_1 + -1.0 v2_2> = 0.0
+       R15 : <gurobi.LinExpr: -1.0 v3_1 + v3_2> <= 0.0
+       R16 : <gurobi.LinExpr: -1.0 v3_2 + v3_3> <= 0.0
+       R17 : <gurobi.LinExpr: b3 + -1.0 v3_1 + -1.0 v3_2 + -1.0 v3_3> = 0.0
+       R18 : <gurobi.LinExpr: -1.0 v4_1 + v4_2> <= 0.0
+       R19 : <gurobi.LinExpr: b4 + -1.0 v4_1 + -1.0 v4_2> = 0.0
+    Binaries
+       ['x1', 'z1_1', 'z1_2', 'z1_3', 'x2', 'z2_2', 'z2_3', 'z2_4', 'x3', 'z3_3', 'z3_4', 'v1_1', 'v2_1', 'v2_2', 'v3_1', 'v3_2', 'v3_3', 'v4_1', 'v4_2']
+    #+end_example
+
+    
+#+begin_src bash :stdin simpleMIP :results verbatim :exports none
+cat | sed 's/<gurobi\.LinExpr\: //' | sed 's/> =/ =/' | \
+    sed 's/^.*: //g' | \
+    sed 's/z\([0-9]*\)_\([0-9]*\)/z_{\1\\rightarrow \2}/g' | \
+    sed 's/v\([0-9]*\)_\([0-9]*\)/v^\2_\1/g' | \
+    sed 's/\([xb]\)\([0-9]*\)/\1_{\2}/g' | \
+    sed 's/+ -/-/g' | \
+    sed 's/link_\([0-9xz-]*\)/\\lambda_{\1}/g'
+#+end_src
+
+#+RESULTS:
+#+begin_example
+    Minimize
+       1.0 + x_{1} + 2.0 x_{2} + 3.0 x_{3} + v^1_1 + v^1_2 + 1.0000000000000002 v^2_2 + v^1_3 + 0.9999999999999998 v^2_3 + v^3_3 + 0.9999999999999999 v^1_4 + v^2_4>
+    Sub_{}ject To
+-1.0 x_{1} + z_{1\rightarrow 1} = 0.0
+-1.0 x_{1} + z_{1\rightarrow 2} = 0.0
+-1.0 x_{1} + z_{1\rightarrow 3} = 0.0
+-1.0 x_{2} + z_{2\rightarrow 2} = 0.0
+-1.0 x_{2} + z_{2\rightarrow 3} = 0.0
+-1.0 x_{2} + z_{2\rightarrow 4} = 0.0
+-1.0 x_{3} + z_{3\rightarrow 3} = 0.0
+-1.0 x_{3} + z_{3\rightarrow 4} = 0.0
+-1.0 z_{1\rightarrow 1} + b_{1} = 0.0
+-1.0 z_{1\rightarrow 2} -1.0 z_{2\rightarrow 2} + b_{2} = 0.0
+-1.0 z_{1\rightarrow 3} -1.0 z_{2\rightarrow 3} -1.0 z_{3\rightarrow 3} + b_{3} = 0.0
+-1.0 z_{2\rightarrow 4} -1.0 z_{3\rightarrow 4} + b_{4} = 0.0
+b_{1} -1.0 v^1_1 = 0.0
+-1.0 v^1_2 + v^2_2> <= 0.0
+b_{2} -1.0 v^1_2 -1.0 v^2_2 = 0.0
+-1.0 v^1_3 + v^2_3> <= 0.0
+-1.0 v^2_3 + v^3_3> <= 0.0
+b_{3} -1.0 v^1_3 -1.0 v^2_3 -1.0 v^3_3 = 0.0
+-1.0 v^1_4 + v^2_4> <= 0.0
+b_{4} -1.0 v^1_4 -1.0 v^2_4 = 0.0
+    Binaries
+       ['x_{1}', 'z_{1\rightarrow 1}', 'z_{1\rightarrow 2}', 'z_{1\rightarrow 3}', 'x_{2}', 'z_{2\rightarrow 2}', 'z_{2\rightarrow 3}', 'z_{2\rightarrow 4}', 'x_{3}', 'z_{3\rightarrow 3}', 'z_{3\rightarrow 4}', 'v^1_1', 'v^1_2', 'v^2_2', 'v^1_3', 'v^2_3', 'v^3_3', 'v^1_4', 'v^2_4']
+#+end_example
+
+\begin{flalign*}
+    \textrm{Minimize:} & 1.0 + x_{1} + 2.0 x_{2} + 3.0 x_{3} + v^1_1 + v^1_2 + 1.0 v^2_2 + v^1_3 + 1.0 v^2_3 + v^3_3 + 1.0 v^1_4 + v^2_4\\
+    \textrm{Subject To:} &\\
+& -1.0 x_{1} + z_{1\rightarrow 1} = 0.0\\
+& -1.0 x_{1} + z_{1\rightarrow 2} = 0.0\\
+& -1.0 x_{1} + z_{1\rightarrow 3} = 0.0\\
+& -1.0 x_{2} + z_{2\rightarrow 2} = 0.0\\
+& -1.0 x_{2} + z_{2\rightarrow 3} = 0.0\\
+& -1.0 x_{2} + z_{2\rightarrow 4} = 0.0\\
+& -1.0 x_{3} + z_{3\rightarrow 3} = 0.0\\
+& -1.0 x_{3} + z_{3\rightarrow 4} = 0.0\\
+& -1.0 z_{1\rightarrow 1} + b_{1} = 0.0\\
+& -1.0 z_{1\rightarrow 2} -1.0 z_{2\rightarrow 2} + b_{2} = 0.0\\
+& -1.0 z_{1\rightarrow 3} -1.0 z_{2\rightarrow 3} -1.0 z_{3\rightarrow 3} + b_{3} = 0.0\\
+& -1.0 z_{2\rightarrow 4} -1.0 z_{3\rightarrow 4} + b_{4} = 0.0\\
+& b_{1} -1.0 v^1_1 = 0.0\\
+& -1.0 v^1_2 + v^2_2 \leq 0.0\\
+& b_{2} -1.0 v^1_2 -1.0 v^2_2 = 0.0\\
+& -1.0 v^1_3 + v^2_3 \leq 0.0\\
+& -1.0 v^2_3 + v^3_3 \leq 0.0\\
+& b_{3} -1.0 v^1_3 -1.0 v^2_3 -1.0 v^3_3 = 0.0\\
+& -1.0 v^1_4 + v^2_4 \leq 0.0\\
+& b_{4} -1.0 v^1_4 -1.0 v^2_4 = 0.0,
+\end{flalign*}
+where $x$ are "locate" decisions, $z$ are covering decisions (which are kind of
+dependent on each other, like we discussed), $b$ are numbers of overlaps, and
+$v$ are used to encode an arbitrary overlap penalty function.
+
+Binary variables are:
+$[x_{1}, z_{1\rightarrow 1}, z_{1\rightarrow 2},
+z_{1\rightarrow 3}, x_{2}, z_{2\rightarrow 2}, z_{2\rightarrow 3},
+z_{2\rightarrow 4}, x_{3}, z_{3\rightarrow 3}, z_{3\rightarrow 4}, v^1_1, v^1_2,
+v^2_2, v^1_3, v^2_3, v^3_3, v^1_4, v^2_4]$ (and I kind of hope that Gurobi's
+=presolve= takes care of the redundant variables.)
+
+** CPP MIP
+    Now, I am generating two decision diagrams, as before:
+    
+| *Diagram*    | *Constraints incorporated* | *Costs incorporated* | *Figure*        |
+|--------------+----------------------------+----------------------+-----------------|
+|--------------+----------------------------+----------------------+-----------------|
+| Covering     | Cover each consumer        | $c_{ij}$ (covering)  | \ref{fig:cover} |
+|              | at least once              | $g_j(n_j)$ (overlap) |                 |
+|--------------+----------------------------+----------------------+-----------------|
+| Availability | "Switch-on" and "covering" | $f_i$ (switch-on)    | \ref{fig:avail} |
+|              | variables are consistent   |                      |                 |
+|--------------+----------------------------+----------------------+-----------------|
+
+#+begin_src python :session *pyOrg* :exports none
+A = UFL.create_availability_BDD(S, f)
+A.show(dir="reports/2021-02-23_Status_BM/", filename="availability.dot")
+
+C = UFL.create_covering_BDD_wg(S, g)
+C.show(dir="reports/2021-02-23_Status_BM/", filename="covering.dot")
+#+end_src
+
+#+RESULTS:
+: None
+
+#+begin_export latex
+\begin{figure}[t!]
+  \begin{subfigure}[t]{0.45\textwidth}
+    \includegraphics[height=\textheight]{./covering.dot.pdf}
+    \caption{Covering BDD}\label{fig:cover}
+  \end{subfigure}%
+  \hfill
+  \begin{subfigure}[t]{0.45\textwidth}
+    \includegraphics[height=\textheight]{./availability.dot.pdf}
+    \caption{Availability BDD}\label{fig:avail}
+  \end{subfigure}
+  \caption{BDDs generated to encode the instance from Figure \ref{fig:problem}.}
+\end{figure}
+#+end_export
+
+Which allows me to formulate the following MIP:
+#+name: CPP_MIP
+#+begin_src python :session *pyOrg* :exports none :results output :cache yes
+m_CPP_MIP, c, v, x = UFL.add_BDD_to_MIP(A, prefix="A_")
+m_CPP_MIP, c, v, x = UFL.add_BDD_to_MIP(D=C, model=m_CPP_MIP, x=x, prefix="C_")
+m_CPP_MIP.display()
+#+end_src
+
+#+RESULTS[ebd026a8ea4e02e96886a34ce367e0165ca945e5]: CPP_MIP
+#+begin_example
+Minimize
+   <gurobi.LinExpr: A_vh0_1 + 2.0 A_vh6_8 + 3.0 A_vh14_16 + 1.1 C_vh0_1 + 0.1 C_vl0_1 + 1.2 C_vh2_4 + 0.2 C_vl2_4 + 2.2 C_vh3_4 + 1.2 C_vl3_4 + 1.3 C_vh7_10 + 0.3 C_vl7_10 + 3.3 C_vh9_10 + 2.3 C_vl9_10 + 2.3 C_vh8_10 + 1.3 C_vl8_10 + 2.4 C_vh12_-1 + 1.4 C_vl12_-1 + 1.4 C_vh11_-1 + 0.4 C_vl11_-1>
+Subject To
+   A_cont-at-0 : <gurobi.LinExpr: -1.0 A_vh0_1 + -1.0 A_vl0_2> = -1.0
+   A_bin-link-1 : <gurobi.LinExpr: link_z1-1 + -1.0 A_vh0_1> = 0.0
+   A_cont-at-2 : <gurobi.LinExpr: A_vl0_2 + -1.0 A_vh2_5 + -1.0 A_vl2_4> = 0.0
+   A_cont-at-1 : <gurobi.LinExpr: A_vh0_1 + -1.0 A_vh1_3 + -1.0 A_vl1_5> = 0.0
+   A_bin-link-2 : <gurobi.LinExpr: link_z1-2 + -1.0 A_vh2_5 + -1.0 A_vh1_3> = 0.0
+   A_cont-at-3 : <gurobi.LinExpr: A_vh1_3 + -1.0 A_vh3_6 + -1.0 A_vl3_7> = 0.0
+   A_cont-at-4 : <gurobi.LinExpr: A_vl2_4 + -1.0 A_vh4_7 + -1.0 A_vl4_6> = 0.0
+   A_cont-at-5 : <gurobi.LinExpr: A_vh2_5 + A_vl1_5 + -1.0 A_vh5_7 + -1.0 A_vl5_7> = 0.0
+   A_bin-link-3 : <gurobi.LinExpr: link_z1-3 + -1.0 A_vh3_6 + -1.0 A_vh4_7 + -1.0 A_vh5_7> = 0.0
+   A_cont-at-7 : <gurobi.LinExpr: A_vl3_7 + A_vh4_7 + A_vh5_7 + A_vl5_7 + -1.0 A_vh7_10 + -1.0 A_vl7_10> = 0.0
+   A_cont-at-6 : <gurobi.LinExpr: A_vh3_6 + A_vl4_6 + -1.0 A_vh6_8 + -1.0 A_vl6_9> = 0.0
+   A_bin-link-4 : <gurobi.LinExpr: link_z2-2 + -1.0 A_vh7_10 + -1.0 A_vh6_8> = 0.0
+   A_cont-at-10 : <gurobi.LinExpr: A_vh7_10 + A_vl7_10 + -1.0 A_vh10_13 + -1.0 A_vl10_13> = 0.0
+   A_cont-at-9 : <gurobi.LinExpr: A_vl6_9 + -1.0 A_vh9_13 + -1.0 A_vl9_12> = 0.0
+   A_cont-at-8 : <gurobi.LinExpr: A_vh6_8 + -1.0 A_vh8_11 + -1.0 A_vl8_13> = 0.0
+   A_bin-link-5 : <gurobi.LinExpr: link_z2-3 + -1.0 A_vh10_13 + -1.0 A_vh9_13 + -1.0 A_vh8_11> = 0.0
+   A_cont-at-12 : <gurobi.LinExpr: A_vl9_12 + -1.0 A_vh12_15 + -1.0 A_vl12_14> = 0.0
+   A_cont-at-13 : <gurobi.LinExpr: A_vh10_13 + A_vl10_13 + A_vh9_13 + A_vl8_13 + -1.0 A_vh13_15 + -1.0 A_vl13_15> = 0.0
+   A_cont-at-11 : <gurobi.LinExpr: A_vh8_11 + -1.0 A_vh11_14 + -1.0 A_vl11_15> = 0.0
+   A_bin-link-6 : <gurobi.LinExpr: link_z2-4 + -1.0 A_vh12_15 + -1.0 A_vh13_15 + -1.0 A_vh11_14> = 0.0
+   A_cont-at-14 : <gurobi.LinExpr: A_vl12_14 + A_vh11_14 + -1.0 A_vh14_16 + -1.0 A_vl14_17> = 0.0
+   A_cont-at-15 : <gurobi.LinExpr: A_vh12_15 + A_vh13_15 + A_vl13_15 + A_vl11_15 + -1.0 A_vh15_18 + -1.0 A_vl15_18> = 0.0
+   A_bin-link-7 : <gurobi.LinExpr: link_z3-3 + -1.0 A_vh14_16 + -1.0 A_vh15_18> = 0.0
+   A_cont-at-18 : <gurobi.LinExpr: A_vh15_18 + A_vl15_18 + -1.0 A_vh18_-2 + -1.0 A_vl18_-2> = 0.0
+   A_cont-at-17 : <gurobi.LinExpr: A_vl14_17 + -1.0 A_vh17_-2 + -1.0 A_vl17_-1> = 0.0
+   A_cont-at-16 : <gurobi.LinExpr: A_vh14_16 + -1.0 A_vh16_-1 + -1.0 A_vl16_-2> = 0.0
+   A_bin-link-8 : <gurobi.LinExpr: link_z3-4 + -1.0 A_vh18_-2 + -1.0 A_vh17_-2 + -1.0 A_vh16_-1> = 0.0
+   A_cont-at--1 : <gurobi.LinExpr: A_vl17_-1 + A_vh16_-1> = 1.0
+   A_cont-at--2 : <gurobi.LinExpr: A_vh18_-2 + A_vl18_-2 + A_vh17_-2 + A_vl16_-2> = 0.0
+   C_cont-at-0 : <gurobi.LinExpr: -1.0 C_vh0_1 + -1.0 C_vl0_1> = -1.0
+   C_bin-link-1 : <gurobi.LinExpr: link_z1-1 + -1.0 C_vh0_1> = 0.0
+   C_cont-at-1 : <gurobi.LinExpr: C_vh0_1 + C_vl0_1 + -1.0 C_vh1_3 + -1.0 C_vl1_2> = 0.0
+   C_bin-link-2 : <gurobi.LinExpr: link_z1-2 + -1.0 C_vh1_3> = 0.0
+   C_cont-at-2 : <gurobi.LinExpr: C_vl1_2 + -1.0 C_vh2_4 + -1.0 C_vl2_4> = 0.0
+   C_cont-at-3 : <gurobi.LinExpr: C_vh1_3 + -1.0 C_vh3_4 + -1.0 C_vl3_4> = 0.0
+   C_bin-link-3 : <gurobi.LinExpr: link_z2-2 + -1.0 C_vh2_4 + -1.0 C_vh3_4> = 0.0
+   C_cont-at-4 : <gurobi.LinExpr: C_vh2_4 + C_vl2_4 + C_vh3_4 + C_vl3_4 + -1.0 C_vh4_6 + -1.0 C_vl4_5> = 0.0
+   C_bin-link-4 : <gurobi.LinExpr: link_z1-3 + -1.0 C_vh4_6> = 0.0
+   C_cont-at-5 : <gurobi.LinExpr: C_vl4_5 + -1.0 C_vh5_8 + -1.0 C_vl5_7> = 0.0
+   C_cont-at-6 : <gurobi.LinExpr: C_vh4_6 + -1.0 C_vh6_9 + -1.0 C_vl6_8> = 0.0
+   C_bin-link-5 : <gurobi.LinExpr: link_z2-3 + -1.0 C_vh5_8 + -1.0 C_vh6_9> = 0.0
+   C_cont-at-7 : <gurobi.LinExpr: C_vl5_7 + -1.0 C_vh7_10 + -1.0 C_vl7_10> = 0.0
+   C_cont-at-9 : <gurobi.LinExpr: C_vh6_9 + -1.0 C_vh9_10 + -1.0 C_vl9_10> = 0.0
+   C_cont-at-8 : <gurobi.LinExpr: C_vh5_8 + C_vl6_8 + -1.0 C_vh8_10 + -1.0 C_vl8_10> = 0.0
+   C_bin-link-6 : <gurobi.LinExpr: link_z3-3 + -1.0 C_vh7_10 + -1.0 C_vh9_10 + -1.0 C_vh8_10> = 0.0
+   C_cont-at-10 : <gurobi.LinExpr: C_vh7_10 + C_vl7_10 + C_vh9_10 + C_vl9_10 + C_vh8_10 + C_vl8_10 + -1.0 C_vh10_12 + -1.0 C_vl10_11> = 0.0
+   C_bin-link-7 : <gurobi.LinExpr: link_z2-4 + -1.0 C_vh10_12> = 0.0
+   C_cont-at-12 : <gurobi.LinExpr: C_vh10_12 + -1.0 C_vh12_-1 + -1.0 C_vl12_-1> = 0.0
+   C_cont-at-11 : <gurobi.LinExpr: C_vl10_11 + -1.0 C_vh11_-1 + -1.0 C_vl11_-1> = 0.0
+   C_bin-link-8 : <gurobi.LinExpr: link_z3-4 + -1.0 C_vh12_-1 + -1.0 C_vh11_-1> = 0.0
+   C_cont-at--2 : <gurobi.LinExpr: 0.0> = 0.0
+   C_cont-at--1 : <gurobi.LinExpr: C_vh12_-1 + C_vl12_-1 + C_vh11_-1 + C_vl11_-1> = 1.0
+Binaries
+   ['link_z1-1', 'link_z1-2', 'link_z1-3', 'link_z2-2', 'link_z2-3', 'link_z2-4', 'link_z3-3', 'link_z3-4']
+#+end_example
+
+#+begin_src bash :stdin CPP_MIP :results verbatim :exports none
+cat | sed 's/<gurobi\.LinExpr\: //' | sed 's/> =/ =/' | \
+    sed 's/: /\& $/g' | \
+    sed 's/^[ ]*\([AC]\)_/    \1: /g' | \
+    sed 's/_-1/_T/g' | \
+    sed 's/_-2/_F/g' | \
+    sed 's/--1/-T/g' | \
+    sed 's/--2/-F/g' | \
+    sed 's/\([AC]\)_v\([hl]\)\([0-9\-]*\)_\([TF0-9\-]*\)/v^\1_{\3 \\rightarrow \4, \2}/g' | \
+    sed 's/+ -/-/g' | \
+    sed 's/link_\([0-9xz-]*\)/\\lambda_{\1}/g' | \
+    sed 's/$/\$\\\\/g'
+#+end_src
+
+#+RESULTS:
+#+begin_example
+Minimize$\\
+    A: vh0_1 + 2.0 v^A_{6 \rightarrow 8, h} + 3.0 v^A_{14 \rightarrow 16, h} + 1.1 v^C_{0 \rightarrow 1, h} + 0.1 v^C_{0 \rightarrow 1, l} + 1.2 v^C_{2 \rightarrow 4, h} + 0.2 v^C_{2 \rightarrow 4, l} + 2.2 v^C_{3 \rightarrow 4, h} + 1.2 v^C_{3 \rightarrow 4, l} + 1.3 v^C_{7 \rightarrow 10, h} + 0.3 v^C_{7 \rightarrow 10, l} + 3.3 v^C_{9 \rightarrow 10, h} + 2.3 v^C_{9 \rightarrow 10, l} + 2.3 v^C_{8 \rightarrow 10, h} + 1.3 v^C_{8 \rightarrow 10, l} + 2.4 v^C_{12 \rightarrow T, h} + 1.4 v^C_{12 \rightarrow T, l} + 1.4 v^C_{11 \rightarrow T, h} + 0.4 v^C_{11 \rightarrow T, l}>$\\
+Subject To$\\
+    A: cont-at-0 & $-1.0 v^A_{0 \rightarrow 1, h} -1.0 v^A_{0 \rightarrow 2, l} = -1.0$\\
+    A: bin-link-1 & $\lambda_{z1-1} -1.0 v^A_{0 \rightarrow 1, h} = 0.0$\\
+    A: cont-at-2 & $v^A_{0 \rightarrow 2, l} -1.0 v^A_{2 \rightarrow 5, h} -1.0 v^A_{2 \rightarrow 4, l} = 0.0$\\
+    A: cont-at-1 & $v^A_{0 \rightarrow 1, h} -1.0 v^A_{1 \rightarrow 3, h} -1.0 v^A_{1 \rightarrow 5, l} = 0.0$\\
+    A: bin-link-2 & $\lambda_{z1-2} -1.0 v^A_{2 \rightarrow 5, h} -1.0 v^A_{1 \rightarrow 3, h} = 0.0$\\
+    A: cont-at-3 & $v^A_{1 \rightarrow 3, h} -1.0 v^A_{3 \rightarrow 6, h} -1.0 v^A_{3 \rightarrow 7, l} = 0.0$\\
+    A: cont-at-4 & $v^A_{2 \rightarrow 4, l} -1.0 v^A_{4 \rightarrow 7, h} -1.0 v^A_{4 \rightarrow 6, l} = 0.0$\\
+    A: cont-at-5 & $v^A_{2 \rightarrow 5, h} + v^A_{1 \rightarrow 5, l} -1.0 v^A_{5 \rightarrow 7, h} -1.0 v^A_{5 \rightarrow 7, l} = 0.0$\\
+    A: bin-link-3 & $\lambda_{z1-3} -1.0 v^A_{3 \rightarrow 6, h} -1.0 v^A_{4 \rightarrow 7, h} -1.0 v^A_{5 \rightarrow 7, h} = 0.0$\\
+    A: cont-at-7 & $v^A_{3 \rightarrow 7, l} + v^A_{4 \rightarrow 7, h} + v^A_{5 \rightarrow 7, h} + v^A_{5 \rightarrow 7, l} -1.0 v^A_{7 \rightarrow 10, h} -1.0 v^A_{7 \rightarrow 10, l} = 0.0$\\
+    A: cont-at-6 & $v^A_{3 \rightarrow 6, h} + v^A_{4 \rightarrow 6, l} -1.0 v^A_{6 \rightarrow 8, h} -1.0 v^A_{6 \rightarrow 9, l} = 0.0$\\
+    A: bin-link-4 & $\lambda_{z2-2} -1.0 v^A_{7 \rightarrow 10, h} -1.0 v^A_{6 \rightarrow 8, h} = 0.0$\\
+    A: cont-at-10 & $v^A_{7 \rightarrow 10, h} + v^A_{7 \rightarrow 10, l} -1.0 v^A_{10 \rightarrow 13, h} -1.0 v^A_{10 \rightarrow 13, l} = 0.0$\\
+    A: cont-at-9 & $v^A_{6 \rightarrow 9, l} -1.0 v^A_{9 \rightarrow 13, h} -1.0 v^A_{9 \rightarrow 12, l} = 0.0$\\
+    A: cont-at-8 & $v^A_{6 \rightarrow 8, h} -1.0 v^A_{8 \rightarrow 11, h} -1.0 v^A_{8 \rightarrow 13, l} = 0.0$\\
+    A: bin-link-5 & $\lambda_{z2-3} -1.0 v^A_{10 \rightarrow 13, h} -1.0 v^A_{9 \rightarrow 13, h} -1.0 v^A_{8 \rightarrow 11, h} = 0.0$\\
+    A: cont-at-12 & $v^A_{9 \rightarrow 12, l} -1.0 v^A_{12 \rightarrow 15, h} -1.0 v^A_{12 \rightarrow 14, l} = 0.0$\\
+    A: cont-at-13 & $v^A_{10 \rightarrow 13, h} + v^A_{10 \rightarrow 13, l} + v^A_{9 \rightarrow 13, h} + v^A_{8 \rightarrow 13, l} -1.0 v^A_{13 \rightarrow 15, h} -1.0 v^A_{13 \rightarrow 15, l} = 0.0$\\
+    A: cont-at-11 & $v^A_{8 \rightarrow 11, h} -1.0 v^A_{11 \rightarrow 14, h} -1.0 v^A_{11 \rightarrow 15, l} = 0.0$\\
+    A: bin-link-6 & $\lambda_{z2-4} -1.0 v^A_{12 \rightarrow 15, h} -1.0 v^A_{13 \rightarrow 15, h} -1.0 v^A_{11 \rightarrow 14, h} = 0.0$\\
+    A: cont-at-14 & $v^A_{12 \rightarrow 14, l} + v^A_{11 \rightarrow 14, h} -1.0 v^A_{14 \rightarrow 16, h} -1.0 v^A_{14 \rightarrow 17, l} = 0.0$\\
+    A: cont-at-15 & $v^A_{12 \rightarrow 15, h} + v^A_{13 \rightarrow 15, h} + v^A_{13 \rightarrow 15, l} + v^A_{11 \rightarrow 15, l} -1.0 v^A_{15 \rightarrow 18, h} -1.0 v^A_{15 \rightarrow 18, l} = 0.0$\\
+    A: bin-link-7 & $\lambda_{z3-3} -1.0 v^A_{14 \rightarrow 16, h} -1.0 v^A_{15 \rightarrow 18, h} = 0.0$\\
+    A: cont-at-18 & $v^A_{15 \rightarrow 18, h} + v^A_{15 \rightarrow 18, l} -1.0 v^A_{18 \rightarrow F, h} -1.0 v^A_{18 \rightarrow F, l} = 0.0$\\
+    A: cont-at-17 & $v^A_{14 \rightarrow 17, l} -1.0 v^A_{17 \rightarrow F, h} -1.0 v^A_{17 \rightarrow T, l} = 0.0$\\
+    A: cont-at-16 & $v^A_{14 \rightarrow 16, h} -1.0 v^A_{16 \rightarrow T, h} -1.0 v^A_{16 \rightarrow F, l} = 0.0$\\
+    A: bin-link-8 & $\lambda_{z3-4} -1.0 v^A_{18 \rightarrow F, h} -1.0 v^A_{17 \rightarrow F, h} -1.0 v^A_{16 \rightarrow T, h} = 0.0$\\
+    A: cont-at-T & $v^A_{17 \rightarrow T, l} + v^A_{16 \rightarrow T, h} = 1.0$\\
+    A: cont-at-F & $v^A_{18 \rightarrow F, h} + v^A_{18 \rightarrow F, l} + v^A_{17 \rightarrow F, h} + v^A_{16 \rightarrow F, l} = 0.0$\\
+    C: cont-at-0 & $-1.0 v^C_{0 \rightarrow 1, h} -1.0 v^C_{0 \rightarrow 1, l} = -1.0$\\
+    C: bin-link-1 & $\lambda_{z1-1} -1.0 v^C_{0 \rightarrow 1, h} = 0.0$\\
+    C: cont-at-1 & $v^C_{0 \rightarrow 1, h} + v^C_{0 \rightarrow 1, l} -1.0 v^C_{1 \rightarrow 3, h} -1.0 v^C_{1 \rightarrow 2, l} = 0.0$\\
+    C: bin-link-2 & $\lambda_{z1-2} -1.0 v^C_{1 \rightarrow 3, h} = 0.0$\\
+    C: cont-at-2 & $v^C_{1 \rightarrow 2, l} -1.0 v^C_{2 \rightarrow 4, h} -1.0 v^C_{2 \rightarrow 4, l} = 0.0$\\
+    C: cont-at-3 & $v^C_{1 \rightarrow 3, h} -1.0 v^C_{3 \rightarrow 4, h} -1.0 v^C_{3 \rightarrow 4, l} = 0.0$\\
+    C: bin-link-3 & $\lambda_{z2-2} -1.0 v^C_{2 \rightarrow 4, h} -1.0 v^C_{3 \rightarrow 4, h} = 0.0$\\
+    C: cont-at-4 & $v^C_{2 \rightarrow 4, h} + v^C_{2 \rightarrow 4, l} + v^C_{3 \rightarrow 4, h} + v^C_{3 \rightarrow 4, l} -1.0 v^C_{4 \rightarrow 6, h} -1.0 v^C_{4 \rightarrow 5, l} = 0.0$\\
+    C: bin-link-4 & $\lambda_{z1-3} -1.0 v^C_{4 \rightarrow 6, h} = 0.0$\\
+    C: cont-at-5 & $v^C_{4 \rightarrow 5, l} -1.0 v^C_{5 \rightarrow 8, h} -1.0 v^C_{5 \rightarrow 7, l} = 0.0$\\
+    C: cont-at-6 & $v^C_{4 \rightarrow 6, h} -1.0 v^C_{6 \rightarrow 9, h} -1.0 v^C_{6 \rightarrow 8, l} = 0.0$\\
+    C: bin-link-5 & $\lambda_{z2-3} -1.0 v^C_{5 \rightarrow 8, h} -1.0 v^C_{6 \rightarrow 9, h} = 0.0$\\
+    C: cont-at-7 & $v^C_{5 \rightarrow 7, l} -1.0 v^C_{7 \rightarrow 10, h} -1.0 v^C_{7 \rightarrow 10, l} = 0.0$\\
+    C: cont-at-9 & $v^C_{6 \rightarrow 9, h} -1.0 v^C_{9 \rightarrow 10, h} -1.0 v^C_{9 \rightarrow 10, l} = 0.0$\\
+    C: cont-at-8 & $v^C_{5 \rightarrow 8, h} + v^C_{6 \rightarrow 8, l} -1.0 v^C_{8 \rightarrow 10, h} -1.0 v^C_{8 \rightarrow 10, l} = 0.0$\\
+    C: bin-link-6 & $\lambda_{z3-3} -1.0 v^C_{7 \rightarrow 10, h} -1.0 v^C_{9 \rightarrow 10, h} -1.0 v^C_{8 \rightarrow 10, h} = 0.0$\\
+    C: cont-at-10 & $v^C_{7 \rightarrow 10, h} + v^C_{7 \rightarrow 10, l} + v^C_{9 \rightarrow 10, h} + v^C_{9 \rightarrow 10, l} + v^C_{8 \rightarrow 10, h} + v^C_{8 \rightarrow 10, l} -1.0 v^C_{10 \rightarrow 12, h} -1.0 v^C_{10 \rightarrow 11, l} = 0.0$\\
+    C: bin-link-7 & $\lambda_{z2-4} -1.0 v^C_{10 \rightarrow 12, h} = 0.0$\\
+    C: cont-at-12 & $v^C_{10 \rightarrow 12, h} -1.0 v^C_{12 \rightarrow T, h} -1.0 v^C_{12 \rightarrow T, l} = 0.0$\\
+    C: cont-at-11 & $v^C_{10 \rightarrow 11, l} -1.0 v^C_{11 \rightarrow T, h} -1.0 v^C_{11 \rightarrow T, l} = 0.0$\\
+    C: bin-link-8 & $\lambda_{z3-4} -1.0 v^C_{12 \rightarrow T, h} -1.0 v^C_{11 \rightarrow T, h} = 0.0$\\
+    C: cont-at-F & $0.0 = 0.0$\\
+    C: cont-at-T & $v^C_{12 \rightarrow T, h} + v^C_{12 \rightarrow T, l} + v^C_{11 \rightarrow T, h} + v^C_{11 \rightarrow T, l} = 1.0$\\
+Binaries$\\
+   ['\lambda_{z1-1}', '\lambda_{z1-2}', '\lambda_{z1-3}', '\lambda_{z2-2}', '\lambda_{z2-3}', '\lambda_{z2-4}', '\lambda_{z3-3}', '\lambda_{z3-4}']$\\
+#+end_example
+
+The objective is:
+#+begin_export latex
+\begin{flalign*}
+\textrm{Minimize:}\quad\quad & v^A_{0\rightarrow 1,h} + 2.0 v^A_{6 \rightarrow 8, h} + 3.0 v^A_{14 \rightarrow 16, h} +\\
+& 1.1 v^C_{0 \rightarrow 1, h} + 0.1 v^C_{0 \rightarrow 1, l} + 1.2 v^C_{2 \rightarrow 4, h} + 0.2 v^C_{2 \rightarrow 4, l} + 2.2 v^C_{3 \rightarrow 4, h} + 1.2 v^C_{3 \rightarrow 4, l} + \\
+& 1.3 v^C_{7 \rightarrow 10, h} + 0.3 v^C_{7 \rightarrow 10, l} + 3.3 v^C_{9 \rightarrow 10, h} + 2.3 v^C_{9 \rightarrow 10, l} + 2.3 v^C_{8 \rightarrow 10, h} + 1.3 v^C_{8 \rightarrow 10, l} + \\
+& 2.4 v^C_{12 \rightarrow T, h} + 1.4 v^C_{12 \rightarrow T, l} + 1.4 v^C_{11 \rightarrow T, h} + 0.4 v^C_{11 \rightarrow T, l}.
+\end{flalign*}
+#+end_export
+
+Here, for example, variable $v^A_{0\rightarrow 1,h}$ corresponds to the flow
+from node \textcircled{0} to node \textcircled{1} of diagram $A$ (availability),
+along the "hi" ("yes") arc.\\
+
+*Legend.*
+- From each diagram, two types of constraints are generated:
+  + /cont-at-\textcircled{.}/ are flow continuity constraints at a given node.
+  + /bin-link-<k>/ are binary linking constraints (needed to link two BDDs -- i.e.,
+    tangle network flow problems), one per layer, indexed with $k$.
+- $A$ denotes "Availability" diagram, $C$ denotes "Covering"
+  diagram.
+  
+All node numbers correspond to the diagrams and have nothing to do with
+customer and facility indices.
+
+- Arc flow variables (continuous) $v$.
+- Linking variables (binary): $\lambda_{z1-1}, \lambda_{z1-2}, \lambda_{z1-3}, \lambda_{z2-2}, \lambda_{z2-3}, \lambda_{z2-4}, \lambda_{z3-3}, \lambda_{z3-4}$.
+
+\newpage Constraints from *covering BDD*:\\
+     
+ #+begin_export latex
+ \begin{tabular}{l l}
+ \textbf{Type} & \textbf{Constraint}\\\hline\\
+     cont-at-0 & $-1.0 v^A_{0 \rightarrow 1, h} -1.0 v^A_{0 \rightarrow 2, l} = -1.0$\\
+     bin-link-1 & $\lambda_{z1-1} -1.0 v^A_{0 \rightarrow 1, h} = 0.0$\\
+     cont-at-2 & $v^A_{0 \rightarrow 2, l} -1.0 v^A_{2 \rightarrow 5, h} -1.0 v^A_{2 \rightarrow 4, l} = 0.0$\\
+     cont-at-1 & $v^A_{0 \rightarrow 1, h} -1.0 v^A_{1 \rightarrow 3, h} -1.0 v^A_{1 \rightarrow 5, l} = 0.0$\\
+     bin-link-2 & $\lambda_{z1-2} -1.0 v^A_{2 \rightarrow 5, h} -1.0 v^A_{1 \rightarrow 3, h} = 0.0$\\
+     cont-at-3 & $v^A_{1 \rightarrow 3, h} -1.0 v^A_{3 \rightarrow 6, h} -1.0 v^A_{3 \rightarrow 7, l} = 0.0$\\
+     cont-at-4 & $v^A_{2 \rightarrow 4, l} -1.0 v^A_{4 \rightarrow 7, h} -1.0 v^A_{4 \rightarrow 6, l} = 0.0$\\
+     cont-at-5 & $v^A_{2 \rightarrow 5, h} + v^A_{1 \rightarrow 5, l} -1.0 v^A_{5 \rightarrow 7, h} -1.0 v^A_{5 \rightarrow 7, l} = 0.0$\\
+     bin-link-3 & $\lambda_{z1-3} -1.0 v^A_{3 \rightarrow 6, h} -1.0 v^A_{4 \rightarrow 7, h} -1.0 v^A_{5 \rightarrow 7, h} = 0.0$\\
+     cont-at-7 & $v^A_{3 \rightarrow 7, l} + v^A_{4 \rightarrow 7, h} + v^A_{5 \rightarrow 7, h} + v^A_{5 \rightarrow 7, l} -1.0 v^A_{7 \rightarrow 10, h} -1.0 v^A_{7 \rightarrow 10, l} = 0.0$\\
+     cont-at-6 & $v^A_{3 \rightarrow 6, h} + v^A_{4 \rightarrow 6, l} -1.0 v^A_{6 \rightarrow 8, h} -1.0 v^A_{6 \rightarrow 9, l} = 0.0$\\
+     bin-link-4 & $\lambda_{z2-2} -1.0 v^A_{7 \rightarrow 10, h} -1.0 v^A_{6 \rightarrow 8, h} = 0.0$\\
+     cont-at-10 & $v^A_{7 \rightarrow 10, h} + v^A_{7 \rightarrow 10, l} -1.0 v^A_{10 \rightarrow 13, h} -1.0 v^A_{10 \rightarrow 13, l} = 0.0$\\
+     cont-at-9 & $v^A_{6 \rightarrow 9, l} -1.0 v^A_{9 \rightarrow 13, h} -1.0 v^A_{9 \rightarrow 12, l} = 0.0$\\
+     cont-at-8 & $v^A_{6 \rightarrow 8, h} -1.0 v^A_{8 \rightarrow 11, h} -1.0 v^A_{8 \rightarrow 13, l} = 0.0$\\
+     bin-link-5 & $\lambda_{z2-3} -1.0 v^A_{10 \rightarrow 13, h} -1.0 v^A_{9 \rightarrow 13, h} -1.0 v^A_{8 \rightarrow 11, h} = 0.0$\\
+     cont-at-12 & $v^A_{9 \rightarrow 12, l} -1.0 v^A_{12 \rightarrow 15, h} -1.0 v^A_{12 \rightarrow 14, l} = 0.0$\\
+     cont-at-13 & $v^A_{10 \rightarrow 13, h} + v^A_{10 \rightarrow 13, l} + v^A_{9 \rightarrow 13, h} + v^A_{8 \rightarrow 13, l} -1.0 v^A_{13 \rightarrow 15, h} -1.0 v^A_{13 \rightarrow 15, l} = 0.0$\\
+     cont-at-11 & $v^A_{8 \rightarrow 11, h} -1.0 v^A_{11 \rightarrow 14, h} -1.0 v^A_{11 \rightarrow 15, l} = 0.0$\\
+     bin-link-6 & $\lambda_{z2-4} -1.0 v^A_{12 \rightarrow 15, h} -1.0 v^A_{13 \rightarrow 15, h} -1.0 v^A_{11 \rightarrow 14, h} = 0.0$\\
+     cont-at-14 & $v^A_{12 \rightarrow 14, l} + v^A_{11 \rightarrow 14, h} -1.0 v^A_{14 \rightarrow 16, h} -1.0 v^A_{14 \rightarrow 17, l} = 0.0$\\
+     cont-at-15 & $v^A_{12 \rightarrow 15, h} + v^A_{13 \rightarrow 15, h} + v^A_{13 \rightarrow 15, l} + v^A_{11 \rightarrow 15, l} -1.0 v^A_{15 \rightarrow 18, h} -1.0 v^A_{15 \rightarrow 18, l} = 0.0$\\
+     bin-link-7 & $\lambda_{z3-3} -1.0 v^A_{14 \rightarrow 16, h} -1.0 v^A_{15 \rightarrow 18, h} = 0.0$\\
+     cont-at-18 & $v^A_{15 \rightarrow 18, h} + v^A_{15 \rightarrow 18, l} -1.0 v^A_{18 \rightarrow F, h} -1.0 v^A_{18 \rightarrow F, l} = 0.0$\\
+     cont-at-17 & $v^A_{14 \rightarrow 17, l} -1.0 v^A_{17 \rightarrow F, h} -1.0 v^A_{17 \rightarrow T, l} = 0.0$\\
+     cont-at-16 & $v^A_{14 \rightarrow 16, h} -1.0 v^A_{16 \rightarrow T, h} -1.0 v^A_{16 \rightarrow F, l} = 0.0$\\
+     bin-link-8 & $\lambda_{z3-4} -1.0 v^A_{18 \rightarrow F, h} -1.0 v^A_{17 \rightarrow F, h} -1.0 v^A_{16 \rightarrow T, h} = 0.0$\\
+     cont-at-T & $v^A_{17 \rightarrow T, l} + v^A_{16 \rightarrow T, h} = 1.0$\\
+     cont-at-F & $v^A_{18 \rightarrow F, h} + v^A_{18 \rightarrow F, l} + v^A_{17 \rightarrow F, h} + v^A_{16 \rightarrow F, l} = 0.0$
+ \end{tabular}
+ #+end_export
+
+\newpage Constraints from *availability BBD*\\
+
+#+begin_export latex
+\begin{tabular}{l l}
+\textbf{Type} & \textbf{Constraint}\\\hline\\
+    cont-at-0 & $-1.0 v^C_{0 \rightarrow 1, h} -1.0 v^C_{0 \rightarrow 1, l} = -1.0$\\
+    bin-link-1 & $\lambda_{z1-1} -1.0 v^C_{0 \rightarrow 1, h} = 0.0$\\
+    cont-at-1 & $v^C_{0 \rightarrow 1, h} + v^C_{0 \rightarrow 1, l} -1.0 v^C_{1 \rightarrow 3, h} -1.0 v^C_{1 \rightarrow 2, l} = 0.0$\\
+    bin-link-2 & $\lambda_{z1-2} -1.0 v^C_{1 \rightarrow 3, h} = 0.0$\\
+    cont-at-2 & $v^C_{1 \rightarrow 2, l} -1.0 v^C_{2 \rightarrow 4, h} -1.0 v^C_{2 \rightarrow 4, l} = 0.0$\\
+    cont-at-3 & $v^C_{1 \rightarrow 3, h} -1.0 v^C_{3 \rightarrow 4, h} -1.0 v^C_{3 \rightarrow 4, l} = 0.0$\\
+    bin-link-3 & $\lambda_{z2-2} -1.0 v^C_{2 \rightarrow 4, h} -1.0 v^C_{3 \rightarrow 4, h} = 0.0$\\
+    cont-at-4 & $v^C_{2 \rightarrow 4, h} + v^C_{2 \rightarrow 4, l} + v^C_{3 \rightarrow 4, h} + v^C_{3 \rightarrow 4, l} -1.0 v^C_{4 \rightarrow 6, h} -1.0 v^C_{4 \rightarrow 5, l} = 0.0$\\
+    bin-link-4 & $\lambda_{z1-3} -1.0 v^C_{4 \rightarrow 6, h} = 0.0$\\
+    cont-at-5 & $v^C_{4 \rightarrow 5, l} -1.0 v^C_{5 \rightarrow 8, h} -1.0 v^C_{5 \rightarrow 7, l} = 0.0$\\
+    cont-at-6 & $v^C_{4 \rightarrow 6, h} -1.0 v^C_{6 \rightarrow 9, h} -1.0 v^C_{6 \rightarrow 8, l} = 0.0$\\
+    bin-link-5 & $\lambda_{z2-3} -1.0 v^C_{5 \rightarrow 8, h} -1.0 v^C_{6 \rightarrow 9, h} = 0.0$\\
+    cont-at-7 & $v^C_{5 \rightarrow 7, l} -1.0 v^C_{7 \rightarrow 10, h} -1.0 v^C_{7 \rightarrow 10, l} = 0.0$\\
+    cont-at-9 & $v^C_{6 \rightarrow 9, h} -1.0 v^C_{9 \rightarrow 10, h} -1.0 v^C_{9 \rightarrow 10, l} = 0.0$\\
+    cont-at-8 & $v^C_{5 \rightarrow 8, h} + v^C_{6 \rightarrow 8, l} -1.0 v^C_{8 \rightarrow 10, h} -1.0 v^C_{8 \rightarrow 10, l} = 0.0$\\
+    bin-link-6 & $\lambda_{z3-3} -1.0 v^C_{7 \rightarrow 10, h} -1.0 v^C_{9 \rightarrow 10, h} -1.0 v^C_{8 \rightarrow 10, h} = 0.0$\\
+    cont-at-10 & $v^C_{7 \rightarrow 10, h} + v^C_{7 \rightarrow 10, l} + v^C_{9 \rightarrow 10, h} + v^C_{9 \rightarrow 10, l} + v^C_{8 \rightarrow 10, h} + v^C_{8 \rightarrow 10, l} -1.0 v^C_{10 \rightarrow 12, h} -1.0 v^C_{10 \rightarrow 11, l} = 0.0$\\
+    bin-link-7 & $\lambda_{z2-4} -1.0 v^C_{10 \rightarrow 12, h} = 0.0$\\
+    cont-at-12 & $v^C_{10 \rightarrow 12, h} -1.0 v^C_{12 \rightarrow T, h} -1.0 v^C_{12 \rightarrow T, l} = 0.0$\\
+    cont-at-11 & $v^C_{10 \rightarrow 11, l} -1.0 v^C_{11 \rightarrow T, h} -1.0 v^C_{11 \rightarrow T, l} = 0.0$\\
+    bin-link-8 & $\lambda_{z3-4} -1.0 v^C_{12 \rightarrow T, h} -1.0 v^C_{11 \rightarrow T, h} = 0.0$\\
+    cont-at-F & $0.0 = 0.0$\\
+    cont-at-T & $v^C_{12 \rightarrow T, h} + v^C_{12 \rightarrow T, l} + v^C_{11 \rightarrow T, h} + v^C_{11 \rightarrow T, l} = 1.0$\\
+\end{tabular}
+#+end_export
+
+** Intersection BDD
+   This is a little more tricky. First, I make 'availability' and 'covering' diagrams order-associated:
+
+   #+begin_src python :session *pyOrg* :exports both :results output
+import varseq as vs
+from BB_search import BBSearch
+
+print(f"Size *before* alignment: {A.size()} + {C.size()} = {A.size() + C.size()} nodes.")
+vs_A = vs.VarSeq(A.vars, [len(L) for L in A.layers[:-1]])
+vs_C = vs.VarSeq(C.vars, [len(L) for L in C.layers[:-1]])
+b = BBSearch(vs_A, vs_C)
+
+status = b.search()
+assert status == "optimal" or status == "timeout"
+
+Ap = A.align_to(b.Ap_cand.layer_var, inplace=False)
+Cp = C.align_to(b.Ap_cand.layer_var, inplace=False)
+
+Ap.show(dir="reports/2021-02-23_Status_BM/", filename="A_aligned.dot")
+Cp.show(dir="reports/2021-02-23_Status_BM/", filename="C_aligned.dot")
+print(f"Size *after* alignment: {Ap.size()} + {Cp.size()} = {Ap.size() + Cp.size()} nodes.")
+print(f"The order revised from \n A: {A.vars}, and\n C: {C.vars}...")
+print(f"...to {Ap.vars}")
+   #+end_src
+
+   #+RESULTS:
+   : Size *before* alignment: 19 + 13 = 32 nodes.
+   : Size *after* alignment: 22 + 14 = 36 nodes.
+   : The order revised from 
+   :  A: ['z1-1', 'z1-2', 'z1-3', 'z2-2', 'z2-3', 'z2-4', 'z3-3', 'z3-4'], and
+   :  C: ['z1-1', 'z1-2', 'z2-2', 'z1-3', 'z2-3', 'z3-3', 'z2-4', 'z3-4']...
+   : ...to ['z1-1', 'z1-2', 'z1-3', 'z2-2', 'z2-3', 'z3-3', 'z2-4', 'z3-4']
+   
+ (This results in the diagrams depicted in Figures \ref{fig:coverA} and \ref{fig:availA}, respectively.)
+ 
+#+begin_export latex
+\begin{figure}[t!]
+  \begin{subfigure}[t]{0.45\textwidth}
+    \includegraphics[height=\textheight]{./C_aligned.dot.pdf}
+    \caption{Covering BDD}\label{fig:coverA}
+  \end{subfigure}%
+  \hfill
+  \begin{subfigure}[t]{0.45\textwidth}
+    \includegraphics[height=\textheight]{./A_aligned.dot.pdf}
+    \caption{Availability BDD}\label{fig:availA}
+  \end{subfigure}
+  \caption{BDDs generated to encode the instance from Figure \ref{fig:problem}: after alignment.}
+\end{figure}
+#+end_export
+
+So, I can generate an intersection BDD (Figure \ref{fig:intDD}) and the corresponding MIP:
+
+   #+begin_src python :session *pyOrg* :exports none
+import BDD as DD
+intDD = DD.intersect(Ap, Cp)
+intDD.show(dir="reports/2021-02-23_Status_BM/", filename="intersection.dot")
+   #+end_src
+
+   #+RESULTS:
+   : None
+   
+#+begin_export latex
+\begin{figure}[h!]
+\includegraphics[width=0.9\textwidth]{./intersection.dot.pdf}
+\caption{An intersection diagram for 'availability' and 'covering' DDs.}
+\label{fig:intDD}
+\end{figure}
+#+end_export
+
+#+name: NF
+#+begin_src python :session *pyOrg* :exports none :results output :cache yes
+m_NF, c, v = UFL.create_NF(intDD)
+m_NF.display()
+#+end_src
+
+#+RESULTS[1114ec180de33ef233edfc3f32a1ee866dcb47b3]: NF
+#+begin_example
+Minimize
+   <gurobi.LinExpr: 2.1 vh0_1 + 0.1 vl0_2 + 0.2 vh6_9 + 0.2 vl6_10 + 1.2 vh5_9 + 1.2 vl5_8 + 0.2 vh4_9 + 0.2 vl4_8 + 1.2 vh3_7 + 1.2 vl3_8 + 3.0 vh10_15 + 3.0 vh7_11 + vh9_14 + vh8_13 + 1.3 vh21_26 + 0.3 vl21_26 + 3.3 vh17_24 + 2.3 vl17_25 + 2.3 vh22_24 + 1.3 vl22_25 + 3.3 vh19_26 + 2.3 vl19_26 + 1.3 vh23_27 + 0.3 vl23_28 + 2.3 vh18_26 + 1.3 vl18_26 + 2.3 vh20_27 + 1.3 vl20_28 + 3.0 vl27_33 + 3.0 vh24_29 + 1.4 vh34_-2 + 0.4 vl34_-1 + 1.4 vh30_-2 + 0.4 vl30_-2 + 2.4 vh29_-1 + 1.4 vl29_-2 + 1.4 vh33_-1 + 0.4 vl33_-2 + 2.4 vh32_-2 + 1.4 vl32_-2 + 2.4 vh31_-2 + 1.4 vl31_-1>
+Subject To
+   cont-at-0 : <gurobi.LinExpr: -1.0 vh0_1 + -1.0 vl0_2> = -1.0
+   cont-at-1 : <gurobi.LinExpr: vh0_1 + -1.0 vh1_3 + -1.0 vl1_4> = 0.0
+   cont-at-2 : <gurobi.LinExpr: vl0_2 + -1.0 vh2_5 + -1.0 vl2_6> = 0.0
+   cont-at-6 : <gurobi.LinExpr: vl2_6 + -1.0 vh6_9 + -1.0 vl6_10> = 0.0
+   cont-at-5 : <gurobi.LinExpr: vh2_5 + -1.0 vh5_9 + -1.0 vl5_8> = 0.0
+   cont-at-4 : <gurobi.LinExpr: vl1_4 + -1.0 vh4_9 + -1.0 vl4_8> = 0.0
+   cont-at-3 : <gurobi.LinExpr: vh1_3 + -1.0 vh3_7 + -1.0 vl3_8> = 0.0
+   cont-at-10 : <gurobi.LinExpr: vl6_10 + -1.0 vh10_15 + -1.0 vl10_16> = 0.0
+   cont-at-7 : <gurobi.LinExpr: vh3_7 + -1.0 vh7_11 + -1.0 vl7_12> = 0.0
+   cont-at-9 : <gurobi.LinExpr: vh6_9 + vh5_9 + vh4_9 + -1.0 vh9_14 + -1.0 vl9_14> = 0.0
+   cont-at-8 : <gurobi.LinExpr: vl5_8 + vl4_8 + vl3_8 + -1.0 vh8_13 + -1.0 vl8_13> = 0.0
+   cont-at-16 : <gurobi.LinExpr: vl10_16 + -1.0 vh16_18 + -1.0 vl16_23> = 0.0
+   cont-at-11 : <gurobi.LinExpr: vh7_11 + -1.0 vh11_17 + -1.0 vl11_18> = 0.0
+   cont-at-12 : <gurobi.LinExpr: vl7_12 + -1.0 vh12_19 + -1.0 vl12_20> = 0.0
+   cont-at-14 : <gurobi.LinExpr: vh9_14 + vl9_14 + -1.0 vh14_19 + -1.0 vl14_18> = 0.0
+   cont-at-15 : <gurobi.LinExpr: vh10_15 + -1.0 vh15_22 + -1.0 vl15_21> = 0.0
+   cont-at-13 : <gurobi.LinExpr: vh8_13 + vl8_13 + -1.0 vh13_18 + -1.0 vl13_21> = 0.0
+   cont-at-21 : <gurobi.LinExpr: vl15_21 + vl13_21 + -1.0 vh21_26 + -1.0 vl21_26> = 0.0
+   cont-at-17 : <gurobi.LinExpr: vh11_17 + -1.0 vh17_24 + -1.0 vl17_25> = 0.0
+   cont-at-22 : <gurobi.LinExpr: vh15_22 + -1.0 vh22_24 + -1.0 vl22_25> = 0.0
+   cont-at-19 : <gurobi.LinExpr: vh12_19 + vh14_19 + -1.0 vh19_26 + -1.0 vl19_26> = 0.0
+   cont-at-23 : <gurobi.LinExpr: vl16_23 + -1.0 vh23_27 + -1.0 vl23_28> = 0.0
+   cont-at-18 : <gurobi.LinExpr: vh16_18 + vl11_18 + vl14_18 + vh13_18 + -1.0 vh18_26 + -1.0 vl18_26> = 0.0
+   cont-at-20 : <gurobi.LinExpr: vl12_20 + -1.0 vh20_27 + -1.0 vl20_28> = 0.0
+   cont-at-27 : <gurobi.LinExpr: vh23_27 + vh20_27 + -1.0 vh27_32 + -1.0 vl27_33> = 0.0
+   cont-at-25 : <gurobi.LinExpr: vl17_25 + vl22_25 + -1.0 vh25_31 + -1.0 vl25_30> = 0.0
+   cont-at-24 : <gurobi.LinExpr: vh17_24 + vh22_24 + -1.0 vh24_29 + -1.0 vl24_30> = 0.0
+   cont-at-26 : <gurobi.LinExpr: vh21_26 + vl21_26 + vh19_26 + vl19_26 + vh18_26 + vl18_26 + -1.0 vh26_32 + -1.0 vl26_30> = 0.0
+   cont-at-28 : <gurobi.LinExpr: vl23_28 + vl20_28 + -1.0 vh28_32 + -1.0 vl28_34> = 0.0
+   cont-at-34 : <gurobi.LinExpr: vl28_34 + -1.0 vh34_-2 + -1.0 vl34_-1> = 0.0
+   cont-at-30 : <gurobi.LinExpr: vl25_30 + vl24_30 + vl26_30 + -1.0 vh30_-2 + -1.0 vl30_-2> = 0.0
+   cont-at-29 : <gurobi.LinExpr: vh24_29 + -1.0 vh29_-1 + -1.0 vl29_-2> = 0.0
+   cont-at-33 : <gurobi.LinExpr: vl27_33 + -1.0 vh33_-1 + -1.0 vl33_-2> = 0.0
+   cont-at-32 : <gurobi.LinExpr: vh27_32 + vh26_32 + vh28_32 + -1.0 vh32_-2 + -1.0 vl32_-2> = 0.0
+   cont-at-31 : <gurobi.LinExpr: vh25_31 + -1.0 vh31_-2 + -1.0 vl31_-1> = 0.0
+   cont-at--1 : <gurobi.LinExpr: vl34_-1 + vh29_-1 + vh33_-1 + vl31_-1> = 1.0
+   cont-at--2 : <gurobi.LinExpr: vh34_-2 + vh30_-2 + vl30_-2 + vl29_-2 + vl33_-2 + vh32_-2 + vl32_-2 + vh31_-2> = 0.0
+#+end_example
+
+#+begin_src bash :stdin NF :results verbatim :exports none
+cat | sed 's/<gurobi\.LinExpr\: //' | sed 's/> =/ =/' | \
+    sed 's/: /\& $/g' | \
+    sed 's/_-1/_T/g' | \
+    sed 's/_-2/_F/g' | \
+    sed 's/--1/-T/g' | \
+    sed 's/--2/-F/g' | \
+    sed 's/v\([hl]\)\([0-9\-]*\)_\([TF0-9\-]*\)/v_{\2 \\rightarrow \3, \1}/g' | \
+    sed 's/+ -/-/g' | \
+    sed 's/$/\$\\\\/g'
+#+end_src
+
+#+RESULTS:
+#+begin_example
+Minimize$\\
+   2.1 v_{0 \rightarrow 1, h} + 0.1 v_{0 \rightarrow 2, l} + 0.2 v_{6 \rightarrow 9, h} + 0.2 v_{6 \rightarrow 10, l} + 1.2 v_{5 \rightarrow 9, h} + 1.2 v_{5 \rightarrow 8, l} + 0.2 v_{4 \rightarrow 9, h} + 0.2 v_{4 \rightarrow 8, l} + 1.2 v_{3 \rightarrow 7, h} + 1.2 v_{3 \rightarrow 8, l} + 3.0 v_{10 \rightarrow 15, h} + 3.0 v_{7 \rightarrow 11, h} + v_{9 \rightarrow 14, h} + v_{8 \rightarrow 13, h} + 1.3 v_{21 \rightarrow 26, h} + 0.3 v_{21 \rightarrow 26, l} + 3.3 v_{17 \rightarrow 24, h} + 2.3 v_{17 \rightarrow 25, l} + 2.3 v_{22 \rightarrow 24, h} + 1.3 v_{22 \rightarrow 25, l} + 3.3 v_{19 \rightarrow 26, h} + 2.3 v_{19 \rightarrow 26, l} + 1.3 v_{23 \rightarrow 27, h} + 0.3 v_{23 \rightarrow 28, l} + 2.3 v_{18 \rightarrow 26, h} + 1.3 v_{18 \rightarrow 26, l} + 2.3 v_{20 \rightarrow 27, h} + 1.3 v_{20 \rightarrow 28, l} + 3.0 v_{27 \rightarrow 33, l} + 3.0 v_{24 \rightarrow 29, h} + 1.4 v_{34 \rightarrow F, h} + 0.4 v_{34 \rightarrow T, l} + 1.4 v_{30 \rightarrow F, h} + 0.4 v_{30 \rightarrow F, l} + 2.4 v_{29 \rightarrow T, h} + 1.4 v_{29 \rightarrow F, l} + 1.4 v_{33 \rightarrow T, h} + 0.4 v_{33 \rightarrow F, l} + 2.4 v_{32 \rightarrow F, h} + 1.4 v_{32 \rightarrow F, l} + 2.4 v_{31 \rightarrow F, h} + 1.4 v_{31 \rightarrow T, l}>$\\
+Subject To$\\
+   cont-at-0 & $-1.0 v_{0 \rightarrow 1, h} -1.0 v_{0 \rightarrow 2, l} = -1.0$\\
+   cont-at-1 & $v_{0 \rightarrow 1, h} -1.0 v_{1 \rightarrow 3, h} -1.0 v_{1 \rightarrow 4, l} = 0.0$\\
+   cont-at-2 & $v_{0 \rightarrow 2, l} -1.0 v_{2 \rightarrow 5, h} -1.0 v_{2 \rightarrow 6, l} = 0.0$\\
+   cont-at-6 & $v_{2 \rightarrow 6, l} -1.0 v_{6 \rightarrow 9, h} -1.0 v_{6 \rightarrow 10, l} = 0.0$\\
+   cont-at-5 & $v_{2 \rightarrow 5, h} -1.0 v_{5 \rightarrow 9, h} -1.0 v_{5 \rightarrow 8, l} = 0.0$\\
+   cont-at-4 & $v_{1 \rightarrow 4, l} -1.0 v_{4 \rightarrow 9, h} -1.0 v_{4 \rightarrow 8, l} = 0.0$\\
+   cont-at-3 & $v_{1 \rightarrow 3, h} -1.0 v_{3 \rightarrow 7, h} -1.0 v_{3 \rightarrow 8, l} = 0.0$\\
+   cont-at-10 & $v_{6 \rightarrow 10, l} -1.0 v_{10 \rightarrow 15, h} -1.0 v_{10 \rightarrow 16, l} = 0.0$\\
+   cont-at-7 & $v_{3 \rightarrow 7, h} -1.0 v_{7 \rightarrow 11, h} -1.0 v_{7 \rightarrow 12, l} = 0.0$\\
+   cont-at-9 & $v_{6 \rightarrow 9, h} + v_{5 \rightarrow 9, h} + v_{4 \rightarrow 9, h} -1.0 v_{9 \rightarrow 14, h} -1.0 v_{9 \rightarrow 14, l} = 0.0$\\
+   cont-at-8 & $v_{5 \rightarrow 8, l} + v_{4 \rightarrow 8, l} + v_{3 \rightarrow 8, l} -1.0 v_{8 \rightarrow 13, h} -1.0 v_{8 \rightarrow 13, l} = 0.0$\\
+   cont-at-16 & $v_{10 \rightarrow 16, l} -1.0 v_{16 \rightarrow 18, h} -1.0 v_{16 \rightarrow 23, l} = 0.0$\\
+   cont-at-11 & $v_{7 \rightarrow 11, h} -1.0 v_{11 \rightarrow 17, h} -1.0 v_{11 \rightarrow 18, l} = 0.0$\\
+   cont-at-12 & $v_{7 \rightarrow 12, l} -1.0 v_{12 \rightarrow 19, h} -1.0 v_{12 \rightarrow 20, l} = 0.0$\\
+   cont-at-14 & $v_{9 \rightarrow 14, h} + v_{9 \rightarrow 14, l} -1.0 v_{14 \rightarrow 19, h} -1.0 v_{14 \rightarrow 18, l} = 0.0$\\
+   cont-at-15 & $v_{10 \rightarrow 15, h} -1.0 v_{15 \rightarrow 22, h} -1.0 v_{15 \rightarrow 21, l} = 0.0$\\
+   cont-at-13 & $v_{8 \rightarrow 13, h} + v_{8 \rightarrow 13, l} -1.0 v_{13 \rightarrow 18, h} -1.0 v_{13 \rightarrow 21, l} = 0.0$\\
+   cont-at-21 & $v_{15 \rightarrow 21, l} + v_{13 \rightarrow 21, l} -1.0 v_{21 \rightarrow 26, h} -1.0 v_{21 \rightarrow 26, l} = 0.0$\\
+   cont-at-17 & $v_{11 \rightarrow 17, h} -1.0 v_{17 \rightarrow 24, h} -1.0 v_{17 \rightarrow 25, l} = 0.0$\\
+   cont-at-22 & $v_{15 \rightarrow 22, h} -1.0 v_{22 \rightarrow 24, h} -1.0 v_{22 \rightarrow 25, l} = 0.0$\\
+   cont-at-19 & $v_{12 \rightarrow 19, h} + v_{14 \rightarrow 19, h} -1.0 v_{19 \rightarrow 26, h} -1.0 v_{19 \rightarrow 26, l} = 0.0$\\
+   cont-at-23 & $v_{16 \rightarrow 23, l} -1.0 v_{23 \rightarrow 27, h} -1.0 v_{23 \rightarrow 28, l} = 0.0$\\
+   cont-at-18 & $v_{16 \rightarrow 18, h} + v_{11 \rightarrow 18, l} + v_{14 \rightarrow 18, l} + v_{13 \rightarrow 18, h} -1.0 v_{18 \rightarrow 26, h} -1.0 v_{18 \rightarrow 26, l} = 0.0$\\
+   cont-at-20 & $v_{12 \rightarrow 20, l} -1.0 v_{20 \rightarrow 27, h} -1.0 v_{20 \rightarrow 28, l} = 0.0$\\
+   cont-at-27 & $v_{23 \rightarrow 27, h} + v_{20 \rightarrow 27, h} -1.0 v_{27 \rightarrow 32, h} -1.0 v_{27 \rightarrow 33, l} = 0.0$\\
+   cont-at-25 & $v_{17 \rightarrow 25, l} + v_{22 \rightarrow 25, l} -1.0 v_{25 \rightarrow 31, h} -1.0 v_{25 \rightarrow 30, l} = 0.0$\\
+   cont-at-24 & $v_{17 \rightarrow 24, h} + v_{22 \rightarrow 24, h} -1.0 v_{24 \rightarrow 29, h} -1.0 v_{24 \rightarrow 30, l} = 0.0$\\
+   cont-at-26 & $v_{21 \rightarrow 26, h} + v_{21 \rightarrow 26, l} + v_{19 \rightarrow 26, h} + v_{19 \rightarrow 26, l} + v_{18 \rightarrow 26, h} + v_{18 \rightarrow 26, l} -1.0 v_{26 \rightarrow 32, h} -1.0 v_{26 \rightarrow 30, l} = 0.0$\\
+   cont-at-28 & $v_{23 \rightarrow 28, l} + v_{20 \rightarrow 28, l} -1.0 v_{28 \rightarrow 32, h} -1.0 v_{28 \rightarrow 34, l} = 0.0$\\
+   cont-at-34 & $v_{28 \rightarrow 34, l} -1.0 v_{34 \rightarrow F, h} -1.0 v_{34 \rightarrow T, l} = 0.0$\\
+   cont-at-30 & $v_{25 \rightarrow 30, l} + v_{24 \rightarrow 30, l} + v_{26 \rightarrow 30, l} -1.0 v_{30 \rightarrow F, h} -1.0 v_{30 \rightarrow F, l} = 0.0$\\
+   cont-at-29 & $v_{24 \rightarrow 29, h} -1.0 v_{29 \rightarrow T, h} -1.0 v_{29 \rightarrow F, l} = 0.0$\\
+   cont-at-33 & $v_{27 \rightarrow 33, l} -1.0 v_{33 \rightarrow T, h} -1.0 v_{33 \rightarrow F, l} = 0.0$\\
+   cont-at-32 & $v_{27 \rightarrow 32, h} + v_{26 \rightarrow 32, h} + v_{28 \rightarrow 32, h} -1.0 v_{32 \rightarrow F, h} -1.0 v_{32 \rightarrow F, l} = 0.0$\\
+   cont-at-31 & $v_{25 \rightarrow 31, h} -1.0 v_{31 \rightarrow F, h} -1.0 v_{31 \rightarrow T, l} = 0.0$\\
+   cont-at-T & $v_{34 \rightarrow T, l} + v_{29 \rightarrow T, h} + v_{33 \rightarrow T, h} + v_{31 \rightarrow T, l} = 1.0$\\
+   cont-at-F & $v_{34 \rightarrow F, h} + v_{30 \rightarrow F, h} + v_{30 \rightarrow F, l} + v_{29 \rightarrow F, l} + v_{33 \rightarrow F, l} + v_{32 \rightarrow F, h} + v_{32 \rightarrow F, l} + v_{31 \rightarrow F, h} = 0.0$\\
+#+end_example
+
+The objective is:
+#+begin_export latex
+\begin{flalign*}
+\textrm{Minimize: } & 2.1 v_{0 \rightarrow 1, h} + 0.1 v_{0 \rightarrow 2, l} + 0.2 v_{6 \rightarrow 9, h} + 0.2 v_{6 \rightarrow 10, l} + 1.2 v_{5 \rightarrow 9, h} + \\
+& 1.2 v_{5 \rightarrow 8, l} + 0.2 v_{4 \rightarrow 9, h} + 0.2 v_{4 \rightarrow 8, l} + 1.2 v_{3 \rightarrow 7, h} + 1.2 v_{3 \rightarrow 8, l} + 3.0 v_{10 \rightarrow 15, h} +\\
+& 3.0 v_{7 \rightarrow 11, h} + v_{9 \rightarrow 14, h} + v_{8 \rightarrow 13, h} + 1.3 v_{21 \rightarrow 26, h} + 0.3 v_{21 \rightarrow 26, l} + 3.3 v_{17 \rightarrow 24, h} + \\
+& 2.3 v_{17 \rightarrow 25, l} + 2.3 v_{22 \rightarrow 24, h} + 1.3 v_{22 \rightarrow 25, l} + 3.3 v_{19 \rightarrow 26, h} + 2.3 v_{19 \rightarrow 26, l} +\\
+& 1.3 v_{23 \rightarrow 27, h} + 0.3 v_{23 \rightarrow 28, l} + 2.3 v_{18 \rightarrow 26, h} + 1.3 v_{18 \rightarrow 26, l} + 2.3 v_{20 \rightarrow 27, h} +\\
+& 1.3 v_{20 \rightarrow 28, l} + 3.0 v_{27 \rightarrow 33, l} + 3.0 v_{24 \rightarrow 29, h} + 1.4 v_{34 \rightarrow F, h} + 0.4 v_{34 \rightarrow T, l} + \\
+& 1.4 v_{30 \rightarrow F, h} + 0.4 v_{30 \rightarrow F, l} + 2.4 v_{29 \rightarrow T, h} + 1.4 v_{29 \rightarrow F, l} + 1.4 v_{33 \rightarrow T, h} + 0.4 v_{33 \rightarrow F, l} +\\
+& 2.4 v_{32 \rightarrow F, h} + 1.4 v_{32 \rightarrow F, l} + 2.4 v_{31 \rightarrow F, h} + 1.4 v_{31 \rightarrow T, l},
+\end{flalign*}
+#+end_export
+
+under the constraints, presented in Table \ref{tab:NFconstr}. Obviously, here I
+have continuous variables only.
+
+#+begin_export latex
+\begin{table}[ht]
+\caption{Network flow constraints (for the intersection BDD).}
+ \begin{tabular}{l l}
+ \textbf{Type} & \textbf{Constraint}\\\hline\\
+   cont-at-0 & $-1.0 v_{0 \rightarrow 1, h} -1.0 v_{0 \rightarrow 2, l} = -1.0$\\
+   cont-at-1 & $v_{0 \rightarrow 1, h} -1.0 v_{1 \rightarrow 3, h} -1.0 v_{1 \rightarrow 4, l} = 0.0$\\
+   cont-at-2 & $v_{0 \rightarrow 2, l} -1.0 v_{2 \rightarrow 5, h} -1.0 v_{2 \rightarrow 6, l} = 0.0$\\
+   cont-at-6 & $v_{2 \rightarrow 6, l} -1.0 v_{6 \rightarrow 9, h} -1.0 v_{6 \rightarrow 10, l} = 0.0$\\
+   cont-at-5 & $v_{2 \rightarrow 5, h} -1.0 v_{5 \rightarrow 9, h} -1.0 v_{5 \rightarrow 8, l} = 0.0$\\
+   cont-at-4 & $v_{1 \rightarrow 4, l} -1.0 v_{4 \rightarrow 9, h} -1.0 v_{4 \rightarrow 8, l} = 0.0$\\
+   cont-at-3 & $v_{1 \rightarrow 3, h} -1.0 v_{3 \rightarrow 7, h} -1.0 v_{3 \rightarrow 8, l} = 0.0$\\
+   cont-at-10 & $v_{6 \rightarrow 10, l} -1.0 v_{10 \rightarrow 15, h} -1.0 v_{10 \rightarrow 16, l} = 0.0$\\
+   cont-at-7 & $v_{3 \rightarrow 7, h} -1.0 v_{7 \rightarrow 11, h} -1.0 v_{7 \rightarrow 12, l} = 0.0$\\
+   cont-at-9 & $v_{6 \rightarrow 9, h} + v_{5 \rightarrow 9, h} + v_{4 \rightarrow 9, h} -1.0 v_{9 \rightarrow 14, h} -1.0 v_{9 \rightarrow 14, l} = 0.0$\\
+   cont-at-8 & $v_{5 \rightarrow 8, l} + v_{4 \rightarrow 8, l} + v_{3 \rightarrow 8, l} -1.0 v_{8 \rightarrow 13, h} -1.0 v_{8 \rightarrow 13, l} = 0.0$\\
+   cont-at-16 & $v_{10 \rightarrow 16, l} -1.0 v_{16 \rightarrow 18, h} -1.0 v_{16 \rightarrow 23, l} = 0.0$\\
+   cont-at-11 & $v_{7 \rightarrow 11, h} -1.0 v_{11 \rightarrow 17, h} -1.0 v_{11 \rightarrow 18, l} = 0.0$\\
+   cont-at-12 & $v_{7 \rightarrow 12, l} -1.0 v_{12 \rightarrow 19, h} -1.0 v_{12 \rightarrow 20, l} = 0.0$\\
+   cont-at-14 & $v_{9 \rightarrow 14, h} + v_{9 \rightarrow 14, l} -1.0 v_{14 \rightarrow 19, h} -1.0 v_{14 \rightarrow 18, l} = 0.0$\\
+   cont-at-15 & $v_{10 \rightarrow 15, h} -1.0 v_{15 \rightarrow 22, h} -1.0 v_{15 \rightarrow 21, l} = 0.0$\\
+   cont-at-13 & $v_{8 \rightarrow 13, h} + v_{8 \rightarrow 13, l} -1.0 v_{13 \rightarrow 18, h} -1.0 v_{13 \rightarrow 21, l} = 0.0$\\
+   cont-at-21 & $v_{15 \rightarrow 21, l} + v_{13 \rightarrow 21, l} -1.0 v_{21 \rightarrow 26, h} -1.0 v_{21 \rightarrow 26, l} = 0.0$\\
+   cont-at-17 & $v_{11 \rightarrow 17, h} -1.0 v_{17 \rightarrow 24, h} -1.0 v_{17 \rightarrow 25, l} = 0.0$\\
+   cont-at-22 & $v_{15 \rightarrow 22, h} -1.0 v_{22 \rightarrow 24, h} -1.0 v_{22 \rightarrow 25, l} = 0.0$\\
+   cont-at-19 & $v_{12 \rightarrow 19, h} + v_{14 \rightarrow 19, h} -1.0 v_{19 \rightarrow 26, h} -1.0 v_{19 \rightarrow 26, l} = 0.0$\\
+   cont-at-23 & $v_{16 \rightarrow 23, l} -1.0 v_{23 \rightarrow 27, h} -1.0 v_{23 \rightarrow 28, l} = 0.0$\\
+   cont-at-18 & $v_{16 \rightarrow 18, h} + v_{11 \rightarrow 18, l} + v_{14 \rightarrow 18, l} + v_{13 \rightarrow 18, h} -1.0 v_{18 \rightarrow 26, h} -1.0 v_{18 \rightarrow 26, l} = 0.0$\\
+   cont-at-20 & $v_{12 \rightarrow 20, l} -1.0 v_{20 \rightarrow 27, h} -1.0 v_{20 \rightarrow 28, l} = 0.0$\\
+   cont-at-27 & $v_{23 \rightarrow 27, h} + v_{20 \rightarrow 27, h} -1.0 v_{27 \rightarrow 32, h} -1.0 v_{27 \rightarrow 33, l} = 0.0$\\
+   cont-at-25 & $v_{17 \rightarrow 25, l} + v_{22 \rightarrow 25, l} -1.0 v_{25 \rightarrow 31, h} -1.0 v_{25 \rightarrow 30, l} = 0.0$\\
+   cont-at-24 & $v_{17 \rightarrow 24, h} + v_{22 \rightarrow 24, h} -1.0 v_{24 \rightarrow 29, h} -1.0 v_{24 \rightarrow 30, l} = 0.0$\\
+   cont-at-26 & $v_{21 \rightarrow 26, h} + v_{21 \rightarrow 26, l} + v_{19 \rightarrow 26, h} + v_{19 \rightarrow 26, l} + v_{18 \rightarrow 26, h} + v_{18 \rightarrow 26, l}$\\
+   & $-1.0 v_{26 \rightarrow 32, h} -1.0 v_{26 \rightarrow 30, l} = 0.0$\\
+   cont-at-28 & $v_{23 \rightarrow 28, l} + v_{20 \rightarrow 28, l} -1.0 v_{28 \rightarrow 32, h} -1.0 v_{28 \rightarrow 34, l} = 0.0$\\
+   cont-at-34 & $v_{28 \rightarrow 34, l} -1.0 v_{34 \rightarrow F, h} -1.0 v_{34 \rightarrow T, l} = 0.0$\\
+   cont-at-30 & $v_{25 \rightarrow 30, l} + v_{24 \rightarrow 30, l} + v_{26 \rightarrow 30, l} -1.0 v_{30 \rightarrow F, h} -1.0 v_{30 \rightarrow F, l} = 0.0$\\
+   cont-at-29 & $v_{24 \rightarrow 29, h} -1.0 v_{29 \rightarrow T, h} -1.0 v_{29 \rightarrow F, l} = 0.0$\\
+   cont-at-33 & $v_{27 \rightarrow 33, l} -1.0 v_{33 \rightarrow T, h} -1.0 v_{33 \rightarrow F, l} = 0.0$\\
+   cont-at-32 & $v_{27 \rightarrow 32, h} + v_{26 \rightarrow 32, h} + v_{28 \rightarrow 32, h} -1.0 v_{32 \rightarrow F, h} -1.0 v_{32 \rightarrow F, l} = 0.0$\\
+   cont-at-31 & $v_{25 \rightarrow 31, h} -1.0 v_{31 \rightarrow F, h} -1.0 v_{31 \rightarrow T, l} = 0.0$\\
+   cont-at-T & $v_{34 \rightarrow T, l} + v_{29 \rightarrow T, h} + v_{33 \rightarrow T, h} + v_{31 \rightarrow T, l} = 1.0$\\
+   cont-at-F & $v_{34 \rightarrow F, h} + v_{30 \rightarrow F, h} + v_{30 \rightarrow F, l} + v_{29 \rightarrow F, l} + v_{33 \rightarrow F, l} + v_{32 \rightarrow F, h} + v_{32 \rightarrow F, l} + v_{31 \rightarrow F, h} = 0.0$\\
+ \end{tabular}
+ \label{tab:NFconstr}
+\end{table}
+#+end_export
+
+** A quick cross-check
+   Of course, I'd like to cross-check somehow. E.g., I can just solve each of
+   the three models and make sure the optimal objective coincide. Indeed:
+   #+begin_src python :session *pyOrg* :exports results :results output
+m_simple.optimize()
+m_CPP_MIP.optimize()
+m_NF.optimize()
+
+print(f"Opt statuses are: {m_simple.status}, {m_CPP_MIP.status}, {m_NF.status}")
+print(f"('optimal' is encoded by 2)")
+print(f"Optimal objectives are:\nSimple MIP: {m_simple.objVal:.1f}\nCPP MIP:    {m_CPP_MIP.objVal:.1f}\nNF (linear):{m_NF.objVal:.1f}")
+   #+end_src
+
+   #+RESULTS:
+   : Opt statuses are: 2, 2, 2
+   : ('optimal' is encoded by 2)
+   : Optimal objectives are:
+   : Simple MIP: 1.0
+   : CPP MIP:    1.0
+   : NF (linear):1.0
+
+Here are, e.g., nonzero variables for the CPP MIP (=-1= encodes \textbf{True}
+terminal node).
+
+#+begin_src python :session *pyOrg* :exports results :results output
+for v in m_CPP_MIP.getVars():
+   if abs(v.x)>0.001:
+      print(f"{v.VarName}: {v.x}")
+#+end_src
+
+#+RESULTS:
+#+begin_example
+A_vl0_2: 1.0
+A_vl2_4: 1.0
+A_vl4_6: 1.0
+A_vl6_9: 1.0
+A_vl9_12: 1.0
+A_vl12_14: 1.0
+A_vl14_17: 1.0
+A_vl17_-1: 1.0
+C_vl0_1: 1.0
+C_vl1_2: 1.0
+C_vl2_4: 1.0
+C_vl4_5: 1.0
+C_vl5_7: 1.0
+C_vl7_10: 1.0
+C_vl10_11: 1.0
+C_vl11_-1: 1.0
+#+end_example
+
+* The problem: intersection DD seems to blow up.
+What I have done is a very simple experiment: I generated 15 random instances
+for different problem sizes -- say, with number of facilities being $n=3,4,5,6$,
+and number of customers $m=2n$ (in every case). What I have is: diagram sizes
+($A$ for availability and $C$ for covering), along with the number of variables
+in the plain MIP grow reasonably (Figure \ref{fig:ACsizes}). However,
+intersection BDD just blows up (Figure \ref{fig:intSizes} -- note I had to draw it in
+*logarithmic* scale), and so does the runtime of what I am doing (Figure
+\ref{fig:runtimes}).
+
+#+begin_export latex
+\begin{figure}
+  \begin{subfigure}{0.45\textwidth}
+    \includegraphics[width=\textwidth]{AandCsizes.eps}
+    \caption{Diagram growth as number of facilities increases.}
+    \label{fig:ACsizes}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}{0.45\textwidth}
+    \includegraphics[width=\textwidth]{inter_size.eps}
+    \caption{Intersection diagram growth as number of facilities increases.}
+    \label{fig:intSizes}
+  \end{subfigure}
+\end{figure}
+#+end_export
+
+#+begin_export latex
+\begin{figure}
+\center
+\includegraphics[width=0.7\textwidth]{runtimes.eps}
+\caption{Experiment runtimes, seconds}
+\label{fig:runtimes}
+\end{figure}
+#+end_export
