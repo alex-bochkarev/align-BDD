@@ -17,6 +17,7 @@ from gurobipy import GRB
 import sys
 from time import time
 import argparse as ap
+from copy import copy
 
 import varseq as vs
 import BB_search as bb
@@ -546,12 +547,89 @@ def solve_with_intBDD(S, f, g):
     m.optimize()
     return m, c, v
 
+
+def build_DP_DD(S, f, g):
+    """Builds a BDD for the UFL problem (with x-variables only)
+
+    Args:
+       S (list): neighborhood list,
+       f (dict): location costs,
+       g (dict): overlap costs.
+
+    Returns:
+        The resulting BDD.
+
+    Notes:
+        - employs a DP approach with state being the number of overlaps
+            for each customer.
+    """
+    Sf = build_Sf(S)
+    D = DD.BDD(N=len(Sf), vars=[i for i in range(1, len(Sf)+1)],
+               weighted=True)
+
+    # a *state* is the number of overlaps for each customer
+    root_state = [0 for _ in range(len(S))]
+    i = 1
+    node_labels = dict({DD.NROOT: root_state})
+    next_layer = {tuple(root_state): D.addnode(None)}
+
+    while i < len(Sf):
+        current_layer = copy(next_layer)
+        next_layer = dict()
+        for state in current_layer:
+            node = current_layer[tuple(state)]
+            if state in next_layer:
+                D.llink(node, next_layer[state], "lo")
+            else:
+                newnode = D.addnode(node, "lo")
+                next_layer.update({state: newnode})
+                node_labels.update({newnode.id: str(state)})
+
+            next_state = list(state)
+            for j in Sf[i]:
+                next_state[j-1] += 1
+            next_state = tuple(next_state)
+
+            if next_state in next_layer:
+                D.llink(node, next_layer[next_state], "hi",
+                        edge_weight=f[i])
+            else:
+                newnode = D.addnode(node, "hi", edge_weight=f[i])
+                next_layer.update({next_state: newnode})
+                node_labels.update({newnode.id: str(next_state)})
+        i += 1
+
+    print(f"i={i} and next layer={next_layer}")
+    for state in next_layer:
+        print(f"state={state}")
+        w_hi = f[i] + sum(g[(j + 1, state[j] + 1)]
+                          if (j + 1) in Sf[i] else g[(j + 1, state[j])]
+                          for j in range(len(state)))
+
+        w_lo = sum(g[(j+1, state[j])]
+                   for j in range(len(state)))
+
+        node_id = next_layer[state].id
+        D.link(node_id, DD.NTRUE, "hi", edge_weight=w_hi)
+        D.link(node_id, DD.NTRUE, "lo", edge_weight=w_lo)
+
+    return D, node_labels
 # =====================================================================
 # Testing code
 # =====================================================================
 
+def make_simple_problem():
+    S = [[1], [1, 2], [1, 2, 3], [2, 3]]
+    f = {1: 1, 2: 2, 3: 3}
+    g = {
+        (1, 0): 11,  (2, 0): 12,  (3, 0): 13,  (4, 0): 14,
+        (1, 1): 0,  (2, 1): 0,  (3, 1): 0,  (4, 1): 0,
+        (1, 2): 2.1,  (2, 2): 2.2,  (3, 2): 2.3,  (4, 2): 2.4,
+        (3, 3): 3.1}
+    return S, f, g
 
-def test_BDD_to_MIP():
+
+def show_BDD_to_MIP():
     """Tests making a MIP from a single BDD."""
     # adhoc experiments
     A = DD.BDD()
@@ -567,7 +645,7 @@ def test_BDD_to_MIP():
     m.display()
 
 
-def test_build_MIP():
+def show_build_MIP():
     """Tests a simple MIP building function."""
     S = [[1], [1, 2], [1, 2, 3], [2, 3]]
     f = {1: 0.1, 2: 0.2, 3: 0.3}
@@ -584,7 +662,7 @@ def test_build_MIP():
     m.display()
 
 
-def test_BDD_build():
+def show_BDD_build():
     """Runs a simple test against a toy problem."""
     S = [[1], [1, 2], [1, 2], [2]]
     f = {1: 0.5, 2: 0.7}
@@ -602,7 +680,7 @@ def test_BDD_build():
     A.show(x_prefix='', filename="availability.dot", dir="run_logs")
 
 
-def test_BDD_to_MIP_wg(S, f, g):
+def show_BDD_to_MIP_wg(S, f, g):
     """Runs a simple test against a toy problem."""
     draw_problem_dia(S, f, g)
     C = create_covering_BDD_wg(S, g)
@@ -946,7 +1024,7 @@ def main():
         vs_A = vs.VarSeq(A.vars, [len(L) for L in A.layers[:-1]])
         vs_C = vs.VarSeq(C.vars, [len(L) for L in C.layers[:-1]])
 
-        bb.TIMEOUT_ITERATIONS=5000
+        bb.TIMEOUT_ITERATIONS = 5000
         b = bb.BBSearch(vs_A, vs_C)
         status = b.search()
         assert status == "optimal" or status == "timeout"

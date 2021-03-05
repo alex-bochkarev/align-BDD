@@ -282,3 +282,6 @@ test: $(LOGS)/BB.test
 
 $(LOGS)/BB.test: $(LOGS)/BB_bounds_R.log $(LOGS)/solved_R.log tests/BB_log_correct.R
 	Rscript tests/BB_log_correct.R -b $(LOGS)/BB_bounds_R.log -s $(LOGS)/solved_R.log > $(LOGS)/BB.test
+
+qtest:
+	python -m pytest tests/UFL_test.py

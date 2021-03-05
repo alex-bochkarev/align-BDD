@@ -164,7 +164,7 @@ class BDD(object):
             self.max_id += 1
             return self.max_id
 
-    def dump_gv(self, layerCapt=True, x_prefix="x"):
+    def dump_gv(self, layerCapt=True, x_prefix="x", node_labels=None):
         """Exports the BDD to the Graphviz format (`.dot`).
         Args:
             layerCapt (bool): whether to generate layer captions.
@@ -181,7 +181,10 @@ class BDD(object):
                     elif n.id == NFALSE:
                         s.node(str(NFALSE),label="F", fillcolor = "gray",style="filled")
                     else:
-                        s.node( str(n.id) )
+                        if node_labels is None:
+                            s.node( str(n.id) )
+                        else:
+                            s.node(str(n.id), label=f"{n.id}: {node_labels[n.id]}")
 
                 if i!=len(self.layers)-1:
                     if layerCapt:
