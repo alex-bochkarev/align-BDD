@@ -1,4 +1,5 @@
 * Current version
+** [2021-03-05 Fri 13:20]: refactored =dia_sizes.sh= into a separate experiment 
 ** [2021-03-05 Fri 12:34]: implemented x-only NF model. 
 ** [2021-02-22 Mon 17:42]: implemented =swap_up= for weighted DDs 
    (simple tests passsing)

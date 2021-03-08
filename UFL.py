@@ -599,9 +599,7 @@ def build_DP_DD(S, f, g):
                 node_labels.update({newnode.id: str(next_state)})
         i += 1
 
-    print(f"i={i} and next layer={next_layer}")
     for state in next_layer:
-        print(f"state={state}")
         w_hi = f[i] + sum(g[(j + 1, state[j] + 1)]
                           if (j + 1) in Sf[i] else g[(j + 1, state[j])]
                           for j in range(len(state)))
@@ -757,6 +755,47 @@ def generate_test_instance(n, m):
     return S, f, g
 
 
+def generate_dense_instance(n, m, covering=0.95):
+    """Generates a dense test facility location instance.
+
+    In the sense that every customer can be covered by (almost)
+    every facility.
+
+    Args:
+        n (int): number of facilities
+        m (int): number of customers
+        covering (float): share of facilities covering each customer
+
+    Returns:
+        S (list): neighborhood list
+        f (dict): costs of facility location
+                    (generated uniformly random int from `f_min` to `f_max`)
+        g (dict): overlap costs, keys: (customer, overlap)
+    """
+    N = [i for i in range(1, n+1)]
+    M = [j for j in range(1, m+1)]
+
+    good_instance = False
+    while not good_instance:
+        S = [np.random.choice(N, round(n*covering),
+                              replace=False).tolist()
+             for j in M]
+
+        f = {i: np.random.randint(5, 10) for i in N}
+
+        g = dict()
+        for j in M:
+            g[(j, 0)] = np.random.randint(2*n, 4*n)
+            g[(j, 1)] = 0
+            for k in range(2, len(S[j-1])+1):
+                g[(j, k)] = g[(j, k-1)] + \
+                    np.random.randint(low=1, high=2+int(5*len(S[j-1])/j))
+
+        Sf = build_Sf(S)
+        if np.sum([1 for i in N if i not in Sf]) == 0:
+            good_instance = True
+
+    return S, f, g
 def test_MIPs_protocol():
     """Runs a series of cross-checks.
 
@@ -846,203 +885,6 @@ def test_BDD_and_plain_MIPs(K=500, TOL=1e-3, n=3, m=4):
     print(f"Plain MIP: {plain_MIP_time / K:.1f} sec.")
     print(f"CPP MIP: {CPP_MIP_time / K:.1f} sec.")
 
-
-def benchmark(K=100, TOL=1e-3, n=5, m=7, prefix=0):
-    """Runs the solution for three different methods.
-
-    Compares plain MIP, CPP MIP, and CPP align+NF (LP) in terms of
-    objectives and time.
-
-    Args:
-        K (int): number of instances to generate (default 500)
-        TOL (float): objective tolerance (for comparison) (default 1e-3)
-        n (int): number of facilities (default 3)
-        m (type): number of customers (default 4)
-
-    Returns:
-        Nothing (outputs the success rate to the screen)
-
-    Output format (stdout, comma-separated):
-        prefix(str): run ID
-        k (int): instance number
-        n (int): no. of customers
-        m (int): no. of facilities
-        method (str): method code
-        step (str): step code
-        duration (float): duration in msec.
-    """
-    for k in range(K):
-        t0 = time()
-        S, f, g = generate_test_instance(n=n, m=m)
-        t1 = time()
-        print(f"{prefix},{k},{n},{m},gen_instance,--,{(t1-t0)*1000:.3f}")
-
-        # Generate and solve plain MIP
-        t0 = time()
-        model = build_MIP(S, f, g)
-        model.setParam("OutputFlag", 0)
-        t1 = time()
-        print(f"{prefix},{k},{n},{m},plain_MIP,model_setup,{(t1-t0)*1000:.3f}")
-        t0 = time()
-        model.optimize()
-        t1 = time()
-        print(f"{prefix},{k},{n},{m},plain_MIP,solve,{(t1-t0)*1000:.3f}")
-
-        if model.status != GRB.OPTIMAL:
-            print(f"Plain MIP status is: {model.status}")
-            print(f"\nS={S}; f={f}; g={g}")
-            continue
-
-        plain_MIP_obj = model.objVal
-
-        # Generate and solve CPP MIP
-        t0 = time()
-        C = create_covering_BDD_wg(S, g)
-        A = create_availability_BDD(S, f)
-        t1 = time()
-        print(f"{prefix},{k},{n},{m},CPP,BDD_setup,{(t1-t0)*1000:.3f}")
-
-        t0 = time()
-        model, c, v, x = add_BDD_to_MIP(A, prefix="A_")
-        model, c, v, x = add_BDD_to_MIP(C, model=model, x=x, prefix="C_")
-        model.update()
-        model.setParam("OutputFlag", 0)
-        t1 = time()
-        print(f"{prefix},{k},{n},{m},CPP_MIP,model_setup,{(t1-t0)*1000:.3f}")
-
-        t0 = time()
-        model.optimize()
-        t1 = time()
-        print(f"{prefix},{k},{n},{m},CPP_MIP,model_solve,{(t1-t0)*1000:.3f}")
-
-        if model.status != GRB.OPTIMAL:
-            print(f"CPP MIP status is: {model.status}")
-            print(f"\nS={S}; f={f}; g={g}")
-            continue
-
-        CPP_MIP_obj = model.objVal
-
-        t0 = time()
-        vs_A = vs.VarSeq(A.vars, [len(L) for L in A.layers[:-1]])
-        vs_C = vs.VarSeq(C.vars, [len(L) for L in C.layers[:-1]])
-        assert set(vs_A.layer_var) == set(vs_C.layer_var)
-        t1 = time()
-        print(f"{prefix},{k},{n},{m},CPP_intBDD,varseq_setup,{(t1-t0)*1000:.3f}")
-
-        t0 = time()
-        b = bb.BBSearch(vs_A, vs_C)
-        status = b.search()
-        assert status == "optimal" or status == "timeout"
-        t1 = time()
-        print(f"{prefix},{k},{n},{m},CPP_intBDD,varseq_solve,{(t1-t0)*1000:.3f}")
-
-        t0 = time()
-        Ap = A.align_to(b.Ap_cand.layer_var, inplace=False)
-        Cp = C.align_to(b.Ap_cand.layer_var, inplace=False)
-        t1 = time()
-        print(f"{prefix},{k},{n},{m},CPP_intBDD,BDD_revise,{(t1-t0)*1000:.3f}")
-
-        t0 = time()
-        int_DD = DD.intersect(Ap, Cp)
-        t1 = time()
-        print(f"{prefix},{k},{n},{m},CPP_intBDD,intBDD_setup,{(t1-t0)*1000:.3f}")
-
-        t0 = time()
-        model, c, v = create_NF(int_DD)
-        model.setParam("OutputFlag", 0)
-        t1 = time()
-        print(f"{prefix},{k},{n},{m},CPP_intBDD,NF_model_setup,{(t1-t0)*1000:.3f}")
-
-        t0 = time()
-        model.optimize()
-        t1 = time()
-        print(f"{prefix},{k},{n},{m},CPP_intBDD,NF_solve,{(t1-t0)*1000:.3f}")
-
-        aBDD_obj = model.objVal
-
-        if abs(CPP_MIP_obj - plain_MIP_obj) >= TOL:
-            print("! (plain vs CPP)")
-            print(f"\nS={S}; f={f}; g={g}")
-        elif (abs(plain_MIP_obj - aBDD_obj) >= TOL):
-            print("! (plain vs aDD)")
-            print(f"plain obj={plain_MIP_obj}, while aBDD obj={aBDD_obj}")
-            print(f"\nS={S}; f={f}; g={g}")
-
-        sys.stdout.flush()
-
-
-def main():
-    """Main code (to be run from the command line)."""
-    parser = ap.ArgumentParser(
-        description= # noqa
-        "Uncapacitated Facility Location benchmarking (c) A. Bochkarev, 2021",
-        formatter_class=ap.ArgumentDefaultsHelpFormatter)
-
-    parser.add_argument("-n",
-                        "--facilities",
-                        action="store",
-                        dest="n",
-                        default="3",
-                        help="no. of facilities")
-    parser.add_argument("-m",
-                        "--customers",
-                        action="store",
-                        dest="m",
-                        default="4",
-                        help="no. of customers")
-    parser.add_argument("-K",
-                        "--instances",
-                        action="store",
-                        dest="K",
-                        default="50",
-                        help="no. of instances to generate")
-    parser.add_argument("-H",
-                        "--header",
-                        action="store_true",
-                        dest="header",
-                        help="show header only and exit")
-    parser.add_argument("-p",
-                        "--prefix",
-                        action="store",
-                        dest="prefix",
-                        default="0",
-                        help="prefix string (ID of the run)")
-
-    args = parser.parse_args()
-
-    if args.header:
-        # print("run,k,n,m,method,step,duration")
-        print("n, A_size, C_size, int_size, plain_MIP_vars, exp_time")
-        exit(0)
-
-    for k in range(int(args.K)):
-        t0 = time()
-        S, f, g = generate_test_instance(n=int(args.n), m=2*int(args.n))
-        A = create_availability_BDD(S, f)
-        C = create_covering_BDD_wg(S, g)
-
-        vs_A = vs.VarSeq(A.vars, [len(L) for L in A.layers[:-1]])
-        vs_C = vs.VarSeq(C.vars, [len(L) for L in C.layers[:-1]])
-
-        bb.TIMEOUT_ITERATIONS = 5000
-        b = bb.BBSearch(vs_A, vs_C)
-        status = b.search()
-        assert status == "optimal" or status == "timeout"
-
-        Ap = A.align_to(b.Ap_cand.layer_var, inplace=False)
-        Cp = C.align_to(b.Ap_cand.layer_var, inplace=False)
-
-        C_to_A = C.align_to(A.vars, inplace=False)
-        # A_to_C = A.align_to(C.vars, inplace=False)
-
-        int_DD = DD.intersect(Ap, Cp)
-
-        int_DDp = DD.intersect(A, C_to_A)
-        # int_DDpp = DD.intersect(A_to_C, C)
-
-        model = build_MIP(S, f, g)
-        t1 = time()
-        print(f"{args.n}, {A.size()}, {C.size()}, {int_DD.size()}, {int_DDp.size()}, {len(model.getVars())}, {(t1-t0):.1f}")
     # benchmark(K=int(args.K), n=int(args.n), m=int(args.m), prefix=args.prefix)
     # Procedure that is run if executed from the command line
 
