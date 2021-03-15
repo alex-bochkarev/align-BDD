@@ -1,0 +1,444 @@
+#+title: An algorithm sketch: a BDD with ``forgetting''.
+
+*Summary:* this is an attempt to design an algorithm based on the ``DP
+ approach'' we discussed before, that would incorporate a state ``forgetting''
+ feature, which would allow to (kind of) limit the state growth as we process
+ the consumers graph. In this note I will briefly sketch the idea and then just
+ show what I mean on a specific example. The purpose of the document is to
+ facilitate the discussion of an idea concerning the construction of a BDD to
+ encode the constraints and costs of ``covering'' all nodes (*not* the color
+ constraint -- just the main one).
+
+* The gist.
+  Following the initial ``DP'' idea, I will process nodes (consider locating
+  facilities there) one by one, and the state will comprise the information of
+  how many overlaps each /consumer/ has by the moment. However, I have been trying
+  to design a procedure to forget parts of the state. In particular, in this
+  version:
+  - a /state/ is the number of /nonzero/ overlaps at each consumer *that cannot
+    be changed further* by any location decisions (of course, I assume a
+    location decision is taken only once -- no reviews), along with the list of
+    processed nodes of the original graph. For example: =A1C2D1= would mean that
+    consumer =A= has $n_A=1$, =C= has 2, and =D= has 1. All the others are
+    either zero, or irrelevant for further costs. For this string to be a state,
+    of course, I would need to complement it with a list of processed nodes --
+    e.g., =ABCD=.
+  - now, /when/ a consumer state (number of overlaps at a consumer) can be
+    changed? Obviously, when a facility can be located either at the same node,
+    or at one of the neighboring nodes. If all of these are ``fixed'', this
+    consumer's state cannot be changed further --- hence, I can save this
+    information in the arc costs of the BDD (the overlap cost), and do not track
+    this part of the state further.
+  - In order to forget as many information as possible, the algorithm will
+    consider low-degree nodes first, and proceed in a breadth-first fashion.
+
+    Hopefully, it will be more clear with an example.
+
+* An example.
+ Let us consider the following graph:
+ #+begin_src dot :file ./G.png
+graph {
+  rankdir="LR";
+  a -- b
+  b -- c
+  c -- d
+  d -- e
+  e -- f
+  e -- h
+  e -- b
+}
+ #+end_src
+
+ #+RESULTS:
+ [[file:./G.png]]
+
+ So, I have three nodes of degree one (=a=, =f=, =h=), two of degree two (=c=,
+ =d=), =b= of degree three, and =e= of degree four. Let me see how I would
+ process with the BDD, encoding the ``covering'' costs (again, I am not
+ considering the ``color'' constraint here at all). The resulting BDD is
+ presented in Figure [[#fig:BDD]], here are some comments:
+
+
+ #+begin_src plantuml :file ./BDD.png
+@startuml
+'!pragma horizontalLineBetweenDifferentPackageAllowed
+package "a" {
+        (r) as "∅" 
+}
+
+package "b" {
+        (e_b) as "∅"
+        (a1b1) as "a1b1"
+}
+r .. e_b
+r -- a1b1
+
+package "Forget a" {
+        (e_fa) as "∅"
+        (a1b1c1e1)
+
+        (a1b1_b) as "a1b1"
+        (a2b2c1e1) as "a2b2c1e1"
+}
+e_b .. e_fa
+e_b -- a1b1c1e1
+
+a1b1 .. a1b1_b
+a1b1 -- a2b2c1e1
+
+package f {
+        (e_f) as "∅"
+        (b1c1e1)
+        (b1)
+        (b2c1e1)
+}
+e_fa -[thickness=3,#blue]-> e_f : g(a; 0)
+a1b1c1e1 -[thickness=3,#blue]-> b1c1e1 : g(a; 1)
+a1b1_b -[thickness=3,#blue]-> b1 : g(a; 1)
+a2b2c1e1 -[thickness=3,#blue]-> b2c1e1 : g(a; 2)
+
+package e {
+        (e_e) as "∅"
+        (e1f1)
+        (b1c1e1_e) as "b1c1e1"
+        (b1c1e2f1)
+        (b1_e) as "b1"
+        (b1e1f1)
+        (b2c1e1_e) as "b2c1e1"
+        (b2c1e2f1)
+}
+e_f .. e_e
+e_f -- e1f1
+
+b1c1e1 .. b1c1e1_e
+b1c1e1 -- b1c1e2f1
+
+b1 .. b1_e
+b1 -- b1e1f1
+
+b2c1e1 .. b2c1e1_e
+b2c1e1 -- b2c1e2f1
+
+
+package "Forget f" {
+        (e_ff) as "∅"
+        (e1f1_ff) as "e1f1"
+        (b1c1e1_ff) as "b1c1e1"
+        (b1c1e2f1_ff) as "b1c1e2f1"
+        (b1_ff) as "b1"
+        (b1e1f1_ff) as "b1e1f1"
+        (b2c1e2f1_ff) as "b2c1e2f1"
+        (b2c1e1_ff) as "b2c1e1"
+
+        (e_e) .. (e_ff)
+        (e_e) -- (b1d1e1f1h1)
+        
+        (e1f1) .. e1f1_ff
+        (e1f1) -- (b1d1e2f2h1)
+
+        (b1c1e1_e) .. (b1c1e1_ff)
+        (b1c1e1_e) -- (b2c1d1e2f1h1)
+
+        (b1c1e2f1) .. (b1c1e2f1_ff)
+        (b1c1e2f1) -- (b2c1d1e3f2h1)
+
+        (b1_e) .. (b1_ff)
+        (b1_e) -- (b2d1e1f1h1)
+
+        (b1e1f1) .. (b1e1f1_ff)
+        (b1e1f1) -- (b2d1e2f2h1)
+
+        (b2c1e1_e) .. (b2c1e1_ff)
+        (b2c1e1_e) -- (b3c1d1e2f1h1)
+
+        (b2c1e2f1) .. (b2c1e2f1_ff)
+        (b2c1e2f1) -- (b3c1d1e3f1h1)
+}
+
+package "c" {
+        (e_c) as "∅"
+        (b1_c) as "b1"
+        (b2c1e1_c) as "b2c1e1"
+        (b1c1e1_c) as "b1c1e1"
+
+        (e_ff) -[thickness=3,#blue]-> (e_c) : g(f;0)
+        (b1d1e1f1h1)-[thickness=3,#blue]->(b1d1e1h1): g(f;1)
+        
+        e1f1_ff-[thickness=3,#blue]->(e1) : g(f;1)
+        (b1d1e2f2h1)-[thickness=3,#blue]->(b1d1e2h1) : g(f;2)
+
+        (b1c1e1_ff)-[thickness=3,#blue]->(b1c1e1_c) : g(f;0)
+        (b2c1d1e2f1h1)-[thickness=3,#blue]->(b2c1d1e2h1) : g(f;1)
+
+        (b1c1e2f1_ff)-[thickness=3,#blue]->(b1c1e2) : g(f;1)
+        (b2c1d1e3f2h1)-[thickness=3,#blue]->(b2c1d1e3h1) : g(f;2)
+
+        (b1_ff)-[thickness=3,#blue]->(b1_c) : g(f;0)
+        (b2d1e1f1h1)-[thickness=3,#blue]->(b2d1e1h1) : g(f;1)
+
+        (b1e1f1_ff)-[thickness=3,#blue]->(b1e1) : g(f;1)
+        (b2d1e2f2h1)-[thickness=3,#blue]->(b2d1e2h1) : g(f;2)
+
+        (b2c1e1_ff)-[thickness=3,#blue]->(b2c1e1_c) : g(f;0)
+        (b3c1d1e2f1h1)-[thickness=3,#blue]->(b3c1d1e2h1) : g(f;1)
+
+        (b2c1e2f1_ff)-[thickness=3,#blue]->(b2c1e2) : g(f;1)
+        (b3c1d1e3f1h1)-[thickness=3,#blue]->(b3c1d1e3h1) : g(f;1)
+}
+
+package "Forget b" {
+        (e_fb) as "∅"
+        (b1d1e1h1_fb) as "bdeh"
+        (e1_fb) as "e"
+        (b1_fb) as "b"
+        (b2c1d1e2h1_fb) as "b2cde2h"
+        (b1c1e2_fb) as "bce2"
+        (b2d1e1h1_fb) as "b2deh"
+        (b1d1e2h1_fb) as "bde2h"
+        (b1c1e1_fb) as "bce"
+        (b1e1_fb) as "be"
+        (b2d1e2h1_fb) as "b2de2h"
+        (b2c1e1_fb) as "b2ce"
+        (b3cde2h_fb) as"b3cde2h"
+        (b2ce2_fb) as "b2ce2"
+        (b3cde3h_fb) as "b3cde3h"
+        
+        (e_c) .. (e_fb)
+
+        (e_c) -- (bcd)
+
+        (b1d1e1h1) .. (b1d1e1h1_fb)
+        (b1d1e1h1) -- (b2cd2eh)
+
+        (e1) .. (e1_fb)
+        (e1) -- (bcde)
+
+        (b1d1e2h1) .. (b1d1e2h1_fb)
+        (b1d1e2h1) -- (b2cd2e2h)
+
+        (b1c1e1_c) .. (b1c1e1_fb)
+        (b1c1e1_c) -- (b2c2de)
+
+        (b2c1d1e2h1) .. (b2c1d1e2h1_fb) 
+        (b2c1d1e2h1) -- (b3c2d2e2h)
+
+        (b1c1e2) .. (b1c1e2_fb)
+        (b1c1e2) -- (b2c2de2)
+
+        (b2c1d1e3h1) .. (b2cde3h_fb)
+        (b2c1d1e3h1) -- (b3c2d2e3h)
+
+        (b1_c) .. (b1_fb)
+        (b1_c) -- (b2cd)
+
+        (b2d1e1h1) .. (b2d1e1h1_fb)
+        (b2d1e1h1) -- (b3cd2eh)
+
+        (b1e1) .. (b1e1_fb)
+        (b1e1) -- (b2cde1)
+
+        (b2d1e2h1) .. (b2d1e2h1_fb)
+        (b2d1e2h1) -- (b3cd2e2h1)
+
+        (b2c1e1_c) .. (b2c1e1_fb)
+        (b2c1e1_c) -- (b3c2de)
+
+        (b3c1d1e2h1) .. (b3cde2h_fb)
+        (b3c1d1e2h1) -- (b4c2d2e2h)
+
+        (b2c1e2) .. (b2ce2_fb)
+        (b2c1e2) -- (b3c2de2)
+
+        (b3c1d1e3h1) .. (b3cde3h_fb)
+        (b3c1d1e3h1) -- (b4c2d2e3h)
+}
+
+package "d" {
+        (e_fb) -[thickness=3,#blue]-> (e_d) : g(b;0)
+
+        (bcd) -[thickness=3,#blue]-> (cd) : g(b;1)
+        (b1d1e1h1_fb) -[thickness=3,#blue]-> (deh) : g(b;1)
+        (b2cd2eh) -[thickness=3,#blue]-> (cd2eh) : g(b;2)
+        (e1_fb) -[thickness=3,#blue]-> (e1_d) : g(b;0)
+        (bcde) -[thickness=3,#blue]-> (cde) : g(b;1)
+        (b1d1e2h1_fb) -[thickness=3,#blue]-> (de2h) : g(b;1)
+        (b2cd2e2h) -[thickness=3,#blue]-> (cd2e2h) : g(b;2)
+        (b1c1e1_fb) -[thickness=3,#blue]-> (ce) : g(b;1)
+        (b2c2de) -[thickness=3,#blue]-> (c2de) : g(b;2)
+        (b2c1d1e2h1_fb)  -[thickness=3,#blue]-> (cde2h) : g(b;2)
+        (b3c2d2e2h) -[thickness=3,#blue]-> (c2d2e2h) : g(b;3)
+        (b1c1e2_fb) -[thickness=3,#blue]-> (ce2) : g(b;1)
+        (b2c2de2) -[thickness=3,#blue]-> (c2de2) : g(b;2)
+        (b2cde3h_fb) -[thickness=3,#blue]-> (cde3h) : g(b;2)
+        (b3c2d2e3h)-[thickness=3,#blue]-> (c2d2e3h) : g(b;3)
+        (b1_fb) -[thickness=3,#blue]-> (e_d) : g(b;1)
+        (b2cd) -[thickness=3,#blue]-> (cd) : g(b;2)
+        (b2d1e1h1_fb) -[thickness=3,#blue]-> (deh) : g(b;2)
+        (b3cd2eh) -[thickness=3,#blue]-> (cd2eh) : g(b;3)
+        (b1e1_fb) -[thickness=3,#blue]-> (e1_d) : g(b;1)
+        (b2cde1) -[thickness=3,#blue]-> (cde) : g(b;2)
+        (b2d1e2h1_fb) -[thickness=3,#blue]-> (de2h) : g(b;2)
+        (b3cd2e2h1) -[thickness=3,#blue]-> (cd2e2h) : g(b;3)
+        (b2c1e1_fb) -[thickness=3,#blue]-> (ce) : g(b;2)
+        (b3c2de) -[thickness=3,#blue]-> (c2de) : g(b;3)
+        (b3cde2h_fb) -[thickness=3,#blue]-> (cde2h) : g(b;3)
+        (b4c2d2e2h) -[thickness=3,#blue]-> (c2d2e2h) : g(b;4)
+        (b2ce2_fb) -[thickness=3,#blue]-> (ce2) : g(b;2)
+        (b3c2de2) -[thickness=3,#blue]-> (c2de2) : g(b;3)
+        (b3cde3h_fb) -[thickness=3,#blue]-> (cde3h) : g(b;3)
+        (b4c2d2e3h) -[thickness=3,#blue]-> (c2d2e3h) : g(b;4)
+}
+
+package "Forget c" {
+        (e_d) .. (e_fc)
+        (e_d) -- (cde_fc)
+
+        (cd) .. (cd_fc)
+        (cd) -- (c2d2e)
+        
+        (deh) .. (deh_fc)
+        (deh) -- (cd2e2h_fc)
+
+        (cd2eh) .. (cd2eh_fc)
+        (cd2eh) -- (c2d3e2h)
+        
+        (e1_d) .. (e1_fc)
+        (e1_d) -- (cde2)
+
+        (cde) .. (cde_fc)
+        (cde) -- (c2d2e2)
+
+        (de2h) .. (de2h_fc)
+        (de2h) -- (cd2e3h)
+
+        (cd2e2h) .. (cd2e2h_fc)
+        (cd2e2h) -- (c2d3e3h)
+
+        (ce) .. (ce_fc)
+        (ce) -- (c2de2_fc)
+
+        (c2de) .. (c2de_fc)
+        (c2de) -- (c3d2e2)
+
+        (cde2h) .. (cde2h_fc)
+        (cde2h) -- (c2d2e3h_fc)
+
+        (c2d2e2h) .. (c2d2e2h_fc)
+        (c2d2e2h) -- (c3d3e3h)
+
+        (ce2) .. (ce2_fc)
+        (ce2) -- (c2de3)
+
+        (c2de2) .. (c2de2_fc)
+        (c2de2) -- (c3d2e3)
+
+        (cde3h) .. (cde3h_fc)
+        (cde3h) -- (c2d2e4h)
+
+        (c2d2e3h) .. (c2d2e3h_fc)
+        (c2d2e3h) -- (c3d3e3h)
+}
+
+package "Forget d" {
+        (e_fc) -[thickness=3,#blue]-> (e_fd) : g(c;0)
+        (cde_fc)-[thickness=3,#blue]-> (de) : g(c;1)
+        (cd_fc)-[thickness=3,#blue]-> (d) : g(c;1)
+        (c2d2e)-[thickness=3,#blue]-> (d2e) : g(c;2)
+        (deh_fc)-[thickness=3,#blue]-> (deh_fd) : g(c;0)
+        (cd2e2h_fc)-[thickness=3,#blue]-> (d2e2h) : g(c;1)
+        (cd2eh_fc)-[thickness=3,#blue]-> (d2eh) : g(c;1)
+        (c2d3e2h)-[thickness=3,#blue]-> (d3e2h) : g(c;2)
+        (e1_fc)-[thickness=3,#blue]-> (e1_fd) : g(c;0)
+        (cde2)-[thickness=3,#blue]-> (de2) : g(c;1)
+        (c2d2e2)-[thickness=3,#blue]-> (d2e2) : g(c;2)
+        (de2h_fc)-[thickness=3,#blue]-> (de2h_fd) : g(c;0)
+        (cd2e3h)-[thickness=3,#blue]-> (d2e3h) : g(c;1)
+        (c2d3e3h)-[thickness=3,#blue]-> (d3e3h) : g(c;2)
+        (ce_fc)-[thickness=3,#blue]-> (e1_fd) : g(c;1)
+        (c2de2_fc)-[thickness=3,#blue]-> (de2) : g(c;2)
+        (c2de_fc)-[thickness=3,#blue]-> (de) : g(c;2)
+        (c3d2e2)-[thickness=3,#blue]-> (d2e2) : g(c;3)
+        (cde2h_fc)-[thickness=3,#blue]-> (de2h_fd) : g(c;1)
+        (c2d2e3h_fc)-[thickness=3,#blue]-> (d2e3h) : g(c;2)
+        (c2d2e2h_fc)-[thickness=3,#blue]-> (d2e2h) : g(c;2)
+        (c3d3e3h)-[thickness=3,#blue]-> (d3e3h) : g(c;3)
+        (ce2_fc)-[thickness=3,#blue]-> (e2) : g(c;1)
+        (c2de3)-[thickness=3,#blue]-> (de3) : g(c;2)
+        (c3d2e3)-[thickness=3,#blue]-> (d2e3) : g(c;3)
+        (cde3h_fc)-[thickness=3,#blue]-> (de3h) : g(c;1)
+        (c2d2e4h)-[thickness=3,#blue]-> (d2e4h) : g(c;2)
+}
+
+package "h" {
+        (d)-[thickness=3,#blue]->(e_h) : g(d;1)
+        (d2e)-[thickness=3,#blue]->(e1_h) : g(d;2)
+        (d2e2)-[thickness=3,#blue]->(e2_h) : g(d;2)
+        (d2e2h)-[thickness=3,#blue]->(e2h) : g(d;2)
+        (d2e3)-[thickness=3,#blue]->(e3) : g(d;2)
+        (d2e3h)-[thickness=3,#blue]->(e3h) : g(d;2)
+        (d2e4h)-[thickness=3,#blue]->(e4h) : g(d;2)
+        (d2eh)-[thickness=3,#blue]->(eh) : g(d;2)
+        (d3e2h)-[thickness=3,#blue]->(e2h) : g(d;3)
+        (d3e3h)-[thickness=3,#blue]->(e3h) : g(d;3)
+        (de)-[thickness=3,#blue]->(e1_h) : g(d;1)
+        (de2)-[thickness=3,#blue]->(e2_h) : g(d;1)
+        (de2h_fd)-[thickness=3,#blue]->(e2h) : g(d;1)
+        (de3)-[thickness=3,#blue]->(e3) : g(d;1)
+        (de3h)-[thickness=3,#blue]->(e3h) : g(d;1)
+        (deh_fd)-[thickness=3,#blue]->(eh) : g(d;1)
+        (e1_fd)-[thickness=3,#blue]->(e1_h) : g(d;0)
+        (e2)-[thickness=3,#blue]->(e2_h) : g(d;0)
+        (e_fd)-[thickness=3,#blue]->(e_h) : g(d;0)
+}
+
+package "Forget e" {
+        (e_h) .. (e_fe)
+        (e_h) -- (e2h_fe)
+
+        (e1_h) .. (e1_fe)
+        (e1_h) -- (e2h_fe)
+
+        (e2_h) .. (e2_fe)
+        (e2_h) -- (e3h_fe)
+
+        (e2h) .. (e2h_fe)
+        (e2h) -- (e3h2_fe)
+
+        (e3) .. (e3_fe)
+        (e3) -- (e4h_fe)
+
+        (e3h) .. (e3h_fe)
+        (e3h) -- (e4h2_fe)
+
+        (e4h) .. (e4h_fe)
+        (e4h) -- (e5h2_fe)
+
+        (eh) .. (eh_fe)
+        (eh) -- (e2h2_fe)
+}
+
+package "Forget h" {
+        (e1_fe)-[thickness=3,#blue]->(e_fh)  : g(e;1)
+        (e2_fe)-[thickness=3,#blue]->(e_fh) : g(e;2)
+        (e2h2_fe)-[thickness=3,#blue]->(h2_fh) : g(e;2)
+        (e2h_fe)-[thickness=3,#blue]->(h_fh) : g(e;2)
+        (e3_fe)-[thickness=3,#blue]->(e_fh) : g(e;3)
+        (e3h2_fe)-[thickness=3,#blue]->(h2_fh) : g(e;3)
+        (e3h_fe)-[thickness=3,#blue]->(h_fh) : g(e;3)
+        (e4h2_fe)-[thickness=3,#blue]->(h2_fh) : g(e;4)
+        (e4h_fe)-[thickness=3,#blue]->(h_fh) : g(e;4)
+        (e5h2_fe)-[thickness=3,#blue]->(h2_fh) : g(e;5)
+        (e_fe)-[thickness=3,#blue]->(e_fh) : g(e;0)
+        (eh_fe)-[thickness=3,#blue]->(h_fh) : g(e;1)
+}
+
+package "Terminal" {
+        (e_fh)-[thickness=3,#blue]->(T) : g(h;0)
+        (h2_fh)-[thickness=3,#blue]->(T): g(h;2)
+        (h_fh)-[thickness=3,#blue]->(T): g(h;1)
+}
+@enduml
+ #+end_src
+
+ #+RESULTS:
+ [[file:./BDD.png]]
