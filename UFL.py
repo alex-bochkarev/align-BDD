@@ -16,7 +16,6 @@ import gurobipy as gp
 from gurobipy import GRB
 import sys
 from time import time
-import argparse as ap
 from copy import copy
 
 import varseq as vs

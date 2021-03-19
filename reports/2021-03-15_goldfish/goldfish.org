@@ -68,20 +68,20 @@ package "a" {
 
 package "b" {
         (e_b) as "∅"
-        (a1b1) as "a1b1"
+        (a1b1) as "ab"
 }
 r .. e_b
 r -- a1b1
 
 package "Forget a" {
         (e_fa) as "∅"
-        (a1b1c1e1)
+        (abce)
 
-        (a1b1_b) as "a1b1"
-        (a2b2c1e1) as "a2b2c1e1"
+        (a1b1_b) as "ab"
+        (a2b2c1e1) as "a2b2ce"
 }
 e_b .. e_fa
-e_b -- a1b1c1e1
+e_b -- abce
 
 a1b1 .. a1b1_b
 a1b1 -- a2b2c1e1
@@ -93,7 +93,7 @@ package f {
         (b2c1e1)
 }
 e_fa -[thickness=3,#blue]-> e_f : g(a; 0)
-a1b1c1e1 -[thickness=3,#blue]-> b1c1e1 : g(a; 1)
+abce -[thickness=3,#blue]-> b1c1e1 : g(a; 1)
 a1b1_b -[thickness=3,#blue]-> b1 : g(a; 1)
 a2b2c1e1 -[thickness=3,#blue]-> b2c1e1 : g(a; 2)
 
@@ -254,6 +254,7 @@ package "Forget b" {
 }
 
 package "d" {
+        (e_d) as "∅"
         (e_fb) -[thickness=3,#blue]-> (e_d) : g(b;0)
 
         (bcd) -[thickness=3,#blue]-> (cd) : g(b;1)
@@ -290,6 +291,7 @@ package "d" {
 }
 
 package "Forget c" {
+        (e_fc) as "∅"
         (e_d) .. (e_fc)
         (e_d) -- (cde_fc)
 
@@ -340,6 +342,7 @@ package "Forget c" {
 }
 
 package "Forget d" {
+        (e_fd) as "∅"
         (e_fc) -[thickness=3,#blue]-> (e_fd) : g(c;0)
         (cde_fc)-[thickness=3,#blue]-> (de) : g(c;1)
         (cd_fc)-[thickness=3,#blue]-> (d) : g(c;1)
@@ -370,6 +373,7 @@ package "Forget d" {
 }
 
 package "h" {
+        (e_h) as "∅"
         (d)-[thickness=3,#blue]->(e_h) : g(d;1)
         (d2e)-[thickness=3,#blue]->(e1_h) : g(d;2)
         (d2e2)-[thickness=3,#blue]->(e2_h) : g(d;2)
@@ -392,6 +396,7 @@ package "h" {
 }
 
 package "Forget e" {
+        (e_fe) as "∅"
         (e_h) .. (e_fe)
         (e_h) -- (e2h_fe)
 
@@ -418,6 +423,7 @@ package "Forget e" {
 }
 
 package "Forget h" {
+        (e_fh) as "∅"
         (e1_fe)-[thickness=3,#blue]->(e_fh)  : g(e;1)
         (e2_fe)-[thickness=3,#blue]->(e_fh) : g(e;2)
         (e2h2_fe)-[thickness=3,#blue]->(h2_fh) : g(e;2)
