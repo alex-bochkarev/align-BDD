@@ -1,4 +1,6 @@
 * Current version
+** [2021-03-19 Fri 13:48]: implemented a cUFL MIP 
+   seems like a simple program, though -- let's see if we'll have an edge with BDDs...
 ** [2021-03-08 Mon 16:50]: drafted the BDD representation for 'colorful' UFL. 
 ** [2021-03-05 Fri 13:20]: refactored =dia_sizes.sh= into a separate experiment 
 ** [2021-03-05 Fri 12:34]: implemented x-only NF model. 

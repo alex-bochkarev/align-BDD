@@ -1,13 +1,11 @@
 * Immediate TODOs
- - [ ] mini bench
- - [ ] prepare a PBS
- - [ ] run a proper bench
- - [ ] prepare a status update note
+  - [ ] =build_overlap_DD=: make single overlap version
+  - [ ] =build_cUFL_MIP=: revise to single overlap version
+  - [ ] test the new problem (against Gurobi)
 
 * Current project TODOs
 ** TODO Kill already merged branches
  [2020-07-11 Sat 09:49]
- [[file:~/projects/align-BDD/BDD.py][file:~/projects/align-BDD/BDD.py]]
 
 - minor_fixes (figures, labels, etc.)
 - scal_update (major scal update)
@@ -36,5 +34,7 @@ As of beginning of the day <2020-07-11> all of these are merged into =master=
    CLOSED: [2020-08-13 Thu 11:14]
  [2020-08-12 Wed 12:07]
  [[file:~/projects/align-BDD/experiments/BDD_size_illustration/BDD_size_illustration.py::B.load("./sample_5var_inst.bdd")]]
+** TODO let S NOT contain the node itself -- amended later :cUFL:
+ [2021-03-22 Mon 18:34]
 * Notes
   - first submission corresponds to =master= commit =04a5b38=
