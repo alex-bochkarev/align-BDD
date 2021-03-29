@@ -1,6 +1,9 @@
 * Immediate TODOs
-  - [ ] =build_overlap_DD=: make single overlap version
+  - [X] =build_cover_DD=: make single overlap version
+  - [ ] =build_color_DD=: fix the procedure (linear DD growth is doable!)
   - [ ] =build_cUFL_MIP=: revise to single overlap version
+  - [ ] cross-check DDs with the MIP.
+  - [ ] test the align-BDD version.
   - [ ] test the new problem (against Gurobi)
 
 * Current project TODOs

@@ -115,7 +115,7 @@ def process_node(i, S, f, res_deg=None, B=None, fixed_nodes=None, trash_pipe=Non
         else:
             fixed_nodes.add(j)
 
-        current_layer = copy(next_layer)
+        current_layer = cpy(next_layer)
         next_layer = dict()
 
         critical_nodes = set()
@@ -166,7 +166,7 @@ def process_node(i, S, f, res_deg=None, B=None, fixed_nodes=None, trash_pipe=Non
                 node_labels.update({newnode.id: make_label(next_state)})
 
     # process the last node in S[i-1] separately
-    # current_layer = copy(next_layer)
+    # current_layer = cpy(next_layer)
 
     # for state in current_layer:
     #     node = current_layer[tuple(state)]
@@ -345,10 +345,19 @@ def build_color_DD(f, f_color, k_bar):  # pylint: disable=invalid-name
     i = 1
     node_labels = dict({DD.NROOT: root_state})
     next_layer = {tuple(root_state): D.addnode(None)}
+    trash_pipe=None
 
     while i < len(f_color):
-        current_layer = copy(next_layer)
+        current_layer = cpy(next_layer)
         next_layer = dict()
+
+        if trash_pipe is not None:
+            # create a new "false" running node.
+            new_tp = D.addnode(trash_pipe, "lo")
+            D.llink(trash_pipe, new_tp, "hi")
+            trash_pipe = new_tp
+            node_labels.update({trash_pipe.id: "💀"})
+
         for state in current_layer:
             node = current_layer[tuple(state)]
             if state in next_layer:
@@ -366,10 +375,22 @@ def build_color_DD(f, f_color, k_bar):  # pylint: disable=invalid-name
                 D.llink(node, next_layer[next_state], "hi",
                         edge_weight=f[i])
             else:
-                newnode = D.addnode(node, "hi", edge_weight=f[i])
-                next_layer.update({next_state: newnode})
-                node_labels.update({newnode.id: str(next_state)})
+                if np.any(np.array(next_state) > k_bar):
+                    if trash_pipe is None:
+                        trash_pipe = D.addnode(node, "hi")
+                        node_labels.update({trash_pipe.id: "💀"})
+                    else:
+                        D.llink(node, trash_pipe, "hi")
+                else:
+                    newnode = D.addnode(node, "hi", edge_weight=f[i])
+                    next_layer.update({next_state: newnode})
+                    node_labels.update({newnode.id: str(next_state)})
         i += 1
+
+    # the last layer of the DD
+    if trash_pipe is not None:
+        D.link(trash_pipe.id, DD.NFALSE, "hi")
+        D.link(trash_pipe.id, DD.NFALSE, "lo")
 
     for state in next_layer:
         node_id = next_layer[state].id
@@ -475,3 +496,9 @@ def check_simple_example():
 
     oD.dump_gv(node_labels=nl_oD).view(filename="overlap")
     lD.dump_gv(node_labels=nl_lD).view(filename="location")
+
+def test_color_UFL():
+    """Tests the formulation for color-UFL (overlap DD)."""
+    S, f, fc, kb = make_simple_problem()
+    cover_DD, cover_nl = build_cover_DD(S, f)
+    color_DD, color_nl = build_color_DD(S, fc, kb)
