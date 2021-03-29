@@ -82,7 +82,13 @@ class BDD(object):
     """
 
     def __init__(self, N=2, vars=None, weighted=False):
-        """Defines an empty BDD with N variables."""
+        """Defines an empty BDD with N variables.
+
+        Args:
+            N (int): number of variables ( = number of layers except the terminal),
+            vars (list): variable names (strings or ints),
+            weighted (bool): a flag for weighted BDD (assigning arc weights).
+        """
         if not vars:
             vars = [i for i in range(1, N+1)]
 
@@ -815,13 +821,16 @@ class BDD(object):
     def rename_vars(self, ren_dict):
         """Helper function: renames variables.
 
-        Note: expects the *full* dict of variables (of length `N`)
+        Note: expects a dict of variables (of length <= `N`)
 
         Args:
-          ren_dict (dict): a dict of labels in the form {before: after}
+          ren_dict (dict): labels in the form {`before`: `after`}
         """
-        assert len(ren_dict) == len(self)
-        new_vars = [ren_dict[v] for v in self.vars]
+        for v in ren_dict.keys():
+            assert v in self.vars, f"{v} is not in {self.vars}"
+
+        new_vars = [(lambda v: ren_dict[v] if v in ren_dict.keys() else v)(v)
+                    for v in self.vars]
         self.vars = new_vars
         self.var_pos = dict(zip(self.vars, [i for i in range(len(self.vars))]))
 

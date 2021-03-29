@@ -1,4 +1,5 @@
 * Current version
+** [2021-03-29 Mon 20:13]: revised =BDD.rename_vars= (to respect partial updates) 
 ** [2021-03-19 Fri 13:48]: implemented a cUFL MIP 
    seems like a simple program, though -- let's see if we'll have an edge with BDDs...
 ** [2021-03-08 Mon 16:50]: drafted the BDD representation for 'colorful' UFL. 

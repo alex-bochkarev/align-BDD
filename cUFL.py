@@ -5,7 +5,7 @@ Problem-solving machinery.
 (c) A. Bochkarev, Clemson University, 2021
 abochka@clemson.edu
 """
-from copy import copy
+from copy import copy as cpy
 from graphviz import Graph
 import numpy as np
 import gurobipy as gp
@@ -43,6 +43,13 @@ class DegreeKeeper:
         """Returns a node's degree."""
         return self.index[key]
 
+    def get_next(self):
+        """Returns the next node ID for processing.
+
+        Currently: a one with the minimal degree.
+        """
+        return self.dh[0][1]
+
     def decrement(self, j):
         """Decrements a degree of node `j`."""
         entry = (self.index[j], j)
@@ -51,8 +58,10 @@ class DegreeKeeper:
         if entry[0] > 1:
             heapq.heappush(self.dh, (entry[0]-1, j))
             self.index.update({j: entry[0]-1})
+            return None
         else:
             self.index.pop(j)
+            return j
 
     def push(self, i, d):
         """Pushes a node `i` with degree `d`."""
@@ -83,6 +92,8 @@ def process_node(i, S, f, res_deg=None, B=None, fixed_nodes=None, trash_pipe=Non
     Returns:
         B (class BDD): updated diagram.
     """
+    assert B is not None
+
     if B is None:
         root_state = np.array([False for _ in range(len(S))], dtype=bool)
         B = DD.BDD(N=len(S[i-1]), vars=[f"stub{j+1}" for j in range(len(S))], weighted=True)
@@ -179,10 +190,11 @@ def process_node(i, S, f, res_deg=None, B=None, fixed_nodes=None, trash_pipe=Non
 
     return B, node_labels, res_deg, fixed_nodes, trash_pipe, next_layer
 
+
 def build_cover_DD(S, f):  # pylint: disable=too-many-locals,invalid-name
     """Builds a BDD for the UFL problem.
 
-    Introduces `x`-variables only; encodes the condition to cover
+    Introduces `x`-variables only; encodes the condition of covering
     each customer at least once (includes location costs).
 
     Args:
@@ -196,16 +208,120 @@ def build_cover_DD(S, f):  # pylint: disable=too-many-locals,invalid-name
         - employs a DP approach with state being the Boolean
             covering at each customer.
     """
-    B = None
-    res_deg = None
-    fixed_nodes = None
     trash_pipe = None
-    next_layer = None
-    nl = None
-    B, nl, res_deg, fixed_nodes, trash_pipe, next_layer = process_node(
-        i, S, f, res_deg, B, fixed_nodes, trash_pipe, next_layer, nl)
+    # prepare the diagram
+    N = len(S)
+    B = DD.BDD(N=N, vars=[f"stub{i}" for i in range(N)],
+               weighted=True)
+    freedoms = DegreeKeeper(S)  # node degrees
 
-    return B, nl
+    root_state = np.array([False for _ in range(len(S))], dtype=bool)
+    node_labels = dict({DD.NROOT: make_label(root_state)})
+
+    next_layer = {tuple(root_state): B.addnode(None)}
+
+    fixed_nodes = set()  # set of processed nodes (value set above in the BDD)
+    k = 1  # layers counter
+
+    while k < N:
+        i = freedoms.get_next()  # current 'central' node to process
+        print(f"running at {i}, degrees are: {freedoms.index}:")
+        print(f"Si to go: {S[i-1]}")
+        for j in S[i-1]:
+            if f"x{j}" in B.vars:
+                continue
+
+            print(f"Introducing node {j}")
+            current_layer = cpy(next_layer)
+            next_layer = dict()
+
+            # define 'critical' nodes -- that got the last 'freedom'
+            # eliminated during the current iteration,
+            # so they can affect the grand outcome (`true`/`false` terminal)
+            critical_nodes = set()
+            for q in S[j-1]:
+                if freedoms.has_freedom(q):
+                    new_critical = freedoms.decrement(q)
+                    if new_critical is not None:
+                        critical_nodes.add(new_critical)
+
+            if trash_pipe is not None:
+                # create a new "false" running node.
+                new_tp = B.addnode(trash_pipe, "lo")
+                B.llink(trash_pipe, new_tp, "hi")
+                trash_pipe = new_tp
+                node_labels.update({trash_pipe.id: "💀"})
+
+            for state in current_layer:
+                # processing nodes of the BDD, introducing another node
+                # of the *original* graph
+                node = current_layer[tuple(state)]
+
+                if state in next_layer:
+                    B.llink(node, next_layer[state], "lo")
+                else:
+                    print(f"state for {critical_nodes} are: {[q for idx, q in enumerate(state) if (idx+1) in critical_nodes]}")
+                    if False in [q for idx, q in enumerate(state)
+                                 if (idx+1) in critical_nodes]:
+                        if trash_pipe is None:
+                            trash_pipe = B.addnode(node, "lo")
+                            node_labels.update({trash_pipe.id: "💀"})
+                        else:
+                            B.llink(node, trash_pipe, "lo")
+                    else:
+                        newnode = B.addnode(node, "lo")
+                        next_layer.update({state: newnode})
+                        node_labels.update({newnode.id: make_label(state)})
+
+                next_state = list(state)
+                for q in S[j-1]:
+                    next_state[q-1] = True
+                next_state = tuple(next_state)
+
+                if next_state in next_layer:
+                    B.llink(node, next_layer[next_state], "hi",
+                            edge_weight=f[j])
+                else:
+                    newnode = B.addnode(node, "hi", edge_weight=f[j])
+                    next_layer.update({next_state: newnode})
+                    node_labels.update({newnode.id: make_label(next_state)})
+            B.rename_vars({f"stub{k-1}":f"x{j}"})
+            print(f"renamed k={k-1} to x{j}")
+            k += 1
+
+    # process the last node in S[i-1] separately
+    print(f"freedoms index={freedoms.index}")
+    i = -1
+    while f"x{i}" in B.vars or i == -1:
+        i, _ = freedoms.pop()
+
+    print(f"Processing the last layer {k}, introducing node {i}")
+    current_layer = cpy(next_layer)
+
+    for state in current_layer:
+        node = current_layer[tuple(state)]
+        if not state[i-1]:
+            B.link(node.id, DD.NFALSE, "lo")
+        else:
+            B.link(node.id, DD.NTRUE, "lo")
+
+        next_state = list(state)
+        for q in S[i-1]:
+            next_state[q-1] = True
+
+        if not next_state[i-1]:
+            B.link(node.id, DD.NFALSE, "hi", f[i])
+        else:
+            B.link(node.id, DD.NTRUE, "hi", f[i])
+
+    if trash_pipe is not None:
+        B.link(trash_pipe.id, DD.NFALSE, "lo")
+        B.link(trash_pipe.id, DD.NFALSE, "hi")
+
+    B.rename_vars({f"stub{k-1}":f"x{i}"})
+    print(f"renamed k={k-1} to x{i}")
+
+    return B, node_labels
 
 
 def build_color_DD(f, f_color, k_bar):  # pylint: disable=invalid-name
@@ -316,14 +432,19 @@ def build_cUFL_MIP(S, f, f_color, k_bar):
 
 
 def make_simple_problem():
-    """Generates a simple problem instance."""
+    """Generates a simple problem instance.
+
+    Returns:
+    S, f, f_colors, k_bar.
+    """
     S = [[1, 2], [1, 2, 3, 5], [2, 3, 4], [3, 4, 5], [2, 4, 5, 6, 7], [5, 6], [5, 7]]
     f = {1: 1, 2: 2, 3: 3, 4: 4, 5: 5, 6: 6, 7: 7}
     f_colors = [0, 1, 2, 2, 1, 0, 0]
     k_bar = [5, 1, 3]
     return S, f, f_colors, k_bar
 
-def draw_problem_dia(S, f, f_colors, k_bar, filename="run_logs/c_problem_dia.gv"):
+def draw_problem_dia(S, f, f_colors, k_bar,
+                     filename="run_logs/c_problem_dia.gv"):
     """Draws the bipartite graph describing the problem."""
     assert len(np.unique(f_colors)) <= 6
     cols = {0: 'red', 1: 'blue', 2: 'green', 3: 'yellow',
