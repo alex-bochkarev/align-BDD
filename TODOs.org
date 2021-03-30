@@ -1,6 +1,6 @@
 * Immediate TODOs
   - [X] =build_cover_DD=: make single overlap version
-  - [ ] =build_color_DD=: fix the procedure (linear DD growth is doable!)
+  - [X] =build_color_DD=: fix the procedure (linear DD growth is doable!)
   - [ ] =build_cUFL_MIP=: revise to single overlap version
   - [ ] cross-check DDs with the MIP.
   - [ ] test the align-BDD version.
@@ -39,5 +39,7 @@ As of beginning of the day <2020-07-11> all of these are merged into =master=
  [[file:~/projects/align-BDD/experiments/BDD_size_illustration/BDD_size_illustration.py::B.load("./sample_5var_inst.bdd")]]
 ** TODO let S NOT contain the node itself -- amended later :cUFL:
  [2021-03-22 Mon 18:34]
+** TODO figure (1) the order of colors and (2) order of nodes within a color
+ [2021-03-30 Tue 13:32]
 * Notes
   - first submission corresponds to =master= commit =04a5b38=

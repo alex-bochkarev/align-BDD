@@ -11,7 +11,6 @@ import numpy as np
 import gurobipy as gp
 from gurobipy import GRB
 import BDD as DD
-import UFL
 import heapq
 
 
@@ -220,7 +219,6 @@ def build_cover_DD(S, f):  # pylint: disable=too-many-locals,invalid-name
 
     next_layer = {tuple(root_state): B.addnode(None)}
 
-    fixed_nodes = set()  # set of processed nodes (value set above in the BDD)
     k = 1  # layers counter
 
     while k < N:
@@ -285,7 +283,7 @@ def build_cover_DD(S, f):  # pylint: disable=too-many-locals,invalid-name
                     newnode = B.addnode(node, "hi", edge_weight=f[j])
                     next_layer.update({next_state: newnode})
                     node_labels.update({newnode.id: make_label(next_state)})
-            B.rename_vars({f"stub{k-1}":f"x{j}"})
+            B.rename_vars({f"stub{k-1}": f"x{j}"})
             print(f"renamed k={k-1} to x{j}")
             k += 1
 
@@ -318,7 +316,7 @@ def build_cover_DD(S, f):  # pylint: disable=too-many-locals,invalid-name
         B.link(trash_pipe.id, DD.NFALSE, "lo")
         B.link(trash_pipe.id, DD.NFALSE, "hi")
 
-    B.rename_vars({f"stub{k-1}":f"x{i}"})
+    B.rename_vars({f"stub{k-1}": f"x{i}"})
     print(f"renamed k={k-1} to x{i}")
 
     return B, node_labels
@@ -338,54 +336,62 @@ def build_color_DD(f, f_color, k_bar):  # pylint: disable=invalid-name
         D (class BDD): resulting diagram.
         nl (dict): string node labels ("states"), `id` -> `label` (string).
     """
-    D = DD.BDD(N=len(f_color), vars=[i for i in range(1, len(f_color)+1)],  # noqa pylint: disable=invalid-name, unnecessary-comprehension
+    D = DD.BDD(N=len(f_color), vars=[f"stub{i}" for i in range(1, len(f_color)+1)],  # noqa pylint: disable=invalid-name, unnecessary-comprehension
                weighted=True)
-    # a *state* is the number of located facilities per color
-    root_state = [0 for _ in range(len(k_bar))]
-    i = 1
-    node_labels = dict({DD.NROOT: root_state})
-    next_layer = {tuple(root_state): D.addnode(None)}
-    trash_pipe=None
+    # a *state* is the number of located facilities
+    # for the *current* color (a single number)
+    n = 1  # (original) nodes counter
+    N = len(f_color)
 
-    while i < len(f_color):
-        current_layer = cpy(next_layer)
-        next_layer = dict()
+    node_labels = dict({DD.NROOT: 0})
+    next_layer = {0: D.addnode(None)}
+    trash_pipe = None
 
-        if trash_pipe is not None:
-            # create a new "false" running node.
-            new_tp = D.addnode(trash_pipe, "lo")
-            D.llink(trash_pipe, new_tp, "hi")
-            trash_pipe = new_tp
-            node_labels.update({trash_pipe.id: "💀"})
+    # TODO: here I'd need to decide the order of colors
+    #       and order of nodes within a color
+    colors = [c for c in range(len(k_bar))]
+    customers = [[C+1 for (C, f_c) in enumerate(f_color) if f_c == c]
+                 for c in colors]
 
-        for state in current_layer:
-            node = current_layer[tuple(state)]
-            if state in next_layer:
-                D.llink(node, next_layer[state], "lo")
-            else:
-                newnode = D.addnode(node, "lo")
-                next_layer.update({state: newnode})
-                node_labels.update({newnode.id: str(state)})
+    for c in colors:
+        for customer in customers[c]:
+            if n == N:
+                break
 
-            next_state = list(state)
-            next_state[f_color[i-1]] += 1
-            next_state = tuple(next_state)
+            current_layer = cpy(next_layer)
+            next_layer = dict()
+            if trash_pipe is not None:
+                # create a new "false" running node.
+                new_tp = D.addnode(trash_pipe, "lo")
+                D.llink(trash_pipe, new_tp, "hi")
+                trash_pipe = new_tp
+                node_labels.update({trash_pipe.id: "💀"})
 
-            if next_state in next_layer:
-                D.llink(node, next_layer[next_state], "hi",
-                        edge_weight=f[i])
-            else:
-                if np.any(np.array(next_state) > k_bar):
-                    if trash_pipe is None:
-                        trash_pipe = D.addnode(node, "hi")
-                        node_labels.update({trash_pipe.id: "💀"})
-                    else:
-                        D.llink(node, trash_pipe, "hi")
+            for state in current_layer:
+                node = current_layer[state]
+                if state in next_layer:
+                    D.llink(node, next_layer[state], "lo")
                 else:
-                    newnode = D.addnode(node, "hi", edge_weight=f[i])
-                    next_layer.update({next_state: newnode})
-                    node_labels.update({newnode.id: str(next_state)})
-        i += 1
+                    newnode = D.addnode(node, "lo")
+                    next_layer.update({state: newnode})
+                    node_labels.update({newnode.id: str(state)})
+
+                if (state+1) in next_layer:
+                    D.llink(node, next_layer[state+1], "hi",
+                            edge_weight=f[customer])
+                else:
+                    if (state+1) > k_bar[c]:
+                        if trash_pipe is None:
+                            trash_pipe = D.addnode(node, "hi")
+                            node_labels.update({trash_pipe.id: "💀"})
+                        else:
+                            D.llink(node, trash_pipe, "hi")
+                    else:
+                        newnode = D.addnode(node, "hi", edge_weight=f[customer])
+                        next_layer.update({state+1: newnode})
+                        node_labels.update({newnode.id: str(state+1)})
+            D.rename_vars({f"stub{n}": customer})
+            n += 1
 
     # the last layer of the DD
     if trash_pipe is not None:
@@ -394,21 +400,15 @@ def build_color_DD(f, f_color, k_bar):  # pylint: disable=invalid-name
 
     for state in next_layer:
         node_id = next_layer[state].id
-        if np.any(np.array(state) > k_bar):
+        if state+1 > k_bar[c]:
             y_target = DD.NFALSE
-            n_target = DD.NFALSE
         else:
-            n_target = DD.NTRUE
-            yes_state = list(state)
-            yes_state[f_color[i-1]] += 1
-            if np.any(np.array(yes_state) > k_bar):
-                y_target = DD.NFALSE
-            else:
-                y_target = DD.NTRUE
+            y_target = DD.NTRUE
 
-        D.link(node_id, y_target, "hi", edge_weight=f[i])
-        D.link(node_id, n_target, "lo")
+        D.link(node_id, y_target, "hi", edge_weight=f[customer])
+        D.link(node_id, DD.NTRUE, "lo")
 
+    D.rename_vars({f"stub{n}": customer})
     return D, node_labels
 
 
