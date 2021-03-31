@@ -485,8 +485,55 @@ def build_cUFL_MIP(S, f, f_color, k_bar):
 
     m.update()
     return m
+
+
 ######################################################################
 # 3. Quick-testing code
+def solve_with_MIP(S, f, fc, kb):
+    """Solves the problem with a naive MIP approach."""
+    m_naive = build_cUFL_MIP(S, f, fc, kb)
+    m_naive.update()
+    m_naive.optimize()
+    return m_naive
+
+
+def generate_test_instance(n):
+    """Generates a (colored) facility location instance.
+
+    Args:
+        n (int): number of nodes (customers / facilities)
+
+    Returns:
+        S (list): neighborhood list,
+        f (dict): location costs
+        f_colors (list): location colors,
+        k_bar (list): budget per color.
+    """
+    F_MIN = 5
+    F_MAX = 10
+    C_MIN = 2
+    C_MAX = 10
+    MAX_DEGREE = min(5, n)
+    MAX_BUDGET = 5
+
+    status = -1
+    while status != GRB.OPTIMAL:
+        N = [i for i in range(1,n+1)]  # a set of nodes
+
+        S = [[i] + np.random.choice([v for v in N if v!=i],
+                                    np.random.randint(1, MAX_DEGREE),
+                                    replace=False).tolist()
+            for i in N]
+
+        f = {i: np.random.randint(F_MIN, F_MAX) for i in N}
+
+        no_colors = np.random.randint(C_MIN, C_MAX)
+        f_colors = [np.random.randint(0, no_colors) for _ in N]
+
+        k_bar = [np.random.randint(1, 1+MAX_BUDGET) for _ in range(no_colors)]
+        status = solve_with_MIP(S, f, f_colors, k_bar).status
+
+    return S, f, f_colors, k_bar
 
 
 def make_simple_problem():
@@ -506,7 +553,7 @@ def draw_problem_dia(S, f, f_colors, k_bar,
     """Draws the bipartite graph describing the problem."""
     assert len(np.unique(f_colors)) <= 6
     cols = {0: 'red', 1: 'blue', 2: 'green', 3: 'yellow',
-            4: 'black', 5: 'purple'}
+            4: 'black', 5: 'purple', 6: 'orange', 7: 'white', 8: 'gray'}
 
     dia = Graph('G', comment="Uncapacitated Facility Location")
 
@@ -534,9 +581,8 @@ def check_simple_example():
     oD.dump_gv(node_labels=nl_oD).view(filename="overlap")
     lD.dump_gv(node_labels=nl_lD).view(filename="location")
 
-def test_color_UFL():
-    """Tests the formulation for color-UFL (overlap DD)."""
-    S, f, fc, kb = make_simple_problem()
+def solve_with_BDD_MIP(S, f, fc, kb):
+    """Sovles the problem by building a MIP from two BDDs."""
     cover_DD, cover_nl = build_cover_DD(S, f)
     color_DD, color_nl = build_color_DD(f, fc, kb)
 
@@ -544,10 +590,22 @@ def test_color_UFL():
     m, c, v, x = UFL.add_BDD_to_MIP(color_DD, m, x, "color")
     m.update()
     m.optimize()
+    return m
 
-    m_naive = build_cUFL_MIP(S, f, fc, kb)
-    m_naive.update()
-    m_naive.optimize()
+def test_color_UFL():
+    """Tests the formulation for color-UFL (overlap DD)."""
+    S, f, fc, kb = make_simple_problem()
+
+    m_naive = solve_with_MIP(S, f, fc, kb)
+    m = solve_with_BDD_MIP(S, f, fc, kb)
     print(f"Naive model: status={m_naive.status}, obj={m_naive.objVal}")
     print(f"BDD model: status={m.status}, obj={m.objVal}")
+    assert m_naive.objVal == m.objVal, f"Naive: {m_naive.objVal} (status {m_naive.status}), while BDD: {m.objVal} (status {m.status})"
+
+def test_random_UFL():
+    """Tests the formulation for color-UFL (overlap DD) -- random instance."""
+    S, f, fc, kb = generate_test_instance(5)
+
+    m_naive = solve_with_MIP(S, f, fc, kb)
+    m = solve_with_BDD_MIP(S, f, fc, kb)
     assert m_naive.objVal == m.objVal, f"Naive: {m_naive.objVal} (status {m_naive.status}), while BDD: {m.objVal} (status {m.status})"
