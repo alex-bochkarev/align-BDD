@@ -5,14 +5,15 @@ Problem-solving machinery.
 (c) A. Bochkarev, Clemson University, 2021
 abochka@clemson.edu
 """
+from UFL import add_BDD_to_MIP
 from copy import copy as cpy
-from graphviz import Graph
-import numpy as np
-import gurobipy as gp
-from gurobipy import GRB
-import BDD as DD
 import heapq
-
+import numpy as np
+from graphviz import Graph
+import gurobipy as gp
+import BDD as DD
+import UFL
+from gurobipy import GRB  # noqa
 
 #######################################################################
 # 1. Building the BDD representation
@@ -111,8 +112,8 @@ def process_node(i, S, f, res_deg=None, B=None, fixed_nodes=None, trash_pipe=Non
         print(f"at {j}, fixed nodes are {fixed_nodes}")
         if j in fixed_nodes:
             continue
-        else:
-            fixed_nodes.add(j)
+
+        fixed_nodes.add(j)
 
         current_layer = cpy(next_layer)
         next_layer = dict()
@@ -354,7 +355,7 @@ def build_color_DD(f, f_color, k_bar):  # pylint: disable=invalid-name
                  for c in colors]
 
     for c in colors:
-        for customer in customers[c]:
+        for customer in customers[c][:-1]:
             if n == N:
                 break
 
@@ -387,28 +388,64 @@ def build_color_DD(f, f_color, k_bar):  # pylint: disable=invalid-name
                         else:
                             D.llink(node, trash_pipe, "hi")
                     else:
-                        newnode = D.addnode(node, "hi", edge_weight=f[customer])
+                        newnode = D.addnode(node, "hi")
                         next_layer.update({state+1: newnode})
                         node_labels.update({newnode.id: str(state+1)})
-            D.rename_vars({f"stub{n}": customer})
+            D.rename_vars({f"stub{n}": f"x{customer}"})
             n += 1
 
-    # the last layer of the DD
-    if trash_pipe is not None:
-        D.link(trash_pipe.id, DD.NFALSE, "hi")
-        D.link(trash_pipe.id, DD.NFALSE, "lo")
+        # Processing the last customer separately
+        # (within a color)
 
-    for state in next_layer:
-        node_id = next_layer[state].id
-        if state+1 > k_bar[c]:
-            y_target = DD.NFALSE
+        if n < N:
+            current_layer = cpy(next_layer)
+            next_layer = dict()
+
+            if trash_pipe is not None:
+                # create a new "false" running node.
+                new_tp = D.addnode(trash_pipe, "lo")
+                D.llink(trash_pipe, new_tp, "hi")
+                trash_pipe = new_tp
+                node_labels.update({trash_pipe.id: "💀"})
+
+            for state in current_layer:
+                node = current_layer[state]
+                new_state = 0  # we 'reset' the color counter
+                if new_state in next_layer:
+                    D.llink(node, next_layer[new_state], "lo")
+                else:
+                    newnode = D.addnode(node, "lo")
+                    next_layer.update({new_state: newnode})
+                    node_labels.update({newnode.id: str(new_state)})
+
+                if (state+1) > k_bar[c]:
+                    if trash_pipe is None:
+                        trash_pipe = D.addnode(node, "hi")
+                        node_labels.update({trash_pipe.id: "💀"})
+                    else:
+                        D.llink(node, trash_pipe, "hi")
+                else:
+                    D.llink(node, next_layer[new_state], "hi")
+
+            D.rename_vars({f"stub{n}": f"x{customers[c][-1]}"})
+            n += 1
         else:
-            y_target = DD.NTRUE
+            # the last layer of the DD
+            if trash_pipe is not None:
+                D.link(trash_pipe.id, DD.NFALSE, "hi")
+                D.link(trash_pipe.id, DD.NFALSE, "lo")
 
-        D.link(node_id, y_target, "hi", edge_weight=f[customer])
-        D.link(node_id, DD.NTRUE, "lo")
+            for state in next_layer:
+                node_id = next_layer[state].id
+                if state+1 > k_bar[c]:
+                    y_target = DD.NFALSE
+                else:
+                    y_target = DD.NTRUE
 
-    D.rename_vars({f"stub{n}": customer})
+                D.link(node_id, y_target, "hi")
+                D.link(node_id, DD.NTRUE, "lo")
+
+            D.rename_vars({f"stub{n}": f"{customers[c][-1]}"})
     return D, node_labels
 
 
@@ -501,4 +538,16 @@ def test_color_UFL():
     """Tests the formulation for color-UFL (overlap DD)."""
     S, f, fc, kb = make_simple_problem()
     cover_DD, cover_nl = build_cover_DD(S, f)
-    color_DD, color_nl = build_color_DD(S, fc, kb)
+    color_DD, color_nl = build_color_DD(f, fc, kb)
+
+    m, c, v, x = UFL.add_BDD_to_MIP(cover_DD, prefix="cover")
+    m, c, v, x = UFL.add_BDD_to_MIP(color_DD, m, x, "color")
+    m.update()
+    m.optimize()
+
+    m_naive = build_cUFL_MIP(S, f, fc, kb)
+    m_naive.update()
+    m_naive.optimize()
+    print(f"Naive model: status={m_naive.status}, obj={m_naive.objVal}")
+    print(f"BDD model: status={m.status}, obj={m.objVal}")
+    assert m_naive.objVal == m.objVal, f"Naive: {m_naive.objVal} (status {m_naive.status}), while BDD: {m.objVal} (status {m.status})"
