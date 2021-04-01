@@ -83,118 +83,6 @@ class DegreeKeeper:
         return key in self.index.keys()
 
 
-def process_node(i, S, f, res_deg=None, B=None, fixed_nodes=None, trash_pipe=None, next_layer=None, node_labels=None):
-    """Processes the given node.
-
-    Args:
-        i (int): node ID (one-based),
-        S (list): customer neighborhood lists,
-        f (dict): costs of location,
-        fixed_nodes (set): the ones mentioned (fixed) earlier in `B`,
-        res_deg (class DegreeKeeper): residual degrees data.
-
-    Returns:
-        B (class BDD): updated diagram.
-    """
-    assert B is not None
-
-    if B is None:
-        root_state = np.array([False for _ in range(len(S))], dtype=bool)
-        B = DD.BDD(N=len(S[i-1]), vars=[f"stub{j+1}" for j in range(len(S))], weighted=True)
-        node_labels = dict({DD.NROOT: make_label(root_state)})
-
-    if res_deg is None:
-        res_deg = DegreeKeeper(S)
-
-    if next_layer is None:
-        next_layer = {tuple(root_state): B.addnode(None)}
-
-    if fixed_nodes is None:
-        fixed_nodes = set()
-
-    for j in S[i-1]:
-        print(f"at {j}, fixed nodes are {fixed_nodes}")
-        if j in fixed_nodes:
-            continue
-
-        fixed_nodes.add(j)
-
-        current_layer = cpy(next_layer)
-        next_layer = dict()
-
-        critical_nodes = set()
-        for k in S[j-1]:
-            res_deg.decrement(k)
-            if not res_deg.has_freedom(k):
-                critical_nodes.add(k)
-
-        print(f"At {j}, critical nodes = {critical_nodes}")
-        if trash_pipe is not None:
-            # create a new "false" running node.
-            new_tp = B.addnode(trash_pipe, "lo")
-            B.llink(trash_pipe, new_tp, "hi")
-            trash_pipe = new_tp
-            node_labels.update({trash_pipe.id: "💀"})
-
-        for state in current_layer:
-            # processing nodes of the BDD, introducing another node
-            # of the *original* graph
-            node = current_layer[tuple(state)]
-            if state in next_layer:
-                B.llink(node, next_layer[state], "lo")
-            else:
-                print(f"state for {critical_nodes} are: {[q for idx, q in enumerate(state) if (idx+1) in critical_nodes]}")
-                if False in [q for idx, q in enumerate(state)
-                             if (idx+1) in critical_nodes]:
-                    if trash_pipe is None:
-                        trash_pipe = B.addnode(node, "lo")
-                        node_labels.update({trash_pipe.id: "💀"})
-                    else:
-                        B.llink(node, trash_pipe, "lo")
-                else:
-                    newnode = B.addnode(node, "lo")
-                    next_layer.update({state: newnode})
-                    node_labels.update({newnode.id: make_label(state)})
-
-            next_state = list(state)
-            for k in S[j-1]:
-                next_state[k-1] = True
-            next_state = tuple(next_state)
-
-            if next_state in next_layer:
-                B.llink(node, next_layer[next_state], "hi",
-                        edge_weight=f[j])
-            else:
-                newnode = B.addnode(node, "hi", edge_weight=f[j])
-                next_layer.update({next_state: newnode})
-                node_labels.update({newnode.id: make_label(next_state)})
-
-    # process the last node in S[i-1] separately
-    # current_layer = cpy(next_layer)
-
-    # for state in current_layer:
-    #     node = current_layer[tuple(state)]
-    #     if not state[i-1]:
-    #         B.link(node.id, DD.NFALSE, "lo")
-    #     else:
-    #         B.link(node.id, DD.NTRUE, "lo")
-
-    #     next_state = list(state)
-    #     for k in S[j-1]:
-    #         next_state[k-1] = True
-
-    #     if not next_state[i-1]:
-    #         B.link(node.id, DD.NFALSE, "hi", f[i])
-    #     else:
-    #         B.link(node.id, DD.NTRUE, "hi", f[i])
-
-    # if trash_pipe is not None:
-    #     B.link(trash_pipe.id, DD.NFALSE, "lo")
-    #     B.link(trash_pipe.id, DD.NFALSE, "hi")
-
-    return B, node_labels, res_deg, fixed_nodes, trash_pipe, next_layer
-
-
 def build_cover_DD(S, f):  # pylint: disable=too-many-locals,invalid-name
     """Builds a BDD for the UFL problem.
 
@@ -662,8 +550,8 @@ def solve_with_align_BDD(S, f, fc, kb):
     m.optimize()
     return m
 
-@pytest.mark.parametrize("test_inst", [generate_test_instance(20)
-                                       for _ in range(100)])
+@pytest.mark.parametrize("test_inst", [generate_test_instance(10)
+                                       for _ in range(200)])
 def test_triple(test_inst):
     """Tests the formulation for color-UFL."""
     TOL=1e-5

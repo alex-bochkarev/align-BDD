@@ -6,7 +6,9 @@
   - [X] fix the bug in cover DD generation (infinite loop?..)
   - [X] cross-check DDs with the MIP (random set)
   - [X] test the align-BDD version.
-  - [ ] test the new problem (against Gurobi)
+  - [ ] implement color ordering / fix the color-DD order
+  - [ ] test the new problem (against Gurobi) -- runtimes.
+  - [ ] write-up
 
 * Current project TODOs
 ** TODO Kill already merged branches

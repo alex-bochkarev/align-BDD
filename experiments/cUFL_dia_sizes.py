@@ -55,7 +55,7 @@ def main():
 
     if args.header:
         # print("run,k,n,m,method,step,duration")
-        print("n, color_size, cover_size, int_size, int_cov2col_size, int_col2cov_size, plain_MIP_vars, exp_time")
+        print("n, color_size, cover_size, int_size, int_cov2col_size, int_col2cov_size, plain_MIP_vars, plain_MIP_constrs, exp_time")
         exit(0)
 
     for _ in range(int(args.K)):
@@ -85,7 +85,7 @@ def main():
 
         model = cUFL.build_cUFL_MIP(S, f, fc, kb)
         t1 = time()
-        print(f"{args.n}, {color.size()}, {cover.size()}, {int_DD.size()}, {int_DDp.size()}, {int_DDpp.size()}, {len(model.getVars())}, {(t1-t0):.1f}")
+        print(f"{args.n}, {color.size()}, {cover.size()}, {int_DD.size()}, {int_DDp.size()}, {int_DDpp.size()}, {len(model.getVars())}, {len(model.getConstrs())}, {(t1-t0):.1f}")
         sys.stdout.flush()
 
 if __name__ == '__main__':
