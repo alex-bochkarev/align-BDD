@@ -302,7 +302,7 @@ def build_cover_DD(S, f):  # pylint: disable=too-many-locals,invalid-name
 
     for state in current_layer:
         node = current_layer[tuple(state)]
-        if not state[i-1]:
+        if not np.all([state[j-1] for j in S[i-1]]):
             B.link(node.id, DD.NFALSE, "lo")
         else:
             B.link(node.id, DD.NTRUE, "lo")
@@ -311,7 +311,7 @@ def build_cover_DD(S, f):  # pylint: disable=too-many-locals,invalid-name
         for q in S[i-1]:
             next_state[q-1] = True
 
-        if not next_state[i-1]:
+        if not np.all([next_state[j-1] for j in S[i-1]]):
             B.link(node.id, DD.NFALSE, "hi", f[i])
         else:
             B.link(node.id, DD.NTRUE, "hi", f[i])
@@ -448,7 +448,7 @@ def build_color_DD(f, f_color, k_bar):  # pylint: disable=invalid-name
                 D.link(node_id, y_target, "hi")
                 D.link(node_id, DD.NTRUE, "lo")
 
-            D.rename_vars({f"stub{n}": f"{customers[c][-1]}"})
+            D.rename_vars({f"stub{n}": f"x{customers[c][-1]}"})
     return D, node_labels
 
 
@@ -621,7 +621,7 @@ def test_color_UFL():
     assert m_naive.objVal == m.objVal, f"Naive: {m_naive.objVal} (status {m_naive.status}), while BDD: {m.objVal} (status {m.status})"
 
 
-@pytest.mark.parametrize("test_inst", [generate_test_instance(np.random.randint(5, 15))
+@pytest.mark.parametrize("test_inst", [generate_test_instance(25)
                                        for _ in range(100)])
 def test_random_UFL(test_inst):
     """Tests the formulation for color-UFL (overlap DD) -- random instance."""

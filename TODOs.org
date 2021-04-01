@@ -4,7 +4,7 @@
   - [X] =build_cUFL_MIP=: revise to single overlap version
   - [X] cross-check DDs with the MIP (simple)
   - [X] fix the bug in cover DD generation (infinite loop?..)
-  - [ ] cross-check DDs with the MIP (random set)
+  - [X] cross-check DDs with the MIP (random set)
   - [ ] test the align-BDD version.
   - [ ] test the new problem (against Gurobi)
 
