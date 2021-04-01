@@ -14,6 +14,8 @@ from graphviz import Graph
 import networkx as nx
 import gurobipy as gp
 import BDD as DD
+import BB_search as bb
+import varseq as vs
 import UFL
 from gurobipy import GRB  # noqa
 
@@ -226,14 +228,10 @@ def build_cover_DD(S, f):  # pylint: disable=too-many-locals,invalid-name
 
     while k < N:
         i = freedoms.get_next()  # current 'central' node to process
-        print(f"running at {i}, degrees are: {freedoms.index}:")
-        print(f"Si to go: {S[i-1]}")
         for j in S[i-1]:
             if f"x{j}" in B.vars or k == N:
-                print(f"continuing for j={j} at k={k}")
                 continue
 
-            print(f"Introducing node {j}")
             current_layer = cpy(next_layer)
             next_layer = dict()
 
@@ -262,7 +260,6 @@ def build_cover_DD(S, f):  # pylint: disable=too-many-locals,invalid-name
                 if state in next_layer:
                     B.llink(node, next_layer[state], "lo")
                 else:
-                    print(f"state for {critical_nodes} are: {[q for idx, q in enumerate(state) if (idx+1) in critical_nodes]}")
                     if False in [q for idx, q in enumerate(state)
                                  if (idx+1) in critical_nodes]:
                         if trash_pipe is None:
@@ -288,16 +285,13 @@ def build_cover_DD(S, f):  # pylint: disable=too-many-locals,invalid-name
                     next_layer.update({next_state: newnode})
                     node_labels.update({newnode.id: make_label(next_state)})
             B.rename_vars({f"stub{k-1}": f"x{j}"})
-            print(f"renamed k={k-1} to x{j}")
             k += 1
 
     # process the last node in S[i-1] separately
-    print(f"freedoms index={freedoms.index}")
     i = -1
     while f"x{i}" in B.vars or i == -1:
         i, _ = freedoms.pop()
 
-    print(f"Processing the last layer {k}, introducing node {i}")
     current_layer = cpy(next_layer)
 
     for state in current_layer:
@@ -321,7 +315,6 @@ def build_cover_DD(S, f):  # pylint: disable=too-many-locals,invalid-name
         B.link(trash_pipe.id, DD.NFALSE, "hi")
 
     B.rename_vars({f"stub{k-1}": f"x{i}"})
-    print(f"renamed k={k-1} to x{i}")
 
     return B, node_labels
 
@@ -622,12 +615,65 @@ def test_color_UFL():
 
 
 @pytest.mark.parametrize("test_inst", [generate_test_instance(25)
-                                       for _ in range(100)])
+                                       for _ in range(10)])
 def test_random_UFL(test_inst):
     """Tests the formulation for color-UFL (overlap DD) -- random instance."""
+    TOL=1e-3
     S, f, fc, kb = test_inst
     print(f"Running a test with:\nS={S}; f={f}; fc={fc}; kb={kb}")
 
     m_naive = solve_with_MIP(S, f, fc, kb)
     m = solve_with_BDD_MIP(S, f, fc, kb)
-    assert m_naive.objVal == m.objVal, f"Naive: {m_naive.objVal} (status {m_naive.status}), while BDD: {m.objVal} (status {m.status})"
+    assert abs(m_naive.objVal - m.objVal) < TOL, f"Naive: {m_naive.objVal} (status {m_naive.status}), while BDD: {m.objVal} (status {m.status})"
+
+
+def solve_with_align_BDD(S, f, fc, kb):
+    """Solves the problem by generating two BDDs, aligning them, and solving a NF.
+
+    Args:
+        S (list): neighborhood,
+        f (dict): location costs,
+        fc (list): facility colors,
+        kb (list): color budgets.
+
+    Returns:
+        m (class gurobipy.Model): the resulting model.
+    """
+    C, cover_nl = build_cover_DD(S, f)
+    A, color_nl = build_color_DD(f, fc, kb)
+
+
+    vs_A = vs.VarSeq(A.vars, [len(L) for L in A.layers[:-1]])
+    vs_C = vs.VarSeq(C.vars, [len(L) for L in C.layers[:-1]])
+
+    assert set(vs_A.layer_var) == set(vs_C.layer_var), f"A:{vs_A.layer_var}, C:{vs_C.layer_var}"
+    b = bb.BBSearch(vs_A, vs_C)
+
+    # bb.TIMEOUT_ITERATIONS=10000
+    status = b.search()
+    assert status == "optimal" or status == "timeout"
+
+    Ap = A.align_to(b.Ap_cand.layer_var, inplace=False)
+    Cp = C.align_to(b.Ap_cand.layer_var, inplace=False)
+
+    int_DD = DD.intersect(Ap, Cp)
+    m, c, v = UFL.create_NF(int_DD)
+    m.setParam("OutputFlag", 0)
+    m.optimize()
+    return m
+
+@pytest.mark.parametrize("test_inst", [generate_test_instance(20)
+                                       for _ in range(100)])
+def test_triple(test_inst):
+    """Tests the formulation for color-UFL."""
+    TOL=1e-5
+    S, f, fc, kb = test_inst
+
+    m_naive = solve_with_MIP(S, f, fc, kb)
+    m_DD_MIP = solve_with_BDD_MIP(S, f, fc, kb)
+    m_NF = solve_with_align_BDD(S, f, fc, kb)
+    print(f"Naive model: status={m_naive.status}, obj={m_naive.objVal}")
+    print(f"BDD-MIP model: status={m_DD_MIP.status}, obj={m_DD_MIP.objVal}")
+    print(f"BDD-NF model: status={m_NF.status}, obj={m_NF.objVal}")
+    assert abs(m_naive.objVal - m_DD_MIP.objVal)<TOL, f"Naive: {m_naive.objVal} (status {m_naive.status}), while BDD: {m_DD_MIP.objVal} (status {m_DD_MIP.status})"
+    assert abs(m_naive.objVal - m_NF.objVal)<TOL, f"Naive: {m_naive.objVal} (status {m_naive.status}), while BDD: {m_NF.objVal} (status {m_NF.status})"

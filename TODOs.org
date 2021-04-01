@@ -5,7 +5,7 @@
   - [X] cross-check DDs with the MIP (simple)
   - [X] fix the bug in cover DD generation (infinite loop?..)
   - [X] cross-check DDs with the MIP (random set)
-  - [ ] test the align-BDD version.
+  - [X] test the align-BDD version.
   - [ ] test the new problem (against Gurobi)
 
 * Current project TODOs

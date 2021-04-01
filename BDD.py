@@ -956,6 +956,9 @@ def intersect(A, B):
 
     Notes:
         BDDs need to be order-associated (same vars in the same order).
+
+    Returns:
+        C (class BDD): an intersection BDD.
     """
     assert A.vars == B.vars
     assert A.weighted == B.weighted
