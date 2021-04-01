@@ -1,4 +1,5 @@
 * Current version
+** [2021-04-01 Thu 12:36]: switched to =networkx= for random graph generation 
 ** [2021-03-31 Wed 18:56]: implemented color+overlap DDs, simple cross-check passing
 ** [2021-03-29 Mon 20:13]: revised =BDD.rename_vars= (to respect partial updates) 
 ** [2021-03-19 Fri 13:48]: implemented a cUFL MIP 

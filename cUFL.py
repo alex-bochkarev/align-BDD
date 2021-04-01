@@ -5,11 +5,13 @@ Problem-solving machinery.
 (c) A. Bochkarev, Clemson University, 2021
 abochka@clemson.edu
 """
+import pytest
 from UFL import add_BDD_to_MIP
 from copy import copy as cpy
 import heapq
 import numpy as np
 from graphviz import Graph
+import networkx as nx
 import gurobipy as gp
 import BDD as DD
 import UFL
@@ -227,7 +229,8 @@ def build_cover_DD(S, f):  # pylint: disable=too-many-locals,invalid-name
         print(f"running at {i}, degrees are: {freedoms.index}:")
         print(f"Si to go: {S[i-1]}")
         for j in S[i-1]:
-            if f"x{j}" in B.vars:
+            if f"x{j}" in B.vars or k == N:
+                print(f"continuing for j={j} at k={k}")
                 continue
 
             print(f"Introducing node {j}")
@@ -512,7 +515,7 @@ def generate_test_instance(n):
     F_MIN = 5
     F_MAX = 10
     C_MIN = 2
-    C_MAX = 10
+    C_MAX = min(10, n)
     MAX_DEGREE = min(5, n)
     MAX_BUDGET = 5
 
@@ -520,23 +523,38 @@ def generate_test_instance(n):
     while status != GRB.OPTIMAL:
         N = [i for i in range(1,n+1)]  # a set of nodes
 
-        S = [[i] + np.random.choice([v for v in N if v!=i],
-                                    np.random.randint(1, MAX_DEGREE),
-                                    replace=False).tolist()
-            for i in N]
+        G = nx.gnp_random_graph(n, 0.3, directed=False)
+        AM = nx.adjacency_matrix(G)
+        S = [[i+1] for i in range(n)]
+        
+        for i in range(n):
+            for j in range(n):
+                if AM[(i,j)] == 1:
+                    if j+1 not in S[i]: S[i].append(j+1)
+                    if i+1 not in S[j]: S[j].append(i+1)
 
         f = {i: np.random.randint(F_MIN, F_MAX) for i in N}
 
         no_colors = np.random.randint(C_MIN, C_MAX)
-        f_colors = [np.random.randint(0, no_colors) for _ in N]
+        N_res = N
+        f_colors = [0] * n
+
+        for c in range(1, no_colors):
+            facilities_c = np.random.choice(N_res,
+                                            np.random.randint(1, 1+ len(N_res) - (no_colors-c)),
+                                            replace=False)
+            for facility in facilities_c:
+                f_colors[facility-1] = c
+
+            N_res = [v for v in N_res if v not in facilities_c]
 
         k_bar = [np.random.randint(1, 1+MAX_BUDGET) for _ in range(no_colors)]
         status = solve_with_MIP(S, f, f_colors, k_bar).status
 
-    return S, f, f_colors, k_bar
+    return (S, f, f_colors, k_bar)
 
 
-def make_simple_problem():
+def generate_simple_problem():
     """Generates a simple problem instance.
 
     Returns:
@@ -571,7 +589,7 @@ def draw_problem_dia(S, f, f_colors, k_bar,
 
 def check_simple_example():
     """Shows a simple example (for visual inspection)."""
-    S, f, fc, kb = make_simple_problem()
+    S, f, fc, kb = generate_simple_problem()
     draw_problem_dia(S, f, fc, kb, "run_logs/test")
     build_cUFL_MIP(S, f, fc, kb).display()
 
@@ -594,7 +612,7 @@ def solve_with_BDD_MIP(S, f, fc, kb):
 
 def test_color_UFL():
     """Tests the formulation for color-UFL (overlap DD)."""
-    S, f, fc, kb = make_simple_problem()
+    S, f, fc, kb = generate_simple_problem()
 
     m_naive = solve_with_MIP(S, f, fc, kb)
     m = solve_with_BDD_MIP(S, f, fc, kb)
@@ -602,9 +620,13 @@ def test_color_UFL():
     print(f"BDD model: status={m.status}, obj={m.objVal}")
     assert m_naive.objVal == m.objVal, f"Naive: {m_naive.objVal} (status {m_naive.status}), while BDD: {m.objVal} (status {m.status})"
 
-def test_random_UFL():
+
+@pytest.mark.parametrize("test_inst", [generate_test_instance(np.random.randint(5, 15))
+                                       for _ in range(100)])
+def test_random_UFL(test_inst):
     """Tests the formulation for color-UFL (overlap DD) -- random instance."""
-    S, f, fc, kb = generate_test_instance(5)
+    S, f, fc, kb = test_inst
+    print(f"Running a test with:\nS={S}; f={f}; fc={fc}; kb={kb}")
 
     m_naive = solve_with_MIP(S, f, fc, kb)
     m = solve_with_BDD_MIP(S, f, fc, kb)
