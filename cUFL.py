@@ -129,18 +129,17 @@ class ColorSorter:
                        if color == c]) for c in range(self.no_colors)]
         col_idx = list(range(len(colors)))
 
-        while changed:
+        for _ in range(self.no_colors**2 +1):
             for i in range(self.no_colors-1):
-                for j in range(i, self.no_colors):
-                    if self.rel_weight(colors[i], colors[j]) > 0:
-                        c = cpy(colors[i])
-                        colors[i] = cpy(colors[j])
-                        colors[j] = c
+                RW = self.rel_weight(colors[i], colors[i+1])
+                if RW >= 0:
+                    c = cpy(colors[i])
+                    colors[i] = cpy(colors[i+1])
+                    colors[i+1] = c
 
-                        c = col_idx[i]
-                        col_idx[i] = col_idx[j]
-                        col_idx[j] = c
-                        break
+                    c = col_idx[i]
+                    col_idx[i] = col_idx[i+1]
+                    col_idx[i+1] = c
 
         customers = {c: [] for c in range(self.no_colors)}
 
@@ -724,8 +723,8 @@ def get_score(A, target):
                 invs += 1
     return invs
 
-@pytest.mark.parametrize("test_inst", [make_instance(15)
-                                       for _ in range(10)])
+@pytest.mark.parametrize("test_inst", [make_instance(7)
+                                       for _ in range(100)])
 def test_ColorSorter(test_inst):
     """Tests that ColorSorter finds an optimal order (compares to bruteforce)."""
     f_colors, target_order = test_inst
