@@ -1,103 +1,67 @@
 digraph {
 	subgraph cluster_0 {
-		0 [label="0: 0"]
-		color=lightgrey label="x1, sz=1"
+		0 [label="0: []"]
+		color=lightgrey label="xx1, sz=1"
 	}
 	subgraph cluster_1 {
-		1 [label="1: 0"]
-		2 [label="2: 1"]
-		color=lightgrey label="x6, sz=2"
+		2 [label="2: [1,2,3,4]"]
+		1 [label="1: []"]
+		color=lightgrey label="xx2, sz=2"
 	}
 	subgraph cluster_2 {
-		3 [label="3: 0"]
-		4 [label="4: 1"]
-		5 [label="5: 2"]
-		color=lightgrey label="x7, sz=3"
+		4 [label="4: [1,2,3,4,5]"]
+		5 [label="5: [1,2,3,4]"]
+		3 [label="3: []"]
+		color=lightgrey label="xx3, sz=3"
 	}
 	subgraph cluster_3 {
-		8 [label="8: 2"]
-		9 [label="9: 3"]
-		6 [label="6: 0"]
-		7 [label="7: 1"]
-		color=lightgrey label="x2, sz=4"
+		6 [label="6: []"]
+		7 [label="7: [1,2,3,5]"]
+		9 [label="9: [1,2,3,4]"]
+		8 [label="8: [1,2,3,4,5]"]
+		color=lightgrey label="xx4, sz=4"
 	}
 	subgraph cluster_4 {
-		14 [label="14: 3"]
-		11 [label="11: 1"]
-		13 [label="13: 2"]
-		10 [label="10: 0"]
-		12 [label="12: 💀"]
-		color=lightgrey label="x5, sz=5"
+		14 [label="14: [1,2,3,4]"]
+		13 [label="13: [1,2,3,4,5]"]
+		11 [label="11: [1,2,4,5]"]
+		12 [label="12: [1,2,3,5]"]
+		10 [label="10: 💀"]
+		color=lightgrey label="xx5, sz=5"
 	}
 	subgraph cluster_5 {
-		16 [label="16: 0"]
-		19 [label="19: 3"]
-		15 [label="15: 💀"]
-		18 [label="18: 2"]
-		17 [label="17: 1"]
-		color=lightgrey label="x3, sz=5"
-	}
-	subgraph cluster_6 {
-		21 [label="21: 0"]
-		24 [label="24: 3"]
-		22 [label="22: 1"]
-		20 [label="20: 💀"]
-		23 [label="23: 2"]
-		color=lightgrey label="x4, sz=5"
-	}
-	subgraph cluster_7 {
-		-2 [label=F fillcolor=gray style=filled]
 		-1 [label=T fillcolor=orange style=filled]
+		-2 [label=F fillcolor=gray style=filled]
 		color=white
 	}
-	0 -> 2 [label=1]
+	0 -> 2 [label=5]
 	0 -> 1 [label=0.0 style=dashed]
-	1 -> 4 [label=6]
+	2 -> 4 [label=9]
+	2 -> 5 [label=0.0 style=dashed]
+	1 -> 4 [label=9]
 	1 -> 3 [label=0.0 style=dashed]
-	2 -> 5 [label=6]
-	2 -> 4 [label=0.0 style=dashed]
-	3 -> 7 [label=7]
+	4 -> 8 [label=8]
+	4 -> 8 [label=0.0 style=dashed]
+	5 -> 8 [label=8]
+	5 -> 9 [label=0.0 style=dashed]
+	3 -> 7 [label=8]
 	3 -> 6 [label=0.0 style=dashed]
-	4 -> 8 [label=7]
-	4 -> 7 [label=0.0 style=dashed]
-	5 -> 9 [label=7]
-	5 -> 8 [label=0.0 style=dashed]
-	8 -> 12 [label=0.0]
-	8 -> 13 [label=0.0 style=dashed]
-	9 -> 12 [label=0.0]
-	9 -> 14 [label=0.0 style=dashed]
-	6 -> 11 [label=2]
+	6 -> 11 [label=6]
 	6 -> 10 [label=0.0 style=dashed]
-	7 -> 12 [label=0.0]
-	7 -> 11 [label=0.0 style=dashed]
-	14 -> 15 [label=0.0]
-	14 -> 19 [label=0.0 style=dashed]
-	11 -> 15 [label=0.0]
-	11 -> 17 [label=0.0 style=dashed]
-	13 -> 15 [label=0.0]
-	13 -> 18 [label=0.0 style=dashed]
-	10 -> 17 [label=5]
-	10 -> 16 [label=0.0 style=dashed]
-	12 -> 15 [label=0.0]
-	12 -> 15 [label=0.0 style=dashed]
-	16 -> 22 [label=3]
-	16 -> 21 [label=0.0 style=dashed]
-	19 -> 20 [label=0.0]
-	19 -> 24 [label=0.0 style=dashed]
-	15 -> 20 [label=0.0]
-	15 -> 20 [label=0.0 style=dashed]
-	18 -> 24 [label=3]
-	18 -> 23 [label=0.0 style=dashed]
-	17 -> 23 [label=3]
-	17 -> 22 [label=0.0 style=dashed]
-	21 -> -1 [label=4]
-	21 -> -1 [label=0.0 style=dashed]
-	24 -> -2 [label=4]
-	24 -> -1 [label=0.0 style=dashed]
-	22 -> -1 [label=4]
-	22 -> -1 [label=0.0 style=dashed]
-	20 -> -2 [label=0.0]
-	20 -> -2 [label=0.0 style=dashed]
-	23 -> -1 [label=4]
-	23 -> -1 [label=0.0 style=dashed]
+	7 -> 13 [label=6]
+	7 -> 12 [label=0.0 style=dashed]
+	9 -> 13 [label=6]
+	9 -> 14 [label=0.0 style=dashed]
+	8 -> 13 [label=6]
+	8 -> 13 [label=0.0 style=dashed]
+	14 -> -1 [label=5]
+	14 -> -2 [label=0.0 style=dashed]
+	13 -> -1 [label=5]
+	13 -> -1 [label=0.0 style=dashed]
+	11 -> -1 [label=5]
+	11 -> -1 [label=0.0 style=dashed]
+	12 -> -1 [label=5]
+	12 -> -1 [label=0.0 style=dashed]
+	10 -> -2 [label=0.0]
+	10 -> -2 [label=0.0 style=dashed]
 }

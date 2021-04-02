@@ -35,16 +35,18 @@
     "geometry"
     "subcaption")
    (LaTeX-add-labels
-    "sec:org36e25f4"
-    "sec:org62955c5"
-    "sec:org7eb4fef"
-    "sec:org694daf3"
-    "sec:orge4cdf4e"
-    "sec:orgf80870e"
-    "sec:org680cb5b"
-    "sec:orgc5d5017"
-    "sec:org3625a65"
-    "sec:org7e85580"
-    "sec:orgda304c8"))
+    "sec:org7d8711a"
+    "sec:org6c7933c"
+    "sec:org6f4a2a7"
+    "sec:orga17d662"
+    "fig:cover"
+    "sec:orged16bd0"
+    "fig:color"
+    "sec:orgdea801b"
+    "sec:org405fbbd"
+    "sec:org01a65ba"
+    "fig:sizes"
+    "sec:org8668add"
+    "sec:org55e4361"))
  :latex)
 
