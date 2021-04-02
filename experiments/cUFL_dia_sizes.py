@@ -61,8 +61,9 @@ def main():
     for _ in range(int(args.K)):
         t0 = time()
         S, f, fc, kb = cUFL.generate_test_instance(int(args.n))
-        color, _ = cUFL.build_color_DD(f, fc, kb)
         cover, _ = cUFL.build_cover_DD(S, f)
+        pref_order = [int(x[1:]) for x in cover.vars]
+        color, _ = cUFL.build_color_DD(f, fc, kb, pref_order)
 
         vs_color = vs.VarSeq(color.vars, [len(L) for L in color.layers[:-1]])
         vs_cover = vs.VarSeq(cover.vars, [len(L) for L in cover.layers[:-1]])

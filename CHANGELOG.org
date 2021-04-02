@@ -1,4 +1,9 @@
 * Current version
+** [2021-04-02 Fri 16:45]: found a subtle bug in =ColorSorter= 
+   Infinite loop occurs with:
+   f_color= [2, 1, 4, 2, 2, 0, 2, 5, 8, 1, 2, 1, 7, 6, 3]
+   target=[ 1, 10, 11, 12, 14,  5,  7,  4,  8,  2, 15,  9,  3, 13,  6]
+** [2021-04-02 Fri 15:13]: implemented ColorSorter 
 ** [2021-04-01 Thu 12:36]: switched to =networkx= for random graph generation 
 ** [2021-03-31 Wed 18:56]: implemented color+overlap DDs, simple cross-check passing
 ** [2021-03-29 Mon 20:13]: revised =BDD.rename_vars= (to respect partial updates) 
