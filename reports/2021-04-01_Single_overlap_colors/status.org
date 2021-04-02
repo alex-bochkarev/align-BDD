@@ -1,0 +1,73 @@
+#+TITLE: Facility Location with BDDs: Status update 2
+#+AUTHOR: A. Bochkarev
+#+OPTIONS: toc:nil date:nil H:3
+#+LATEX_HEADER: \usepackage[margin=1in]{geometry}
+#+LATEX_EADER: \usepackage{caption}
+#+LATEX_HEADER: \usepackage{subcaption}
+#+PROPERTY: header-args :eval never-export :dir ../.. :session *pyOrg*
+
+* Technical code  :noexport:
+ #+BEGIN_SRC python :noweb yes :results none
+rdir = "reports/2021-04-01_Single_overlap_colors"
+import cUFL
+ #+END_SRC 
+  
+ #+BEGIN_SRC python :results output :exports none
+print(f"rdir={rdir}")
+ #+END_SRC
+
+ #+RESULTS:
+ : rdir=reports/2021-04-01_Single_overlap_colors
+
+
+* Status
+  - we are dealing with the Facility location problem in the following edition: every facility can
+    "cover" all its neighbors, we have to cover every customer at least once, no
+    overlap costs; we have "colored" facilities + budget for number of locations
+    per color.
+  - I have implemented constructing BDDs for (1) *cover* constraints, and (2) *color* constraints.
+  - with this problem formulation, intersection BDD is still very large, but now
+    we have at least something to discuss, as the process depends on many factors.
+  - runtimes, to me, still do not look competitive with MIP -- we might want to
+    look into some specific instance types?
+
+* The problem.
+First, let me re-introduce my ``model'' problem. Assume I have the following
+seven nodes (costs are in the parentheses):
+#+BEGIN_SRC python :exports none
+S,f,fc,kb = cUFL.generate_simple_problem()
+cUFL.draw_problem_dia(S,f,fc,kb, filename=f"{rdir}/problem.dot")
+#+END_SRC
+
+[[file:problem_LR.png]]
+
+Color limits are as follows: red (5), blue (1), green (3). (So, the point is: I
+can't have two ``central'' blue nodes, \textcircled{2} and \textcircled{5}, at the
+same time -- other limits are not binding.)
+ 
+* Plan of attack
+- build *cover* BDD (encode the condition ``every facility has to be covered at least once'');
+- build *color* BDD (encode the condition ``respect color budgets'');
+- make them order-associated;
+- build an intersection DD.
+- formulate and solve the network flow out of the intersection DD.
+
+All of these steps are implemented now.
+
+* Building the cover DD
+  
+* Building the color DD
+  
+* Random instances generation
+
+* Some results of numerical modeling.
+  
+** Diagram sizes (table)
+
+** Runtimes
+   
+* Discussion
+  - sorting variables in =color= diagram.
+  - random graph generation (limit node degree?)
+  - next node selection in the (cover) BDD generation procedure.
+
