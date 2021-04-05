@@ -72,11 +72,11 @@ All of these steps are implemented now.
   remaining /"freedoms"/ of $G$ nodes: node degree minus the number of its
   neighbors already present in the diagram above. When such number drops to
   zero, then there is no way the "state" of the node ("covered" vs. "not
-  covered" can be changed further down the BDD).
-- so, I "process" nodes one by one as follows. I just "incorporate" the node,
-  and then all its neighbors, into the BDD. For example, "processing" node
-  \textcircled{1} involves incorporating nodes \textcircled{1} and
-  \textcircled{2}. Processing \textcircled{2} would involve incorporating
+  covered") can be changed further down the BDD.
+- so, I "process" nodes one by one as follows. I just create BDD layers for the node,
+  and then for all its neighbors. For example, "processing" node
+  \textcircled{1} involves going through nodes \textcircled{1} and
+  \textcircled{2}. Processing \textcircled{2} would involve considering 
   \textcircled{1}, \textcircled{2}, \textcircled{3}, and \textcircled{5}, and so
   on.
 - Again, after every node processing I update the node "freedoms".
@@ -187,7 +187,7 @@ see Listing [[fig:sizes]]. To me, this table highlights the key problem I am hav
 at the moment. I have also run some experiments to benchmark BDD-based methods
 with this "plain MIP": of course, given the intersection sizes, for $n=30$ nodes
 in $G$ I have the intersection-based thing 1--3 orders of magnitude slower than
-the plain the MIP. It is still as bad as replacing a complicated-type problem
+the plain MIP. It is still as bad as replacing a complicated-type problem
 with 40-ish variables and constraints with a simple-type problem with, like,
 40k-ish variables... (and I do not think it behaves well asymptotically, as the size grows...)
 

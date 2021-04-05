@@ -51,6 +51,13 @@ def main():
                         default="0",
                         help="prefix string (ID of the run)")
 
+    parser.add_argument("-t",
+                        "--type",
+                        action="store",
+                        dest="inst_type",
+                        default="ER",
+                        help="instance type (ER or STRING)")
+
     args = parser.parse_args()
 
     if args.header:
@@ -60,7 +67,14 @@ def main():
 
     for _ in range(int(args.K)):
         t0 = time()
-        S, f, fc, kb = cUFL.generate_test_instance(int(args.n))
+        if args.inst_type == "ER":
+            S, f, fc, kb = cUFL.generate_test_instance(int(args.n))
+        elif args.inst_type == "STRING":
+            S, f, fc, kb = cUFL.generate_string_instance(int(args.n))
+        else:
+            print(f"FATAL ERROR: {args.inst_type} -- wrong instance type. Expected `ER` or `STRING`.")
+            exit(-1)
+
         cover, _ = cUFL.build_cover_DD(S, f)
         pref_order = [int(x[1:]) for x in cover.vars]
         color, _ = cUFL.build_color_DD(f, fc, kb, pref_order)

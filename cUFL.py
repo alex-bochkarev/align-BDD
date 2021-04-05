@@ -471,13 +471,14 @@ def generate_test_instance(n):
     MAX_BUDGET = 5
 
     status = -1
+    N = [i for i in range(1,n+1)]  # a set of nodes
+
     while status != GRB.OPTIMAL:
-        N = [i for i in range(1,n+1)]  # a set of nodes
 
         G = nx.gnp_random_graph(n, 0.3, directed=False)
         AM = nx.adjacency_matrix(G)
         S = [[i+1] for i in range(n)]
-        
+
         for i in range(n):
             for j in range(n):
                 if AM[(i,j)] == 1:
@@ -486,6 +487,129 @@ def generate_test_instance(n):
 
         f = {i: np.random.randint(F_MIN, F_MAX) for i in N}
 
+        no_colors = np.random.randint(C_MIN, C_MAX)
+        N_res = N
+        f_colors = [0] * n
+
+        for c in range(1, no_colors):
+            facilities_c = np.random.choice(N_res,
+                                            np.random.randint(1, 1+ len(N_res) - (no_colors-c)),
+                                            replace=False)
+            for facility in facilities_c:
+                f_colors[facility-1] = c
+
+            N_res = [v for v in N_res if v not in facilities_c]
+
+        k_bar = [np.random.randint(1, 1+MAX_BUDGET) for _ in range(no_colors)]
+        status = solve_with_MIP(S, f, f_colors, k_bar).status
+
+    return (S, f, f_colors, k_bar)
+
+
+def generate_string_instance(n):
+    """Generates a (colored) facility location instance: string.
+
+    Args:
+        n (int): number of nodes (customers / facilities)
+
+    Returns:
+        S (list): neighborhood list,
+        f (dict): location costs
+        f_colors (list): location colors,
+        k_bar (list): budget per color.
+    """
+    F_MIN = 5
+    F_MAX = 10
+    C_MIN = 2
+    C_MAX = min(10, n)
+    MAX_BUDGET = 5
+
+    f = {i: np.random.randint(F_MIN, F_MAX + 1)
+         for i in range(1, n+1)}
+
+    status = -1
+    S = [[] for _ in range(n)]
+    S[0] = [1, 2]
+    S[-1] = [n-1, n]
+
+    for k in range(1, n-1):
+        S[k] = [k, k+1, k+2]  # so, e.g. "3" is accessible from "2","3","4"
+
+    N = [i for i in range(1,n+1)]  # a set of nodes
+    while status != GRB.OPTIMAL:
+        no_colors = np.random.randint(C_MIN, C_MAX)
+        N_res = N
+        f_colors = [0] * n
+
+        for c in range(1, no_colors):
+            facilities_c = np.random.choice(N_res,
+                                            np.random.randint(1, 1+ len(N_res) - (no_colors-c)),
+                                            replace=False)
+            for facility in facilities_c:
+                f_colors[facility-1] = c
+
+            N_res = [v for v in N_res if v not in facilities_c]
+
+        k_bar = [np.random.randint(1, 1+MAX_BUDGET) for _ in range(no_colors)]
+        status = solve_with_MIP(S, f, f_colors, k_bar).status
+
+    return (S, f, f_colors, k_bar)
+
+
+def generate_organic_instance(n):
+    """Generates a (colored) facility location instance: 'organic' thing.
+
+    Args:
+        n (int): number of nodes (customers / facilities)
+
+    Returns:
+        S (list): neighborhood list,
+        f (dict): location costs
+        f_colors (list): location colors,
+        k_bar (list): budget per color.
+    """
+    F_MIN = 5
+    F_MAX = 10
+    C_MIN = 2
+    C_MAX = min(10, n)
+    MAX_BUDGET = 5
+
+    f = {i: np.random.randint(F_MIN, F_MAX + 1)
+         for i in range(1, n+1)}
+
+    status = -1
+    S = [[] for _ in range(n)]
+
+    k = 0
+    S[0] = [1, 2]
+
+    prev_node = 1
+    k = 2
+    while k < n-1:
+        if np.random.uniform() <= 0.5:
+            # degree-2 node
+            S[k - 1] = [prev_node, k, k+1]
+            prev_node = k
+        else:
+            # deg-3 node + deg-1 node
+            S[k - 1] = [prev_node, k, k+1, k+2]
+            S[(k+1) - 1] = [k, k+1]
+            prev_node = k+2
+            k += 1
+
+        k += 1
+
+    if k == n-1:
+        S[k-1] = [prev_node, n-1, n]
+        S[k] = [n-1, n]
+    elif k == n:
+        S[k-1] = [n-2, n]
+
+    print(f"k={k}, n={n}")
+    print(f"S={S}")
+    # coloring the nodes
+    N = [i for i in range(1,n+1)]  # a set of nodes
+    while status != GRB.OPTIMAL:
         no_colors = np.random.randint(C_MIN, C_MAX)
         N_res = N
         f_colors = [0] * n
@@ -520,9 +644,10 @@ def generate_simple_problem():
 def draw_problem_dia(S, f, f_colors, k_bar,
                      filename="run_logs/c_problem_dia.gv"):
     """Draws the bipartite graph describing the problem."""
-    assert len(np.unique(f_colors)) <= 6
+    assert len(np.unique(f_colors)) <= 10
     cols = {0: 'red', 1: 'blue', 2: 'green', 3: 'yellow',
-            4: 'black', 5: 'purple', 6: 'orange', 7: 'white', 8: 'gray'}
+            4: 'black', 5: 'purple', 6: 'orange', 7: 'white', 8: 'gray',
+            9: 'cyan', 10: 'magenta'}
 
     dia = Graph('G', comment="Uncapacitated Facility Location")
 
@@ -573,8 +698,9 @@ def test_color_UFL():
     assert m_naive.objVal == m.objVal, f"Naive: {m_naive.objVal} (status {m_naive.status}), while BDD: {m.objVal} (status {m.status})"
 
 
-@pytest.mark.parametrize("test_inst", [generate_test_instance(15)
-                                       for _ in range(100)])
+@pytest.mark.parametrize("test_inst",
+                         [generate_test_instance(15) for _ in range(100)] +
+                         [generate_string_instance(15) for _ in range(100)])
 def test_random_UFL(test_inst):
     """Tests the formulation for color-UFL (overlap DD) -- random instance."""
     TOL=1e-3

@@ -6,9 +6,14 @@
   - [X] fix the bug in cover DD generation (infinite loop?..)
   - [X] cross-check DDs with the MIP (random set)
   - [X] test the align-BDD version.
-  - [ ] implement color ordering / fix the color-DD order
-  - [ ] test the new problem (against Gurobi) -- runtimes.
+  - [X] implement color ordering / fix the color-DD order
+  - [X] test the new problem (against Gurobi) -- runtimes.
+  - [ ] special case instance (string): diagram sizes
+  - [ ] special case (organic thing): dia sizes. Is it max degree?
   - [ ] write-up
+    + [ ] write-up the algo logic (example)
+    + [ ] ER gallery
+    + [ ] next steps
 
 * Current project TODOs
 ** TODO Kill already merged branches
