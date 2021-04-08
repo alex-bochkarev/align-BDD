@@ -1,4 +1,6 @@
 * Current version
+** [2021-04-05 Mon 16:57]: generated degree-2, -3, and -4 instances.  
+   Interestingly, still width-4 cover DD.
 ** [2021-04-02 Fri 16:45]: found a subtle bug in =ColorSorter= 
    Infinite loop occurs with:
    f_color= [2, 1, 4, 2, 2, 0, 2, 5, 8, 1, 2, 1, 7, 6, 3]

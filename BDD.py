@@ -730,7 +730,8 @@ class BDD(object):
              dir="testing",
              filename="showfunc.dot",
              layerCapt=True,
-             x_prefix="x"):
+             x_prefix="x",
+             node_labels=None):
         """Shows the diagram.
 
         Generates a `.dot` file and compiles it to `.pdf`.
@@ -741,7 +742,7 @@ class BDD(object):
             layerCapt (bool): whether to show layer captions (default: True)
             x_prefix(str): a prefix for variable captions (default:'x')
         """
-        self.dump_gv(layerCapt, x_prefix).view(filename,
+        self.dump_gv(layerCapt, x_prefix, node_labels).view(filename,
                                                directory=dir,
                                                cleanup=True)
 
@@ -950,6 +951,32 @@ class BDD(object):
 
         return [True, msg]
 
+    def shortest_path(self):
+        """Finds a shortest-path in O(`no-of-nodes`) time, returns a dict of node labels (by ID)."""
+        assert self.weighted
+        # NOTE: alternative would be: no. of hops.
+        #       Doesn't make sense for our BDD, perhaps. The answer is `len(self)`.
+
+        node_labels = {NTRUE: 0}
+
+        for L in reversed(range(len(self.vars))):
+            for node in self.layers[L]:
+                node_label = None
+                if node.hi.id in node_labels.keys():
+                    node_label = node_labels[node.hi.id] + self.weights[(node.id, node.hi.id, "hi")]
+
+                if node.lo.id in node_labels.keys():
+                    node_label = min(node_label,
+                                     node_labels[node.lo.id] + self.weights[(node.id, node.lo.id, "lo")])
+
+                if node_label is not None:
+                    node_labels.update({node.id: node_label})
+
+        for node in self.nodes:
+            if node not in node_labels.keys():
+                node_labels[node] = "∞"
+
+        return node_labels
 
 def intersect(A, B):
     """Produces an intersection BDD of `A` and `B`.
@@ -1026,7 +1053,7 @@ def intersect(A, B):
 # =====================================================================
 # testing code
 # =====================================================================
-def test_intersections():
+def show_intersections():
     """Tests intersection function."""
     A = BDD()
     A.load("./tests/int_A.wbdd", weighted=True)
@@ -1040,7 +1067,7 @@ def test_intersections():
 
 
 # BDD creation and rendering (with graphviz)
-def test_create_render():
+def show_create_render():
     """Tests the BDD creation and rendering code."""
     bdd = BDD(4)
     root = bdd.addnode(None)
@@ -1096,7 +1123,7 @@ def gen_4BDD():
     nh.link(bdd.F, "hi")
     return bdd
 
-def test_swap_sift():
+def show_swap_sift():
     """quick test of swap and sift operations"""
     ## swap operation
     bdd.swap_up(2)
@@ -1153,7 +1180,7 @@ def test_swap_sift():
     g.render("./after_sifting.dot",view=True)
 
 
-def test_save_load(bdd):
+def save_load(bdd):
     """quickly tests the load-save functionality
 
     must result in two equivalent graphs (BDDs) on the screen
@@ -1164,17 +1191,17 @@ def test_save_load(bdd):
     bdd.dump_gv().view("./before_save.dot",cleanup=True)
     bdd2.dump_gv().view("./after_save.dot",cleanup=True)
 
-def test_save_load_noargs():
+def save_load_noargs():
     bdd = gen_4BDD()
     bdd.sift(3,0)
-    test_save_load(bdd)
+    save_load(bdd)
 
 
-def test_rnd():
+def show_rnd():
     bdd = BDD.random(N=5,p=0.8)
     bdd.dump_gv().view("./random.dot",directory="./testing",cleanup = True)
 
-def test_align():
+def show_align():
     bdd_A = BDD.random(N=4,p=0.8)
     bdd_B = BDD.random(N=4,p=0.8)
 
@@ -1187,7 +1214,7 @@ def test_align():
     Ba[0].dump_gv().render("./testing/Ba.dot", view=True)
 
 
-def test_bruteforcing():
+def show_bruteforcing():
     bdd = BDD.random(N=4, p=0.8) # it works for gen_4BDD(), though
 
     perms = iters.permutations(bdd.vars)
@@ -1198,7 +1225,7 @@ def test_bruteforcing():
         bdd.show()
         input("Press Enter to continue...")
 
-def test_rnd_naming():
+def show_rnd_naming():
     mybdd = BDD.random(N=4,p=0.8)
     mybdd.show()
 
@@ -1211,7 +1238,7 @@ def test_rnd_naming():
     mybdd_al.swap_up(mybdd_al.p(3))
     mybdd_al.show()
 
-def test_swapping_2():
+def show_swapping_2():
     mybdd = BDD.random(N=4,p=0.8)
     mybdd.show()
 
@@ -1228,7 +1255,8 @@ def test_swapping_2():
     bdds.dump_gv().render("./testing/after_swap.dot", view=True, cleanup=True)
 
 
-def test_random_swapping(N, k, m, p=0.8, mode="swaps"):
+# TODO: rewrite as a pytest test
+def manual_test_random_swapping(N, k, m, p=0.8, mode="swaps"):
     """TEST: checks if swaps work correctly (random problems).
 
     Generates a random BDD, makes some random swaps (or sifts),
@@ -1248,7 +1276,7 @@ def test_random_swapping(N, k, m, p=0.8, mode="swaps"):
                 are to be generated
 
     Example:
-        test_random_swapping(8,500,20,0.8,sys.argv[1])
+        manual_test_random_swapping(8,500,20,0.8,sys.argv[1])
     """
     status = "OK"
 
@@ -1312,7 +1340,8 @@ def test_random_swapping(N, k, m, p=0.8, mode="swaps"):
     print("\n{} instances processed, status: {}".format(k, status))
 
 
-def test_swaps_w():
+# TODO: rewrite as a pytest test
+def manual_test_swaps_w():
     """Tests if swaps are implemented correctly for a weighted BDD.
 
     (All paths costs and terminals must coincide after a series of swaps.)
@@ -1341,7 +1370,8 @@ def test_swaps_w():
     eq, msg = A.is_equivalent(B)
     assert eq, msg
 
-def test_swaps_weighted():
+# TODO: rewrite as a pytest etst
+def manual_test_swaps_weighted():
     for i in range(1000):
         A = BDD.random(N=5, weighted=True)
         B = copy.deepcopy(A)
@@ -1364,6 +1394,8 @@ def test_swaps_weighted():
         print(".", end="")
         sys.stdout.flush()
 
+
+# TODO: rewrite as a pytest etst
 def test_swaps_uweighted():
     for i in range(100):
         A = BDD.random(N=10, weighted=False)
@@ -1389,7 +1421,24 @@ def test_swaps_uweighted():
         sys.stdout.flush()
 
 def main():
-    test_swaps_weighted()
+    manual_test_swaps_weighted()
 
 if __name__ == '__main__':
     main()
+
+def test_shortest_path(N, p):
+    """Tests the shortest path procedure (with Gurobi model)"""
+    A = BDD.random(N, p, weighted=True)
+    from UFL import add_BDD_to_MIP
+
+    m, c, v, x = add_BDD_to_MIP(A)
+    m.update()
+    m.optimize()
+
+    nl = A.shortest_path()
+    print(f"model status is {m.status}, root node label is {nl[NROOT]}")
+    if m.status == 2:
+        # optimal
+        assert nl[NROOT] == m.objVal, "SP={nl[NROOT], while Gurobi gave {m.objVal}}"
+    else:
+        assert nl[NROOT] == "∞", "with Gurobi status {m.status}, root node label is {nl[NROOT]}"

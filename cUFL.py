@@ -183,9 +183,12 @@ def build_cover_DD(S, f):  # pylint: disable=too-many-locals,invalid-name
     while k < N:
         i = freedoms.get_next()  # current 'central' node to process
         for j in S[i-1]:
+            print(f"k={k}")
+            print(f"freedoms = {freedoms.index}")
             if f"x{j}" in B.vars or k == N:
                 continue
 
+            print(f"going through node j={j}")
             current_layer = cpy(next_layer)
             next_layer = dict()
 
@@ -594,7 +597,7 @@ def generate_organic_instance(n):
             # deg-3 node + deg-1 node
             S[k - 1] = [prev_node, k, k+1, k+2]
             S[(k+1) - 1] = [k, k+1]
-            prev_node = k+2
+            prev_node = k
             k += 1
 
         k += 1
@@ -604,6 +607,81 @@ def generate_organic_instance(n):
         S[k] = [n-1, n]
     elif k == n:
         S[k-1] = [n-2, n]
+
+    print(f"k={k}, n={n}")
+    print(f"S={S}")
+    # coloring the nodes
+    N = [i for i in range(1,n+1)]  # a set of nodes
+    while status != GRB.OPTIMAL:
+        no_colors = np.random.randint(C_MIN, C_MAX)
+        N_res = N
+        f_colors = [0] * n
+
+        for c in range(1, no_colors):
+            facilities_c = np.random.choice(N_res,
+                                            np.random.randint(1, 1+ len(N_res) - (no_colors-c)),
+                                            replace=False)
+            for facility in facilities_c:
+                f_colors[facility-1] = c
+
+            N_res = [v for v in N_res if v not in facilities_c]
+
+        k_bar = [np.random.randint(1, 1+MAX_BUDGET) for _ in range(no_colors)]
+        status = solve_with_MIP(S, f, f_colors, k_bar).status
+
+    return (S, f, f_colors, k_bar)
+
+
+def generate_d4_instance(n):
+    """Generates a (colored) facility location instance: degree-4 nodes.
+
+    Args:
+        n (int): number of nodes (customers / facilities)
+
+    Returns:
+        S (list): neighborhood list,
+        f (dict): location costs
+        f_colors (list): location colors,
+        k_bar (list): budget per color.
+    """
+    F_MIN = 5
+    F_MAX = 10
+    C_MIN = 2
+    C_MAX = min(10, n)
+    MAX_BUDGET = 5
+
+    f = {i: np.random.randint(F_MIN, F_MAX + 1)
+         for i in range(1, n+1)}
+
+    status = -1
+    S = [[] for _ in range(n)]
+
+    k = 0
+    S[0] = [1, 2]
+
+    prev_node = 1
+    k = 2
+    while k < n-3:
+        if np.random.uniform() <= 0.5:
+            # degree-2 node
+            S[k - 1] = [prev_node, k, k+1]
+            prev_node = k
+        else:
+            # deg-4 node
+            S[k - 1] = [prev_node, k, k+1, k+2, k+3]
+            S[(k+1) - 1] = [k, k+1]
+            S[(k+2) - 1] = [k, k+2]
+            prev_node = k
+            k += 2
+
+        k += 1
+
+    while k < n:
+        S[k-1] = [prev_node, k, k+1]
+        prev_node = k
+        k += 1
+
+    S[-1]=[n-1, n]
 
     print(f"k={k}, n={n}")
     print(f"S={S}")
@@ -640,6 +718,20 @@ def generate_simple_problem():
     f_colors = [0, 1, 2, 2, 1, 0, 0]
     k_bar = [5, 1, 3]
     return S, f, f_colors, k_bar
+
+def generate_5d_problem(n=None):
+    """Generates a simple problem instance, with two nodes of degree 5.
+
+    Returns:
+    S, f, f_colors, k_bar.
+    """
+    S = [[1, 2, 3, 4, 5,6], [2, 1], [3, 1], [4, 1], [5, 1], [6, 1, 7, 8, 9, 10],
+         [7, 6], [8, 6], [9, 6], [10, 6]]
+    f = {1: 1, 2: 2, 3: 3, 4: 4, 5: 5, 6: 6, 7: 7, 8: 8, 9: 9, 10: 10}
+    f_colors = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    k_bar = [11]
+    return S, f, f_colors, k_bar
+
 
 def draw_problem_dia(S, f, f_colors, k_bar,
                      filename="run_logs/c_problem_dia.gv"):
@@ -700,7 +792,9 @@ def test_color_UFL():
 
 @pytest.mark.parametrize("test_inst",
                          [generate_test_instance(15) for _ in range(100)] +
-                         [generate_string_instance(15) for _ in range(100)])
+                         [generate_string_instance(15) for _ in range(100)] +
+                         [generate_d4_instance(15) for _ in range(100)] +
+                         [generate_organic_instance(15) for _ in range(100)])
 def test_random_UFL(test_inst):
     """Tests the formulation for color-UFL (overlap DD) -- random instance."""
     TOL=1e-3
@@ -857,3 +951,20 @@ def test_ColorSorter(test_inst):
     print(f"The instance is: f_colors={f_colors}, target={target_order}")
     assert get_score(find_correct_order(f_colors, target_order), target_order) == get_score(
         bruteforce_correct_order(f_colors, target_order), target_order)
+
+
+def show_cov(n, gen_func):
+    """Generates an instance, generates and shows a *cover* diagram.
+
+    Available generators:
+    - generate_simple_problem
+    - generate_test_instance
+    - generate_string_instance
+    - generate_organic_instance
+    - generate_d4_instance
+    - generate_5d_problem
+    """
+    S,f, fc, kb = gen_func(n)
+    draw_problem_dia(S,f,fc,kb)
+    c, nl = build_cover_DD(S,f)
+    c.dump_gv(node_labels=nl).view()
