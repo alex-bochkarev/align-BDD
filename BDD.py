@@ -14,6 +14,7 @@ from numpy.random import random as rnd
 from random import choice as rnd_choose
 from random import randint
 import sys
+import pytest
 
 import itertools as iters
 from graphviz import Digraph
@@ -966,8 +967,11 @@ class BDD(object):
                     node_label = node_labels[node.hi.id] + self.weights[(node.id, node.hi.id, "hi")]
 
                 if node.lo.id in node_labels.keys():
-                    node_label = min(node_label,
-                                     node_labels[node.lo.id] + self.weights[(node.id, node.lo.id, "lo")])
+                    if node_label is not None:
+                        node_label = min(node_label,
+                                         node_labels[node.lo.id] + self.weights[(node.id, node.lo.id, "lo")])
+                    else:
+                        node_label = node_labels[node.lo.id] + self.weights[(node.id, node.lo.id, "lo")]
 
                 if node_label is not None:
                     node_labels.update({node.id: node_label})
@@ -1396,7 +1400,7 @@ def manual_test_swaps_weighted():
 
 
 # TODO: rewrite as a pytest etst
-def test_swaps_uweighted():
+def manual_test_swaps_uweighted():
     for i in range(100):
         A = BDD.random(N=10, weighted=False)
         B = copy.deepcopy(A)
@@ -1426,8 +1430,12 @@ def main():
 if __name__ == '__main__':
     main()
 
-def test_shortest_path(N, p):
+@pytest.mark.parametrize("test_inst", [(np.random.randint(5, 20),
+                                        np.random.uniform())
+                                       for _ in range(500)])
+def test_shortest_path(test_inst):
     """Tests the shortest path procedure (with Gurobi model)"""
+    N, p = test_inst
     A = BDD.random(N, p, weighted=True)
     from UFL import add_BDD_to_MIP
 
@@ -1436,7 +1444,6 @@ def test_shortest_path(N, p):
     m.optimize()
 
     nl = A.shortest_path()
-    print(f"model status is {m.status}, root node label is {nl[NROOT]}")
     if m.status == 2:
         # optimal
         assert nl[NROOT] == m.objVal, "SP={nl[NROOT], while Gurobi gave {m.objVal}}"
