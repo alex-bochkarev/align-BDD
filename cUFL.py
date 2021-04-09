@@ -5,7 +5,6 @@ Problem-solving machinery.
 (c) A. Bochkarev, Clemson University, 2021
 abochka@clemson.edu
 """
-import pytest
 from UFL import add_BDD_to_MIP
 from copy import copy as cpy
 import heapq
@@ -19,6 +18,7 @@ import BB_search as bb
 import varseq as vs
 import UFL
 from gurobipy import GRB  # noqa
+import pytest
 
 #######################################################################
 # 1. Building the BDD representation
@@ -183,12 +183,9 @@ def build_cover_DD(S, f):  # pylint: disable=too-many-locals,invalid-name
     while k < N:
         i = freedoms.get_next()  # current 'central' node to process
         for j in S[i-1]:
-            print(f"k={k}")
-            print(f"freedoms = {freedoms.index}")
             if f"x{j}" in B.vars or k == N:
                 continue
 
-            print(f"going through node j={j}")
             current_layer = cpy(next_layer)
             next_layer = dict()
 
@@ -790,22 +787,6 @@ def test_color_UFL():
     assert m_naive.objVal == m.objVal, f"Naive: {m_naive.objVal} (status {m_naive.status}), while BDD: {m.objVal} (status {m.status})"
 
 
-@pytest.mark.parametrize("test_inst",
-                         [generate_test_instance(15) for _ in range(100)] +
-                         [generate_string_instance(15) for _ in range(100)] +
-                         [generate_d4_instance(15) for _ in range(100)] +
-                         [generate_organic_instance(15) for _ in range(100)])
-def test_random_UFL(test_inst):
-    """Tests the formulation for color-UFL (overlap DD) -- random instance."""
-    TOL=1e-3
-    S, f, fc, kb = test_inst
-    print(f"Running a test with:\nS={S}; f={f}; fc={fc}; kb={kb}")
-
-    m_naive = solve_with_MIP(S, f, fc, kb)
-    m = solve_with_BDD_MIP(S, f, fc, kb)
-    assert abs(m_naive.objVal - m.objVal) < TOL, f"Naive: {m_naive.objVal} (status {m_naive.status}), while BDD: {m.objVal} (status {m.status})"
-
-
 def solve_with_align_BDD(S, f, fc, kb):
     """Solves the problem by generating two BDDs, aligning them, and solving a NF.
 
@@ -841,23 +822,6 @@ def solve_with_align_BDD(S, f, fc, kb):
     m.setParam("OutputFlag", 0)
     m.optimize()
     return m
-
-@pytest.mark.parametrize("test_inst", [generate_test_instance(10)
-                                       for _ in range(200)])
-def test_triple(test_inst):
-    """Tests the formulation for color-UFL."""
-    TOL=1e-5
-    S, f, fc, kb = test_inst
-
-    m_naive = solve_with_MIP(S, f, fc, kb)
-    m_DD_MIP = solve_with_BDD_MIP(S, f, fc, kb)
-    m_NF = solve_with_align_BDD(S, f, fc, kb)
-    print(f"Naive model: status={m_naive.status}, obj={m_naive.objVal}")
-    print(f"BDD-MIP model: status={m_DD_MIP.status}, obj={m_DD_MIP.objVal}")
-    print(f"BDD-NF model: status={m_NF.status}, obj={m_NF.objVal}")
-    assert abs(m_naive.objVal - m_DD_MIP.objVal)<TOL, f"Naive: {m_naive.objVal} (status {m_naive.status}), while BDD: {m_DD_MIP.objVal} (status {m_DD_MIP.status})"
-    assert abs(m_naive.objVal - m_NF.objVal)<TOL, f"Naive: {m_naive.objVal} (status {m_naive.status}), while BDD: {m_NF.objVal} (status {m_NF.status})"
-
 
 # Separate tesing code for ColorSorter
 
@@ -942,16 +906,6 @@ def get_score(A, target):
             if pos[A[i]] > pos[A[j]]:
                 invs += 1
     return invs
-
-@pytest.mark.parametrize("test_inst", [make_instance(7)
-                                       for _ in range(100)])
-def test_ColorSorter(test_inst):
-    """Tests that ColorSorter finds an optimal order (compares to bruteforce)."""
-    f_colors, target_order = test_inst
-    print(f"The instance is: f_colors={f_colors}, target={target_order}")
-    assert get_score(find_correct_order(f_colors, target_order), target_order) == get_score(
-        bruteforce_correct_order(f_colors, target_order), target_order)
-
 
 def show_cov(n, gen_func):
     """Generates an instance, generates and shows a *cover* diagram.

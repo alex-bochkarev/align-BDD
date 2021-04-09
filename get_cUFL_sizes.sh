@@ -1,6 +1,6 @@
 #!/bin/bash
 
 python -m experiments.cUFL_dia_sizes -H
-for n in 5 7 10 15 20 25 30; do
-    python -m experiments.cUFL_dia_sizes -K 5 -n $n --type STRING
+for n in 10 15 20; do
+    python -m experiments.cUFL_dia_sizes -K 3 -n $n
 done

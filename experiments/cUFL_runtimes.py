@@ -9,9 +9,9 @@ abochka@clemson.edu
 from time import time
 import argparse as ap
 import sys
+import cUFL
 from gurobipy import GRB
 import UFL
-import cUFL
 import varseq as vs
 import BDD as DD
 import BB_search as bb
@@ -56,7 +56,7 @@ def benchmark(K=10, TOL=1e-3, n=5, prefix=0):
         model.setParam("OutputFlag", 0)
         model.optimize()
         t1 = time()
-        print(f"{prefix},{k},{n},plain_MIP,all,{(t1-t0)*1000:.3f}")
+        print(f"{prefix},{k},{n},plain_MIP,build+solve,{(t1-t0)*1000:.1f}")
 
         if model.status != GRB.OPTIMAL:
             print(f"Plain MIP status is: {model.status}")
@@ -72,15 +72,20 @@ def benchmark(K=10, TOL=1e-3, n=5, prefix=0):
         color_DD, color_nl = cUFL.build_color_DD(f, fc, kb, pref_order)
         t1 = time()
         DD_build_time = t1 - t0
+        print(f"{prefix},{k},{n},CPP,BDD-build,{DD_build_time*1000:.1f}")
 
         t0 = time()
         m, c, v, x = UFL.add_BDD_to_MIP(cover_DD, prefix="cover")
         m, c, v, x = UFL.add_BDD_to_MIP(color_DD, m, x, "color")
-        m.update()
         m.setParam("OutputFlag", 0)
+        t1 = time()
+        print(f"{prefix},{k},{n},CPP,MIP-build,{(t1-t0)*1000:.1f}")
+
+        t0 = time()
         m.optimize()
         t1 = time()
-        print(f"{prefix},{k},{n},CPP_MIP,build_and_solve,{(DD_build_time+t1-t0)*1000:.1f}")
+
+        print(f"{prefix},{k},{n},CPP,MIP-solve,{(t1-t0)*1000:.1f}")
 
         if m.status != GRB.OPTIMAL:
             print(f"CPP MIP status is: {m.status}")
@@ -92,25 +97,34 @@ def benchmark(K=10, TOL=1e-3, n=5, prefix=0):
         t0 = time()
         vs_cover = vs.VarSeq(cover_DD.vars, [len(L) for L in cover_DD.layers[:-1]])
         vs_color = vs.VarSeq(color_DD.vars, [len(L) for L in color_DD.layers[:-1]])
+        t1 = time()
 
         assert set(vs_cover.layer_var) == set(vs_color.layer_var), f"cover:{vs_cover.layer_var}, color:{vs_color.layer_var}"
-        b = bb.BBSearch(vs_cover, vs_color)
 
+        b = bb.BBSearch(vs_cover, vs_color)
         # bb.TIMEOUT_ITERATIONS=10000
         status = b.search()
         assert status == "optimal" or status == "timeout"
+        t1 = time()
+        print(f"{prefix},{k},{n},CPP,VS-build+solve,{(t1-t0)*1000:.1f}")
 
+        t0 = time()
         cover_p = cover_DD.align_to(b.Ap_cand.layer_var, inplace=False)
         color_p = color_DD.align_to(b.Ap_cand.layer_var, inplace=False)
+        t1 = time()
+        print(f"{prefix},{k},{n},CPP,BDD-align,{(t1-t0)*1000:.1f}")
 
+        t0 = time()
         int_DD = DD.intersect(cover_p, color_p)
-        m, c, v = UFL.create_NF(int_DD)
-        m.setParam("OutputFlag", 0)
-        m.optimize()
+        t1 = time()
+        print(f"{prefix},{k},{n},CPP,intersection-build,{(t1-t0)*1000:.1f}")
+
+        t0 = time()
+        nl = int_DD.shortest_path()
         t1 = time()
 
-        print(f"{prefix},{k},{n},int_DD_based,build_and_solve,{(DD_build_time+t1-t0)*1000:.1f}")
-        NF_obj = m.objVal
+        print(f"{prefix},{k},{n},CPP,intersection-SP-solve,{(t1-t0)*1000:.1f}")
+        NF_obj = nl[DD.NROOT]
 
         if abs(CPP_MIP_obj - plain_MIP_obj) >= TOL:
             print("! (plain vs CPP)")
@@ -135,12 +149,6 @@ def main():
                         dest="n",
                         default="3",
                         help="no. of facilities")
-    parser.add_argument("-m",
-                        "--customers",
-                        action="store",
-                        dest="m",
-                        default="4",
-                        help="no. of customers")
     parser.add_argument("-K",
                         "--instances",
                         action="store",

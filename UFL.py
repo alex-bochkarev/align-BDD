@@ -795,6 +795,8 @@ def generate_dense_instance(n, m, covering=0.95):
             good_instance = True
 
     return S, f, g
+
+
 def test_MIPs_protocol():
     """Runs a series of cross-checks.
 
@@ -906,7 +908,3 @@ def test_BDD_and_plain_MIPs(K=500, TOL=1e-3, n=3, m=4):
     # test_BDD_to_MIP_wg(S, f, g)
     # generate_test_figures()
     # test_BDD_to_MIP()
-
-
-if __name__ == '__main__':
-    main()
