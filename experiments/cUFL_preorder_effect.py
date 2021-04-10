@@ -83,10 +83,13 @@ def main():
 
             color, _ = cUFL.build_color_DD(f, fc, kb, pref_order)
 
+            cover.make_reduced()
+            color.make_reduced()
+
             vs_color = vs.VarSeq(color.vars, [len(L) for L in color.layers[:-1]])
             vs_cover = vs.VarSeq(cover.vars, [len(L) for L in cover.layers[:-1]])
 
-            bb.TIMEOUT_ITERATIONS = 5000
+            bb.TIMEOUT_ITERATIONS = 10000
             b = bb.BBSearch(vs_color, vs_cover)
             status = b.search()
             assert status == "optimal" or status == "timeout"
@@ -94,22 +97,40 @@ def main():
             color_p = color.align_to(b.Ap_cand.layer_var, inplace=False)
             cover_p = cover.align_to(b.Ap_cand.layer_var, inplace=False)
 
+            assert color_p.is_reduced()
+            cover_p.make_reduced()
+
             cover_to_color = cover.align_to(color.vars, inplace=False)
             color_to_cover = color.align_to(cover.vars, inplace=False)
+
+            cover_to_color.make_reduced()
+            color_to_cover.make_reduced()
 
             int_DD = DD.intersect(color_p, cover_p)
 
             int_DDp = DD.intersect(color, cover_to_color)
             int_DDpp = DD.intersect(color_to_cover, cover)
 
+            int_DD.make_reduced()
+            int_DDp.make_reduced()
+            int_DDpp.make_reduced()
+
             cov_c = deepcopy(cover)
             col_c = deepcopy(color)
 
             cov_c.gsifts(col_c)
-            int_cov2col_gsifts = DD.intersect(cov_c, col_c)
+            cov_c.make_reduced()
+            assert col_c.is_reduced()
 
-            cover.gsifts(color)
-            int_col2cov_gsifts = DD.intersect(cover, color)
+            int_cov2col_gsifts = DD.intersect(cov_c, col_c)
+            int_cov2col_gsifts.make_reduced()
+
+            color.gsifts(cover)
+            cover.make_reduced()
+            color.make_reduced()
+
+            int_col2cov_gsifts = DD.intersect(color, cover)
+            int_col2cov_gsifts.make_reduced()
 
             model = cUFL.build_cUFL_MIP(S, f, fc, kb)
             t1 = time()

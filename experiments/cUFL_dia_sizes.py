@@ -87,6 +87,9 @@ def main():
 
         color, _ = cUFL.build_color_DD(f, fc, kb, pref_order)
 
+        color.make_reduced()
+        cover.make_reduced()
+
         vs_color = vs.VarSeq(color.vars, [len(L) for L in color.layers[:-1]])
         vs_cover = vs.VarSeq(cover.vars, [len(L) for L in cover.layers[:-1]])
 
@@ -98,13 +101,23 @@ def main():
         color_p = color.align_to(b.Ap_cand.layer_var, inplace=False)
         cover_p = cover.align_to(b.Ap_cand.layer_var, inplace=False)
 
+        color_p.make_reduced()
+        cover_p.make_reduced()
+
         cover_to_color = cover.align_to(color.vars, inplace=False)
         color_to_cover = color.align_to(cover.vars, inplace=False)
+
+        cover_to_color.make_reduced()
+        color_to_cover.make_reduced()
 
         int_DD = DD.intersect(color_p, cover_p)
 
         int_DDp = DD.intersect(color, cover_to_color)
         int_DDpp = DD.intersect(color_to_cover, cover)
+
+        int_DD.make_reduced()
+        int_DDp.make_reduced()
+        int_DDpp.make_reduced()
 
         model = cUFL.build_cUFL_MIP(S, f, fc, kb)
         t1 = time()
