@@ -68,7 +68,7 @@ def main():
         print("n, instance, color_size, cover_size, int_vs_size, int_cov2col_size, int_col2cov_size, int_gsifts_size, exp_time")
         exit(0)
 
-    for _ in range(int(args.K)):
+    for k in range(int(args.K)):
         t0 = time()
         if args.inst_type == "ER":
             S, f, fc, kb = cUFL.generate_test_instance(int(args.n))
@@ -123,7 +123,7 @@ def main():
         int_DD_gsifts.make_reduced()
 
         t1 = time()
-        print(f"{args.n}, {args.prefix}, {color_size}, {cover_size}, {int_DD.size()}, {int_DD_cov2col.size()}, {int_DD_col2cov.size()}, {int_DD_gsifts.size()}, {(t1-t0):.1f}")
+        print(f"{args.n}, {k}, {color_size}, {cover_size}, {int_DD.size()}, {int_DD_cov2col.size()}, {int_DD_col2cov.size()}, {int_DD_gsifts.size()}, {(t1-t0):.1f}")
         sys.stdout.flush()
 
 if __name__ == '__main__':

@@ -117,12 +117,14 @@ def benchmark(K=10, TOL=1e-3, n=5, prefix=0):
         t1 = time()
         print(f"{prefix},{k},{n},CPP,BDD-align-to-vs,{(t1-t0)*1000:.1f}")
 
-        t0 = time()
-        cover_pp = deepcopy(cover_DD)
-        color_pp = deepcopy(color_DD)
-        color_pp.gsifts(cover_pp)
-        t1 = time()
-        print(f"{prefix},{k},{n},CPP,BDD-align-gsifts,{(t1-t0)*1000:.1f}")
+        # gsifts commented out since taking impractical time
+        # already for moderate `n`-s
+        # t0 = time()
+        # cover_pp = deepcopy(cover_DD)
+        # color_pp = deepcopy(color_DD)
+        # color_pp.gsifts(cover_pp)
+        # t1 = time()
+        # print(f"{prefix},{k},{n},CPP,BDD-align-gsifts,{(t1-t0)*1000:.1f}")
 
         t0 = time()
         int_DD = DD.intersect(cover_p, color_p)

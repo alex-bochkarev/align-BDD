@@ -1,101 +1,136 @@
 run,k,n,method,step,time
-test,0,20,gen_instance,all, 33.7
-test,0,20,plain_MIP,build+solve,2.2
-test,0,20,CPP,BDD-build,187.5
-test,0,20,CPP,MIP-build,35.0
-test,0,20,CPP,MIP-solve,18.0
-test,0,20,CPP,VS-build+solve,46.4
-test,0,20,CPP,BDD-align-to-vs,85.5
-test,0,20,CPP,BDD-align-gsifts,5065.2
-test,0,20,CPP,intersection-build,9.0
-test,0,20,CPP,intersection-SP-solve,2.3
-test,1,20,gen_instance,all, 11.4
-test,1,20,plain_MIP,build+solve,1.5
-test,1,20,CPP,BDD-build,184.5
-test,1,20,CPP,MIP-build,34.7
-test,1,20,CPP,MIP-solve,18.6
-test,1,20,CPP,VS-build+solve,46.5
-test,1,20,CPP,BDD-align-to-vs,97.5
-test,1,20,CPP,BDD-align-gsifts,5752.2
-test,1,20,CPP,intersection-build,12.6
-test,1,20,CPP,intersection-SP-solve,3.2
+test,0,20,gen_instance,all, 124.2
+test,0,20,plain_MIP,build+solve,5.4
+test,0,20,CPP,BDD-build,149.4
+test,0,20,CPP,MIP-build,29.7
+test,0,20,CPP,MIP-solve,20.4
+test,0,20,CPP,VS-build+solve,87.2
+test,0,20,CPP,BDD-align-to-vs,100.0
+test,0,20,CPP,intersection-build,10.9
+test,0,20,CPP,intersection-SP-solve,1.8
+test,1,20,gen_instance,all, 11.9
+test,1,20,plain_MIP,build+solve,1.6
+test,1,20,CPP,BDD-build,150.3
+test,1,20,CPP,MIP-build,28.6
+test,1,20,CPP,MIP-solve,8.1
+test,1,20,CPP,VS-build+solve,28.1
+test,1,20,CPP,BDD-align-to-vs,70.8
+test,1,20,CPP,intersection-build,6.0
+test,1,20,CPP,intersection-SP-solve,0.7
 test,2,20,gen_instance,all, 11.4
-test,2,20,plain_MIP,build+solve,1.9
-test,2,20,CPP,BDD-build,148.6
-test,2,20,CPP,MIP-build,26.0
-test,2,20,CPP,MIP-solve,27.7
-test,2,20,CPP,VS-build+solve,25.3
-test,2,20,CPP,BDD-align-to-vs,91.7
-test,2,20,CPP,BDD-align-gsifts,3194.2
-test,2,20,CPP,intersection-build,62.6
-test,2,20,CPP,intersection-SP-solve,2.8
-test,3,20,gen_instance,all, 13.2
-test,3,20,plain_MIP,build+solve,2.9
-test,3,20,CPP,BDD-build,159.9
-test,3,20,CPP,MIP-build,28.4
-test,3,20,CPP,MIP-solve,19.4
-test,3,20,CPP,VS-build+solve,48.7
-test,3,20,CPP,BDD-align-to-vs,86.0
-test,3,20,CPP,BDD-align-gsifts,5766.0
-test,3,20,CPP,intersection-build,12.2
-test,3,20,CPP,intersection-SP-solve,2.3
-test,4,20,gen_instance,all, 23.3
-test,4,20,plain_MIP,build+solve,2.7
-test,4,20,CPP,BDD-build,286.8
-test,4,20,CPP,MIP-build,45.0
-test,4,20,CPP,MIP-solve,25.9
-test,4,20,CPP,VS-build+solve,42.7
-test,4,20,CPP,BDD-align-to-vs,125.7
-test,4,20,CPP,BDD-align-gsifts,8711.5
-test,4,20,CPP,intersection-build,13.5
-test,4,20,CPP,intersection-SP-solve,2.8
-test,5,20,gen_instance,all, 12.4
-test,5,20,plain_MIP,build+solve,2.3
-test,5,20,CPP,BDD-build,169.8
-test,5,20,CPP,MIP-build,33.3
-test,5,20,CPP,MIP-solve,17.7
-test,5,20,CPP,VS-build+solve,113.3
-test,5,20,CPP,BDD-align-to-vs,78.9
-test,5,20,CPP,BDD-align-gsifts,4473.3
-test,5,20,CPP,intersection-build,10.7
-test,5,20,CPP,intersection-SP-solve,1.9
-test,6,20,gen_instance,all, 12.3
-test,6,20,plain_MIP,build+solve,2.4
-test,6,20,CPP,BDD-build,135.2
-test,6,20,CPP,MIP-build,31.1
-test,6,20,CPP,MIP-solve,16.0
-test,6,20,CPP,VS-build+solve,60.5
-test,6,20,CPP,BDD-align-to-vs,106.4
-test,6,20,CPP,BDD-align-gsifts,6656.4
-test,6,20,CPP,intersection-build,13.3
-test,6,20,CPP,intersection-SP-solve,3.2
-test,7,20,gen_instance,all, 14.0
-test,7,20,plain_MIP,build+solve,3.8
-test,7,20,CPP,BDD-build,244.7
-test,7,20,CPP,MIP-build,37.5
-test,7,20,CPP,MIP-solve,24.2
-test,7,20,CPP,VS-build+solve,19.8
-test,7,20,CPP,BDD-align-to-vs,137.2
-test,7,20,CPP,BDD-align-gsifts,5697.5
-test,7,20,CPP,intersection-build,10.8
-test,7,20,CPP,intersection-SP-solve,1.1
-test,8,20,gen_instance,all, 11.6
-test,8,20,plain_MIP,build+solve,1.3
-test,8,20,CPP,BDD-build,228.6
-test,8,20,CPP,MIP-build,41.8
-test,8,20,CPP,MIP-solve,24.0
-test,8,20,CPP,VS-build+solve,23.9
-test,8,20,CPP,BDD-align-to-vs,144.5
-test,8,20,CPP,BDD-align-gsifts,5839.2
-test,8,20,CPP,intersection-build,11.5
-test,8,20,CPP,intersection-SP-solve,3.1
-test,9,20,gen_instance,all, 12.5
-test,9,20,plain_MIP,build+solve,2.4
-test,9,20,CPP,BDD-build,198.3
-test,9,20,CPP,MIP-build,28.7
-test,9,20,CPP,MIP-solve,20.0
-test,9,20,CPP,VS-build+solve,96.9
-test,9,20,CPP,BDD-align-to-vs,120.0
-test,9,20,CPP,BDD-align-gsifts,5567.1
-test,9,20,CPP,intersection-build,9.3
-test,9,20,CPP,intersection-SP-solve,2.3
+test,2,20,plain_MIP,build+solve,1.4
+test,2,20,CPP,BDD-build,188.1
+test,2,20,CPP,MIP-build,35.4
+test,2,20,CPP,MIP-solve,18.3
+test,2,20,CPP,VS-build+solve,15.0
+test,2,20,CPP,BDD-align-to-vs,87.2
+test,2,20,CPP,intersection-build,12.5
+test,2,20,CPP,intersection-SP-solve,1.7
+test,3,20,gen_instance,all, 12.3
+test,3,20,plain_MIP,build+solve,2.4
+test,3,20,CPP,BDD-build,126.8
+test,3,20,CPP,MIP-build,67.0
+test,3,20,CPP,MIP-solve,13.8
+test,3,20,CPP,VS-build+solve,21.4
+test,3,20,CPP,BDD-align-to-vs,81.1
+test,3,20,CPP,intersection-build,7.5
+test,3,20,CPP,intersection-SP-solve,0.9
+test,4,20,gen_instance,all, 11.7
+test,4,20,plain_MIP,build+solve,1.4
+test,4,20,CPP,BDD-build,246.8
+test,4,20,CPP,MIP-build,40.4
+test,4,20,CPP,MIP-solve,20.5
+test,4,20,CPP,VS-build+solve,136.8
+test,4,20,CPP,BDD-align-to-vs,138.5
+test,4,20,CPP,intersection-build,7.7
+test,4,20,CPP,intersection-SP-solve,1.9
+test,0,25,gen_instance,all, 46.6
+test,0,25,plain_MIP,build+solve,4.8
+test,0,25,CPP,BDD-build,1135.8
+test,0,25,CPP,MIP-build,189.6
+test,0,25,CPP,MIP-solve,95.9
+test,0,25,CPP,VS-build+solve,342.5
+test,0,25,CPP,BDD-align-to-vs,461.2
+test,0,25,CPP,intersection-build,59.1
+test,0,25,CPP,intersection-SP-solve,15.6
+test,1,25,gen_instance,all, 17.4
+test,1,25,plain_MIP,build+solve,2.7
+test,1,25,CPP,BDD-build,1120.3
+test,1,25,CPP,MIP-build,149.9
+test,1,25,CPP,MIP-solve,80.0
+test,1,25,CPP,VS-build+solve,153.4
+test,1,25,CPP,BDD-align-to-vs,528.6
+test,1,25,CPP,intersection-build,59.0
+test,1,25,CPP,intersection-SP-solve,9.9
+test,2,25,gen_instance,all, 17.2
+test,2,25,plain_MIP,build+solve,2.2
+test,2,25,CPP,BDD-build,633.2
+test,2,25,CPP,MIP-build,91.2
+test,2,25,CPP,MIP-solve,61.4
+test,2,25,CPP,VS-build+solve,245.9
+test,2,25,CPP,BDD-align-to-vs,515.7
+test,2,25,CPP,intersection-build,44.6
+test,2,25,CPP,intersection-SP-solve,11.0
+test,3,25,gen_instance,all, 17.6
+test,3,25,plain_MIP,build+solve,2.8
+test,3,25,CPP,BDD-build,1881.7
+test,3,25,CPP,MIP-build,235.8
+test,3,25,CPP,MIP-solve,131.0
+test,3,25,CPP,VS-build+solve,90.1
+test,3,25,CPP,BDD-align-to-vs,939.8
+test,3,25,CPP,intersection-build,139.5
+test,3,25,CPP,intersection-SP-solve,24.8
+test,4,25,gen_instance,all, 28.7
+test,4,25,plain_MIP,build+solve,9.7
+test,4,25,CPP,BDD-build,1818.9
+test,4,25,CPP,MIP-build,205.6
+test,4,25,CPP,MIP-solve,119.0
+test,4,25,CPP,VS-build+solve,186.2
+test,4,25,CPP,BDD-align-to-vs,1149.4
+test,4,25,CPP,intersection-build,136.0
+test,4,25,CPP,intersection-SP-solve,32.4
+test,0,30,gen_instance,all, 69.0
+test,0,30,plain_MIP,build+solve,5.2
+test,0,30,CPP,BDD-build,7185.1
+test,0,30,CPP,MIP-build,949.0
+test,0,30,CPP,MIP-solve,665.6
+test,0,30,CPP,VS-build+solve,204.1
+test,0,30,CPP,BDD-align-to-vs,4030.1
+test,0,30,CPP,intersection-build,712.0
+test,0,30,CPP,intersection-SP-solve,124.9
+test,1,30,gen_instance,all, 49.7
+test,1,30,plain_MIP,build+solve,7.0
+test,1,30,CPP,BDD-build,4700.2
+test,1,30,CPP,MIP-build,685.6
+test,1,30,CPP,MIP-solve,383.7
+test,1,30,CPP,VS-build+solve,577.4
+test,1,30,CPP,BDD-align-to-vs,4665.5
+test,1,30,CPP,intersection-build,465.9
+test,1,30,CPP,intersection-SP-solve,98.2
+test,2,30,gen_instance,all, 45.2
+test,2,30,plain_MIP,build+solve,21.3
+test,2,30,CPP,BDD-build,5593.7
+test,2,30,CPP,MIP-build,813.5
+test,2,30,CPP,MIP-solve,612.6
+test,2,30,CPP,VS-build+solve,110.3
+test,2,30,CPP,BDD-align-to-vs,2748.7
+test,2,30,CPP,intersection-build,523.5
+test,2,30,CPP,intersection-SP-solve,67.5
+test,3,30,gen_instance,all, 25.8
+test,3,30,plain_MIP,build+solve,3.8
+test,3,30,CPP,BDD-build,3675.7
+test,3,30,CPP,MIP-build,423.5
+test,3,30,CPP,MIP-solve,241.2
+test,3,30,CPP,VS-build+solve,420.1
+test,3,30,CPP,BDD-align-to-vs,2121.4
+test,3,30,CPP,intersection-build,355.4
+test,3,30,CPP,intersection-SP-solve,150.3
+test,4,30,gen_instance,all, 120.2
+test,4,30,plain_MIP,build+solve,69.8
+test,4,30,CPP,BDD-build,4801.8
+test,4,30,CPP,MIP-build,702.9
+test,4,30,CPP,MIP-solve,516.2
+test,4,30,CPP,VS-build+solve,950.0
+test,4,30,CPP,BDD-align-to-vs,3684.5
+test,4,30,CPP,intersection-build,438.0
+test,4,30,CPP,intersection-SP-solve,63.9

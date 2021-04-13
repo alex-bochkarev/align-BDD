@@ -58,10 +58,10 @@ def get_sizes(n=10, K=1):
         status = b.search()
         assert status == "optimal" or status == "timeout"
 
-        color_p = col_pre.align_to(b.Ap_cand.layer_var, inplace=False)
-        cover_p = cov.align_to(b.Ap_cand.layer_var, inplace=False)
+        col_pre.align_to(b.Ap_cand.layer_var, inplace=True)
+        cov.align_to(b.Ap_cand.layer_var, inplace=True)
 
-        int_pre = intersect(color_p, cover_p)
+        int_pre = intersect(col_pre, cov)
         int_pre.make_reduced()
 
         int_sizes = int_sizes.append({'preorder': int_pre.size(), 'no_preorder': int_nopre.size(), 'pre_factor': int_pre.size() / int_nopre.size()}, ignore_index=True)
@@ -73,7 +73,7 @@ def get_sizes(n=10, K=1):
 
 
 if __name__ == '__main__':
-    int_sizes = get_sizes(K=500)
+    int_sizes = get_sizes(K=1000)
     print(f"No of cases where preorder made sense: {np.sum(int_sizes['pre_factor'] < 1.0)} out of {len(int_sizes['pre_factor'])}")
     sns.histplot(int_sizes, x="pre_factor", binwidth=0.1)
     plt.show()
