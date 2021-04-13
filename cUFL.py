@@ -29,16 +29,32 @@ def make_label(state):
 
 class DegreeKeeper:
     """Keeps a heap of node degrees."""
-    def __init__(self, S=None):
-        """Initializes the heap and index."""
+    def __init__(self, S=None, next_node_type="min"):
+        """Initializes the heap and index.
+
+        EXPERIMENT BRACH version:
+        Allows for different approaches to `get_next` node,
+        parameterized by `next_node_type`:
+        - `min`: minimum residual degree,
+        - `max`: resp., maximum,
+        - `rnd`: getting random node.
+        """
         self.dh = []
         self.index = dict()
+
+        assert next_node_type in ['min', 'max', 'rnd']
+        self.next_type = next_node_type
+
         if S is None:
             heapq.heapify(self.dh)
         else:
             for j in range(len(S)):
-                heapq.heappush(self.dh, (len(S[j]), j+1))
-                self.index.update({j+1: len(S[j])})
+                if next_node_type == 'min' or next_node_type == 'rnd':
+                    heapq.heappush(self.dh, (len(S[j]), j+1))
+                    self.index.update({j+1: len(S[j])})
+                elif next_node_type == 'max':
+                    heapq.heappush(self.dh, (-len(S[j]), j+1))
+                    self.index.update({j+1: len(S[j])})
 
     def __len__(self):
         """Returns no. of elements in the heap."""
@@ -53,16 +69,27 @@ class DegreeKeeper:
 
         Currently: a one with the minimal degree.
         """
-        return self.dh[0][1]
+        if self.next_type in ['min', 'max']:
+            return self.dh[0][1]
+        else:
+            return np.random.choice(list(self.index.keys()))
 
     def decrement(self, j):
         """Decrements a degree of node `j`."""
-        entry = (self.index[j], j)
+        if self.next_type in ['min', 'rnd']:
+            entry = (self.index[j], j)
+        else:
+            entry = (-self.index[j], j)
+
         self.dh.remove(entry)
         heapq.heapify(self.dh)
-        if entry[0] > 1:
+        if (self.next_type == "min" or self.next_type == "rnd") and entry[0] > 1:
             heapq.heappush(self.dh, (entry[0]-1, j))
             self.index.update({j: entry[0]-1})
+            return None
+        elif self.next_type == "max" and entry[0] < -1:
+            heapq.heappush(self.dh, (entry[0]+1, j))
+            self.index.update({j: -(entry[0]+1)})
             return None
         else:
             self.index.pop(j)
@@ -77,7 +104,10 @@ class DegreeKeeper:
         """Pops a node from the heap, returns (`j`, `degree`)."""
         entry = heapq.heappop(self.dh)
         self.index.pop(entry[1])
-        return entry[1], entry[0]
+        if self.next_type in ['min', 'rnd']:
+            return entry[1], entry[0]
+        else:
+            return entry[1], -entry[0]  # this is 'max' type
 
     def has_freedom(self, key):
         """Checks whether a node can be further covered."""
@@ -149,16 +179,17 @@ class ColorSorter:
         return col_idx, customers
 
 
-def build_cover_DD(S, f):  # pylint: disable=too-many-locals,invalid-name
+def build_cover_DD(S, f, next_node_type='min'):  # pylint: disable=too-many-locals,invalid-name
     """Builds a BDD for the UFL problem.
 
     Introduces `x`-variables only; encodes the condition of covering
     each customer at least once (includes location costs).
 
     Args:
-       S (list): neighborhood list,
-       f (dict): location costs.
-
+        S (list): neighborhood list,
+        f (dict): location costs.
+        next_node_type (str): `min`, `max`, or `rnd` -- see `DegreeKeeper`
+                                docstring for details.
     Returns:
         The resulting BDD.
 
@@ -171,7 +202,7 @@ def build_cover_DD(S, f):  # pylint: disable=too-many-locals,invalid-name
     N = len(S)
     B = DD.BDD(N=N, vars=[f"stub{i}" for i in range(N)],
                weighted=True)
-    freedoms = DegreeKeeper(S)  # node degrees
+    freedoms = DegreeKeeper(S, next_node_type)  # node degrees
 
     root_state = np.array([False for _ in range(len(S))], dtype=bool)
     node_labels = dict({DD.NROOT: make_label(root_state)})
@@ -202,7 +233,7 @@ def build_cover_DD(S, f):  # pylint: disable=too-many-locals,invalid-name
             if trash_pipe is not None:
                 # create a new "false" running node.
                 new_tp = B.addnode(trash_pipe, "lo")
-                B.llink(trash_pipe, new_tp, "hi")
+                B.llink(trash_pipe, new_tp, "hi", edge_weight=f[j])
                 trash_pipe = new_tp
                 node_labels.update({trash_pipe.id: "💀"})
 
@@ -266,7 +297,7 @@ def build_cover_DD(S, f):  # pylint: disable=too-many-locals,invalid-name
 
     if trash_pipe is not None:
         B.link(trash_pipe.id, DD.NFALSE, "lo")
-        B.link(trash_pipe.id, DD.NFALSE, "hi")
+        B.link(trash_pipe.id, DD.NFALSE, "hi", f[i])
 
     B.rename_vars({f"stub{k-1}": f"x{i}"})
 

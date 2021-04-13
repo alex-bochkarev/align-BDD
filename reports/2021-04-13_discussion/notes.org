@@ -1,0 +1,25 @@
+#+TITLE: [Align-BDD] Status check on 2021-04-13
+#+AUTHOR: Bochkarev
+
+* Node picking algorithm: min-degree is (kind of) best
+** Max degree instead of min degree
+   No of cases where =max= is better than =min=: 138 out of 1000
+   [[./max_rel_node_picking.png]]
+
+** Random node instead of min degree
+   No of cases where =rnd= is better than =min=: 78 out of 1000
+   [[./rnd_rel_node_picking.png]]
+
+* Pre-ordering effect (on the intersection DD size): kind of okay
+  No of cases where preorder made sense: *358* out of *500*
+
+  [[./preordering_factor_smaller_is_better.png]]
+
+* Quick-note: BDD-tailored SP algo
+  Single (backward) pass through the intersection DD.
+  
+* Runtimes: SP-solve is fast, indeed.
+  [[./cUFL_runtimes.ods]]
+
+* Intersection diagram sizes: =gsifts= is good, but slow.
+[[./cUFL_int_sizes.ods]]
