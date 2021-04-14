@@ -50,5 +50,8 @@ As of beginning of the day <2020-07-11> all of these are merged into =master=
  [2021-03-22 Mon 18:34]
 ** TODO figure (1) the order of colors and (2) order of nodes within a color
  [2021-03-30 Tue 13:32]
+** TODO Technical description :doc:
+   - makefile
+   - pytest and testing framework
 * Notes
   - first submission corresponds to =master= commit =04a5b38=

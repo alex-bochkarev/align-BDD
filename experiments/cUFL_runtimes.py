@@ -23,7 +23,7 @@ def show_header():
     print("run,k,n,method,step,time")
 
 
-def benchmark(K=10, TOL=1e-3, n=5, prefix=0):
+def benchmark(K=10, TOL=1e-3, n=5, prefix=0, do_sifts=False):
     """Runs the solution for three different methods.
 
     Compares plain MIP, CPP MIP, and network-flow from DD (LP)
@@ -117,15 +117,6 @@ def benchmark(K=10, TOL=1e-3, n=5, prefix=0):
         t1 = time()
         print(f"{prefix},{k},{n},CPP,BDD-align-to-vs,{(t1-t0)*1000:.1f}")
 
-        # gsifts commented out since taking impractical time
-        # already for moderate `n`-s
-        # t0 = time()
-        # cover_pp = deepcopy(cover_DD)
-        # color_pp = deepcopy(color_DD)
-        # color_pp.gsifts(cover_pp)
-        # t1 = time()
-        # print(f"{prefix},{k},{n},CPP,BDD-align-gsifts,{(t1-t0)*1000:.1f}")
-
         t0 = time()
         int_DD = DD.intersect(cover_p, color_p)
         t1 = time()
@@ -145,6 +136,31 @@ def benchmark(K=10, TOL=1e-3, n=5, prefix=0):
             print("! (plain vs aDD)")
             print(f"plain obj={plain_MIP_obj}, while aBDD obj={NF_obj}")
             print(f"\nS={S}; f={f}; fc={fc}; kb={kb}")
+
+        if do_sifts:
+            t0 = time()
+            cover_pp = deepcopy(cover_DD)
+            color_pp = deepcopy(color_DD)
+            color_pp.gsifts(cover_pp)
+            t1 = time()
+            print(f"{prefix},{k},{n},CPP,BDD-align-gsifts,{(t1-t0)*1000:.1f}")
+
+            t0 = time()
+            int_DD_gsifts = DD.intersect(cover_pp, color_pp)
+            t1 = time()
+            print(f"{prefix},{k},{n},CPP,intersection-gsifts-build,{(t1-t0)*1000:.1f}")
+
+            t0 = time()
+            nl = int_DD_gsifts.shortest_path()
+            t1 = time()
+
+            print(f"{prefix},{k},{n},CPP,intersection-gsifts-SP-solve,{(t1-t0)*1000:.1f}")
+            NF_obj = nl[DD.NROOT]
+
+            if (abs(plain_MIP_obj - NF_obj) >= TOL):
+                print("! (plain vs gsifts)")
+                print(f"plain obj={plain_MIP_obj}, while aBDD obj={NF_obj}")
+                print(f"\nS={S}; f={f}; fc={fc}; kb={kb}")
 
         sys.stdout.flush()
 
@@ -172,6 +188,11 @@ def main():
                         action="store_true",
                         dest="header",
                         help="show header only and exit")
+    parser.add_argument("-s",
+                        "--with-gsifts",
+                        action="store_true",
+                        dest="do_sifts",
+                        help="perform greedy sifts (slow)")
     parser.add_argument("-p",
                         "--prefix",
                         action="store",
@@ -185,7 +206,7 @@ def main():
         show_header()
         exit(0)
 
-    benchmark(int(args.K), n=int(args.n), prefix="test")
+    benchmark(int(args.K), n=int(args.n), prefix="test", do_sifts=args.do_sifts)
 
 if __name__ == '__main__':
     main()
