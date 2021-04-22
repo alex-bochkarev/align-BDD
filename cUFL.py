@@ -20,6 +20,7 @@ import UFL
 from gurobipy import GRB  # noqa
 import pytest
 
+
 #######################################################################
 # 1. Building the BDD representation
 def make_label(state):
@@ -580,7 +581,7 @@ def build_randomized_color_DD(f, f_color, k_bar):  # pylint: disable=invalid-nam
 
     colors = list(np.random.permutation([c for c in range(len(k_bar))]))
     customers = [[C+1 for (C, f_c) in enumerate(f_color) if f_c == c]
-                for c in colors]
+                 for c in colors]
     for i in range(len(customers)):
         customers[i] = list(np.random.permutation(customers[i]))
 
@@ -677,10 +678,10 @@ def build_randomized_color_DD(f, f_color, k_bar):  # pylint: disable=invalid-nam
 
             D.rename_vars({f"stub{n}": f"x{customers[c][-1]}"})
     return D, node_labels
+
+
 ######################################################################
 # 2. Building a MIP
-
-
 def build_cUFL_MIP(S, f, f_color, k_bar):
     """Builds 'plain-vanilla' MIP instance for 'colorful' UFL.
 
