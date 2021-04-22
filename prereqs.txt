@@ -1,0 +1,19 @@
+  289  conda install numpy
+  290  conda install matplotlib
+  291  conda install pytest
+  292  conda install pandas
+  293  conda install networkx
+  294  conda install graphviz
+  298  conda install -c anaconda pygraphviz
+  302  conda install numpy
+  304  conda install matplotlib
+  305  conda install pandas seaborn
+  310  conda install pygraphviz
+  312  conda install graphviz
+  314  conda install pydot
+  316  conda install python-graphviz
+  320  conda install gurobi
+  325  conda install -c conda-forge anytree
+  327  conda install requests
+  329  conda install pytest
+  331  conda install networkx
