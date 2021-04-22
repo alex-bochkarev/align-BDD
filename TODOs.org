@@ -8,12 +8,12 @@
   - [X] test the align-BDD version.
   - [X] implement color ordering / fix the color-DD order
   - [X] test the new problem (against Gurobi) -- runtimes.
-  - [ ] special case instance (string): diagram sizes
-  - [ ] special case (organic thing): dia sizes. Is it max degree?
-  - [ ] write-up
-    + [ ] write-up the algo logic (example)
-    + [ ] ER gallery
-    + [ ] next steps
+  - [X] special case instance (string): diagram sizes
+  - [X] special case (organic thing): dia sizes. Is it max degree?
+  - [X] example of 'arbitrarily poor' heuristic.
+  - [X] randomized cover-DD builder (random order of nodes)
+  - [ ] randomized color-DD builder
+  - [ ] num tests
 
 * Current project TODOs
 ** TODO Kill already merged branches
@@ -42,6 +42,7 @@ As of beginning of the day <2020-07-11> all of these are merged into =master=
  Like, maybe rename to =test_equivalence=. And then =is_equivalent <- test_equivalence()[0]=
 ** TODO rename =VarSeq.layer_var= into =vars=, I suppose...
  [2021-02-22 Mon 17:52]
+** TODO rename =cUFL= (streamlining names)
 ** DONE Move =are_equivalent= method to =BDD.py=
    CLOSED: [2020-08-13 Thu 11:14]
  [2020-08-12 Wed 12:07]
@@ -53,5 +54,6 @@ As of beginning of the day <2020-07-11> all of these are merged into =master=
 ** TODO Technical description :doc:
    - makefile
    - pytest and testing framework
+** TODO maybe instances gallery for tUFL?
 * Notes
   - first submission corresponds to =master= commit =04a5b38=

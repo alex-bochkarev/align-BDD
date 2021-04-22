@@ -5,7 +5,7 @@ Problem-solving machinery.
 (c) A. Bochkarev, Clemson University, 2021
 abochka@clemson.edu
 """
-from UFL import add_BDD_to_MIP
+from UFL import add_BDD_to_MIP, generate_test_instance
 from copy import copy as cpy
 import heapq
 import numpy as np
@@ -300,6 +300,123 @@ def build_cover_DD(S, f, next_node_type='min'):  # pylint: disable=too-many-loca
         B.link(trash_pipe.id, DD.NFALSE, "hi", f[i])
 
     B.rename_vars({f"stub{k-1}": f"x{i}"})
+
+    return B, node_labels
+
+
+def build_randomized_cover_DD(S, f):
+    """Builds a BDD for the typed-UFL problem.
+
+    Introduces `x`-variables only; encodes the condition of covering
+    each customer at least once (includes location costs).
+
+    *Processes the nodes in random order.*
+
+    Args:
+        S (list): neighborhood list,
+        f (dict): location costs.
+    Returns:
+        The resulting BDD.
+
+    Notes:
+        - employs a DP approach with state being the Boolean
+            covering at each customer.
+    """
+    trash_pipe = None
+    # prepare the diagram
+    N = len(S)
+    B = DD.BDD(N=N, vars=[f"stub{i}" for i in range(N)],
+               weighted=True)
+    freedoms = {i+1: len(S[i]) for i in range(N)}
+
+    root_state = np.array([False for _ in range(len(S))], dtype=bool)
+    node_labels = dict({DD.NROOT: make_label(root_state)})
+
+    next_layer = {tuple(root_state): B.addnode(None)}
+
+    residual_nodes = set(i for i in range(1, N+1))
+
+    for k in range(1, N):
+        # pick a random node of the original graph
+        i = np.random.choice([x for x in list(freedoms.keys())
+                              if freedoms[x] > 0 and x in residual_nodes])
+
+        current_layer = cpy(next_layer)
+        next_layer = dict()
+
+        if trash_pipe is not None:
+            # create a new "false" running node.
+            new_tp = B.addnode(trash_pipe, "lo")
+            B.llink(trash_pipe, new_tp, "hi", edge_weight=f[i])
+            trash_pipe = new_tp
+            node_labels.update({trash_pipe.id: "💀"})
+
+        for q in S[i-1]:
+            freedoms[q] = max(freedoms[q]-1, 0)
+
+        for state in current_layer:
+            # processing nodes of the BDD, introducing another node
+            # of the *original* graph
+            node = current_layer[tuple(state)]
+
+            if state in next_layer:
+                B.llink(node, next_layer[state], "lo")
+            else:
+                if False in [state[r] for r in range(N) if freedoms[r+1] == 0]:
+                    # we won't be able to cover the node further
+                    if trash_pipe is None:
+                        trash_pipe = B.addnode(node, "lo")
+                        node_labels.update({trash_pipe.id: "💀"})
+                    else:
+                        B.llink(node, trash_pipe, "lo")
+                else:
+                    newnode = B.addnode(node, "lo")
+                    next_layer.update({state: newnode})
+                    node_labels.update({newnode.id: make_label(state)})
+
+            next_state = list(state)
+            for q in S[i-1]:
+                next_state[q-1] = True
+
+            next_state = tuple(next_state)
+
+            if next_state in next_layer:
+                B.llink(node, next_layer[next_state], "hi",
+                        edge_weight=f[i])
+            else:
+                newnode = B.addnode(node, "hi", edge_weight=f[i])
+                next_layer.update({next_state: newnode})
+                node_labels.update({newnode.id: make_label(next_state)})
+
+        B.rename_vars({f"stub{k-1}": f"x{i}"})
+        residual_nodes.remove(i)
+
+    # process the last layer separately
+    i = residual_nodes.pop()
+
+    current_layer = cpy(next_layer)
+
+    for state in current_layer:
+        node = current_layer[tuple(state)]
+        if not np.all([state[j-1] for j in S[i-1]]):
+            B.link(node.id, DD.NFALSE, "lo")
+        else:
+            B.link(node.id, DD.NTRUE, "lo")
+
+        next_state = list(state)
+        for q in S[i-1]:
+            next_state[q-1] = True
+
+        if not np.all([next_state[j-1] for j in S[i-1]]):
+            B.link(node.id, DD.NFALSE, "hi", f[i])
+        else:
+            B.link(node.id, DD.NTRUE, "hi", f[i])
+
+    if trash_pipe is not None:
+        B.link(trash_pipe.id, DD.NFALSE, "lo")
+        B.link(trash_pipe.id, DD.NFALSE, "hi", f[i])
+
+    B.rename_vars({f"stub{N-1}": f"x{i}"})
 
     return B, node_labels
 

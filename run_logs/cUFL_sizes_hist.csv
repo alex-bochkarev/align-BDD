@@ -1,0 +1,5 @@
+instance,num_type,value,comment
+-1,legend,orig_simpl,Simplified problem
+-1,legend,orig_minAB,Best of A and B
+-1,legend,orig_5random,Best of 5 random
+-1,legend,orig_gsifts1p,Greedy BDD sifts
