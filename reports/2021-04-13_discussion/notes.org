@@ -1,0 +1,95 @@
+#+TITLE: [Align-BDD] Status check on 2021-04-13
+#+AUTHOR: Bochkarev
+
+* Call summary + some more data
+* Node picking algorithm: min-degree is (kind of) best
+  *Bottom line:* I am, perhaps, OK with the "pick-minimum-degree-nodes-first"
+   approach. Although, it is not strictly the best one (perhaps, it is possible
+   to devise a smarter criterion for the next node choice).
+
+  For this experiment I was trying different approaches to picking the next node
+  to process. I tested "min-degree", "max-degree", and "random". I generated
+  several random instances and for each one I:
+  - built a cover DD in each of the three ways;
+  - performed a reduction step (no "redundant nodes");
+  - divided the diagram size (after reduction) by the one obtained with the
+    "min-degree" approach.
+  - calculated a histogram of relative cover-DD sizes: cover-DD size obtained
+    with an alternative relative to the cover-DD size obtained with a
+    "min-degree" method for the same instance (so, smaller is better; 1.0
+    corresponds to the "min-degree" approach).
+    
+ So, what I got is:
+  - no of cases where =max= is better than =min=: *278* out of *1000*. The histogram:
+
+   [[./max_rel_node_picking.png]]
+
+  - no of cases where =rnd= is better than =min=: *283* out of *1000*:
+
+   [[./rnd_rel_node_picking.png]]
+
+* Preordering effect (on the intersection DD size): kind of okay
+  *Bottom line:* again, the preordering step makes sense for most of the
+  instances, although, again, is not strictly better for all cases.
+
+  I was wondering if the "preordering" algorithm for
+  color DD made sense in terms of the possible reduction of the intersection DD
+  size. So, again, I generated 1,000 random instances, and for each one:
+  - built a cover DD;
+  - built a color DD, with and without preordering (auxiliary procedure used to
+    minimized the number of inversions between the already built cover DD and the
+    color DD under construction).
+  - performed reduction of both DDs;
+  - solved the simplified problem to find a good shared order of vars (with and
+    without color preordering);
+  - built an intersection DD (with and without color preordering; i.e. with one
+    or another color DD).
+  - calculated and reduced the intersection DD, calculated the size (number of
+    nodes after reduction) with preordering relative to the one without
+    preordering.
+
+  No of cases where the preordering step made sense: *755* out of *1000* (again,
+  in a significant share of instances -- more than 20%! -- it made things
+  worse). The histogram (intersection DD size with preordering over the one
+  without the preordering step; smaller is better):
+
+  [[./preordering_factor_smaller_is_better.png]]
+
+* Quick-note: BDD-tailored SP algo
+  I have implemented a simple shortest-path algorithm tailored to the BDD. It
+  took a single (backward) pass through the intersection DD, labeling each node
+  exactly once and considering each arc once.
+  
+  (I have cross-checked with a Gurobi LP model for several instances, just in
+  case.)
+* Runtimes
+  *Bottom line:* SP-solve is fast, indeed; but requires quite costly set up of
+  BDDs (CPP MIP is comparable, but faster).
+  
+  See =cUFL_runtimes.ods= spreadsheet. I generated five random instances for
+  each instance size: 20, 25, and 30 variables. My observations are:
+  - building and solving a naive MIP is *ridiculously* fast;
+  - although, after the preliminary steps are done (building all the diagrams),
+    solving the shortest-path with a single pass takes almost the same time (but
+    it's an LP; I wonder if my trivial algo might be modified to give any
+    more info in this timeframe, such as sensitivity?..).
+  - building BDDs and aligning them are by far most costly steps;
+  - building and solving a MIP out of Consistent Path Problem (having two BDDs)
+    is faster, but still sort of comparable to aligning BDDs, building an
+    intersection, and solving a shortest path.
+  - I do not see any fundamental changes in this picture as I move from 20 to 30
+    variables.
+
+    (I am attaching the raw data as well, just in case -- please let me know if
+    you'll have any questions / suggestions.)
+
+* Intersection diagram sizes: =gsifts= is good, but slow.
+  *Bottom line:* greedy sifts heuristic (baseline) is usually good in terms of
+  (intersection) DD sizes, but it is way too slow (see above). The heuristic we
+  propose (based on the simplified problem) might be comparable to some simpler
+  heuristics -- e.g., best of { A-to-B, B-to-A }. The situation may or may not
+  change as the instance size grows -- I think I'd need more statistics to tell
+  with confidence.
+
+  (Again, I am attaching the raw data -- see =cUFL_int_sizes.ods=.)
+  

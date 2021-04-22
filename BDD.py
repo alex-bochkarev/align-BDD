@@ -34,6 +34,42 @@ NTRUE = -1
 NFALSE = -2
 ######################################################################
 
+def simscore(seq_A, seq_B, p_B = None):
+    """Calculates a 'similarity score' between `A` and `B`.
+    Args:
+        seq_A (list): sequence A
+        seq_B (list): sequence B to compare
+        p_B (dict): dict of element positions in B (default: None, will be built)
+
+    Returns:
+        simscore (num): share of possible inversions, as a degree of similarity.
+
+    Examples:
+    >>> simscore([1,2,3], [1,2,3])
+    1.0
+
+    >>> simscore([1,2,3], [3,2,1])
+    0.0
+
+    >>> simscore([1,2,3], [1,3,2])
+    0.6666666666666667
+
+    >>> simscore([1,2,3,4,5,6,7], [5,6,3,4,2,7,1])
+    0.33333333333333337
+    """
+    N = len(seq_A)
+    no_inversions = 0
+    if p_B is None:
+        p_B = {seq_B[i]: i for i in range(N)}
+
+    assert set(seq_A) == set(seq_B)
+    for i in range(N-1):
+        for j in range(i, N):
+            if p_B[seq_A[i]] > p_B[seq_A[j]]:
+                no_inversions += 1
+
+    return 1 - no_inversions / (N*(N-1)/2)
+
 
 class node(object):
     """Encodes a node of the BDD.
@@ -770,6 +806,11 @@ class BDD(object):
         Args:
             with_what (BDD): target diagram.
             LR (bool): if set, layer-reduces each candidate BDD.
+
+        Returns:
+            alternatives (int): number of alternative optima
+            A_aligned (list): of A-aligned (in each optimum)
+            B_aligned (list): of B-aligned (in respective optimum"""""")
         """
         # generate all possible permutations
         perms = iters.permutations(self.vars)
@@ -981,6 +1022,10 @@ class BDD(object):
                 node_labels[node] = "∞"
 
         return node_labels
+
+    def simscore(self, B):
+        """Computes a simscore with another diagram, `B` (see `simscore`)."""
+        return simscore(self.vars, B.vars, B.var_pos)
 
 def intersect(A, B):
     """Produces an intersection BDD of `A` and `B`.
@@ -1449,3 +1494,4 @@ def test_shortest_path(test_inst):
         assert nl[NROOT] == m.objVal, "SP={nl[NROOT], while Gurobi gave {m.objVal}}"
     else:
         assert nl[NROOT] == "∞", "with Gurobi status {m.status}, root node label is {nl[NROOT]}"
+

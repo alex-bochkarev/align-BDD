@@ -15,6 +15,7 @@ import UFL
 import varseq as vs
 import BDD as DD
 import BB_search as bb
+from copy import deepcopy
 
 
 def show_header():
@@ -22,7 +23,7 @@ def show_header():
     print("run,k,n,method,step,time")
 
 
-def benchmark(K=10, TOL=1e-3, n=5, prefix=0):
+def benchmark(K=10, TOL=1e-3, n=5, prefix=0, do_sifts=False):
     """Runs the solution for three different methods.
 
     Compares plain MIP, CPP MIP, and network-flow from DD (LP)
@@ -48,7 +49,7 @@ def benchmark(K=10, TOL=1e-3, n=5, prefix=0):
         t0 = time()
         S, f, fc, kb = cUFL.generate_test_instance(n=n)
         t1 = time()
-        print(f"{prefix},{k},{n},gen_instance,all, {(t1-t0)*1000:.3f}")
+        print(f"{prefix},{k},{n},gen_instance,all, {(t1-t0)*1000:.1f}")
 
         # Generate and solve plain MIP
         t0 = time()
@@ -67,9 +68,11 @@ def benchmark(K=10, TOL=1e-3, n=5, prefix=0):
 
         # Generate and solve CPP MIP
         t0 = time()
-        cover_DD, cover_nl = cUFL.build_cover_DD(S, f)
+        cover_DD, _ = cUFL.build_cover_DD(S, f)
+        cover_DD.make_reduced()
         pref_order = [int(x[1:]) for x in cover_DD.vars]
-        color_DD, color_nl = cUFL.build_color_DD(f, fc, kb, pref_order)
+        color_DD, _ = cUFL.build_color_DD(f, fc, kb, pref_order)
+        color_DD.make_reduced()
         t1 = time()
         DD_build_time = t1 - t0
         print(f"{prefix},{k},{n},CPP,BDD-build,{DD_build_time*1000:.1f}")
@@ -102,7 +105,7 @@ def benchmark(K=10, TOL=1e-3, n=5, prefix=0):
         assert set(vs_cover.layer_var) == set(vs_color.layer_var), f"cover:{vs_cover.layer_var}, color:{vs_color.layer_var}"
 
         b = bb.BBSearch(vs_cover, vs_color)
-        # bb.TIMEOUT_ITERATIONS=10000
+        bb.TIMEOUT_ITERATIONS=10000
         status = b.search()
         assert status == "optimal" or status == "timeout"
         t1 = time()
@@ -112,7 +115,7 @@ def benchmark(K=10, TOL=1e-3, n=5, prefix=0):
         cover_p = cover_DD.align_to(b.Ap_cand.layer_var, inplace=False)
         color_p = color_DD.align_to(b.Ap_cand.layer_var, inplace=False)
         t1 = time()
-        print(f"{prefix},{k},{n},CPP,BDD-align,{(t1-t0)*1000:.1f}")
+        print(f"{prefix},{k},{n},CPP,BDD-align-to-vs,{(t1-t0)*1000:.1f}")
 
         t0 = time()
         int_DD = DD.intersect(cover_p, color_p)
@@ -133,6 +136,31 @@ def benchmark(K=10, TOL=1e-3, n=5, prefix=0):
             print("! (plain vs aDD)")
             print(f"plain obj={plain_MIP_obj}, while aBDD obj={NF_obj}")
             print(f"\nS={S}; f={f}; fc={fc}; kb={kb}")
+
+        if do_sifts:
+            t0 = time()
+            cover_pp = deepcopy(cover_DD)
+            color_pp = deepcopy(color_DD)
+            color_pp.gsifts(cover_pp)
+            t1 = time()
+            print(f"{prefix},{k},{n},CPP,BDD-align-gsifts,{(t1-t0)*1000:.1f}")
+
+            t0 = time()
+            int_DD_gsifts = DD.intersect(cover_pp, color_pp)
+            t1 = time()
+            print(f"{prefix},{k},{n},CPP,intersection-gsifts-build,{(t1-t0)*1000:.1f}")
+
+            t0 = time()
+            nl = int_DD_gsifts.shortest_path()
+            t1 = time()
+
+            print(f"{prefix},{k},{n},CPP,intersection-gsifts-SP-solve,{(t1-t0)*1000:.1f}")
+            NF_obj = nl[DD.NROOT]
+
+            if (abs(plain_MIP_obj - NF_obj) >= TOL):
+                print("! (plain vs gsifts)")
+                print(f"plain obj={plain_MIP_obj}, while aBDD obj={NF_obj}")
+                print(f"\nS={S}; f={f}; fc={fc}; kb={kb}")
 
         sys.stdout.flush()
 
@@ -160,6 +188,11 @@ def main():
                         action="store_true",
                         dest="header",
                         help="show header only and exit")
+    parser.add_argument("-s",
+                        "--with-gsifts",
+                        action="store_true",
+                        dest="do_sifts",
+                        help="perform greedy sifts (slow)")
     parser.add_argument("-p",
                         "--prefix",
                         action="store",
@@ -173,7 +206,7 @@ def main():
         show_header()
         exit(0)
 
-    benchmark(int(args.K), n=int(args.n), prefix="test")
+    benchmark(int(args.K), n=int(args.n), prefix="test", do_sifts=args.do_sifts)
 
 if __name__ == '__main__':
     main()

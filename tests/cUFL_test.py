@@ -42,3 +42,12 @@ def test_ColorSorter(test_inst):
     assert get_score(find_correct_order(f_colors, target_order), target_order) == get_score(
         bruteforce_correct_order(f_colors, target_order), target_order)
 
+
+@pytest.mark.parametrize("test_inst", [generate_test_instance(7)
+                                       for _ in range(100)])
+def test_randomized_cover_DD(test_inst):
+    S, f, fc, kb = test_inst
+    C, _ = build_cover_DD(S, f)
+    Cr, _ = build_randomized_cover_DD(S, f)
+
+    assert C.is_equivalent(Cr)[0], f"Not equivalent:\nS={S}, f={f}"

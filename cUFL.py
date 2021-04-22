@@ -5,7 +5,7 @@ Problem-solving machinery.
 (c) A. Bochkarev, Clemson University, 2021
 abochka@clemson.edu
 """
-from UFL import add_BDD_to_MIP
+from UFL import add_BDD_to_MIP, generate_test_instance
 from copy import copy as cpy
 import heapq
 import numpy as np
@@ -29,16 +29,32 @@ def make_label(state):
 
 class DegreeKeeper:
     """Keeps a heap of node degrees."""
-    def __init__(self, S=None):
-        """Initializes the heap and index."""
+    def __init__(self, S=None, next_node_type="min"):
+        """Initializes the heap and index.
+
+        EXPERIMENT BRACH version:
+        Allows for different approaches to `get_next` node,
+        parameterized by `next_node_type`:
+        - `min`: minimum residual degree,
+        - `max`: resp., maximum,
+        - `rnd`: getting random node.
+        """
         self.dh = []
         self.index = dict()
+
+        assert next_node_type in ['min', 'max', 'rnd']
+        self.next_type = next_node_type
+
         if S is None:
             heapq.heapify(self.dh)
         else:
             for j in range(len(S)):
-                heapq.heappush(self.dh, (len(S[j]), j+1))
-                self.index.update({j+1: len(S[j])})
+                if next_node_type == 'min' or next_node_type == 'rnd':
+                    heapq.heappush(self.dh, (len(S[j]), j+1))
+                    self.index.update({j+1: len(S[j])})
+                elif next_node_type == 'max':
+                    heapq.heappush(self.dh, (-len(S[j]), j+1))
+                    self.index.update({j+1: len(S[j])})
 
     def __len__(self):
         """Returns no. of elements in the heap."""
@@ -53,16 +69,27 @@ class DegreeKeeper:
 
         Currently: a one with the minimal degree.
         """
-        return self.dh[0][1]
+        if self.next_type in ['min', 'max']:
+            return self.dh[0][1]
+        else:
+            return np.random.choice(list(self.index.keys()))
 
     def decrement(self, j):
         """Decrements a degree of node `j`."""
-        entry = (self.index[j], j)
+        if self.next_type in ['min', 'rnd']:
+            entry = (self.index[j], j)
+        else:
+            entry = (-self.index[j], j)
+
         self.dh.remove(entry)
         heapq.heapify(self.dh)
-        if entry[0] > 1:
+        if (self.next_type == "min" or self.next_type == "rnd") and entry[0] > 1:
             heapq.heappush(self.dh, (entry[0]-1, j))
             self.index.update({j: entry[0]-1})
+            return None
+        elif self.next_type == "max" and entry[0] < -1:
+            heapq.heappush(self.dh, (entry[0]+1, j))
+            self.index.update({j: -(entry[0]+1)})
             return None
         else:
             self.index.pop(j)
@@ -77,7 +104,10 @@ class DegreeKeeper:
         """Pops a node from the heap, returns (`j`, `degree`)."""
         entry = heapq.heappop(self.dh)
         self.index.pop(entry[1])
-        return entry[1], entry[0]
+        if self.next_type in ['min', 'rnd']:
+            return entry[1], entry[0]
+        else:
+            return entry[1], -entry[0]  # this is 'max' type
 
     def has_freedom(self, key):
         """Checks whether a node can be further covered."""
@@ -149,16 +179,17 @@ class ColorSorter:
         return col_idx, customers
 
 
-def build_cover_DD(S, f):  # pylint: disable=too-many-locals,invalid-name
+def build_cover_DD(S, f, next_node_type='min'):  # pylint: disable=too-many-locals,invalid-name
     """Builds a BDD for the UFL problem.
 
     Introduces `x`-variables only; encodes the condition of covering
     each customer at least once (includes location costs).
 
     Args:
-       S (list): neighborhood list,
-       f (dict): location costs.
-
+        S (list): neighborhood list,
+        f (dict): location costs.
+        next_node_type (str): `min`, `max`, or `rnd` -- see `DegreeKeeper`
+                                docstring for details.
     Returns:
         The resulting BDD.
 
@@ -171,7 +202,7 @@ def build_cover_DD(S, f):  # pylint: disable=too-many-locals,invalid-name
     N = len(S)
     B = DD.BDD(N=N, vars=[f"stub{i}" for i in range(N)],
                weighted=True)
-    freedoms = DegreeKeeper(S)  # node degrees
+    freedoms = DegreeKeeper(S, next_node_type)  # node degrees
 
     root_state = np.array([False for _ in range(len(S))], dtype=bool)
     node_labels = dict({DD.NROOT: make_label(root_state)})
@@ -202,7 +233,7 @@ def build_cover_DD(S, f):  # pylint: disable=too-many-locals,invalid-name
             if trash_pipe is not None:
                 # create a new "false" running node.
                 new_tp = B.addnode(trash_pipe, "lo")
-                B.llink(trash_pipe, new_tp, "hi")
+                B.llink(trash_pipe, new_tp, "hi", edge_weight=f[j])
                 trash_pipe = new_tp
                 node_labels.update({trash_pipe.id: "💀"})
 
@@ -266,9 +297,126 @@ def build_cover_DD(S, f):  # pylint: disable=too-many-locals,invalid-name
 
     if trash_pipe is not None:
         B.link(trash_pipe.id, DD.NFALSE, "lo")
-        B.link(trash_pipe.id, DD.NFALSE, "hi")
+        B.link(trash_pipe.id, DD.NFALSE, "hi", f[i])
 
     B.rename_vars({f"stub{k-1}": f"x{i}"})
+
+    return B, node_labels
+
+
+def build_randomized_cover_DD(S, f):
+    """Builds a BDD for the typed-UFL problem.
+
+    Introduces `x`-variables only; encodes the condition of covering
+    each customer at least once (includes location costs).
+
+    *Processes the nodes in random order.*
+
+    Args:
+        S (list): neighborhood list,
+        f (dict): location costs.
+    Returns:
+        The resulting BDD.
+
+    Notes:
+        - employs a DP approach with state being the Boolean
+            covering at each customer.
+    """
+    trash_pipe = None
+    # prepare the diagram
+    N = len(S)
+    B = DD.BDD(N=N, vars=[f"stub{i}" for i in range(N)],
+               weighted=True)
+    freedoms = {i+1: len(S[i]) for i in range(N)}
+
+    root_state = np.array([False for _ in range(len(S))], dtype=bool)
+    node_labels = dict({DD.NROOT: make_label(root_state)})
+
+    next_layer = {tuple(root_state): B.addnode(None)}
+
+    residual_nodes = set(i for i in range(1, N+1))
+
+    for k in range(1, N):
+        # pick a random node of the original graph
+        i = np.random.choice([x for x in list(freedoms.keys())
+                              if freedoms[x] > 0 and x in residual_nodes])
+
+        current_layer = cpy(next_layer)
+        next_layer = dict()
+
+        if trash_pipe is not None:
+            # create a new "false" running node.
+            new_tp = B.addnode(trash_pipe, "lo")
+            B.llink(trash_pipe, new_tp, "hi", edge_weight=f[i])
+            trash_pipe = new_tp
+            node_labels.update({trash_pipe.id: "💀"})
+
+        for q in S[i-1]:
+            freedoms[q] = max(freedoms[q]-1, 0)
+
+        for state in current_layer:
+            # processing nodes of the BDD, introducing another node
+            # of the *original* graph
+            node = current_layer[tuple(state)]
+
+            if state in next_layer:
+                B.llink(node, next_layer[state], "lo")
+            else:
+                if False in [state[r] for r in range(N) if freedoms[r+1] == 0]:
+                    # we won't be able to cover the node further
+                    if trash_pipe is None:
+                        trash_pipe = B.addnode(node, "lo")
+                        node_labels.update({trash_pipe.id: "💀"})
+                    else:
+                        B.llink(node, trash_pipe, "lo")
+                else:
+                    newnode = B.addnode(node, "lo")
+                    next_layer.update({state: newnode})
+                    node_labels.update({newnode.id: make_label(state)})
+
+            next_state = list(state)
+            for q in S[i-1]:
+                next_state[q-1] = True
+
+            next_state = tuple(next_state)
+
+            if next_state in next_layer:
+                B.llink(node, next_layer[next_state], "hi",
+                        edge_weight=f[i])
+            else:
+                newnode = B.addnode(node, "hi", edge_weight=f[i])
+                next_layer.update({next_state: newnode})
+                node_labels.update({newnode.id: make_label(next_state)})
+
+        B.rename_vars({f"stub{k-1}": f"x{i}"})
+        residual_nodes.remove(i)
+
+    # process the last layer separately
+    i = residual_nodes.pop()
+
+    current_layer = cpy(next_layer)
+
+    for state in current_layer:
+        node = current_layer[tuple(state)]
+        if not np.all([state[j-1] for j in S[i-1]]):
+            B.link(node.id, DD.NFALSE, "lo")
+        else:
+            B.link(node.id, DD.NTRUE, "lo")
+
+        next_state = list(state)
+        for q in S[i-1]:
+            next_state[q-1] = True
+
+        if not np.all([next_state[j-1] for j in S[i-1]]):
+            B.link(node.id, DD.NFALSE, "hi", f[i])
+        else:
+            B.link(node.id, DD.NTRUE, "hi", f[i])
+
+    if trash_pipe is not None:
+        B.link(trash_pipe.id, DD.NFALSE, "lo")
+        B.link(trash_pipe.id, DD.NFALSE, "hi", f[i])
+
+    B.rename_vars({f"stub{N-1}": f"x{i}"})
 
     return B, node_labels
 
@@ -403,6 +551,132 @@ def build_color_DD(f, f_color, k_bar, preferred_order=None):  # pylint: disable=
     return D, node_labels
 
 
+def build_randomized_color_DD(f, f_color, k_bar):  # pylint: disable=invalid-name
+    """Builds a BDD encoding location-level constraints.
+
+    Deals with no. locations per color and location costs.
+    *Uses random order of colors, and random order
+    of nodes within each color*
+
+    Args:
+        f (dict): location costs,
+        colors (dict): color codes per facility
+        k_bar (np.array): max. number of locations per color.
+
+    Returns:
+        D (class BDD): resulting diagram.
+        nl (dict): string node labels ("states"), `id` -> `label` (string).
+    """
+    D = DD.BDD(N=len(f_color), vars=[f"stub{i}" for i in range(1, len(f_color)+1)],  # noqa pylint: disable=invalid-name, unnecessary-comprehension
+               weighted=True)
+    # a *state* is the number of located facilities
+    # for the *current* color (a single number)
+    n = 1  # (original) nodes counter
+    N = len(f_color)
+
+    node_labels = dict({DD.NROOT: 0})
+    next_layer = {0: D.addnode(None)}
+    trash_pipe = None
+
+    colors = list(np.random.permutation([c for c in range(len(k_bar))]))
+    customers = [[C+1 for (C, f_c) in enumerate(f_color) if f_c == c]
+                for c in colors]
+    for i in range(len(customers)):
+        customers[i] = list(np.random.permutation(customers[i]))
+
+    for c in colors:
+        for customer in customers[c][:-1]:
+            if n == N:
+                break
+
+            current_layer = cpy(next_layer)
+            next_layer = dict()
+            if trash_pipe is not None:
+                # create a new "false" running node.
+                new_tp = D.addnode(trash_pipe, "lo")
+                D.llink(trash_pipe, new_tp, "hi")
+                trash_pipe = new_tp
+                node_labels.update({trash_pipe.id: "💀"})
+
+            for state in current_layer:
+                node = current_layer[state]
+                if state in next_layer:
+                    D.llink(node, next_layer[state], "lo")
+                else:
+                    newnode = D.addnode(node, "lo")
+                    next_layer.update({state: newnode})
+                    node_labels.update({newnode.id: str(state)})
+
+                if (state+1) in next_layer:
+                    D.llink(node, next_layer[state+1], "hi",
+                            edge_weight=f[customer])
+                else:
+                    if (state+1) > k_bar[c]:
+                        if trash_pipe is None:
+                            trash_pipe = D.addnode(node, "hi")
+                            node_labels.update({trash_pipe.id: "💀"})
+                        else:
+                            D.llink(node, trash_pipe, "hi")
+                    else:
+                        newnode = D.addnode(node, "hi")
+                        next_layer.update({state+1: newnode})
+                        node_labels.update({newnode.id: str(state+1)})
+            D.rename_vars({f"stub{n}": f"x{customer}"})
+            n += 1
+
+        # Processing the last customer separately
+        # (within a color)
+
+        if n < N:
+            current_layer = cpy(next_layer)
+            next_layer = dict()
+
+            if trash_pipe is not None:
+                # create a new "false" running node.
+                new_tp = D.addnode(trash_pipe, "lo")
+                D.llink(trash_pipe, new_tp, "hi")
+                trash_pipe = new_tp
+                node_labels.update({trash_pipe.id: "💀"})
+
+            for state in current_layer:
+                node = current_layer[state]
+                new_state = 0  # we 'reset' the color counter
+                if new_state in next_layer:
+                    D.llink(node, next_layer[new_state], "lo")
+                else:
+                    newnode = D.addnode(node, "lo")
+                    next_layer.update({new_state: newnode})
+                    node_labels.update({newnode.id: str(new_state)})
+
+                if (state+1) > k_bar[c]:
+                    if trash_pipe is None:
+                        trash_pipe = D.addnode(node, "hi")
+                        node_labels.update({trash_pipe.id: "💀"})
+                    else:
+                        D.llink(node, trash_pipe, "hi")
+                else:
+                    D.llink(node, next_layer[new_state], "hi")
+
+            D.rename_vars({f"stub{n}": f"x{customers[c][-1]}"})
+            n += 1
+        else:
+            # the last layer of the DD
+            if trash_pipe is not None:
+                D.link(trash_pipe.id, DD.NFALSE, "hi")
+                D.link(trash_pipe.id, DD.NFALSE, "lo")
+
+            for state in next_layer:
+                node_id = next_layer[state].id
+                if state+1 > k_bar[c]:
+                    y_target = DD.NFALSE
+                else:
+                    y_target = DD.NTRUE
+
+                D.link(node_id, y_target, "hi")
+                D.link(node_id, DD.NTRUE, "lo")
+
+            D.rename_vars({f"stub{n}": f"x{customers[c][-1]}"})
+    return D, node_labels
 ######################################################################
 # 2. Building a MIP
 

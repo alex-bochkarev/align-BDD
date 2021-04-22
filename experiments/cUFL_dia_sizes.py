@@ -65,11 +65,10 @@ def main():
     args = parser.parse_args()
 
     if args.header:
-        # print("run,k,n,m,method,step,duration")
-        print("n, instance, color_size, cover_size, int_size, int_cov2col_size, int_col2cov_size, plain_MIP_vars, plain_MIP_constrs, exp_time")
+        print("n, instance, color_size, cover_size, int_vs_size, int_cov2col_size, int_col2cov_size, int_gsifts_size, exp_time")
         exit(0)
 
-    for _ in range(int(args.K)):
+    for k in range(int(args.K)):
         t0 = time()
         if args.inst_type == "ER":
             S, f, fc, kb = cUFL.generate_test_instance(int(args.n))
@@ -80,20 +79,20 @@ def main():
             exit(-1)
 
         cover, _ = cUFL.build_cover_DD(S, f)
-        if args.preorder:
-            pref_order = [int(x[1:]) for x in cover.vars]
-        else:
-            pref_order = None
 
+        pref_order = [int(x[1:]) for x in cover.vars]
         color, _ = cUFL.build_color_DD(f, fc, kb, pref_order)
 
         color.make_reduced()
         cover.make_reduced()
 
+        color_size = color.size()
+        cover_size = cover.size()
+
         vs_color = vs.VarSeq(color.vars, [len(L) for L in color.layers[:-1]])
         vs_cover = vs.VarSeq(cover.vars, [len(L) for L in cover.layers[:-1]])
 
-        bb.TIMEOUT_ITERATIONS = 5000
+        bb.TIMEOUT_ITERATIONS = 10000
         b = bb.BBSearch(vs_color, vs_cover)
         status = b.search()
         assert status == "optimal" or status == "timeout"
@@ -112,16 +111,19 @@ def main():
 
         int_DD = DD.intersect(color_p, cover_p)
 
-        int_DDp = DD.intersect(color, cover_to_color)
-        int_DDpp = DD.intersect(color_to_cover, cover)
+        int_DD_cov2col = DD.intersect(color, cover_to_color)
+        int_DD_col2cov = DD.intersect(color_to_cover, cover)
+
+        cover.gsifts(color)
+        int_DD_gsifts = DD.intersect(cover, color)
 
         int_DD.make_reduced()
-        int_DDp.make_reduced()
-        int_DDpp.make_reduced()
+        int_DD_cov2col.make_reduced()
+        int_DD_col2cov.make_reduced()
+        int_DD_gsifts.make_reduced()
 
-        model = cUFL.build_cUFL_MIP(S, f, fc, kb)
         t1 = time()
-        print(f"{args.n}, {args.prefix}, {color.size()}, {cover.size()}, {int_DD.size()}, {int_DDp.size()}, {int_DDpp.size()}, {len(model.getVars())}, {len(model.getConstrs())}, {(t1-t0):.1f}")
+        print(f"{args.n}, {k}, {color_size}, {cover_size}, {int_DD.size()}, {int_DD_cov2col.size()}, {int_DD_col2cov.size()}, {int_DD_gsifts.size()}, {(t1-t0):.1f}")
         sys.stdout.flush()
 
 if __name__ == '__main__':
