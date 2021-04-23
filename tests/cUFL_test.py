@@ -53,7 +53,7 @@ def test_randomized_cover_DD(test_inst):
     assert C.is_equivalent(Cr)[0], f"Not equivalent:\nS={S}, f={f}"
 
 
-@pytest.mark.parametrize("test_inst", [generate_test_instance(7)
+@pytest.mark.parametrize("test_inst", [generate_test_instance(8)
                                        for _ in range(100)])
 def test_randomized_color_DD(test_inst):
     S, f, fc, kb = test_inst

@@ -572,16 +572,22 @@ def build_randomized_color_DD(f, f_color, k_bar):  # pylint: disable=invalid-nam
                weighted=True)
     # a *state* is the number of located facilities
     # for the *current* color (a single number)
-    n = 1  # (original) nodes counter
+    n = 1  # (original graph) nodes counter
     N = len(f_color)
 
     node_labels = dict({DD.NROOT: 0})
     next_layer = {0: D.addnode(None)}
     trash_pipe = None
 
-    colors = list(np.random.permutation([c for c in range(len(k_bar))]))
+    # order of colors to be processed
+    colors = [c for c in range(len(k_bar))]
+
+    # customers per color
     customers = [[C+1 for (C, f_c) in enumerate(f_color) if f_c == c]
                  for c in colors]
+
+    colors = list(np.random.permutation(colors))
+
     for i in range(len(customers)):
         customers[i] = list(np.random.permutation(customers[i]))
 

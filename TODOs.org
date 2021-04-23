@@ -12,7 +12,7 @@
   - [X] special case (organic thing): dia sizes. Is it max degree?
   - [X] example of 'arbitrarily poor' heuristic.
   - [X] randomized cover-DD builder (random order of nodes)
-  - [ ] randomized color-DD builder
+  - [X] randomized color-DD builder
   - [ ] num tests
 
 * Current project TODOs
