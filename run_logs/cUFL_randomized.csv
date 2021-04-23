@@ -1,0 +1,80 @@
+instance,num_type,value,comment
+-1,legend,orig_simpl_nat,Simplified problem (natural var order)
+-1,legend,orig_simpl_rnd,Simplified problem (random var order)
+-1,legend,orig_minAB_nat,Best of A and B (natural var order)
+-1,legend,orig_minAB_rnd,Best of A and B (random var order)
+-1,legend,orig_5random_nat,Best of 5 random (natural var order)
+-1,legend,orig_5random_rnd,Best of 5 random (random var order)
+-1,legend,orig_gsifts1p_nat,Greedy BDD sifts (natural var order)
+-1,legend,orig_gsifts1p_ctl,Greedy BDD sifts (random var order)
+-1,legend,orig_5random_ctl,Best of 5 random (random var order)
+-1,legend,orig_minAB_ctl,Best of A and B (random var order)
+-1,legend,orig_simpl_ctl,Simplified problem (random var order)
+0,orig_simpl_nat_obj,231,--none--
+0,orig_minAB_nat_obj,223,--none--
+0,orig_5random_nat_obj,272,--none--
+0,orig_gsifts1p_nat_obj,222,--none--
+0,orig_simpl_rnd_obj,357,--none--
+0,orig_minAB_rnd_obj,286,--none--
+0,orig_5random_rnd_obj,351,--none--
+0,orig_gsifts1p_rnd_obj,187,--none--
+0,orig_simpl_ctl_obj,1677,--none--
+0,orig_minAB_ctl_obj,2152,--none--
+0,orig_5random_ctl_obj,3651,--none--
+0,orig_gsifts1p_ctl_obj,1072,--none--
+1,orig_simpl_nat_obj,215,--none--
+1,orig_minAB_nat_obj,177,--none--
+1,orig_5random_nat_obj,182,--none--
+1,orig_gsifts1p_nat_obj,171,--none--
+1,orig_simpl_rnd_obj,195,--none--
+1,orig_minAB_rnd_obj,181,--none--
+1,orig_5random_rnd_obj,244,--none--
+1,orig_gsifts1p_rnd_obj,117,--none--
+1,orig_simpl_ctl_obj,7425,--none--
+1,orig_minAB_ctl_obj,8222,--none--
+1,orig_5random_ctl_obj,13998,--none--
+1,orig_gsifts1p_ctl_obj,7425,--none--
+2,orig_simpl_nat_obj,233,--none--
+2,orig_minAB_nat_obj,222,--none--
+2,orig_5random_nat_obj,216,--none--
+2,orig_gsifts1p_nat_obj,157,--none--
+2,orig_simpl_rnd_obj,243,--none--
+2,orig_minAB_rnd_obj,275,--none--
+2,orig_5random_rnd_obj,261,--none--
+2,orig_gsifts1p_rnd_obj,151,--none--
+2,orig_simpl_ctl_obj,6291,--none--
+2,orig_minAB_ctl_obj,5677,--none--
+2,orig_5random_ctl_obj,9419,--none--
+2,orig_gsifts1p_ctl_obj,3436,--none--
+3,orig_simpl_nat_obj,208,--none--
+3,orig_minAB_nat_obj,171,--none--
+3,orig_5random_nat_obj,198,--none--
+3,orig_gsifts1p_nat_obj,155,--none--
+3,orig_simpl_rnd_obj,249,--none--
+3,orig_minAB_rnd_obj,196,--none--
+3,orig_5random_rnd_obj,220,--none--
+3,orig_gsifts1p_rnd_obj,108,--none--
+3,orig_simpl_ctl_obj,5868,--none--
+3,orig_minAB_ctl_obj,9229,--none--
+3,orig_5random_ctl_obj,11995,--none--
+3,orig_gsifts1p_ctl_obj,5400,--none--
+4,orig_simpl_nat_obj,335,--none--
+4,orig_minAB_nat_obj,327,--none--
+4,orig_5random_nat_obj,506,--none--
+4,orig_gsifts1p_nat_obj,311,--none--
+4,orig_simpl_rnd_obj,635,--none--
+4,orig_minAB_rnd_obj,492,--none--
+4,orig_5random_rnd_obj,395,--none--
+4,orig_gsifts1p_rnd_obj,332,--none--
+4,orig_simpl_ctl_obj,7817,--none--
+4,orig_minAB_ctl_obj,9147,--none--
+4,orig_5random_ctl_obj,16088,--none--
+4,orig_gsifts1p_ctl_obj,7876,--none--
+5,orig_simpl_nat_obj,145,--none--
+5,orig_minAB_nat_obj,145,--none--
+5,orig_5random_nat_obj,195,--none--
+5,orig_gsifts1p_nat_obj,139,--none--
+5,orig_simpl_rnd_obj,190,--none--
+5,orig_minAB_rnd_obj,173,--none--
+5,orig_5random_rnd_obj,173,--none--
+5,orig_gsifts1p_rnd_obj,156,--none--
