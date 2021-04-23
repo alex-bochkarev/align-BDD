@@ -98,7 +98,7 @@ df_rel = df_rel %>%
 ## draw the figure
 # X_QUANTILE = 0.98
 xmin = min(df_rel$value)
-xmax = quantile(df_rel$value,X_QUANTILE)
+xmax = quantile(df_rel$value,X_QUANTILE, na.rm=TRUE)
 
 plt_dens =
     ggplot(df_rel, aes(x=value))+
@@ -140,7 +140,7 @@ plt_dens =
         strip.text.y.left = element_text(size=15, angle=0),
         strip.background = element_blank()
     )+
-    facet_grid(heuristic_label ~ entry_type, scales="free_y", switch="y")
+    facet_grid(heuristic_label ~ entry_type, switch="y")
     ## end of styling
 
 ggsave(opt$out,plt_dens, width = 16, height = 10)

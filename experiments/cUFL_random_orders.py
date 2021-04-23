@@ -9,6 +9,7 @@ An experiment concerning the Uncapacitated Facility Location with colors (colore
 (c) A. Bochkarev, Clemson University, 2021
 abochka@clemson.edu
 """
+from copy import deepcopy
 from time import time
 import argparse as ap
 import sys
@@ -38,12 +39,12 @@ def main():
                         dest="K",
                         default="50",
                         help="no. of instances to generate")
-    # parser.add_argument("-p",
-    #                     "--prefix",
-    #                     action="store",
-    #                     dest="prefix",
-    #                     default="0",
-    #                     help="prefix for the instance number")
+    parser.add_argument("-p",
+                        "--prefix",
+                        action="store",
+                        dest="prefix",
+                        default="0",
+                        help="prefix for the instance number")
     parser.add_argument("-H",
                         "--header",
                         action="store_true",
@@ -51,7 +52,7 @@ def main():
                         help="show header only and exit")
 
     args = parser.parse_args()
-    # prefix = args.prefix
+    prefix = args.prefix
 
     if args.header:
         print("instance,num_type,value,comment")
@@ -63,10 +64,10 @@ def main():
         print("-1,legend,orig_5random_rnd,Best of 5 random (random var order)")
         print("-1,legend,orig_gsifts1p_nat,Greedy BDD sifts (natural var order)")
 
-        print("-1,legend,orig_gsifts1p_ctl,Greedy BDD sifts (random var order)")
-        print("-1,legend,orig_5random_ctl,Best of 5 random (random var order)")
-        print("-1,legend,orig_minAB_ctl,Best of A and B (random var order)")
-        print("-1,legend,orig_simpl_ctl,Simplified problem (random var order)")
+        print("-1,legend,orig_gsifts1p_ctl,Greedy BDD sifts (control experiment)")
+        print("-1,legend,orig_5random_ctl,Best of 5 random (control experiment)")
+        print("-1,legend,orig_minAB_ctl,Best of A and B (control experiment)")
+        print("-1,legend,orig_simpl_ctl,Simplified problem (control experiment)")
         exit(0)
 
     for k in range(int(args.K)):
@@ -114,7 +115,7 @@ def main():
             int_DD_VS = DD.intersect(color_p, cover_p)
             int_DD_VS.make_reduced()
 
-            print(f"{k},orig_simpl_{dsc}_obj,{int_DD_VS.size()},--none--")
+            print(f"{prefix}-{k},orig_simpl_{dsc}_obj,{int_DD_VS.size()},--none--")
 
             cover_to_color = cover.align_to(color.vars, inplace=False)
             color_to_cover = color.align_to(cover.vars, inplace=False)
@@ -125,7 +126,7 @@ def main():
             int_DD_col2cov = DD.intersect(color_to_cover, cover)
             int_DD_col2cov.make_reduced()
 
-            print(f"{k},orig_minAB_{dsc}_obj,{min(int_DD_cov2col.size(), int_DD_col2cov.size())},--none--")
+            print(f"{prefix}-{k},orig_minAB_{dsc}_obj,{min(int_DD_cov2col.size(), int_DD_col2cov.size())},--none--")
 
             int_DD_rnd = None
             for _ in range(5):
@@ -138,13 +139,21 @@ def main():
                 if int_DD_rnd is None or int_DD_rnd > int_rnd.size():
                     int_DD_rnd = int_rnd.size()
 
-            print(f"{k},orig_5random_{dsc}_obj,{int_DD_rnd},--none--")
+            print(f"{prefix}-{k},orig_5random_{dsc}_obj,{int_DD_rnd},--none--")
+
+            cover2 = deepcopy(cover)
+            color2 = deepcopy(color)
 
             cover.gsifts(color)
+            color2.gsifts(cover2)
 
             int_DD_gsifts = DD.intersect(cover, color)
             int_DD_gsifts.make_reduced()
-            print(f"{k},orig_gsifts1p_{dsc}_obj,{int_DD_gsifts.size()},--none--")
+
+            int_DD_gsifts2 = DD.intersect(cover2, color2)
+            int_DD_gsifts2.make_reduced()
+
+            print(f"{prefix}-{k},orig_gsifts1p_{dsc}_obj,{min(int_DD_gsifts.size(), int_DD_gsifts2.size())},--none--")
 
             sys.stdout.flush()
 

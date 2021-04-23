@@ -6,10 +6,10 @@ instance,num_type,value,comment
 -1,legend,orig_5random_nat,Best of 5 random (natural var order)
 -1,legend,orig_5random_rnd,Best of 5 random (random var order)
 -1,legend,orig_gsifts1p_nat,Greedy BDD sifts (natural var order)
--1,legend,orig_gsifts1p_ctl,Greedy BDD sifts (random var order)
--1,legend,orig_5random_ctl,Best of 5 random (random var order)
--1,legend,orig_minAB_ctl,Best of A and B (random var order)
--1,legend,orig_simpl_ctl,Simplified problem (random var order)
+-1,legend,orig_gsifts1p_ctl,Greedy BDD sifts (control experiment)
+-1,legend,orig_5random_ctl,Best of 5 random (control experiment)
+-1,legend,orig_minAB_ctl,Best of A and B (control experiment)
+-1,legend,orig_simpl_ctl,Simplified problem (control experiment)
 0,orig_simpl_nat_obj,231,--none--
 0,orig_minAB_nat_obj,223,--none--
 0,orig_5random_nat_obj,272,--none--
@@ -78,3 +78,27 @@ instance,num_type,value,comment
 5,orig_minAB_rnd_obj,173,--none--
 5,orig_5random_rnd_obj,173,--none--
 5,orig_gsifts1p_rnd_obj,156,--none--
+5,orig_simpl_ctl_obj,6766,--none--
+5,orig_minAB_ctl_obj,9735,--none--
+5,orig_5random_ctl_obj,10493,--none--
+5,orig_gsifts1p_ctl_obj,5132,--none--
+6,orig_simpl_nat_obj,79,--none--
+6,orig_minAB_nat_obj,70,--none--
+6,orig_5random_nat_obj,87,--none--
+6,orig_gsifts1p_nat_obj,80,--none--
+6,orig_simpl_rnd_obj,101,--none--
+6,orig_minAB_rnd_obj,89,--none--
+6,orig_5random_rnd_obj,90,--none--
+6,orig_gsifts1p_rnd_obj,64,--none--
+6,orig_simpl_ctl_obj,2985,--none--
+6,orig_minAB_ctl_obj,3672,--none--
+6,orig_5random_ctl_obj,4194,--none--
+6,orig_gsifts1p_ctl_obj,3004,--none--
+7,orig_simpl_nat_obj,145,--none--
+7,orig_minAB_nat_obj,145,--none--
+7,orig_5random_nat_obj,197,--none--
+7,orig_gsifts1p_nat_obj,162,--none--
+7,orig_simpl_rnd_obj,255,--none--
+7,orig_minAB_rnd_obj,222,--none--
+7,orig_5random_rnd_obj,213,--none--
+7,orig_gsifts1p_rnd_obj,139,--none--
