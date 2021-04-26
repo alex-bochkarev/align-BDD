@@ -1,0 +1,24 @@
+#PBS -N MinVsSimpl
+#PBS -l select=1:ncpus=1:mem=8gb:interconnect=any,walltime=08:00:00
+#PBS -j oe
+
+module add anaconda3/5.1.0-gcc/8.3.1
+source activate ab-local
+
+cd /home/abochka/BDD/align-BDD
+
+tgs -m "starting the run: various randomized orders"
+# run-command
+python -m experiments.tUFL_rand_orders_nosifts -H > run_logs/rnd_orders_nosifts.csv
+
+for n in 5 10 12 14 16 18 20 22 24 26; do
+    python -m experiments.tUFL_rand_orders_nosifts -n $n -K 100 -p $n >> run_logs/rnd_orders_nosifts.csv
+done
+
+tgs -m "Experiment done."
+tgs -f run_logs/rnd_orders_nosifts.csv
+tgs -s happycat
+
+# deactivate the env
+source deactivate ab-local
+
