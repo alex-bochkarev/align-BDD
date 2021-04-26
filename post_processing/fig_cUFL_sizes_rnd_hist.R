@@ -138,7 +138,8 @@ plt_dens =
         panel.grid.minor.x = element_line(size=0.5,linetype = 'solid', colour = "lightgrey"),
         panel.grid.minor.y = element_line(size=0.5,linetype = 'solid', colour = "lightgrey"),
         strip.text.y.left = element_text(size=15, angle=0),
-        strip.background = element_blank()
+        strip.background = element_blank(),
+        strip.text.x.top = element_text(size=15, angle=0),
     )+
     facet_grid(heuristic_label ~ entry_type, switch="y")
     ## end of styling
