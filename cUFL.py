@@ -732,11 +732,13 @@ def solve_with_MIP(S, f, fc, kb):
     return m_naive
 
 
-def generate_test_instance(n):
+def generate_test_instance(n, p=0.3):
     """Generates a (colored) facility location instance.
 
     Args:
         n (int): number of nodes (customers / facilities)
+        p (float): graph generation parameter
+            (prob of an edge between a pair of nodes)
 
     Returns:
         S (list): neighborhood list,
@@ -756,7 +758,7 @@ def generate_test_instance(n):
 
     while status != GRB.OPTIMAL:
 
-        G = nx.gnp_random_graph(n, 0.3, directed=False)
+        G = nx.gnp_random_graph(n, p, directed=False)
         AM = nx.adjacency_matrix(G)
         S = [[i+1] for i in range(n)]
 
@@ -780,6 +782,62 @@ def generate_test_instance(n):
                 f_colors[facility-1] = c
 
             N_res = [v for v in N_res if v not in facilities_c]
+
+        k_bar = [np.random.randint(1, 1+MAX_BUDGET) for _ in range(no_colors)]
+        status = solve_with_MIP(S, f, f_colors, k_bar).status
+
+    return (S, f, f_colors, k_bar)
+
+
+def generate_test_instance_alt(n, p=0.3, nodes_per_color=5):
+    """Generates a (colored) facility location instance.
+
+    Args:
+        n (int): number of nodes (customers / facilities)
+        p (float): graph generation parameter
+            (prob of an edge between a pair of nodes)
+        nodes_per_color(int): color generation parameter
+
+    Returns:
+        S (list): neighborhood list,
+        f (dict): location costs
+        f_colors (list): location colors,
+        k_bar (list): budget per color.
+    """
+    F_MIN = 5
+    F_MAX = 10
+    MAX_BUDGET = 5
+
+    status = -1
+    N = [i for i in range(1,n+1)]  # a set of nodes
+
+    while status != GRB.OPTIMAL:
+
+        G = nx.gnp_random_graph(n, p, directed=False)
+        AM = nx.adjacency_matrix(G)
+        S = [[i+1] for i in range(n)]
+
+        for i in range(n):
+            for j in range(n):
+                if AM[(i,j)] == 1:
+                    if j+1 not in S[i]: S[i].append(j+1)
+                    if i+1 not in S[j]: S[j].append(i+1)
+
+        f = {i: np.random.randint(F_MIN, F_MAX) for i in N}
+
+        no_colors = round(n / nodes_per_color)
+        N_res = N
+        np.random.shuffle(N_res)
+        N_res = list(N_res)
+
+        f_colors = [0] * n
+
+        for c in range(no_colors):
+            cur_node = N_res.pop()
+            f_colors[cur_node - 1] = c
+
+        while len(N_res) > 0:
+            f_colors[N_res.pop()-1] = np.random.randint(0, no_colors)
 
         k_bar = [np.random.randint(1, 1+MAX_BUDGET) for _ in range(no_colors)]
         status = solve_with_MIP(S, f, f_colors, k_bar).status

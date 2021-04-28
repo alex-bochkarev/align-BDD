@@ -1,7 +1,7 @@
 ######################################################################
 ## Creates ggplot for the original problem:
 ## benchmarking different heuristics
-## (objective values histogram)
+## (diagram sizes histogram)
 ##
 ## (c) Alexey Bochkarev, Clemson University, 2020
 
@@ -145,5 +145,8 @@ plt_dens =
     ## end of styling
 
 ggsave(opt$out,plt_dens, width = 16, height = 10)
-
+#ggsave("./reports/2021-04-27_Randomized_dia_sizes/rnd_order_10v1k.png",
+#       width=16, height=10)  # done with cUFL_randomized_cluster.csv
+ggsave("./reports/2021-04-27_Randomized_dia_sizes/2_rnd_order_w_ctl.png",
+       width=16, height=10)
 

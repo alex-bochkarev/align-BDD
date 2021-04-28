@@ -13,7 +13,9 @@
   - [X] example of 'arbitrarily poor' heuristic.
   - [X] randomized cover-DD builder (random order of nodes)
   - [X] randomized color-DD builder
-  - [ ] num tests
+  - [X] num test
+  - [X] Look into =gen_test_p.csv= (dia sizes for various instance gen parameters =p=)
+  - [X] check out =gen_test_colors.csv= (different no. of colors for given =n = 15=
 
 * Current project TODOs
 ** TODO Kill already merged branches
