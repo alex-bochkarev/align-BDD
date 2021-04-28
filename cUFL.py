@@ -437,6 +437,10 @@ def build_color_DD(f, f_color, k_bar, preferred_order=None):  # pylint: disable=
     Returns:
         D (class BDD): resulting diagram.
         nl (dict): string node labels ("states"), `id` -> `label` (string).
+
+    Notes:
+        If `preferred_order` is given, randomly shuffles colors, but makes sensible
+        order of customers within each color (corresponding to `preferred_order`).
     """
     D = DD.BDD(N=len(f_color), vars=[f"stub{i}" for i in range(1, len(f_color)+1)],  # noqa pylint: disable=invalid-name, unnecessary-comprehension
                weighted=True)
@@ -454,8 +458,13 @@ def build_color_DD(f, f_color, k_bar, preferred_order=None):  # pylint: disable=
         customers = [[C+1 for (C, f_c) in enumerate(f_color) if f_c == c]
                     for c in colors]
     else:
-        cs = ColorSorter(f_color, preferred_order)
-        colors, customers = cs.sort_colors()
+        colors = [c for c in range(len(k_bar))]
+        customers = {c: [] for c in range(len(k_bar))}
+
+        for j in preferred_order:
+            customers[f_color[j-1]].append(j)
+
+        colors = list(np.random.permutation(colors))
 
     for c in colors:
         for customer in customers[c][:-1]:
@@ -568,122 +577,9 @@ def build_randomized_color_DD(f, f_color, k_bar):  # pylint: disable=invalid-nam
         D (class BDD): resulting diagram.
         nl (dict): string node labels ("states"), `id` -> `label` (string).
     """
-    D = DD.BDD(N=len(f_color), vars=[f"stub{i}" for i in range(1, len(f_color)+1)],  # noqa pylint: disable=invalid-name, unnecessary-comprehension
-               weighted=True)
-    # a *state* is the number of located facilities
-    # for the *current* color (a single number)
-    n = 1  # (original graph) nodes counter
-    N = len(f_color)
-
-    node_labels = dict({DD.NROOT: 0})
-    next_layer = {0: D.addnode(None)}
-    trash_pipe = None
-
-    # order of colors to be processed
-    colors = [c for c in range(len(k_bar))]
-
-    # customers per color
-    customers = [[C+1 for (C, f_c) in enumerate(f_color) if f_c == c]
-                 for c in colors]
-
-    colors = list(np.random.permutation(colors))
-
-    for i in range(len(customers)):
-        customers[i] = list(np.random.permutation(customers[i]))
-
-    for c in colors:
-        for customer in customers[c][:-1]:
-            if n == N:
-                break
-
-            current_layer = cpy(next_layer)
-            next_layer = dict()
-            if trash_pipe is not None:
-                # create a new "false" running node.
-                new_tp = D.addnode(trash_pipe, "lo")
-                D.llink(trash_pipe, new_tp, "hi")
-                trash_pipe = new_tp
-                node_labels.update({trash_pipe.id: "💀"})
-
-            for state in current_layer:
-                node = current_layer[state]
-                if state in next_layer:
-                    D.llink(node, next_layer[state], "lo")
-                else:
-                    newnode = D.addnode(node, "lo")
-                    next_layer.update({state: newnode})
-                    node_labels.update({newnode.id: str(state)})
-
-                if (state+1) in next_layer:
-                    D.llink(node, next_layer[state+1], "hi",
-                            edge_weight=f[customer])
-                else:
-                    if (state+1) > k_bar[c]:
-                        if trash_pipe is None:
-                            trash_pipe = D.addnode(node, "hi")
-                            node_labels.update({trash_pipe.id: "💀"})
-                        else:
-                            D.llink(node, trash_pipe, "hi")
-                    else:
-                        newnode = D.addnode(node, "hi")
-                        next_layer.update({state+1: newnode})
-                        node_labels.update({newnode.id: str(state+1)})
-            D.rename_vars({f"stub{n}": f"x{customer}"})
-            n += 1
-
-        # Processing the last customer separately
-        # (within a color)
-
-        if n < N:
-            current_layer = cpy(next_layer)
-            next_layer = dict()
-
-            if trash_pipe is not None:
-                # create a new "false" running node.
-                new_tp = D.addnode(trash_pipe, "lo")
-                D.llink(trash_pipe, new_tp, "hi")
-                trash_pipe = new_tp
-                node_labels.update({trash_pipe.id: "💀"})
-
-            for state in current_layer:
-                node = current_layer[state]
-                new_state = 0  # we 'reset' the color counter
-                if new_state in next_layer:
-                    D.llink(node, next_layer[new_state], "lo")
-                else:
-                    newnode = D.addnode(node, "lo")
-                    next_layer.update({new_state: newnode})
-                    node_labels.update({newnode.id: str(new_state)})
-
-                if (state+1) > k_bar[c]:
-                    if trash_pipe is None:
-                        trash_pipe = D.addnode(node, "hi")
-                        node_labels.update({trash_pipe.id: "💀"})
-                    else:
-                        D.llink(node, trash_pipe, "hi")
-                else:
-                    D.llink(node, next_layer[new_state], "hi")
-
-            D.rename_vars({f"stub{n}": f"x{customers[c][-1]}"})
-            n += 1
-        else:
-            # the last layer of the DD
-            if trash_pipe is not None:
-                D.link(trash_pipe.id, DD.NFALSE, "hi")
-                D.link(trash_pipe.id, DD.NFALSE, "lo")
-
-            for state in next_layer:
-                node_id = next_layer[state].id
-                if state+1 > k_bar[c]:
-                    y_target = DD.NFALSE
-                else:
-                    y_target = DD.NTRUE
-
-                D.link(node_id, y_target, "hi")
-                D.link(node_id, DD.NTRUE, "lo")
-
-            D.rename_vars({f"stub{n}": f"x{customers[c][-1]}"})
-    return D, node_labels
+    D, _ = build_color_DD(f, f_color, k_bar)
+    D.align_to(np.random.permutation(D.vars), inplace=True)
+    return D, None
 
 
 ######################################################################
