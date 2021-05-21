@@ -1,0 +1,17 @@
+cat: 'run_logs/tUFL_varying_p.*.csv': No such file or directory
+{"ok":true,"result":{"message_id":1260,"from":{"id":931364299,"is_bot":true,"first_name":"Wintermute","username":"ab_wintermute_bot"},"chat":{"id":122533105,"first_name":"Alex","last_name":"Bochkarev","username":"abochka","type":"private"},"date":1619615852,"sticker":{"width":512,"height":512,"emoji":"\ud83d\ude0a","set_name":"KookyCat","is_animated":false,"thumb":{"file_id":"AAMCAgADGQMAAgTsYIlgbPv7GB8kKssEf4U8wEg5vkYAAjwBAAIYQu4IxnWTmVt_iR508nANAAQBAAdtAANCWQACHwQ","file_unique_id":"AQADdPJwDQAEQlkAAg","file_size":4638,"width":128,"height":128},"file_id":"CAACAgIAAxkDAAIE7GCJYGz7-xgfJCrLBH-FPMBIOb5GAAI8AQACGELuCMZ1k5lbf4keHwQ","file_unique_id":"AgADPAEAAhhC7gg","file_size":29142}}} 
+ 
++------------------------------------------+ 
+| PALMETTO CLUSTER PBS RESOURCES REQUESTED | 
++------------------------------------------+ 
+ 
+mem=8gb,walltime=08:00:00,ncpus=8
+ 
+ 
++-------------------------------------+ 
+| PALMETTO CLUSTER PBS RESOURCES USED | 
++-------------------------------------+ 
+ 
+cput=13:09:45,mem=1716800kb,walltime=01:55:39,ncpus=8,cpupercent=682,vmem=1716800kb
+ 
+ 

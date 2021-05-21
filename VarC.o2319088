@@ -1,0 +1,42 @@
+/bin/bash: line 1: 594787 Killed                  python -m experiments.tUFL_generation_tests -n 25 -K 32 -C 8 -p 8 > run_logs/tUFL_varying_C.8_2.csv
+/bin/bash: line 1: 594795 Killed                  python -m experiments.tUFL_generation_tests -n 25 -K 32 -C 4 -p 4 > run_logs/tUFL_varying_C.4_3.csv
+/bin/bash: line 1: 594793 Killed                  python -m experiments.tUFL_generation_tests -n 25 -K 32 -C 3 -p 3 > run_logs/tUFL_varying_C.3_3.csv
+/bin/bash: line 1: 594781 Killed                  python -m experiments.tUFL_generation_tests -n 25 -K 32 -C 3 -p 3 > run_logs/tUFL_varying_C.3_2.csv
+/bin/bash: line 1: 594771 Killed                  python -m experiments.tUFL_generation_tests -n 25 -K 32 -C 4 -p 4 > run_logs/tUFL_varying_C.4_'{1'.csv
+/bin/bash: line 1: 594777 Killed                  python -m experiments.tUFL_generation_tests -n 25 -K 32 -C 10 -p 10 > run_logs/tUFL_varying_C.10_'{1'.csv
+/bin/bash: line 1: 594813 Killed                  python -m experiments.tUFL_generation_tests -n 25 -K 32 -C 10 -p 10 > run_logs/tUFL_varying_C.10_4.csv
+/bin/bash: line 1: 594799 Killed                  python -m experiments.tUFL_generation_tests -n 25 -K 32 -C 8 -p 8 > run_logs/tUFL_varying_C.8_3.csv
+/bin/bash: line 1: 594823 Killed                  python -m experiments.tUFL_generation_tests -n 25 -K 32 -C 8 -p 8 > run_logs/tUFL_varying_C.8_5.csv
+/bin/bash: line 1: 594805 Killed                  python -m experiments.tUFL_generation_tests -n 25 -K 32 -C 3 -p 3 > run_logs/tUFL_varying_C.3_4.csv
+/bin/bash: line 1: 594819 Killed                  python -m experiments.tUFL_generation_tests -n 25 -K 32 -C 4 -p 4 > run_logs/tUFL_varying_C.4_5.csv
+/bin/bash: line 1: 594791 Killed                  python -m experiments.tUFL_generation_tests -n 25 -K 32 -C 2 -p 2 > run_logs/tUFL_varying_C.2_3.csv
+/bin/bash: line 1: 594807 Killed                  python -m experiments.tUFL_generation_tests -n 25 -K 32 -C 4 -p 4 > run_logs/tUFL_varying_C.4_4.csv
+/bin/bash: line 1: 594783 Killed                  python -m experiments.tUFL_generation_tests -n 25 -K 32 -C 4 -p 4 > run_logs/tUFL_varying_C.4_2.csv
+/bin/bash: line 1: 594773 Killed                  python -m experiments.tUFL_generation_tests -n 25 -K 32 -C 6 -p 6 > run_logs/tUFL_varying_C.6_'{1'.csv
+/bin/bash: line 1: 594815 Killed                  python -m experiments.tUFL_generation_tests -n 25 -K 32 -C 2 -p 2 > run_logs/tUFL_varying_C.2_5.csv
+/bin/bash: line 1: 594801 Killed                  python -m experiments.tUFL_generation_tests -n 25 -K 32 -C 10 -p 10 > run_logs/tUFL_varying_C.10_3.csv
+/bin/bash: line 1: 594767 Killed                  python -m experiments.tUFL_generation_tests -n 25 -K 32 -C 2 -p 2 > run_logs/tUFL_varying_C.2_'{1'.csv
+/bin/bash: line 1: 594827 Killed                  python -m experiments.tUFL_generation_tests -n 25 -K 32 -C 2 -p 2 > run_logs/tUFL_varying_C.2_6.csv
+/bin/bash: line 1: 594809 Killed                  python -m experiments.tUFL_generation_tests -n 25 -K 32 -C 6 -p 6 > run_logs/tUFL_varying_C.6_4.csv
+/bin/bash: line 1: 594811 Killed                  python -m experiments.tUFL_generation_tests -n 25 -K 32 -C 8 -p 8 > run_logs/tUFL_varying_C.8_4.csv
+/bin/bash: line 1: 594779 Killed                  python -m experiments.tUFL_generation_tests -n 25 -K 32 -C 2 -p 2 > run_logs/tUFL_varying_C.2_2.csv
+/bin/bash: line 1: 594797 Killed                  python -m experiments.tUFL_generation_tests -n 25 -K 32 -C 6 -p 6 > run_logs/tUFL_varying_C.6_3.csv
+/bin/bash: line 1: 595296 Killed                  python -m experiments.tUFL_generation_tests -n 25 -K 32 -C 10 -p 10 > run_logs/tUFL_varying_C.10_6.csv
+/bin/bash: line 1: 594825 Killed                  python -m experiments.tUFL_generation_tests -n 25 -K 32 -C 10 -p 10 > run_logs/tUFL_varying_C.10_5.csv
+=>> PBS: job killed: mem 67108872kb exceeded limit 67108864kb
+ 
+ 
++------------------------------------------+ 
+| PALMETTO CLUSTER PBS RESOURCES REQUESTED | 
++------------------------------------------+ 
+ 
+mem=64gb,walltime=08:00:00,ncpus=32
+ 
+ 
++-------------------------------------+ 
+| PALMETTO CLUSTER PBS RESOURCES USED | 
++-------------------------------------+ 
+ 
+cput=01:41:56,mem=67108872kb,walltime=00:03:26,ncpus=32,cpupercent=2754,vmem=67108872kb
+ 
+ 

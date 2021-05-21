@@ -1,0 +1,26 @@
+#PBS -N VarC
+#PBS -l select=1:ncpus=16:mem=64gb:interconnect=any,walltime=08:00:00
+#PBS -j oe
+#PBS -M abochka@clemson.edu
+#PBS -m abe
+
+module add anaconda3/5.1.0-gcc/8.3.1
+source activate ab-local
+module add gnu-parallel
+
+cd /home/abochka/BDD/align-BDD
+
+tgs -m "starting the run: varying *types* (generation) parameter"
+# run-command
+fname=run_logs/tUFL_varying_C
+rm $fname.*.csv
+parallel -j16 python -m experiments.tUFL_generation_tests -n 24 -K 32 -C {2} -p {2} ">" $fname.{2}_{1}.csv ::: $(seq 1 16) ::: {2,3,4,6,8,10}
+python -m experiments.tUFL_generation_tests -H > $fname.csv
+cat $fname.*.csv >> $fname.csv
+tgs -m "Experiment done (varying *types* gen parameter)."
+tgs -f $fname.csv
+tgs -s happycat
+
+# deactivate the env
+source deactivate ab-local
+

@@ -1,0 +1,20 @@
+/bin/bash: line 1: 488830 Killed                  python -m experiments.tUFL_generation_tests -n 24 -K 32 -C 8 -p 8 > run_logs/tUFL_varying_C.8_2.csv
+/bin/bash: line 1: 488834 Killed                  python -m experiments.tUFL_generation_tests -n 24 -K 32 -C 2 -p 2 > run_logs/tUFL_varying_C.2_3.csv
+/bin/bash: line 1: 488826 Killed                  python -m experiments.tUFL_generation_tests -n 24 -K 32 -C 4 -p 4 > run_logs/tUFL_varying_C.4_2.csv
+=>> PBS: job killed: mem 67111516kb exceeded limit 67108864kb
+ 
+ 
++------------------------------------------+ 
+| PALMETTO CLUSTER PBS RESOURCES REQUESTED | 
++------------------------------------------+ 
+ 
+mem=64gb,walltime=08:00:00,ncpus=16
+ 
+ 
++-------------------------------------+ 
+| PALMETTO CLUSTER PBS RESOURCES USED | 
++-------------------------------------+ 
+ 
+cput=02:08:06,mem=67111780kb,walltime=00:08:18,ncpus=16,cpupercent=1473,vmem=67111780kb
+ 
+ 
