@@ -1,0 +1,16 @@
+{"ok":true,"result":{"message_id":1275,"from":{"id":931364299,"is_bot":true,"first_name":"Wintermute","username":"ab_wintermute_bot"},"chat":{"id":122533105,"first_name":"Alex","last_name":"Bochkarev","username":"abochka","type":"private"},"date":1621633633,"sticker":{"width":512,"height":512,"emoji":"\ud83d\ude0a","is_animated":false,"thumb":{"file_id":"AAMCAgADGQMAAgT7YKgqYcTD-T95fPeaPpAyB6vldF8AAjwBAAIYQu4IxnWTmVt_iR508nANAAQBAAdtAANCWQACHwQ","file_unique_id":"AQADdPJwDQAEQlkAAg","file_size":4638,"width":128,"height":128},"file_id":"CAACAgIAAxkDAAIE-2CoKmHEw_k_eXz3mj6QMger5XRfAAI8AQACGELuCMZ1k5lbf4keHwQ","file_unique_id":"AgADPAEAAhhC7gg","file_size":29142}}} 
+ 
++------------------------------------------+ 
+| PALMETTO CLUSTER PBS RESOURCES REQUESTED | 
++------------------------------------------+ 
+ 
+mem=32gb,walltime=02:00:00,ncpus=32
+ 
+ 
++-------------------------------------+ 
+| PALMETTO CLUSTER PBS RESOURCES USED | 
++-------------------------------------+ 
+ 
+cput=27:48:10,mem=10184500kb,walltime=00:56:28,ncpus=32,cpupercent=2947,vmem=10184500kb
+ 
+ 
