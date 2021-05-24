@@ -62,6 +62,14 @@ MAX_I=$(shell expr $(PAR_SOL) - 1 )
 .PHONY: all figures clean-raw-inst clean-insts move-logs figures/sample_BB_tree.png
 
 ######################################################################
+## Ad-hoc figures
+figures/fig_jUFL_simpl_eff.png: post_processing/fig_jUFL_simpl_eff.R run_logs/jUFL/logfile.csv
+				Rscript post_processing/fig_jUFL_simpl_eff.R -i run_logs/jUFL/logfile.csv -o $@
+
+# run_logs/jUFL/logfile.csv: experiments/jUFL_hist_sizes.py
+#				./get_jUFL_hist.sh 4 # or qsub pbs/jUFL_hists.pbs
+
+######################################################################
 ## High-level recipes
 .SECONDARY: # keep all the intermediary logfiles (will not work o/w)
 
