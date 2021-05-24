@@ -18,6 +18,8 @@ library(optparse)
 option_list = list(
     make_option(c("-i", "--input"), type="character", default=NULL,
                 help="input filename (solved instances log)", metavar="character"),
+    make_option(c("-p", "--problem"), type="character",
+                help="problem name", metavar="character", default="Joint UFL"),
     make_option(c("-o", "--out"), type="character", default="./out.eps",
                 help="output file name [default= %default]", metavar="character")
 );
@@ -65,7 +67,7 @@ plt_dens =
         ## minor_breaks = seq(xmin,xmax,length.out=21),
         ## limits = c(xmin, xmax)
     )+
-  ggtitle(paste("Joint UFL problem: Relative efficiency of two heuristics for the original problem. From a total of", nrow(df_wide),"instances (including all combination of parameters)."))+
+  ggtitle(paste(opt$problem, "problem: Relative efficiency of two heuristics for the original problem. From a total of", nrow(df_wide),"instances (including all combination of parameters)."))+
     theme(
         legend.position = c(0.6, 0.8),
         legend.direction = "vertical",
