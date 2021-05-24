@@ -1,9 +1,6 @@
 """Benchmarks DD sizes for different solution methods (colored UFL)
 
-An experiment concerning the Uncapacitated Facility Location with colors (colored UFL):
-- compares diagram sizes for color, covering, and intersection DDs vs the number of
-  variables in 'naive' MIPs.
-- experiment runner file: `get_cUFL_sizes.sh`
+An experiment concerning the Uncapacitated Facility Location with types (typed UFL)
 
 ---
 (c) A. Bochkarev, Clemson University, 2021
@@ -41,6 +38,12 @@ def main():
                         dest="prob",
                         default="0.25",
                         help="prob parameter for instance generation")
+    parser.add_argument("-P",
+                        "--prefix",
+                        action="store",
+                        dest="prefix",
+                        default="test",
+                        help="prefix to be printed")
     parser.add_argument("-K",
                         "--instances",
                         action="store",
@@ -56,23 +59,22 @@ def main():
     args = parser.parse_args()
 
     if args.header:
-        print("instance,num_type,value,comment")
-        print("-1,legend,orig_simpl,Simplified problem")
-        print("-1,legend,orig_minAB,Best of A and B")
-        print("-1,legend,orig_5random,Best of 5 random")
-        print("-1,legend,orig_gsifts1p,Greedy BDD sifts")
+        print("instance,n,prob,num_type,value")
         exit(0)
 
     for k in range(int(args.K)):
         S_1, S_2, f_1, f_2 = jUFL.generate_instance(int(args.n), p=float(args.prob))
 
-        C_1, _ = cUFL.build_randomized_cover_DD(S_1, f_1)
-        C_2, _ = cUFL.build_randomized_cover_DD(S_2, f_2)
-        # C_1, _ = cUFL.build_cover_DD(S_1, f_1)
-        # C_2, _ = cUFL.build_cover_DD(S_2, f_2)
+        # C_1, _ = cUFL.build_randomized_cover_DD(S_1, f_1)
+        # C_2, _ = cUFL.build_randomized_cover_DD(S_2, f_2)
+        C_1, _ = cUFL.build_cover_DD(S_1, f_1)
+        C_2, _ = cUFL.build_cover_DD(S_2, f_2)
 
         C_1.make_reduced()
         C_2.make_reduced()
+
+        C_1.align_to(np.random.permutation(C_1.vars), inplace=True)
+        C_2.align_to(np.random.permutation(C_2.vars), inplace=True)
 
         C1_to_C2 = C_1.align_to(C_2.vars, inplace=False)
         C2_to_C1 = C_2.align_to(C_1.vars, inplace=False)
@@ -83,7 +85,7 @@ def main():
         int_DD_C2_to_C1 = DD.intersect(C_1, C2_to_C1)
         int_DD_C2_to_C1.make_reduced()
 
-        print(f"{k},orig_minAB_obj,{min(int_DD_C1_to_C2.size(), int_DD_C2_to_C1.size())},--none--")
+        print(f"{args.prefix}-{k},{args.n},{args.prob},orig_minAB_obj,{min(int_DD_C1_to_C2.size(), int_DD_C2_to_C1.size())}")
 
         vs_1 = vs.VarSeq(C_1.vars, [len(L) for L in C_1.layers[:-1]])
         vs_2 = vs.VarSeq(C_2.vars, [len(L) for L in C_2.layers[:-1]])
@@ -101,29 +103,7 @@ def main():
         int_DD_VS = DD.intersect(C1p, C2p)
         int_DD_VS.make_reduced()
 
-        print(f"{k},orig_simpl_obj,{int_DD_VS.size()},--none--")
-
-        # int_DD_rnd = None
-        # for _ in range(5):
-        #     perm = np.random.permutation(C_1.vars)
-        #     C1_rnd = C_1.align_to(perm, inplace=False)
-        #     C2_rnd = C_2.align_to(perm, inplace=False)
-
-        #     assert C1_rnd.is_reduced()
-        #     assert C2_rnd.is_reduced()
-
-        #     int_rnd = DD.intersect(C1_rnd, C2_rnd)
-        #     int_rnd.make_reduced()
-
-        #     if int_DD_rnd is None or int_DD_rnd > int_rnd.size():
-        #         int_DD_rnd = int_rnd.size()
-
-        # print(f"{k},orig_5random_obj,{int_DD_rnd},--none--")
-
-        # C_1.gsifts(C_2)
-        # int_DD_gsifts = DD.intersect(C_1, C_2)
-        # int_DD_gsifts.make_reduced()
-        # print(f"{k},orig_gsifts1p_obj,{int_DD_gsifts.size()},--none--")
+        print(f"{args.prefix}-{k},{args.n},{args.prob},orig_simpl_obj,{int_DD_VS.size()}")
 
         sys.stdout.flush()
 
