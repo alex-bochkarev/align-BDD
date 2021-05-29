@@ -60,14 +60,14 @@ def main():
         print("-1,legend,orig_simpl_rnd,Simplified problem (random var order)")
         print("-1,legend,orig_minAB_nat,Best of A and B (natural var order)")
         print("-1,legend,orig_minAB_rnd,Best of A and B (random var order)")
-        print("-1,legend,orig_5random_nat,Best of 5 random (natural var order)")
-        print("-1,legend,orig_5random_rnd,Best of 5 random (random var order)")
-        print("-1,legend,orig_gsifts1p_nat,Greedy BDD sifts (natural var order)")
+        # print("-1,legend,orig_5random_nat,Best of 5 random (natural var order)")
+        # print("-1,legend,orig_5random_rnd,Best of 5 random (random var order)")
+        # print("-1,legend,orig_gsifts1p_nat,Greedy BDD sifts (natural var order)")
 
-        print("-1,legend,orig_gsifts1p_ctl,Greedy BDD sifts (control experiment)")
-        print("-1,legend,orig_5random_ctl,Best of 5 random (control experiment)")
-        print("-1,legend,orig_minAB_ctl,Best of A and B (control experiment)")
-        print("-1,legend,orig_simpl_ctl,Simplified problem (control experiment)")
+        # print("-1,legend,orig_gsifts1p_ctl,Greedy BDD sifts (control experiment)")
+        # print("-1,legend,orig_5random_ctl,Best of 5 random (control experiment)")
+        # print("-1,legend,orig_minAB_ctl,Best of A and B (control experiment)")
+        # print("-1,legend,orig_simpl_ctl,Simplified problem (control experiment)")
         exit(0)
 
     for k in range(int(args.K)):
@@ -86,17 +86,16 @@ def main():
         color_rnd.make_reduced()
         cover_rnd.make_reduced()
 
-        A = DD.BDD.random(N = int(args.n), p=0.6, weighted=True)
-        B = DD.BDD.random(N = int(args.n), p=0.6, weighted=True)
-        B.rename_vars(dict(zip([i for i in range(1,int(args.n)+1)],
-                               np.random.permutation([i for i in range(1,int(args.n)+1)]))))
+        # A = DD.BDD.random(N = int(args.n), p=0.6, weighted=True)
+        # B = DD.BDD.random(N = int(args.n), p=0.6, weighted=True)
+        # B.rename_vars(dict(zip([i for i in range(1,int(args.n)+1)],
+        #                        np.random.permutation([i for i in range(1,int(args.n)+1)]))))
 
-        A.make_reduced()
-        B.make_reduced()
+        # A.make_reduced()
+        # B.make_reduced()
 
         experiment_versions = [(color_nat, cover_nat, "nat"),
-                               (color_rnd, cover_rnd, "rnd"),
-                               (A, B, "ctl")]
+                               (color_rnd, cover_rnd, "rnd")]
 
         for experiment in experiment_versions:
             color, cover, dsc = experiment
@@ -128,32 +127,32 @@ def main():
 
             print(f"{prefix}-{k},orig_minAB_{dsc}_obj,{min(int_DD_cov2col.size(), int_DD_col2cov.size())},--none--")
 
-            int_DD_rnd = None
-            for _ in range(5):
-                perm = np.random.permutation(color.vars)
-                cov_rnd = cover.align_to(perm, inplace=False)
-                col_rnd = color.align_to(perm, inplace=False)
+            # int_DD_rnd = None
+            # for _ in range(5):
+            #     perm = np.random.permutation(color.vars)
+            #     cover.align_to(perm, inplace=True)
+            #     color.align_to(perm, inplace=True)
 
-                int_rnd = DD.intersect(cov_rnd, col_rnd)
-                int_rnd.make_reduced()
-                if int_DD_rnd is None or int_DD_rnd > int_rnd.size():
-                    int_DD_rnd = int_rnd.size()
+            #     int_rnd = DD.intersect(cover, color)
+            #     int_rnd.make_reduced()
+            #     if int_DD_rnd is None or int_DD_rnd > int_rnd.size():
+            #         int_DD_rnd = int_rnd.size()
 
-            print(f"{prefix}-{k},orig_5random_{dsc}_obj,{int_DD_rnd},--none--")
+            # print(f"{prefix}-{k},orig_5random_{dsc}_obj,{int_DD_rnd},--none--")
 
-            cover2 = deepcopy(cover)
-            color2 = deepcopy(color)
+            # cover2 = deepcopy(cover)
+            # color2 = deepcopy(color)
 
-            cover.gsifts(color)
-            color2.gsifts(cover2)
+            # cover.gsifts(color)
+            # color2.gsifts(cover2)
 
-            int_DD_gsifts = DD.intersect(cover, color)
-            int_DD_gsifts.make_reduced()
+            # int_DD_gsifts = DD.intersect(cover, color)
+            # int_DD_gsifts.make_reduced()
 
-            int_DD_gsifts2 = DD.intersect(cover2, color2)
-            int_DD_gsifts2.make_reduced()
+            # int_DD_gsifts2 = DD.intersect(cover2, color2)
+            # int_DD_gsifts2.make_reduced()
 
-            print(f"{prefix}-{k},orig_gsifts1p_{dsc}_obj,{min(int_DD_gsifts.size(), int_DD_gsifts2.size())},--none--")
+            # print(f"{prefix}-{k},orig_gsifts1p_{dsc}_obj,{min(int_DD_gsifts.size(), int_DD_gsifts2.size())},--none--")
 
             sys.stdout.flush()
 

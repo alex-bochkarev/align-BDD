@@ -1,23 +1,23 @@
-#PBS -N RND
-#PBS -l select=1:ncpus=8:mem=8gb:interconnect=any,walltime=03:00:00
+#PBS -N Var25
+#PBS -l select=1:ncpus=32:mem=16gb:interconnect=any,walltime=01:00:00
 #PBS -j oe
 #PBS -M abochka@clemson.edu
 #PBS -m abe
 
 module add anaconda3/5.1.0-gcc/8.3.1
 source activate ab-local
-module add r/4.0.2-gcc/8.3.1
 module add gnu-parallel
 
 cd /home/abochka/BDD/align-BDD
 
-tgs -m "starting the run: randomized orders"
+tgs -m "starting the run: randomized orders, 25 vars"
 # run-command
-parallel -j8 ./get_cUFL_randomized_figs.sh {} ">" run_logs/cUFL_randomized_cluster.{}.csv ::: {1,2,3,4,5,6,7,8}
-python -m experiments.cUFL_random_orders -H > run_logs/cUFL_randomized_cluster.csv
-cat run_logs/cUFL_randomized_cluster.*.csv >> run_logs/cUFL_randomized_cluster.csv
-tgs -m "Experiment done."
-tgs -f run_logs/cUFL_randomized_cluster.csv
+fname="run_logs/tUFL_rnd_DDs_25vars"
+parallel -j32 python -m experiments.cUFL_random_orders -n 25 -K 32 -p {} ">" $fname.{}.csv ::: $(seq 1 32)
+python -m experiments.cUFL_random_orders -H > $fname.csv
+cat $fname.*.csv >> $fname.csv
+tgs -m "Experiment done (randomized orders, 25 vars)."
+tgs -f $fname.csv
 tgs -s happycat
 
 # deactivate the env
