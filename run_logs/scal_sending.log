@@ -1,2 +1,0 @@
-{"ok":true,"result":{"message_id":1149,"from":{"id":931364299,"is_bot":true,"first_name":"Wintermute","username":"ab_wintermute_bot"},"chat":{"id":122533105,"first_name":"Alex","last_name":"Bochkarev","username":"abochka","type":"private"},"date":1597258317,"text":"Image from the scaling test:"}}/var/spool/pbs/mom_priv/jobs/64285.pbs02.SC: line 19: convert: command not found
-mv: cannot stat './fig_scal.png': No such file or directory
