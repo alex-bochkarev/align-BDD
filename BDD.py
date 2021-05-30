@@ -877,6 +877,11 @@ class BDD(object):
         self.vars = new_vars
         self.var_pos = dict(zip(self.vars, [i for i in range(len(self.vars))]))
 
+    def shuffle_vars(self):
+        """Randomly shuffles variables."""
+        self.rename_vars(
+            dict(zip(self.vars, np.random.permutation(self.vars))))
+
     def is_aligned(self, to_what):
         """Helper function: checks if the BDD is aligned w/ to_what."""
         return np.array_equal(self.vars, to_what.vars)
@@ -1494,4 +1499,3 @@ def test_shortest_path(test_inst):
         assert nl[NROOT] == m.objVal, "SP={nl[NROOT], while Gurobi gave {m.objVal}}"
     else:
         assert nl[NROOT] == "∞", "with Gurobi status {m.status}, root node label is {nl[NROOT]}"
-
