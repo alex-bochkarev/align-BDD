@@ -16,6 +16,10 @@
   - [X] num test
   - [X] Look into =gen_test_p.csv= (dia sizes for various instance gen parameters =p=)
   - [X] check out =gen_test_colors.csv= (different no. of colors for given =n = 15=
+  - [ ] check out if the costs are correct for =build_color_DD=.
+    I thought it was not assume to include costs at all. How does it pass the tests?..
+  - [ ] maybe generate t-UFLP differently?
+    distribute the first facility into every bin, and then sort them randomly?
 
 * Current project TODOs
 ** TODO Kill already merged branches

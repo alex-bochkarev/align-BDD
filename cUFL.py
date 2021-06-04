@@ -180,7 +180,8 @@ class ColorSorter:
         return col_idx, customers
 
 
-def build_cover_DD(S, f, next_node_type='min'):  # pylint: disable=too-many-locals,invalid-name
+# pylint: disable=too-many-locals,invalid-name
+def build_cover_DD(S, f, next_node_type='min'):
     """Builds a BDD for the UFL problem.
 
     Introduces `x`-variables only; encodes the condition of covering

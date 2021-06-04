@@ -74,6 +74,9 @@ figures/fig_tUFL_simpl_eff_rnd.png: post_processing/fig_jUFL_simpl_eff.R run_log
 # run_logs/jUFL/logfile.csv: experiments/jUFL_hist_sizes.py
 #				./get_jUFL_hist.sh 4 # or qsub pbs/jUFL_hists.pbs
 
+figures/fig_simpl_vs_min.png: post_processing/fig_simpl_vs_min.R run_logs/jUFL/logfile.csv run_logs/jUFL/logfile_tUFL_nat.csv run_logs/jUFL/logfile_tUFL_rnd.csv run_logs/jUFL/logfile_rnd_dia.csv
+				Rscript post_processing/fig_simpl_vs_min.R -o $@
+
 ######################################################################
 ## High-level recipes
 .SECONDARY: # keep all the intermediary logfiles (will not work o/w)
