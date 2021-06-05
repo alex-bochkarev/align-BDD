@@ -1,15 +1,19 @@
 ######################################################################
 ##
-## Colored UFL runtimes breakdown figure.
+## t-UFLP runtimes breakdown figure.
+##
+## Relevant experiment: tUFLP_runtimes.py (cUFL_runtimes.py)
 ##
 ## (c) Alexey Bochkarev, Clemson University, 2021
 ## abochka@clemson.edu
 
-library(ggplot2)
-library(dplyr)
-library(tidyr)
-library(gridExtra)
-library(optparse)
+suppressPackageStartupMessages({
+  library(ggplot2)
+  library(dplyr)
+  library(tidyr)
+  library(gridExtra)
+  library(optparse)
+})
 
 ######################################################################
 ## unpack the command line arguments
@@ -33,13 +37,14 @@ if (is.null(opt$input) | is.null(opt$out)){
 infile = opt$input
 
 df = read.csv(infile, stringsAsFactors = FALSE)
+df$ID = paste(df$n,df$k,sep="-")
 df$run = NULL
 df$method = NULL
 df$n = NULL  # all these are n=20
 
 df$step <- sapply(df$step, function(x) gsub("[+-]", ".", x), USE.NAMES = FALSE)
 
-df = pivot_wider(df, id_cols = "k", names_from = step, values_from = time)
+df = pivot_wider(df, id_cols = "ID", names_from = step, values_from = time)
 
 df = df %>%
   mutate(
@@ -53,7 +58,7 @@ df = df %>%
     naive_MIP = build.solve
   )
 
-df = pivot_longer(select(df, k,
+df = pivot_longer(select(df, ID,
                          build_BDDs,
                          solve_VS,
                          align_BDDs,
@@ -62,16 +67,31 @@ df = pivot_longer(select(df, k,
                          VS_pipeline,
                          CPP_MIP_pipeline,
                          naive_MIP),
-                         !k, names_to = "step", values_to = "time")
+                         !ID, names_to = "step", values_to = "time")
 
 steps = c("build_BDDs", "solve_VS", "align_BDDs", "intersect_BDDs", "solve_SP", "VS_pipeline", "CPP_MIP_pipeline", "naive_MIP")
 
-df = df %>%
-  mutate(step_factor = factor(step, levels=steps))
+captions = list("build_BDDs"="(1) Build BDDs",
+                "solve_VS"="(2) Solve VS",
+                "align_BDDs"="(3) Align BDDs",
+                "intersect_BDDs"="(4) Build\nintersection",
+                "solve_SP"="(5) Solve SP",
+                "VS_pipeline"="(6) TOTAL\nCPP+SP (VS)",
+                "CPP_MIP_pipeline"="(7) CPP MIP",
+                "naive_MIP"="(8) Naive MIP")
 
-cairo_ps(opt$out, width = 16, height = 10)
-ggplot(df, aes(x=log(time)))+
+df = df %>%
+  mutate(
+    step_factor = factor(step, levels = steps)
+  )
+
+levels(df$step_factor) <- sapply(levels(df$step_factor),
+                                 function(x) return(captions[[x]]))
+
+breakdown_plot=
+ggplot(df, aes(x=time))+
   geom_histogram(position="identity", binwidth = 0.1)+
+  scale_x_log10()+
   coord_flip()+
   theme(
     axis.text.x = element_text(angle=90,hjust=0.8),
@@ -83,11 +103,10 @@ ggplot(df, aes(x=log(time)))+
                                     colour = "lightgrey"),
     panel.grid.minor.x = element_line(size=0.25,linetype = 'solid', colour = "lightgrey"),
     panel.grid.minor.y = element_line(size=0.25,linetype = 'solid', colour = "lightgrey"),
-    strip.text.y = element_text(size=16, angle=180)
-    ## strip.background = element_blank()
-    )+
+    strip.background = element_blank(),
+    strip.text.x = element_text(size = 14, face="bold"))+
   facet_grid(. ~ step_factor, scales="fixed")+
-  xlab("Step runtime (log msec.)")+
-  ylab(paste("Instances count (out of ", length(unique(df$k)), ")", sep=""))+
-  ggtitle("Colored UFL: runtimes breakdown")
-dev.off()
+  xlab("Step runtime, msec.")+
+  ylab(paste("Instances count (out of ", length(unique(df$ID)), ")", sep=""))
+
+ggsave(opt$out, breakdown_plot, width=16, height=10)
