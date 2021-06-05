@@ -80,6 +80,9 @@ figures/fig_simpl_vs_min.png: post_processing/fig_simpl_vs_min.R run_logs/jUFL/l
 figures/fig_tUFLP_runtimes_breakdown.eps: run_logs/cUFL_runtimes.csv post_processing/fig_cUFL_runtimes_breakdown.R
 				Rscript post_processing/fig_cUFL_runtimes_breakdown.R -i $< -o $@
 
+figures/fig_tUFLP_runtimes_overview.eps: run_logs/cUFL_runtimes_overview.csv post_processing/fig_cUFL_runtimes_overview.R
+				Rscript post_processing/fig_cUFL_runtimes_overview.R -i $< -o $@
+
 ######################################################################
 ## High-level recipes
 .SECONDARY: # keep all the intermediary logfiles (will not work o/w)

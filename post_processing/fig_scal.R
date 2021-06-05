@@ -5,11 +5,13 @@
 ## (c) Alexey Bochkarev, Clemson University, 2020
 ## abochka@clemson.edu
 
-library(ggplot2)
-library(dplyr)
-library(tidyr)
-library(gridExtra)
-library(optparse)
+suppressPackageStartupMessages({
+  library(ggplot2)
+  library(dplyr)
+  library(tidyr)
+  library(gridExtra)
+  library(viridis)
+  library(optparse)})
 
 ######################################################################
 ## unpack the command line arguments
@@ -68,91 +70,93 @@ cat(paste("No. of unsolved instances (total): ", as.character(nrow(filter(df, or
 
 p1 =
 ggplot(df)+
-    geom_point(aes(x=N, y = log(orig_simpl_time), color="Auxiliary problem / heuristic"),
+  geom_point(aes(x=N, y = orig_simpl_time,
+                 color="Auxiliary problem / heuristic"),
              shape=3, size=5, alpha=0.3)+
-    geom_jitter(aes(x=N, y = log(orig_gsifts1p_time), color="BDD sifts"),
+  geom_jitter(aes(x=N, y = orig_gsifts1p_time,
+                  color="BDD sifts"),
               size=2, alpha=0.3, width = 0.1)+
-    geom_line(data=df_means, aes(x=N, y=log(mean_simpl_time),
-                               color="Auxiliary problem / heuristic", linetype="Auxiliary problem / heuristic"), size=2)+
-    geom_line(data=df_means, aes(x=N, y=log(mean_gsifts_time),
+  geom_line(data=df_means, aes(x=N, y=mean_simpl_time,
+                               color="Auxiliary problem / heuristic",
+                               linetype="Auxiliary problem / heuristic"), size=2)+
+  geom_line(data=df_means, aes(x=N, y=mean_gsifts_time,
                                color="BDD sifts", linetype="BDD sifts"), size=2)+
-    geom_label(data=df_outp, aes(x=N, label=scales::percent(accuracy=1,simpl_outp)),y=7.5, size=3)+
-    scale_linetype_manual(values = c("solid", "dashed"),
+  geom_label(data=df_outp, aes(x=N, label=scales::percent(accuracy=1,simpl_outp)),
+             y=3.5, size=3)+
+  scale_linetype_manual(values = c("solid", "dashed"),
                         labels = c("Auxiliary problem / heuristic", "BDD sifts"))+
-    scale_x_continuous(
-        breaks = seq(min(df$N),max(df$N),by = 1),
-        minor_breaks = seq(min(df$N),max(df$N), by=1)
-    )+
-    labs(x="No. of variables\n(a)",y="Solution time, sec., logarithmic scale, ln (t)")+
-    guides(color=guide_legend("Solution method (log of median values):"), linetype=guide_legend("Solution method (log of median values):"))+
-    theme(
-        legend.position = c(0.4, 0.8),
-        legend.direction = "vertical",
-        legend.title = element_text(size=16),
-        legend.text = element_text(size=16),
-        legend.key = element_blank(),
-        legend.key.width = unit(2.5,"cm"),
-        axis.text.x = element_text(size=18,angle=45,vjust = 0.7),
-        axis.text.y = element_text(size=18),
-        axis.title.x = element_text(size = 26),
-        axis.title.y = element_text(size = 26),
-        panel.background = element_blank(),
-        panel.grid.major = element_line(size = 0.5, linetype = 'solid',
-                                        colour = "lightgrey"),
-        panel.grid.minor.x = element_line(size=0.25,linetype = 'solid', colour = "lightgrey"),
-        panel.grid.minor.y = element_line(size=0.25,linetype = 'solid', colour = "lightgrey")
-    )
+  scale_x_continuous(
+    breaks = seq(min(df$N),max(df$N),by = 1),
+    minor_breaks = seq(min(df$N),max(df$N), by=1)
+  )+
+  scale_color_viridis(discrete=TRUE) +
+  annotation_logticks(sides = "l")+
+  scale_y_log10(labels=scales::comma)+
+  labs(x="No. of variables\n(a)",y="Solution time, sec")+
+  guides(color=guide_legend("Solution method (median values):"), linetype=guide_legend("Solution method (median values):"))+
+  theme(
+    legend.position = c(0.4, 0.8),
+    legend.direction = "vertical",
+    legend.title = element_text(size=16),
+    legend.text = element_text(size=16),
+    legend.key = element_blank(),
+    legend.key.width = unit(2.5,"cm"),
+    axis.text.x = element_text(size=18,angle=45,vjust = 0.7),
+    axis.text.y = element_text(size=10),
+    axis.title.x = element_text(size = 26),
+    axis.title.y = element_text(size = 26),
+    panel.background = element_blank(),
+    panel.grid.major = element_line(size = 0.5, linetype = 'solid',
+                                    colour = "lightgrey"),
+    panel.grid.minor.x = element_line(size=0.25,linetype = 'solid', colour = "lightgrey"),
+    panel.grid.minor.y = element_line(size=0.25,linetype = 'solid', colour = "lightgrey")
+  )
 
-## leg = "# variables (N):"
-## Nmin = min(df$N)
-## Nmax = max(df$N)
-## Ns = unique(df$N)
-## Nmed = Ns[which.min(abs(Ns - median(Ns)))]
+######################################################################
+## The right panel
+
 Ns = c(5,10,12,15,17,20,22,25)
-xmin = min(df$rel_obj)
-xmax = quantile(df$rel_obj, 0.99)
+dfn = filter(df, N %in% Ns)
+
+xmin = min(dfn$rel_obj)
+xmax = quantile(dfn$rel_obj, 0.99)
 
 p2 =
-ggplot(filter(df, N %in% Ns), aes(x=rel_obj))+
+ggplot(dfn, aes(x=rel_obj))+
     geom_histogram(position="identity",binwidth = 0.05)+
-#    geom_density(alpha=0.1,position="identity")+
-    ## guides(fill=FALSE, color = FALSE)+
-    theme(
-        panel.grid.major = element_line(size = 0.5, linetype = 'solid',
-                                        color = "darkgrey"),
-        axis.text.x = element_text(angle=90,hjust=0.8),
-        legend.position = c(0.5,0.8),
-        )+
     scale_x_continuous(
         "Relative heuristic objective\n(b)",
         label = scales::percent,
-        breaks = seq(min(df$rel_obj), max(df$rel_obj), length.out = 11),
+        breaks = seq(xmin, xmax, length.out = 5),
         limits = c(xmin,xmax)
     )+
     scale_y_continuous(
-      "No. of instances",
+      paste0("Number of instances, out of ",
+             nrow(filter(df, N == Ns[1]))),
       position="right")+
-    ##     ## breaks = seq(0, nrow(df), length.out = 11),
-    ##     ## minor_breaks = seq(0, nrow(df), length.out = 21),
-    ##     label = scales::number_format(accuracy = 1.0)
-    ## )+
     theme(
-        legend.title = element_text(size=24),
-        legend.text = element_text(size=24),
-        axis.text.x = element_text(size=22,angle=45,vjust = 0.7),
-        axis.text.y = element_text(size=11),
-        axis.title.x = element_text(size = 26),
-        axis.title.y = element_text(size = 26),
-        panel.background = element_blank(),
-        panel.grid.major = element_line(size = 0.5, linetype = 'solid',
-                                        colour = "lightgrey"),
-        panel.grid.minor.x = element_line(size=0.25,linetype = 'solid', colour = "lightgrey"),
-        panel.grid.minor.y = element_line(size=0.25,linetype = 'solid', colour = "lightgrey"),
-        strip.text.y = element_text(size=16, angle=180)
-        ## strip.background = element_blank()
+      legend.title = element_text(size=24),
+      legend.text = element_text(size=24),
+      legend.position = c(0.5,0.8),
+      axis.text.x = element_text(size=22,angle=45,vjust = 0.7),
+      axis.text.y = element_text(size=11),
+      axis.title.x = element_text(size = 26),
+      axis.title.y = element_text(size = 26),
+      panel.background = element_blank(),
+      panel.grid.major = element_line(size = 0.5, linetype = 'solid',
+                                      colour = "lightgrey"),
+      panel.grid.minor.x = element_line(size=0.25,linetype = 'solid', colour = "lightgrey"),
+      panel.grid.minor.y = element_line(size=0.25,linetype = 'solid', colour = "lightgrey"),
+      strip.text.y = element_text(size=16, angle=180)
+      ## strip.background = element_blank()
     )+
-  facet_grid(N ~ ., scales="free_y", switch="y")
+  facet_grid(N ~ ., scales="fixed", switch="y")
 
-cairo_ps(opt$out, width = 16, height = 10)
+if(length(unique(table(dfn$N)))>1){
+  cat("WARNING: unbalanced dataset: different number of elements for different Ns in the figure! Please check the data\n")
+}
+
+outfile = opt$out
+cairo_ps(outfile, width = 16, height = 10, family="Arial")
 grid.arrange(p1,p2,ncol=2)
 dev.off()

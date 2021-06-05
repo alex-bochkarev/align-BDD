@@ -5,13 +5,14 @@
 ##
 ## (c) Alexey Bochkarev, Clemson University, 2020
 
-library(ggplot2)
-library(gridExtra)
-library(dplyr)
-library(tidyr)
-library(stringr)
-library(latex2exp)
-library(optparse)
+suppressPackageStartupMessages({
+  library(ggplot2)
+  library(gridExtra)
+  library(dplyr)
+  library(tidyr)
+  library(stringr)
+  library(latex2exp)
+  library(optparse)})
 
 ## Internal parameters for the figure
 BINWIDTH = 0.01
@@ -35,7 +36,9 @@ if (is.null(opt$input) | is.null(opt$out)){
 
 ######################################################################
 ## parse the input file
-df = read.csv(opt$input, stringsAsFactors = FALSE)
+infile = opt$input
+
+df = read.csv(infile, stringsAsFactors = FALSE)
 df_legends = unique(select(
   filter(df, !grepl("timelog", legend)), LB, legend))
 
@@ -49,65 +52,42 @@ df = merge(
 df$caption = str_wrap(df$legend.capt, width=10)
 df$caption_f = factor(df$caption, levels = unique(df$caption))
 df$entry_type = ifelse(grepl("timelog", df$legend.tech), "time","gap")
-### new edition
-facet_names <- c(labels, list(
-  "gap" = "LB tightness score",
-  "time" = "Wall-clock time per instance, sec"
-  )
-)
+df = df %>% mutate(
+              value = ifelse(entry_type=="gap", gap*100,
+                             gap*1000)
+                  )
 
-mylab = function(x){
-  if(x %in% names(facet_names)){
-    return(facet_names[x])
-  }else{
-    return(x)
-  }
-}
+facets = list("LB_first" = "Min size\nfirst\nelement\naligned",
+  "LB_last" = "Min size\nlast\nelement\naligned",
+  "LB_levels" = "Inversions-\ndriven LB",
+  "gap" = "LB tightness score, percent",
+  "time" = "Wall-clock time per instance, msec")
 
 plt =
-   ggplot(df,aes(x=gap, group=caption))+
-    ## geom_point(size=5)+
-    ##geom_density_ridges(rel_min_height = 0.01, jittered_points = TRUE,
-    ##                  position = position_points_jitter(width = 0.01, height = 0),
-    ##                  point_shape = "|", point_size = 2,
-  ##                  alpha = 0.1)+
+   ggplot(df,aes(x=value, group=caption))+
     geom_histogram(bins=50)+
-    geom_vline(data=filter(df, entry_type=="gap"), aes(xintercept = 1.0), size=0.5, color="red", linetype="dashed")+
+    geom_vline(data=filter(df, entry_type=="gap"), aes(xintercept = 100.0), size=0.5, color="red", linetype="dashed")+
     geom_vline(data=filter(df, entry_type=="gap"), aes(xintercept = 0.0), size=0.5, color="red", linetype="dashed")+
     scale_y_continuous(position="right")+
-    ##     "Objective value (percent of the exact min)",
-    ##     labels = scales::percent
-    ## )+
-    ## scale_x_continuous(
-    ##     "Calculation (wall-clock) time per instance, sec.",
-         ## labels = scales::number_format(accuracy = 0.1),
-    ##     ## breaks = seq(xmin,xmax,length.out = Nticks)
-    ## )+
-  ## coord_cartesian(ylim=c(ymin,ymax))+
-    ## scale_shape_manual(values=1:length(unique(df_time_o$comment)))+
-    ## guides(
-    ##     color=guide_legend(title="Heuristic / method:"),
-    ##     shape=guide_legend(title="Heuristic / method:")
-    ##     )+
-    guides(fill=FALSE)+
+    guides(fill="none")+
     theme(
-      ## legend.position = c(0.8, 0.8),
-      ## legend.direction = "vertical",
-      ## legend.title = element_text(size=24),
-      ## legend.text = element_text(size=24),
-      axis.text.x = element_text(size=22,angle=45,vjust = 0.7),
+      axis.text.x = element_text(size=18),
       axis.text.y = element_text(size=13),
-      axis.title.x = element_text(size = 26),
+      axis.title.x = element_blank(),
       axis.title.y = element_text(size = 26, margin = margin(t=50)),
       panel.background = element_rect(fill = NA, color = "black"),
       panel.grid.major = element_line(size = 0.5, linetype = 'solid',
                                       color = "lightgrey"),
+      panel.grid.minor = element_line(size = 0.25, linetype = 'solid',
+                                      color = "lightgrey"),
       strip.text.x = element_text(size = 22),
-      strip.text.y = element_text(size=22, angle=180),
+      strip.text.y.left = element_text(size = 22, angle=0),
       strip.background = element_blank()
     )+
-  facet_grid(caption ~ entry_type, labeller=as_labeller(mylab), scales="free", switch="y")+
-  ylab("")+xlab("")
+  facet_grid(LB ~ entry_type, labeller=as_labeller(function(x) return(facets[x])), scales="free_x", switch="y")+
+  ylab(paste0("Number of instances, out of ",
+              nrow(df)/length(unique(df$LB))))
+
 ### end of the new edition
 ######################################################################
 ## draw the figure

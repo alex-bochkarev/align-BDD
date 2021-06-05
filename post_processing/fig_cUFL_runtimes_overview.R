@@ -1,6 +1,6 @@
 ######################################################################
 ##
-## cUFL runtimes overview 
+## cUFL runtimes overview
 ##
 ## (c) Alexey Bochkarev, Clemson University, 2021
 ## abochka@clemson.edu
@@ -10,6 +10,7 @@ library(dplyr)
 library(tidyr)
 library(gridExtra)
 library(optparse)
+library(viridis)
 
 ######################################################################
 ## unpack the command line arguments
@@ -58,32 +59,34 @@ df_means = df %>%
     med_align_gsifts_SP = median(align_gsifts_SP)
   )
 
-cairo_ps(opt$out, width = 16, height = 10)
+cairo_ps(opt$out, width = 16, height = 10, family="Arial")
 
 ggplot(df)+
-  ggtitle("Colored UFL: runtimes overview / scaling.")+
-  geom_jitter(aes(x=n, y = log(naive_MIP), color="Naive MIP"),
-              size=2, alpha=0.3, width = 0.1)+
-  geom_jitter(aes(x=n, y = log(BDD_MIP), color="CPP MIP"),
-              size=2, alpha=0.3, width = 0.1)+
-  geom_jitter(aes(x=n, y = log(align_vs_SP), color="CPP align-BDD (VS) + SP"),
-              size=2, alpha=0.3, width = 0.1)+
-  geom_jitter(aes(x=n, y = log(align_gsifts_SP), color="CPP align-BDD (gsifts) + SP"),
-              size=2, alpha=0.3, width = 0.1)+
-  labs(x="No. of variables (nodes in the original graph)",y="Solution time, log(msec.) ")+
-  geom_line(data=df_means, aes(x=n, y=log(med_naive_MIP),
+  scale_color_viridis(discrete=TRUE) +
+  scale_y_log10(labels=scales::comma)+
+  annotation_logticks(sides='l') +
+  geom_jitter(aes(x=n, y = naive_MIP, color="Naive MIP"),
+              size=2, alpha=0.3, width = 0.1, shape=1)+
+  geom_jitter(aes(x=n, y = BDD_MIP, color="CPP MIP"),
+              size=2, alpha=0.3, width = 0.1, shape=2)+
+  geom_jitter(aes(x=n, y = align_vs_SP, color="CPP align-BDD (VS) + SP"),
+              size=2, alpha=0.3, width = 0.1, shape=3)+
+  geom_jitter(aes(x=n, y = align_gsifts_SP, color="CPP align-BDD (gsifts) + SP"),
+              size=2, alpha=0.3, width = 0.1, shape=4)+
+  labs(x="No. of variables (nodes in the original graph)",y="Solution time, msec")+
+  geom_line(data=df_means, aes(x=n, y=med_naive_MIP,
                                color="Naive MIP", linetype="Naive MIP"), size=2)+
-  geom_line(data=df_means, aes(x=n, y=log(med_BDD_MIP),
+  geom_line(data=df_means, aes(x=n, y=med_BDD_MIP,
                                color="CPP MIP", linetype="CPP MIP"), size=2)+
-  geom_line(data=df_means, aes(x=n, y=log(med_align_vs_SP),
+  geom_line(data=df_means, aes(x=n, y=med_align_vs_SP,
                                 color="CPP align-BDD (VS) + SP", linetype="CPP align-BDD (VS) + SP"), size=2)+
-  geom_line(data=df_means, aes(x=n, y=log(med_align_gsifts_SP),
+  geom_line(data=df_means, aes(x=n, y=med_align_gsifts_SP,
                                color="CPP align-BDD (gsifts) + SP", linetype="CPP align-BDD (gsifts) + SP"), size=2)+
   scale_x_continuous(
     breaks = seq(min(df$n),max(df$n),by = 1),
     minor_breaks = seq(min(df$n),max(df$n), by=1)
   )+
-  guides(color=guide_legend("Solution method (log of median values):"), linetype=guide_legend("Solution method (log of median values):"))+
+  guides(color=guide_legend("Solution method (median values):"), linetype=guide_legend("Solution method (median values):"))+
   theme(
     legend.position = c(0.2, 0.8),
     legend.direction = "vertical",

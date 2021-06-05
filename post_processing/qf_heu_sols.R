@@ -31,8 +31,8 @@ ggplot(df_less_than_hundred) +
   theme(
     axis.text.x = element_text(size = 18),
     axis.text.y = element_text(size = 18),
-    axis.title.x = element_text(size = 20),
-    axis.title.y = element_text(size = 20),
+    axis.title.x = element_text(size = 23),
+    axis.title.y = element_text(size = 23),
     panel.background = element_blank(),
     panel.grid.major = element_line(
       size = 0.5, linetype = "solid",
@@ -61,13 +61,13 @@ cat(sprintf("Fig: opts diam"), "\n")
 
 ggplot(df) +
   geom_histogram(aes(x=opts_diam), binwidth=5) +
-  xlab("Minimal similarity score between optima, percent") +
+  xlab("Min. simscore between optima, percent") +
   ylab(paste0("Count of instances (out of ", nrow(df), ")"))+
   theme(
     axis.text.x = element_text(size = 18),
     axis.text.y = element_text(size = 18),
-    axis.title.x = element_text(size = 20),
-    axis.title.y = element_text(size = 20),
+    axis.title.x = element_text(size = 23),
+    axis.title.y = element_text(size = 23),
     panel.background = element_blank(),
     panel.grid.major = element_line(
       size = 0.5, linetype = "solid",
@@ -120,8 +120,8 @@ ggplot(df_m) +
     legend.text.align = 0,
     axis.text.x = element_text(size = 18),
     axis.text.y = element_text(size = 18),
-    axis.title.x = element_text(size = 20),
-    axis.title.y = element_text(size = 20),
+    axis.title.x = element_text(size = 23),
+    axis.title.y = element_text(size = 23),
     strip.background = element_blank(),
     strip.text.x = element_text(size = 18, face="bold"),
     panel.background = element_blank(),
@@ -145,8 +145,8 @@ ggplot(df) +
   geom_bin2d(aes(AB_simscore, best_VS_simscore), bins = 10) +
   scale_fill_viridis_c() +
   guides(fill = guide_legend("No. instances:")) +
-  xlab("Simscore between A and B (initial orders)")+
-  ylab("Best simscore from the heuristic")+
+  xlab("Simscore(A,B): initial orders")+
+  ylab("Best simscore (heuristic)")+
   theme(
     ## legend.position = c(0.2, 0.8),
     ## legend.direction = "vertical",
@@ -155,8 +155,8 @@ ggplot(df) +
     ## legend.text.align = 0,
     axis.text.x = element_text(size = 18),
     axis.text.y = element_text(size = 18),
-    axis.title.x = element_text(size = 20),
-    axis.title.y = element_text(size = 20),
+    axis.title.x = element_text(size = 23),
+    axis.title.y = element_text(size = 23),
     panel.background = element_blank(),
     panel.grid.major = element_line(
       size = 0.5, linetype = "solid",

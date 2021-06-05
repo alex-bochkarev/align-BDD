@@ -5,13 +5,15 @@
 ##
 ## (c) Alexey Bochkarev, Clemson University, 2020
 
-library(ggplot2)
-library(ggridges)
-library(dplyr)
-library(tidyr)
-library(stringr)
-library(latex2exp)
-library(optparse)
+suppressPackageStartupMessages({
+  library(ggplot2)
+  library(ggridges)
+  library(dplyr)
+  library(tidyr)
+  library(stringr)
+  library(latex2exp)
+  library(optparse)
+})
 
 ## Internal parameters for the figure
 ORIG_BASE_COL = "simpl_BB_obj" # col to divide by
@@ -40,8 +42,9 @@ if (is.null(opt$input) | is.null(opt$out)){
 
 ######################################################################
 ## parse the input file
+infile = opt$input
 
-df = read.csv(opt$input, stringsAsFactors = FALSE)
+df = read.csv(infile, stringsAsFactors = FALSE)
 
 df_legend = select(filter(df, num_type=="legend"), value,comment)
 df = filter(df, num_type != "legend")
@@ -93,54 +96,41 @@ names(labels) <- facet_names$heuristic
 
 facet_names <- c(labels, list(
   "obj" = "Objective values, percent",
-  "time" = "Wall-clock time, sec"
+  "time" = "Wall-clock time / instance, msec"
   )
 )
 
 mylab = function(x){ return(facet_names[x]) }
 
+my_ticks = annotation_logticks(sides = "b")
+my_ticks$data=filter(df_time_o, comment=="Best of A and B")
+
+df_time_o = df_time_o %>%
+  mutate(
+    value = ifelse(entry_type == "time", value*1000, value*100)
+  )
+
 plt_zoomed =
-   ggplot(df_time_o,aes(x=log(value), group=comment))+
-    ## geom_point(size=5)+
-    ##geom_density_ridges(rel_min_height = 0.01, jittered_points = TRUE,
-    ##                  position = position_points_jitter(width = 0.01, height = 0),
-    ##                  point_shape = "|", point_size = 2,
-  ##                  alpha = 0.1)+
-    geom_histogram(binwidth=BINWIDTH)+
-    scale_y_continuous(position="right")+
-    ##     "Objective value (percent of the exact min)",
-    ##     labels = scales::percent
-    ## )+
-    ## scale_x_continuous(
-    ##     "Calculation (wall-clock) time per instance, sec.",
-         ## labels = scales::number_format(accuracy = 0.1),
-    ##     ## breaks = seq(xmin,xmax,length.out = Nticks)
-    ## )+
-  ## coord_cartesian(ylim=c(ymin,ymax))+
-    ## scale_shape_manual(values=1:length(unique(df_time_o$comment)))+
-    ## guides(
-    ##     color=guide_legend(title="Heuristic / method:"),
-    ##     shape=guide_legend(title="Heuristic / method:")
-    ##     )+
-    guides(fill=FALSE)+
-    theme(
-      ## legend.position = c(0.8, 0.8),
-      ## legend.direction = "vertical",
-      ## legend.title = element_text(size=24),
-      ## legend.text = element_text(size=24),
-      axis.text.x = element_text(size=22,angle=45,vjust = 0.7),
-      axis.text.y = element_text(size=13),
-      axis.title.x = element_text(size = 26),
-      axis.title.y = element_text(size = 26, margin = margin(t=50)),
-      panel.background = element_rect(fill = NA, color = "black"),
-      panel.grid.major = element_line(size = 0.5, linetype = 'solid',
-                                      color = "lightgrey"),
-      strip.text.x = element_text(size = 22),
-      strip.text.y = element_text(size=22, angle=180),
-      strip.background = element_blank()
-    )+
-  facet_grid(heuristic ~ entry_type, labeller=as_labeller(mylab), scales="free", switch="y")+
-  xlab("Logarithm of the value")+ylab("Heuristic")
+  ggplot(df_time_o,aes(x=value, group=comment))+
+  geom_histogram(binwidth=BINWIDTH)+ scale_y_continuous(position="right")+
+  guides(fill="none")+
+  theme(
+    axis.text.x = element_text(size=10,angle = 45,vjust = 0.7),
+    axis.text.y = element_text(size=10),
+    axis.title.x = element_blank(),
+    axis.title.y = element_text(size = 26, margin = margin(t=50)),
+    panel.background = element_rect(fill = NA, color = "black"),
+    panel.grid.major = element_line(size = 0.5,
+                                    linetype = 'solid',
+                                    color = "lightgrey"),
+    strip.text.x = element_text(size = 22),
+    strip.text.y.left = element_text(size = 22, angle=0),
+    strip.background = element_blank()) +
+  scale_x_log10()+ my_ticks+
+  facet_grid(heuristic ~ entry_type, scales="free_x",
+             labeller=as_labeller(mylab), switch="y")+
+  ylab(paste0("Number of instances, out of ",
+              length(unique(df_rel$instance))))
 
 
 ggsave(opt$out,plt_zoomed,width = 16, height = 10, device = cairo_ps)

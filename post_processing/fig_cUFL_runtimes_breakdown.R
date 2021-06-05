@@ -88,6 +88,9 @@ df = df %>%
 levels(df$step_factor) <- sapply(levels(df$step_factor),
                                  function(x) return(captions[[x]]))
 
+my_ticks = annotation_logticks(sides = "l")
+my_ticks$data=filter(df, step=="build_BDDs")
+
 breakdown_plot=
 ggplot(df, aes(x=time))+
   geom_histogram(position="identity", binwidth = 0.1)+
@@ -107,6 +110,7 @@ ggplot(df, aes(x=time))+
     strip.text.x = element_text(size = 14, face="bold"))+
   facet_grid(. ~ step_factor, scales="fixed")+
   xlab("Step runtime, msec.")+
-  ylab(paste("Instances count (out of ", length(unique(df$ID)), ")", sep=""))
+  ylab(paste("Instances count (out of ", length(unique(df$ID)), ")", sep=""))+
+  my_ticks  # isn't it wonderful?..
 
 ggsave(opt$out, breakdown_plot, width=16, height=10)
