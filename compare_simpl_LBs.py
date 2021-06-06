@@ -18,9 +18,13 @@ if __name__ == "__main__":
                                formatter_class=ap.ArgumentDefaultsHelpFormatter)
     parser.add_argument("-d","--dir", dest="inst_dir", help="temporary output directory")
     parser.add_argument("-l","--list_inst", dest="inst_list", help="list of instance IDs (filename)")
+    parser.add_argument("-H", "--header", action="store_true", dest="header", help="show header only and exit")
     args = parser.parse_args()
 
-    log("LB,gap",comment="legend")
+    if args.header:
+        log("LB,gap",comment="legend")
+        exit(0)
+
     with open(args.inst_list,"r") as inst_list:
         for inst_id in inst_list:
             inst_id = int(inst_id.rstrip())

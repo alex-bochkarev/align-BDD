@@ -1,0 +1,715 @@
+LB,gap,legend
+simpl_BB,0.007791280746459961,timelog
+LB_first,0.013888888888888888,min size first element aligned
+LB_first,0.00020766258239746094,timelog
+LB_last,0.4861111111111111,min size last element aligned
+LB_last,0.001987934112548828,timelog
+LB_levels,0.2222222222222222,inversions-driven LB
+LB_levels,0.00018453598022460938,timelog
+simpl_BB,0.019770145416259766,timelog
+LB_first,0.036585365853658534,min size first element aligned
+LB_first,0.00021839141845703125,timelog
+LB_last,0.34146341463414637,min size last element aligned
+LB_last,0.002000570297241211,timelog
+LB_levels,0.3048780487804878,inversions-driven LB
+LB_levels,0.00018787384033203125,timelog
+simpl_BB,0.012990951538085938,timelog
+LB_first,0.007407407407407408,min size first element aligned
+LB_first,0.0001983642578125,timelog
+LB_last,0.14814814814814814,min size last element aligned
+LB_last,0.0018875598907470703,timelog
+LB_levels,0.06666666666666667,inversions-driven LB
+LB_levels,0.00019478797912597656,timelog
+simpl_BB,0.01705026626586914,timelog
+LB_first,0.009345794392523364,min size first element aligned
+LB_first,0.00020313262939453125,timelog
+LB_last,0.4953271028037383,min size last element aligned
+LB_last,0.0020422935485839844,timelog
+LB_levels,0.1588785046728972,inversions-driven LB
+LB_levels,0.0002040863037109375,timelog
+simpl_BB,0.013056755065917969,timelog
+LB_first,0.02654867256637168,min size first element aligned
+LB_first,0.0002048015594482422,timelog
+LB_last,0.02654867256637168,min size last element aligned
+LB_last,0.002006053924560547,timelog
+LB_levels,0.23008849557522124,inversions-driven LB
+LB_levels,0.0001952648162841797,timelog
+simpl_BB,0.01304173469543457,timelog
+LB_first,0.04032258064516129,min size first element aligned
+LB_first,0.000202178955078125,timelog
+LB_last,0.47580645161290325,min size last element aligned
+LB_last,0.0019860267639160156,timelog
+LB_levels,0.18548387096774194,inversions-driven LB
+LB_levels,0.0001881122589111328,timelog
+simpl_BB,0.022114038467407227,timelog
+LB_first,0.017094017094017096,min size first element aligned
+LB_first,0.0002033710479736328,timelog
+LB_last,0.4700854700854701,min size last element aligned
+LB_last,0.002028942108154297,timelog
+LB_levels,0.15384615384615385,inversions-driven LB
+LB_levels,0.00019693374633789062,timelog
+simpl_BB,0.010830879211425781,timelog
+LB_first,0.0,min size first element aligned
+LB_first,0.00020503997802734375,timelog
+LB_last,0.7290322580645161,min size last element aligned
+LB_last,0.0019078254699707031,timelog
+LB_levels,0.15483870967741936,inversions-driven LB
+LB_levels,0.0001995563507080078,timelog
+simpl_BB,0.024977684020996094,timelog
+LB_first,0.0,min size first element aligned
+LB_first,0.00020170211791992188,timelog
+LB_last,0.2222222222222222,min size last element aligned
+LB_last,0.001972675323486328,timelog
+LB_levels,0.3333333333333333,inversions-driven LB
+LB_levels,0.0001804828643798828,timelog
+simpl_BB,0.012616157531738281,timelog
+LB_first,0.019417475728155338,min size first element aligned
+LB_first,0.00020313262939453125,timelog
+LB_last,0.02912621359223301,min size last element aligned
+LB_last,0.001920461654663086,timelog
+LB_levels,0.1650485436893204,inversions-driven LB
+LB_levels,0.00019884109497070312,timelog
+simpl_BB,0.011444807052612305,timelog
+LB_first,0.008,min size first element aligned
+LB_first,0.00020194053649902344,timelog
+LB_last,0.08,min size last element aligned
+LB_last,0.001949310302734375,timelog
+LB_levels,0.176,inversions-driven LB
+LB_levels,0.00019240379333496094,timelog
+simpl_BB,0.028334379196166992,timelog
+LB_first,0.021897810218978103,min size first element aligned
+LB_first,0.0002033710479736328,timelog
+LB_last,0.38686131386861317,min size last element aligned
+LB_last,0.0015115737915039062,timelog
+LB_levels,0.17518248175182483,inversions-driven LB
+LB_levels,0.00010943412780761719,timelog
+simpl_BB,0.015297651290893555,timelog
+LB_first,0.08426966292134831,min size first element aligned
+LB_first,0.0002307891845703125,timelog
+LB_last,0.2640449438202247,min size last element aligned
+LB_last,0.0016562938690185547,timelog
+LB_levels,0.10674157303370786,inversions-driven LB
+LB_levels,0.00014710426330566406,timelog
+simpl_BB,0.019092559814453125,timelog
+LB_first,0.010526315789473684,min size first element aligned
+LB_first,0.00019979476928710938,timelog
+LB_last,0.3157894736842105,min size last element aligned
+LB_last,0.0016345977783203125,timelog
+LB_levels,0.24210526315789474,inversions-driven LB
+LB_levels,0.00016570091247558594,timelog
+simpl_BB,0.017418861389160156,timelog
+LB_first,0.006711409395973154,min size first element aligned
+LB_first,0.00019550323486328125,timelog
+LB_last,0.19463087248322147,min size last element aligned
+LB_last,0.0016484260559082031,timelog
+LB_levels,0.16778523489932887,inversions-driven LB
+LB_levels,0.0001251697540283203,timelog
+simpl_BB,0.02200937271118164,timelog
+LB_first,0.031746031746031744,min size first element aligned
+LB_first,0.00033974647521972656,timelog
+LB_last,0.4444444444444444,min size last element aligned
+LB_last,0.0020470619201660156,timelog
+LB_levels,0.20634920634920634,inversions-driven LB
+LB_levels,0.0001862049102783203,timelog
+simpl_BB,0.014317750930786133,timelog
+LB_first,0.013157894736842105,min size first element aligned
+LB_first,0.0003483295440673828,timelog
+LB_last,0.5789473684210527,min size last element aligned
+LB_last,0.0025403499603271484,timelog
+LB_levels,0.14473684210526316,inversions-driven LB
+LB_levels,0.0001895427703857422,timelog
+simpl_BB,0.012742757797241211,timelog
+LB_first,0.0,min size first element aligned
+LB_first,0.00032401084899902344,timelog
+LB_last,0.6582278481012658,min size last element aligned
+LB_last,0.00208282470703125,timelog
+LB_levels,0.22784810126582278,inversions-driven LB
+LB_levels,0.00018906593322753906,timelog
+simpl_BB,0.023669004440307617,timelog
+LB_first,0.0332409972299169,min size first element aligned
+LB_first,0.000347137451171875,timelog
+LB_last,0.6869806094182825,min size last element aligned
+LB_last,0.0020384788513183594,timelog
+LB_levels,0.06371191135734072,inversions-driven LB
+LB_levels,0.00024366378784179688,timelog
+simpl_BB,0.009252309799194336,timelog
+LB_first,0.027777777777777776,min size first element aligned
+LB_first,0.0003337860107421875,timelog
+LB_last,0.20833333333333334,min size last element aligned
+LB_last,0.002080678939819336,timelog
+LB_levels,0.375,inversions-driven LB
+LB_levels,0.00017714500427246094,timelog
+simpl_BB,0.014861822128295898,timelog
+LB_first,0.07111111111111111,min size first element aligned
+LB_first,0.00020551681518554688,timelog
+LB_last,0.3422222222222222,min size last element aligned
+LB_last,0.001728057861328125,timelog
+LB_levels,0.07111111111111111,inversions-driven LB
+LB_levels,0.0002105236053466797,timelog
+simpl_BB,0.012825965881347656,timelog
+LB_first,0.0,min size first element aligned
+LB_first,0.0001964569091796875,timelog
+LB_last,0.3931034482758621,min size last element aligned
+LB_last,0.001641988754272461,timelog
+LB_levels,0.1793103448275862,inversions-driven LB
+LB_levels,0.000186920166015625,timelog
+simpl_BB,0.01520228385925293,timelog
+LB_first,0.0,min size first element aligned
+LB_first,0.00019025802612304688,timelog
+LB_last,0.07042253521126761,min size last element aligned
+LB_last,0.0015974044799804688,timelog
+LB_levels,0.11267605633802817,inversions-driven LB
+LB_levels,0.00020837783813476562,timelog
+simpl_BB,0.012679100036621094,timelog
+LB_first,0.008264462809917356,min size first element aligned
+LB_first,0.00020170211791992188,timelog
+LB_last,0.3305785123966942,min size last element aligned
+LB_last,0.0016345977783203125,timelog
+LB_levels,0.19008264462809918,inversions-driven LB
+LB_levels,0.0002052783966064453,timelog
+simpl_BB,0.02207207679748535,timelog
+LB_first,0.0,min size first element aligned
+LB_first,0.00021314620971679688,timelog
+LB_last,0.3137254901960784,min size last element aligned
+LB_last,0.0017375946044921875,timelog
+LB_levels,0.23529411764705882,inversions-driven LB
+LB_levels,0.0001628398895263672,timelog
+simpl_BB,0.01836371421813965,timelog
+LB_first,0.0,min size first element aligned
+LB_first,0.00019478797912597656,timelog
+LB_last,0.38333333333333336,min size last element aligned
+LB_last,0.0016651153564453125,timelog
+LB_levels,0.21666666666666667,inversions-driven LB
+LB_levels,0.0001926422119140625,timelog
+simpl_BB,0.017260074615478516,timelog
+LB_first,0.010638297872340425,min size first element aligned
+LB_first,0.0002048015594482422,timelog
+LB_last,0.7925531914893617,min size last element aligned
+LB_last,0.0016036033630371094,timelog
+LB_levels,0.09042553191489362,inversions-driven LB
+LB_levels,0.00020503997802734375,timelog
+simpl_BB,0.011213302612304688,timelog
+LB_first,0.014705882352941176,min size first element aligned
+LB_first,0.00019693374633789062,timelog
+LB_last,0.25735294117647056,min size last element aligned
+LB_last,0.0015821456909179688,timelog
+LB_levels,0.25,inversions-driven LB
+LB_levels,0.00019550323486328125,timelog
+simpl_BB,0.010316848754882812,timelog
+LB_first,0.017467248908296942,min size first element aligned
+LB_first,0.00020051002502441406,timelog
+LB_last,0.07860262008733625,min size last element aligned
+LB_last,0.0015668869018554688,timelog
+LB_levels,0.056768558951965066,inversions-driven LB
+LB_levels,0.00018978118896484375,timelog
+simpl_BB,0.0181732177734375,timelog
+LB_first,0.07547169811320754,min size first element aligned
+LB_first,0.0003466606140136719,timelog
+LB_last,0.8018867924528302,min size last element aligned
+LB_last,0.002382516860961914,timelog
+LB_levels,0.09905660377358491,inversions-driven LB
+LB_levels,0.00022411346435546875,timelog
+simpl_BB,0.013791084289550781,timelog
+LB_first,0.020833333333333332,min size first element aligned
+LB_first,0.00033664703369140625,timelog
+LB_last,0.4583333333333333,min size last element aligned
+LB_last,0.0021452903747558594,timelog
+LB_levels,0.19791666666666666,inversions-driven LB
+LB_levels,0.0002086162567138672,timelog
+simpl_BB,0.019121885299682617,timelog
+LB_first,0.038461538461538464,min size first element aligned
+LB_first,0.00020360946655273438,timelog
+LB_last,0.38461538461538464,min size last element aligned
+LB_last,0.001678466796875,timelog
+LB_levels,0.21794871794871795,inversions-driven LB
+LB_levels,0.0002048015594482422,timelog
+simpl_BB,0.01659989356994629,timelog
+LB_first,0.047619047619047616,min size first element aligned
+LB_first,0.00020003318786621094,timelog
+LB_last,0.6060606060606061,min size last element aligned
+LB_last,0.0016057491302490234,timelog
+LB_levels,0.09090909090909091,inversions-driven LB
+LB_levels,0.0002048015594482422,timelog
+simpl_BB,0.017511606216430664,timelog
+LB_first,0.09900990099009901,min size first element aligned
+LB_first,0.0002932548522949219,timelog
+LB_last,0.10891089108910891,min size last element aligned
+LB_last,0.0016412734985351562,timelog
+LB_levels,0.15841584158415842,inversions-driven LB
+LB_levels,0.00011754035949707031,timelog
+simpl_BB,0.018085479736328125,timelog
+LB_first,0.050359712230215826,min size first element aligned
+LB_first,0.0002601146697998047,timelog
+LB_last,0.2302158273381295,min size last element aligned
+LB_last,0.0019121170043945312,timelog
+LB_levels,0.17985611510791366,inversions-driven LB
+LB_levels,0.0001289844512939453,timelog
+simpl_BB,0.01908111572265625,timelog
+LB_first,0.030303030303030304,min size first element aligned
+LB_first,0.00022554397583007812,timelog
+LB_last,0.4393939393939394,min size last element aligned
+LB_last,0.0016934871673583984,timelog
+LB_levels,0.11363636363636363,inversions-driven LB
+LB_levels,0.00012493133544921875,timelog
+simpl_BB,0.016457319259643555,timelog
+LB_first,0.0,min size first element aligned
+LB_first,0.0002014636993408203,timelog
+LB_last,0.46808510638297873,min size last element aligned
+LB_last,0.0016303062438964844,timelog
+LB_levels,0.2553191489361702,inversions-driven LB
+LB_levels,0.00013875961303710938,timelog
+simpl_BB,0.021950960159301758,timelog
+LB_first,0.012345679012345678,min size first element aligned
+LB_first,0.0002040863037109375,timelog
+LB_last,0.4074074074074074,min size last element aligned
+LB_last,0.0016036033630371094,timelog
+LB_levels,0.2345679012345679,inversions-driven LB
+LB_levels,0.00020885467529296875,timelog
+simpl_BB,0.015688419342041016,timelog
+LB_first,0.00980392156862745,min size first element aligned
+LB_first,0.00020194053649902344,timelog
+LB_last,0.49019607843137253,min size last element aligned
+LB_last,0.0016546249389648438,timelog
+LB_levels,0.14705882352941177,inversions-driven LB
+LB_levels,0.00015091896057128906,timelog
+simpl_BB,0.028339624404907227,timelog
+LB_first,0.00558659217877095,min size first element aligned
+LB_first,0.00020051002502441406,timelog
+LB_last,0.5195530726256983,min size last element aligned
+LB_last,0.001585245132446289,timelog
+LB_levels,0.2011173184357542,inversions-driven LB
+LB_levels,0.00015974044799804688,timelog
+simpl_BB,0.011975288391113281,timelog
+LB_first,0.0,min size first element aligned
+LB_first,0.00018787384033203125,timelog
+LB_last,0.20253164556962025,min size last element aligned
+LB_last,0.0015535354614257812,timelog
+LB_levels,0.21518987341772153,inversions-driven LB
+LB_levels,0.00017690658569335938,timelog
+simpl_BB,0.017918825149536133,timelog
+LB_first,0.034482758620689655,min size first element aligned
+LB_first,0.0002028942108154297,timelog
+LB_last,0.16551724137931034,min size last element aligned
+LB_last,0.0015642642974853516,timelog
+LB_levels,0.1724137931034483,inversions-driven LB
+LB_levels,0.00021696090698242188,timelog
+simpl_BB,0.008911848068237305,timelog
+LB_first,0.0,min size first element aligned
+LB_first,0.00021076202392578125,timelog
+LB_last,0.2,min size last element aligned
+LB_last,0.001581430435180664,timelog
+LB_levels,0.1,inversions-driven LB
+LB_levels,0.00017189979553222656,timelog
+simpl_BB,0.016617298126220703,timelog
+LB_first,0.014705882352941176,min size first element aligned
+LB_first,0.00033545494079589844,timelog
+LB_last,0.17647058823529413,min size last element aligned
+LB_last,0.0024213790893554688,timelog
+LB_levels,0.38235294117647056,inversions-driven LB
+LB_levels,0.00019431114196777344,timelog
+simpl_BB,0.02582263946533203,timelog
+LB_first,0.02727272727272727,min size first element aligned
+LB_first,0.0003399848937988281,timelog
+LB_last,0.6454545454545455,min size last element aligned
+LB_last,0.002139568328857422,timelog
+LB_levels,0.07878787878787878,inversions-driven LB
+LB_levels,0.00021505355834960938,timelog
+simpl_BB,0.019812822341918945,timelog
+LB_first,0.1,min size first element aligned
+LB_first,0.0003371238708496094,timelog
+LB_last,0.05714285714285714,min size last element aligned
+LB_last,0.0020945072174072266,timelog
+LB_levels,0.14285714285714285,inversions-driven LB
+LB_levels,0.00019049644470214844,timelog
+simpl_BB,0.010821104049682617,timelog
+LB_first,0.058823529411764705,min size first element aligned
+LB_first,0.00041604042053222656,timelog
+LB_last,0.2,min size last element aligned
+LB_last,0.002115964889526367,timelog
+LB_levels,0.23529411764705882,inversions-driven LB
+LB_levels,0.00018596649169921875,timelog
+simpl_BB,0.022372722625732422,timelog
+LB_first,0.041666666666666664,min size first element aligned
+LB_first,0.00033783912658691406,timelog
+LB_last,0.4166666666666667,min size last element aligned
+LB_last,0.002144336700439453,timelog
+LB_levels,0.2708333333333333,inversions-driven LB
+LB_levels,0.00018548965454101562,timelog
+simpl_BB,0.01786208152770996,timelog
+LB_first,0.0,min size first element aligned
+LB_first,0.00031304359436035156,timelog
+LB_last,0.0784313725490196,min size last element aligned
+LB_last,0.0024902820587158203,timelog
+LB_levels,0.08823529411764706,inversions-driven LB
+LB_levels,0.0001761913299560547,timelog
+simpl_BB,0.014184951782226562,timelog
+LB_first,0.13513513513513514,min size first element aligned
+LB_first,0.0003504753112792969,timelog
+LB_last,0.08108108108108109,min size last element aligned
+LB_last,0.0025000572204589844,timelog
+LB_levels,0.4864864864864865,inversions-driven LB
+LB_levels,0.0001819133758544922,timelog
+simpl_BB,0.013210773468017578,timelog
+LB_first,0.0,min size first element aligned
+LB_first,0.0003228187561035156,timelog
+LB_last,0.0,min size last element aligned
+LB_last,0.0021512508392333984,timelog
+LB_levels,0.2833333333333333,inversions-driven LB
+LB_levels,0.00017309188842773438,timelog
+simpl_BB,0.01978778839111328,timelog
+LB_first,0.14634146341463414,min size first element aligned
+LB_first,0.00036144256591796875,timelog
+LB_last,0.1951219512195122,min size last element aligned
+LB_last,0.002476215362548828,timelog
+LB_levels,0.18699186991869918,inversions-driven LB
+LB_levels,0.00019621849060058594,timelog
+simpl_BB,0.02358722686767578,timelog
+LB_first,0.08936170212765958,min size first element aligned
+LB_first,0.00034546852111816406,timelog
+LB_last,0.7148936170212766,min size last element aligned
+LB_last,0.002464771270751953,timelog
+LB_levels,0.1148936170212766,inversions-driven LB
+LB_levels,0.00025153160095214844,timelog
+simpl_BB,0.009873151779174805,timelog
+LB_first,0.013333333333333334,min size first element aligned
+LB_first,0.00019979476928710938,timelog
+LB_last,0.21333333333333335,min size last element aligned
+LB_last,0.001886129379272461,timelog
+LB_levels,0.13333333333333333,inversions-driven LB
+LB_levels,0.00017642974853515625,timelog
+simpl_BB,0.016217708587646484,timelog
+LB_first,0.034482758620689655,min size first element aligned
+LB_first,0.0003414154052734375,timelog
+LB_last,0.6293103448275862,min size last element aligned
+LB_last,0.0024261474609375,timelog
+LB_levels,0.09482758620689655,inversions-driven LB
+LB_levels,0.00021314620971679688,timelog
+simpl_BB,0.01787281036376953,timelog
+LB_first,0.044444444444444446,min size first element aligned
+LB_first,0.0003371238708496094,timelog
+LB_last,0.06666666666666667,min size last element aligned
+LB_last,0.002436399459838867,timelog
+LB_levels,0.4,inversions-driven LB
+LB_levels,0.00016355514526367188,timelog
+simpl_BB,0.012696027755737305,timelog
+LB_first,0.024691358024691357,min size first element aligned
+LB_first,0.00033593177795410156,timelog
+LB_last,0.0,min size last element aligned
+LB_last,0.0024242401123046875,timelog
+LB_levels,0.20987654320987653,inversions-driven LB
+LB_levels,0.0001862049102783203,timelog
+simpl_BB,0.013859033584594727,timelog
+LB_first,0.0,min size first element aligned
+LB_first,0.00019550323486328125,timelog
+LB_last,0.3246753246753247,min size last element aligned
+LB_last,0.0014064311981201172,timelog
+LB_levels,0.15584415584415584,inversions-driven LB
+LB_levels,9.870529174804688e-05,timelog
+simpl_BB,0.009562492370605469,timelog
+LB_first,0.0,min size first element aligned
+LB_first,0.000209808349609375,timelog
+LB_last,0.7454545454545455,min size last element aligned
+LB_last,0.0013556480407714844,timelog
+LB_levels,0.2545454545454545,inversions-driven LB
+LB_levels,9.417533874511719e-05,timelog
+simpl_BB,0.023482799530029297,timelog
+LB_first,0.1,min size first element aligned
+LB_first,0.00034165382385253906,timelog
+LB_last,0.03333333333333333,min size last element aligned
+LB_last,0.0020356178283691406,timelog
+LB_levels,0.2833333333333333,inversions-driven LB
+LB_levels,0.00019788742065429688,timelog
+simpl_BB,0.01767134666442871,timelog
+LB_first,0.03278688524590164,min size first element aligned
+LB_first,0.0003323554992675781,timelog
+LB_last,0.26229508196721313,min size last element aligned
+LB_last,0.0020427703857421875,timelog
+LB_levels,0.39344262295081966,inversions-driven LB
+LB_levels,0.0001723766326904297,timelog
+simpl_BB,0.017716646194458008,timelog
+LB_first,0.014285714285714285,min size first element aligned
+LB_first,0.00035119056701660156,timelog
+LB_last,0.2571428571428571,min size last element aligned
+LB_last,0.002113819122314453,timelog
+LB_levels,0.24285714285714285,inversions-driven LB
+LB_levels,0.00018548965454101562,timelog
+simpl_BB,0.012578487396240234,timelog
+LB_first,0.013793103448275862,min size first element aligned
+LB_first,0.0002009868621826172,timelog
+LB_last,0.3448275862068966,min size last element aligned
+LB_last,0.0015964508056640625,timelog
+LB_levels,0.08275862068965517,inversions-driven LB
+LB_levels,0.0001971721649169922,timelog
+simpl_BB,0.010168790817260742,timelog
+LB_first,0.0,min size first element aligned
+LB_first,0.00019025802612304688,timelog
+LB_last,0.19090909090909092,min size last element aligned
+LB_last,0.0016963481903076172,timelog
+LB_levels,0.2545454545454545,inversions-driven LB
+LB_levels,0.00010275840759277344,timelog
+simpl_BB,0.017531156539916992,timelog
+LB_first,0.16447368421052633,min size first element aligned
+LB_first,0.0003082752227783203,timelog
+LB_last,0.3092105263157895,min size last element aligned
+LB_last,0.0016636848449707031,timelog
+LB_levels,0.13815789473684212,inversions-driven LB
+LB_levels,0.00011229515075683594,timelog
+simpl_BB,0.020082712173461914,timelog
+LB_first,0.03636363636363636,min size first element aligned
+LB_first,0.0001983642578125,timelog
+LB_last,0.16363636363636364,min size last element aligned
+LB_last,0.0015637874603271484,timelog
+LB_levels,0.18181818181818182,inversions-driven LB
+LB_levels,0.0001983642578125,timelog
+simpl_BB,0.015256166458129883,timelog
+LB_first,0.1509433962264151,min size first element aligned
+LB_first,0.00020313262939453125,timelog
+LB_last,0.03773584905660377,min size last element aligned
+LB_last,0.0015892982482910156,timelog
+LB_levels,0.2830188679245283,inversions-driven LB
+LB_levels,0.00010156631469726562,timelog
+simpl_BB,0.021533966064453125,timelog
+LB_first,0.044585987261146494,min size first element aligned
+LB_first,0.00034427642822265625,timelog
+LB_last,0.5477707006369427,min size last element aligned
+LB_last,0.0023508071899414062,timelog
+LB_levels,0.15286624203821655,inversions-driven LB
+LB_levels,0.00021648406982421875,timelog
+simpl_BB,0.02221965789794922,timelog
+LB_first,0.008849557522123894,min size first element aligned
+LB_first,0.00033664703369140625,timelog
+LB_last,0.5973451327433629,min size last element aligned
+LB_last,0.0020411014556884766,timelog
+LB_levels,0.11061946902654868,inversions-driven LB
+LB_levels,0.0002346038818359375,timelog
+simpl_BB,0.015741348266601562,timelog
+LB_first,0.02040816326530612,min size first element aligned
+LB_first,0.00033855438232421875,timelog
+LB_last,0.16326530612244897,min size last element aligned
+LB_last,0.002134084701538086,timelog
+LB_levels,0.21428571428571427,inversions-driven LB
+LB_levels,0.0002040863037109375,timelog
+simpl_BB,0.0062732696533203125,timelog
+LB_first,0.019230769230769232,min size first element aligned
+LB_first,0.0003197193145751953,timelog
+LB_last,0.34615384615384615,min size last element aligned
+LB_last,0.0018312931060791016,timelog
+LB_levels,0.25,inversions-driven LB
+LB_levels,0.00016427040100097656,timelog
+simpl_BB,0.018263578414916992,timelog
+LB_first,0.0,min size first element aligned
+LB_first,0.00032806396484375,timelog
+LB_last,0.5846153846153846,min size last element aligned
+LB_last,0.002076387405395508,timelog
+LB_levels,0.3076923076923077,inversions-driven LB
+LB_levels,0.000186920166015625,timelog
+simpl_BB,0.01548624038696289,timelog
+LB_first,0.0,min size first element aligned
+LB_first,0.0003314018249511719,timelog
+LB_last,0.14814814814814814,min size last element aligned
+LB_last,0.0020322799682617188,timelog
+LB_levels,0.20987654320987653,inversions-driven LB
+LB_levels,0.0001838207244873047,timelog
+simpl_BB,0.015303373336791992,timelog
+LB_first,0.011764705882352941,min size first element aligned
+LB_first,0.00034737586975097656,timelog
+LB_last,0.5529411764705883,min size last element aligned
+LB_last,0.0025680065155029297,timelog
+LB_levels,0.21176470588235294,inversions-driven LB
+LB_levels,0.000194549560546875,timelog
+simpl_BB,0.017186641693115234,timelog
+LB_first,0.0,min size first element aligned
+LB_first,0.0003349781036376953,timelog
+LB_last,0.2818181818181818,min size last element aligned
+LB_last,0.0020208358764648438,timelog
+LB_levels,0.36363636363636365,inversions-driven LB
+LB_levels,0.00016951560974121094,timelog
+simpl_BB,0.013431072235107422,timelog
+LB_first,0.09836065573770492,min size first element aligned
+LB_first,0.0003504753112792969,timelog
+LB_last,0.0,min size last element aligned
+LB_last,0.002078533172607422,timelog
+LB_levels,0.21311475409836064,inversions-driven LB
+LB_levels,0.00018668174743652344,timelog
+simpl_BB,0.014798879623413086,timelog
+LB_first,0.07407407407407407,min size first element aligned
+LB_first,0.0003440380096435547,timelog
+LB_last,0.3148148148148148,min size last element aligned
+LB_last,0.0020155906677246094,timelog
+LB_levels,0.1419753086419753,inversions-driven LB
+LB_levels,0.0002186298370361328,timelog
+simpl_BB,0.029751300811767578,timelog
+LB_first,0.0,min size first element aligned
+LB_first,0.00036454200744628906,timelog
+LB_last,0.5416666666666666,min size last element aligned
+LB_last,0.0021300315856933594,timelog
+LB_levels,0.22916666666666666,inversions-driven LB
+LB_levels,0.00018358230590820312,timelog
+simpl_BB,0.01627802848815918,timelog
+LB_first,0.01680672268907563,min size first element aligned
+LB_first,0.0003390312194824219,timelog
+LB_last,0.17647058823529413,min size last element aligned
+LB_last,0.0020020008087158203,timelog
+LB_levels,0.21008403361344538,inversions-driven LB
+LB_levels,0.00019049644470214844,timelog
+simpl_BB,0.015450716018676758,timelog
+LB_first,0.04526748971193416,min size first element aligned
+LB_first,0.0003409385681152344,timelog
+LB_last,0.05761316872427984,min size last element aligned
+LB_last,0.002000093460083008,timelog
+LB_levels,0.07818930041152264,inversions-driven LB
+LB_levels,0.0002002716064453125,timelog
+simpl_BB,0.009537696838378906,timelog
+LB_first,0.11538461538461539,min size first element aligned
+LB_first,0.0003292560577392578,timelog
+LB_last,0.0,min size last element aligned
+LB_last,0.0024602413177490234,timelog
+LB_levels,0.34615384615384615,inversions-driven LB
+LB_levels,0.00016427040100097656,timelog
+simpl_BB,0.01612257957458496,timelog
+LB_first,0.013513513513513514,min size first element aligned
+LB_first,0.0003352165222167969,timelog
+LB_last,0.44594594594594594,min size last element aligned
+LB_last,0.002446413040161133,timelog
+LB_levels,0.22972972972972974,inversions-driven LB
+LB_levels,0.00018739700317382812,timelog
+simpl_BB,0.01489567756652832,timelog
+LB_first,0.0,min size first element aligned
+LB_first,0.00032901763916015625,timelog
+LB_last,0.36363636363636365,min size last element aligned
+LB_last,0.0025453567504882812,timelog
+LB_levels,0.3181818181818182,inversions-driven LB
+LB_levels,0.00018405914306640625,timelog
+simpl_BB,0.016358137130737305,timelog
+LB_first,0.015151515151515152,min size first element aligned
+LB_first,0.00033402442932128906,timelog
+LB_last,0.3787878787878788,min size last element aligned
+LB_last,0.002077817916870117,timelog
+LB_levels,0.30303030303030304,inversions-driven LB
+LB_levels,0.00018548965454101562,timelog
+simpl_BB,0.013499259948730469,timelog
+LB_first,0.08695652173913043,min size first element aligned
+LB_first,0.0003426074981689453,timelog
+LB_last,0.18840579710144928,min size last element aligned
+LB_last,0.0020754337310791016,timelog
+LB_levels,0.16666666666666666,inversions-driven LB
+LB_levels,0.0002009868621826172,timelog
+simpl_BB,0.01936650276184082,timelog
+LB_first,0.1310344827586207,min size first element aligned
+LB_first,0.00034427642822265625,timelog
+LB_last,0.3448275862068966,min size last element aligned
+LB_last,0.0020694732666015625,timelog
+LB_levels,0.14482758620689656,inversions-driven LB
+LB_levels,0.00021839141845703125,timelog
+simpl_BB,0.014854669570922852,timelog
+LB_first,0.03968253968253968,min size first element aligned
+LB_first,0.0003383159637451172,timelog
+LB_last,0.10317460317460317,min size last element aligned
+LB_last,0.002068042755126953,timelog
+LB_levels,0.09523809523809523,inversions-driven LB
+LB_levels,0.00021195411682128906,timelog
+simpl_BB,0.01713109016418457,timelog
+LB_first,0.10273972602739725,min size first element aligned
+LB_first,0.00034236907958984375,timelog
+LB_last,0.15753424657534246,min size last element aligned
+LB_last,0.0020525455474853516,timelog
+LB_levels,0.1232876712328767,inversions-driven LB
+LB_levels,0.0002124309539794922,timelog
+simpl_BB,0.01707601547241211,timelog
+LB_first,0.02830188679245283,min size first element aligned
+LB_first,0.0003509521484375,timelog
+LB_last,0.5754716981132075,min size last element aligned
+LB_last,0.002042055130004883,timelog
+LB_levels,0.16037735849056603,inversions-driven LB
+LB_levels,0.00020575523376464844,timelog
+simpl_BB,0.01081228256225586,timelog
+LB_first,0.0,min size first element aligned
+LB_first,0.0003275871276855469,timelog
+LB_last,0.47802197802197804,min size last element aligned
+LB_last,0.0020644664764404297,timelog
+LB_levels,0.21428571428571427,inversions-driven LB
+LB_levels,0.00018262863159179688,timelog
+simpl_BB,0.028380155563354492,timelog
+LB_first,0.015748031496062992,min size first element aligned
+LB_first,0.00019812583923339844,timelog
+LB_last,0.5669291338582677,min size last element aligned
+LB_last,0.0015361309051513672,timelog
+LB_levels,0.14960629921259844,inversions-driven LB
+LB_levels,0.00018358230590820312,timelog
+simpl_BB,0.014724493026733398,timelog
+LB_first,0.047619047619047616,min size first element aligned
+LB_first,0.00019979476928710938,timelog
+LB_last,0.5238095238095238,min size last element aligned
+LB_last,0.00157928466796875,timelog
+LB_levels,0.1523809523809524,inversions-driven LB
+LB_levels,0.00011873245239257812,timelog
+simpl_BB,0.020076274871826172,timelog
+LB_first,0.03546099290780142,min size first element aligned
+LB_first,0.00019788742065429688,timelog
+LB_last,0.3546099290780142,min size last element aligned
+LB_last,0.0015537738800048828,timelog
+LB_levels,0.20567375886524822,inversions-driven LB
+LB_levels,0.0001342296600341797,timelog
+simpl_BB,0.027997255325317383,timelog
+LB_first,0.02564102564102564,min size first element aligned
+LB_first,0.0001976490020751953,timelog
+LB_last,0.3076923076923077,min size last element aligned
+LB_last,0.0015490055084228516,timelog
+LB_levels,0.3076923076923077,inversions-driven LB
+LB_levels,0.0001823902130126953,timelog
+simpl_BB,0.006714820861816406,timelog
+LB_first,0.0,min size first element aligned
+LB_first,0.0001838207244873047,timelog
+LB_last,0.0,min size last element aligned
+LB_last,0.0015408992767333984,timelog
+LB_levels,0.1935483870967742,inversions-driven LB
+LB_levels,0.00013685226440429688,timelog
+simpl_BB,0.014155864715576172,timelog
+LB_first,0.061224489795918366,min size first element aligned
+LB_first,0.00019812583923339844,timelog
+LB_last,0.10204081632653061,min size last element aligned
+LB_last,0.002210855484008789,timelog
+LB_levels,0.23469387755102042,inversions-driven LB
+LB_levels,0.00011229515075683594,timelog
+simpl_BB,0.010294914245605469,timelog
+LB_first,0.0196078431372549,min size first element aligned
+LB_first,0.00019311904907226562,timelog
+LB_last,0.1715686274509804,min size last element aligned
+LB_last,0.0016868114471435547,timelog
+LB_levels,0.07352941176470588,inversions-driven LB
+LB_levels,0.00011873245239257812,timelog
+simpl_BB,0.011287927627563477,timelog
+LB_first,0.08333333333333333,min size first element aligned
+LB_first,0.0002181529998779297,timelog
+LB_last,0.10606060606060606,min size last element aligned
+LB_last,0.0015447139739990234,timelog
+LB_levels,0.09848484848484848,inversions-driven LB
+LB_levels,0.00010919570922851562,timelog
+simpl_BB,0.026468276977539062,timelog
+LB_first,0.00904977375565611,min size first element aligned
+LB_first,0.000232696533203125,timelog
+LB_last,0.4660633484162896,min size last element aligned
+LB_last,0.001638650894165039,timelog
+LB_levels,0.167420814479638,inversions-driven LB
+LB_levels,0.00019121170043945312,timelog
+simpl_BB,0.012443780899047852,timelog
+LB_first,0.0,min size first element aligned
+LB_first,0.00019240379333496094,timelog
+LB_last,0.425,min size last element aligned
+LB_last,0.0016798973083496094,timelog
+LB_levels,0.2875,inversions-driven LB
+LB_levels,0.00014901161193847656,timelog
+simpl_BB,0.01105499267578125,timelog
+LB_first,0.01932367149758454,min size first element aligned
+LB_first,0.00021886825561523438,timelog
+LB_last,0.033816425120772944,min size last element aligned
+LB_last,0.0016002655029296875,timelog
+LB_levels,0.04830917874396135,inversions-driven LB
+LB_levels,0.0001704692840576172,timelog
+simpl_BB,0.01750922203063965,timelog
+LB_first,0.010380622837370242,min size first element aligned
+LB_first,0.00020742416381835938,timelog
+LB_last,0.6678200692041523,min size last element aligned
+LB_last,0.0016903877258300781,timelog
+LB_levels,0.08304498269896193,inversions-driven LB
+LB_levels,0.0001952648162841797,timelog

@@ -51,6 +51,7 @@ if __name__ == "__main__":
                         action="store", type=float, default=0.6)
     parser.add_argument("-U","--unique", help="generate unique instances",action="store_true")
     parser.add_argument("out_dir", help="output directory")
+    parser.add_argument("-q","--quiet", help="suppress unnecessary output",action="store_true")
 
     group = parser.add_mutually_exclusive_group()
     group.add_argument("-R","--reduced", help="generate reduced instances",action="store_true")
@@ -69,7 +70,8 @@ if __name__ == "__main__":
         print("Error: '{}' -- not a directory".format(out_dir))
         exit(1)
 
-    print("instance,inversions,reducedA,reducedB,gen_trial")
+    if not args.quiet:
+        print("instance,inversions,reducedA,reducedB,gen_trial")
 
     inst_profiles = set()
 
@@ -100,5 +102,6 @@ if __name__ == "__main__":
         bdd_A.save(out_dir+"/A{}.bdd".format(inst_id))
         bdd_B.save(out_dir+"/B{}.bdd".format(inst_id))
 
-        print("{},{},{},{},{}".format(inst_id,count_inversions(bdd_A.vars, bdd_B.vars), bdd_A.is_reduced(), bdd_B.is_reduced(), trials))
-        sys.stdout.flush() # otherwise we are risking not to have anyting on job kill...
+        if not args.quiet:
+            print("{},{},{},{},{}".format(inst_id,count_inversions(bdd_A.vars, bdd_B.vars), bdd_A.is_reduced(), bdd_B.is_reduced(), trials))
+            sys.stdout.flush() # otherwise we are risking not to have anyting on job kill...

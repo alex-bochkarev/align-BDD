@@ -1,5 +1,5 @@
 ######################################################################
-## Creates Figure 7: runtime and objectives for different heuristics
+## Creates Figure 7: runtime and objectives for different heuristics (*simplified* problem)
 ##
 ## (c) Alexey Bochkarev, Clemson University, 2021
 
@@ -131,4 +131,4 @@ plt_zoomed =
               length(unique(df_rel$instance))))
 
 
-ggsave(opt$out,plt_zoomed,width = 16, height = 10, device = cairo_ps)
+ggsave(opt$out,plt_zoomed,width = 16, height = 10, device = cairo_ps(family="Arial"))

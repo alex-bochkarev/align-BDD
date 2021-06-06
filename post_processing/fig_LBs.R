@@ -86,7 +86,7 @@ plt =
     )+
   facet_grid(LB ~ entry_type, labeller=as_labeller(function(x) return(facets[x])), scales="free_x", switch="y")+
   ylab(paste0("Number of instances, out of ",
-              nrow(df)/length(unique(df$LB))))
+              nrow(filter(df, entry_type=="time")) / length(unique(df$LB))))
 
 ### end of the new edition
 ######################################################################
@@ -180,5 +180,5 @@ plt =
 
 ##     ## end of styling
 
-ggsave(opt$out,plt,width = 16, height = 10, device = cairo_ps)
+ggsave(opt$out,plt,width = 16, height = 10, device = cairo_ps(family="Arial"))
 

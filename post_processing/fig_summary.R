@@ -2,14 +2,16 @@
 ### Generates stats for random BDDs (layer sizes)
 ### produced by the python script
 ###
-### (c) Alexey Bochkarev, Clemson University, 2020
+### (c) Alexey Bochkarev, Clemson University, 2021
 
-library(ggplot2)
-library(reshape)
-library(dplyr)
-library(optparse)
-library(latex2exp)
-library(stringr)
+suppressPackageStartupMessages({
+  library(ggplot2)
+  library(reshape)
+  library(dplyr)
+  library(optparse)
+  library(latex2exp)
+  library(stringr)
+})
 
 ######################################################################
 ## unpack the command line arguments

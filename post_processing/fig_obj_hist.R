@@ -129,10 +129,11 @@ plt_dens =
         panel.grid.minor.x = element_line(size=0.5,linetype = 'solid', colour = "lightgrey"),
         panel.grid.minor.y = element_line(size=0.5,linetype = 'solid', colour = "lightgrey"),
         strip.text.y = element_text(size=22, angle=180),
+        strip.text.y.left = element_text(size=22, angle=0),
         strip.background = element_blank()
     )+
     facet_grid(comment ~ ., scales="fixed", switch="y")
     ## end of styling
 
-ggsave(opt$out,plt_dens, device = cairo_ps, width = 16, height = 10)
+ggsave(opt$out,plt_dens, device = cairo_ps(family="Arial"), width = 16, height = 10)
 

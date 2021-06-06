@@ -24,8 +24,13 @@ RND_N=15
 RND_P=0.6
 HEU_BM_NO_INST=10
 
+ORIG_N = 10
+ORIG_K_TOTAL = 100
+
 STAT_N = 10
 STAT_PS = 0.2 0.5 0.8
+
+SCAL_K=1
 
 ## Technical constants
 # how many jobs to run in parallel?
@@ -33,33 +38,91 @@ PARFLAG=2
 
 ## Key targets
 figures: \
-	$(FIGS)/fig_simpl_heuristics.eps \
+	$(FIGS)/guessing.tex \
+	$(FIGS)/simpl_heuristics.eps \
 	$(FIGS)/LB.eps \
+	$(FIGS)/orig_obj_histograms.eps \
+	$(FIGS)/orig_runtimes.eps \
 	$(FIGS)/.opts_stats \
+	$(FIGS)/tUFLP_runtimes_overview.eps \
+	$(FIGS)/various_simpl_vs_min.eps \
+	$(FIGS)/orig_lwidth_stats.eps \
+	$(FIGS)/tUFLP_runtimes_breakdown.eps
 
 ######################################################################
 ## Calculated values
 HEU_BM_K=$(shell expr $(HEU_BM_NO_INST) / $(PARFLAG) + 1)
 STAT_K=$(shell expr $(STAT_N) / $(PARFLAG) + 1)
+ORIG_K=$(shell expr $(ORIG_K_TOTAL) / $(PARFLAG) + 1)
+
 
 ######################################################################
 ## Figures description
 
+## The table (simplified problem heuristics)
 
-$(FIGS)/simpl_heuristics.eps: $(LOGS)/simplified_problem.csv $(PP)/fig_simpl_heuristics.R
+$(FIGS)/guessing.tex: $(LOGS)/main_rnd_run.csv $(PP)/tab_guessing.R
+				Rscript $(PP)/tab_guessing.R -i $< -o $@
+
+
+## Comparison of the heuristics to the *simplified* problem
+
+$(FIGS)/simpl_heuristics.eps: $(LOGS)/main_rnd_run.csv $(PP)/fig_simpl_heuristics.R
 				Rscript $(PP)/fig_simpl_heuristics.R -i $< -o $@
+
 
 ## Different approaches to lower bound
 $(FIGS)/LB.eps: $(LOGS)/simpl_LB.csv $(PP)/fig_LBs.R
 				Rscript $(PP)/fig_LBs.R -i $< -o $@
 
+$(LOGS)/simpl_LB.csv: $(INST)/orig_problem.list compare_simpl_LBs.py
+				rm -f $<.tmp.* && \
+				split -d -nl/$(PARFLAG) $< $<.LBs.tmp. && \
+				parallel -j $(PARFLAG) python -m compare_simpl_LBs -l {} ">" $@.tmp.{#} -d $(INST)/orig_problem/ ::: $$(ls $<.LBs.tmp.*) && \
+				python -m compare_simpl_LBs --header > $@ && \
+				cat $@.tmp.* >> $@ && \
+				rm $@.tmp.* && \
+				rm $<.LBs.tmp.*
+
 
 ## Histograms of the original objective value
-$(FIGS)/orig_obj_histograms.eps: $(LOGS)/original_problem.csv $(PP)/fig_obj_hist.R
+$(FIGS)/orig_obj_histograms.eps: $(LOGS)/main_rnd_run.csv $(PP)/fig_obj_hist.R
 				Rscript $(PP)/fig_obj_hist.R -i $< -o $@
 
+$(LOGS)/main_rnd_run.csv: $(INST)/orig_problem.list
+				rm -f $<.tmp.* && \
+				split -d -nl/$(PARFLAG) $< $<.tmp. && \
+				parallel -j $(PARFLAG) python -m solve_inst -i {} -o $@.tmp.{#} -d $(INST)/orig_problem/ ::: $$(ls $<.tmp.*) && \
+				python -m solve_inst --header > $@ && \
+				cat $@.tmp.* >> $@ && \
+				rm $@.tmp.* && \
+				rm $<.tmp.*
+
+$(INST)/orig_problem.list: gen_BDD_pair.py
+				rm -rf $(INST)/orig_problem && \
+				mkdir $(INST)/orig_problem && \
+				parallel -j $(PARFLAG) 'python -m gen_BDD_pair -s $$(( $(ORIG_K) * {#} - $(ORIG_K)))' -K $(ORIG_K) -v $(ORIG_N) -p $(RND_P) -R -U $(INST)/orig_problem/ --quiet ::: $(shell seq 1 $(PARFLAG)) && \
+				ls $(INST)/orig_problem | grep -Po "A\\K[^\\.]*" > $@
+
+## Original problem (rnd) scaling figure
 $(FIGS)/orig_runtimes.eps: $(LOGS)/orig_scal.csv $(PP)/fig_scal.R
 				Rscript $(PP)/fig_scal.R -i $< -o $@
+
+
+$(LOGS)/orig_scal.csv: $(INST)/scal/instances.list par_scal_test.py
+				rm -f $(INST)/scal/instances.list.* && \
+				split -d -nl/$(PARFLAG) $< $(INST)/scal/instances.list. && \
+				parallel -j $(PARFLAG) python -m par_scal_test -i {} -o $@.tmp.{#} -d $(INST)/scal/ ::: $$(ls $(INST)/scal/instances.list.*) && \
+				python -m par_scal_test --header > $@ && \
+				cat $@.tmp.* >> $@ && \
+				rm $@.tmp.* && \
+				tar czf $(INST)/orig_scal.tar.gz -C $(INST)/scal . --remove-files
+
+
+$(INST)/scal/instances.list: gen_BDD_pair.py
+				mkdir -p $(INST)/scal && \
+				parallel -j $(PARFLAG) 'python -m gen_BDD_pair -s $$(( $(SCAL_K) * {#} - $(SCAL_K)))' -K $(SCAL_K) -v {} -p $(RND_P) -R -U $(INST)/scal/ --quiet ::: $(shell seq 5 7 | shuf) && \
+				ls $(INST)/scal | grep -Po "A\\K[^\\.]*" > $@
 
 
 ## Optima stats for the simplified problem
@@ -77,9 +140,9 @@ $(FIGS)/tUFLP_runtimes_overview.eps: $(LOGS)/tUFLP_runtimes_scal.csv $(PP)/fig_t
 				Rscript $(PP)/fig_tUFLP_runtimes_scal.R -i $< -o $@
 
 $(LOGS)/tUFLP_runtimes_scal.csv: experiments/tUFLP_runtimes.py
+				parallel -j $(PARFLAG) python -m experiments.tUFLP_runtimes -K 100 -n {} --with-gsifts ">" $@.tmp.{} ::: $(shell seq 5 10 | shuf) && \
 				python -m experiments.tUFLP_runtimes -H > $@ && \
-				parallel -j $(PARFLAG) python -m experiments.tUFLP_runtimes -K 100 -n {} --with-gsifts ">" $@.tmp.{} ::: $(shell seq 5 25 | shuf) && \
-				cat $@.tmp.* > $@ && rm $@.tmp.*
+				cat $@.tmp.* >> $@ && rm $@.tmp.*
 
 $(FIGS)/various_simpl_vs_min.eps: $(PP)/fig_simpl_vs_min.R $(LOGS)/heu_bm/jUFLP.csv $(LOGS)/heu_bm/tUFLP_nat.csv $(LOGS)/heu_bm/tUFLP_rnd.csv $(LOGS)/heu_bm/rnd_dia.csv
 				Rscript post_processing/fig_simpl_vs_min.R --indir $(LOGS)/heu_bm --out $@
@@ -88,6 +151,7 @@ $(FIGS)/various_simpl_vs_min.eps: $(PP)/fig_simpl_vs_min.R $(LOGS)/heu_bm/jUFLP.
 ## Logfiles generation
 
 $(LOGS)/heu_bm/jUFLP.csv: experiments/jUFL_hist_sizes.py
+				mkdir -p $(LOGS)/heu_bm && \
 				python -m experiments.jUFL_hist_sizes -H > $@ && \
 				parallel -j $(PARFLAG) python -m experiments.jUFL_hist_sizes -n $(JUFL_N) -K $(HEU_BM_K) -p $(JUFL_P) -P {} -l $(INST)/jUFLP_inst.tmp.{} ">>" $@.tmp.{} ::: $(shell seq 1 $(PARFLAG)) && \
 				cat $@.tmp.* >> $@ && rm $@.tmp.* && \
@@ -96,6 +160,7 @@ $(LOGS)/heu_bm/jUFLP.csv: experiments/jUFL_hist_sizes.py
 
 
 $(LOGS)/heu_bm/tUFLP_nat.csv: experiments/tUFL_hist_sizes_control.py
+				mkdir -p $(LOGS)/heu_bm && \
 				python -m experiments.tUFL_hist_sizes_control -H > $@ && \
 				parallel -j $(PARFLAG) python -m experiments.tUFL_hist_sizes_control -n $(TUFL_N) -K $(HEU_BM_K) -p $(TUFL_P) -P {} -l $(INST)/tUFLP_nat_inst.tmp.{} ">>" $@.tmp.{} ::: $(shell seq 1 $(PARFLAG)) && \
 				cat $@.tmp.* >> $@ && rm $@.tmp.* && \
@@ -104,6 +169,7 @@ $(LOGS)/heu_bm/tUFLP_nat.csv: experiments/tUFL_hist_sizes_control.py
 
 
 $(LOGS)/heu_bm/tUFLP_rnd.csv: experiments/tUFL_hist_sizes_control.py
+				mkdir -p $(LOGS)/heu_bm && \
 				python -m experiments.tUFL_hist_sizes_control -H > $@ && \
 				parallel -j $(PARFLAG) python -m experiments.tUFL_hist_sizes_control -R -n $(TUFL_N) -K $(HEU_BM_K) -p $(TUFL_P) -P {} -l $(INST)/tUFLP_rnd_inst.tmp.{} ">>" $@.tmp.{} ::: $(shell seq 1 $(PARFLAG)) && \
 				cat $@.tmp.* >> $@ && rm $@.tmp.* && \
@@ -112,6 +178,7 @@ $(LOGS)/heu_bm/tUFLP_rnd.csv: experiments/tUFL_hist_sizes_control.py
 
 
 $(LOGS)/heu_bm/rnd_dia.csv: experiments/rnd_dia_hist_sizes_control.py
+				mkdir -p $(LOGS)/heu_bm && \
 				rm -rf $(INST)/bm_heu_inst && \
 				mkdir -p $(INST)/bm_heu_inst && \
 				python -m experiments.rnd_dia_hist_sizes_control -H > $@ && \
@@ -127,7 +194,7 @@ $(FIGS)/orig_lwidth_stats.eps: $(LOGS)/lwidths.log $(PP)/fig_summary.R
 $(LOGS)/lwidths.log: gen_BDD_pair.py
 				mkdir -p $(INST)/orig_stats && \
 				parallel mkdir -p $(INST)/orig_stats/{} ::: $(STAT_PS) && \
-				parallel -j $(PARFLAG) python -m gen_BDD_pair -v $(RND_N) -K $(STAT_K) -p $(RND_P) -R -U $(INST)/orig_stats/{1} ::: $(STAT_PS) ::: $(shell seq 1 $(PARFLAG)) && \
+				parallel -j $(PARFLAG) python -m gen_BDD_pair -v $(RND_N) -K $(STAT_K) -p $(RND_P) -R -U $(INST)/orig_stats/{1} --quiet ::: $(STAT_PS) ::: $(shell seq 1 $(PARFLAG)) && \
 				parallel find $(INST)/orig_stats/{}/*.bdd ">" $(INST)/orig_stats/{}/inst.list ::: $(STAT_PS) && \
 				$(STATS) -H $@ && \
 				parallel $(STATS) -s {} $(INST)/orig_stats/{}/inst.list ">" $(LOGS)/lwidths.tmp.{} ::: $(STAT_PS) && \
@@ -144,6 +211,9 @@ $(LOGS)/tUFLP_runtimes.csv: experiments/tUFLP_runtimes.py
 				python -m experiments.tUFLP_runtimes -H > $@ && \
 				python -m experiments.tUFLP_runtimes -K 20 -n 20 -l $(INST)/tUFLP_steps_breakdown.json >> $@
 
+## clean-up
+save-orig-instances:
+				tar czf $(INST)/orig_problem.tar.gz -C $(INST)/orig_problem . --remove-files
 ######################################################################
 ## Files and directories
 # INST=$(PREF)/instances/raw
@@ -172,7 +242,6 @@ $(LOGS)/tUFLP_runtimes.csv: experiments/tUFLP_runtimes.py
 
 # ### scalability figure
 # SCAL_N=5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 #26 27 28 29 30
-# SCAL_K=100
 # SCAL_P=$(p)
 # SCAL_R=R
 
@@ -199,23 +268,6 @@ $(LOGS)/tUFLP_runtimes.csv: experiments/tUFLP_runtimes.py
 # .PHONY: all figures clean-raw-inst clean-insts move-logs figures/sample_BB_tree.png
 
 # ######################################################################
-# ## Ad-hoc figures
-# figures/fig_jUFL_simpl_eff.png: post_processing/fig_jUFL_simpl_eff.R run_logs/jUFL/logfile.csv
-# 				Rscript post_processing/fig_jUFL_simpl_eff.R -i run_logs/jUFL/logfile.csv -o $@
-
-# figures/fig_tUFL_simpl_eff_nat.png: post_processing/fig_jUFL_simpl_eff.R run_logs/jUFL/logfile_tUFL_nat.csv
-# 				Rscript post_processing/fig_jUFL_simpl_eff.R -i run_logs/jUFL/logfile_tUFL_nat.csv -o $@ -p "Typed UFL (natural order)"
-
-# figures/fig_tUFL_simpl_eff_rnd.png: post_processing/fig_jUFL_simpl_eff.R run_logs/jUFL/logfile_tUFL_rnd.csv
-# 				Rscript post_processing/fig_jUFL_simpl_eff.R -i run_logs/jUFL/logfile_tUFL_rnd.csv -o $@ -p "Typed UFL (random order)"
-# # run_logs/jUFL/logfile.csv: experiments/jUFL_hist_sizes.py
-# #				./get_jUFL_hist.sh 4 # or qsub pbs/jUFL_hists.pbs
-
-# figures/fig_simpl_vs_min.png: post_processing/fig_simpl_vs_min.R run_logs/jUFL/logfile.csv run_logs/jUFL/logfile_tUFL_nat.csv run_logs/jUFL/logfile_tUFL_rnd.csv run_logs/jUFL/logfile_rnd_dia.csv
-# 				Rscript post_processing/fig_simpl_vs_min.R -o $@
-
-
-# ######################################################################
 # ## High-level recipes
 # .SECONDARY: # keep all the intermediary logfiles (will not work o/w)
 
@@ -225,31 +277,12 @@ $(LOGS)/tUFLP_runtimes.csv: experiments/tUFLP_runtimes.py
 # 	python ./sample_BB_tree.py -v -V 8 -n 10 -o ./run_logs/sample_BB_tree.dot && \
 # 	dot -Tpng ./run_logs/sample_BB_tree.dot > ./figures/sample_BB_tree.png
 
-# figures: $(FIGS)/fig_sol_guessing_R.eps $(FIGS)/fig_sol_fireplace_R.eps $(FIGS)/fig_BB_gaps_R.eps $(FIGS)/LB.eps $(FIGS)/fig_sol_obj_hist_R.eps $(FIGS)/fig_sol_obj_int_R.eps $(FIGS)/guessing.tex
-
-# #figures_R figures_N
-
-# scalfig: $(FIGS)/fig_scal.eps
-
-# summary_figs: $(FIGS)/fig_summary_R.eps $(FIGS)/fig_summary_N.eps
-# 	touch summary_figs
-
-# figures_R: $(FIGS)/fig_sol_guessing_R.eps $(FIGS)/fig_BB_gaps_R.eps $(FIGS)/fig_sol_fireplace_R.eps $(FIGS)/fig_sol_obj_hist_R.eps $(FIGS)/fig_sol_obj_int_R.eps
-# figures_N: $(FIGS)/fig_sol_guessing_N.eps $(FIGS)/fig_BB_gaps_N.eps $(FIGS)/fig_sol_fireplace_N.eps $(FIGS)/fig_sol_obj_hist_N.eps $(FIGS)/fig_sol_obj_int_N.eps
-
-# hists: $(FIGS)/fig_sol_obj_hist_R.eps $(FIGS)/fig_sol_obj_hist_N.eps
-# 	touch hists
 
 # ######################################################################
 # ## Figure recipes
 # SOL_RECIPE = Rscript $(PP)/fig_$*.R -i $< -o $@
 # BB_RECIPE = Rscript $(PP)/fig_BB_$*.R -i $< -o $@
 
-# $(FIGS)/fig_sol_%_R.eps: $(LOGS)/solved_R.log $(PP)/fig_%.R
-# 	$(SOL_RECIPE)
-
-# $(FIGS)/fig_sol_%_N.eps: $(LOGS)/solved_N.log $(PP)/fig_%.R
-# 	$(SOL_RECIPE)
 
 # $(FIGS)/fig_BB_%_R.eps: $(LOGS)/BB_bounds_R.log $(PP)/fig_BB_%.R
 # 	$(BB_RECIPE)
@@ -257,91 +290,10 @@ $(LOGS)/tUFLP_runtimes.csv: experiments/tUFLP_runtimes.py
 # $(FIGS)/fig_BB_%_N.eps: $(LOGS)/BB_bounds_N.log $(PP)/fig_BB_%.R
 # 	$(BB_RECIPE)
 
-# $(FIGS)/fig_scal.eps: $(LOGS)/scal_par.log $(PP)/fig_scal.R
-# 	Rscript $(PP)/fig_scal.R -i $< -o $@
-
-# $(FIGS)/fig_summary_R.eps: DS_FLAG=R
-# $(FIGS)/fig_summary_N.eps: DS_FLAG=N
-
-# $(FIGS)/fig_summary_%.eps: $(LOGS)/lwidths_%.log $(PP)/fig_summary.R
-# 	Rscript $(PP)/fig_summary.R -i $< -o $@
-
-# $(FIGS)/guessing.tex: $(LOGS)/solved_R.log $(PP)/tab_guessing.R
-# 	Rscript $(PP)/tab_guessing.R -i $< -o $@
 
 # ######################################################################
-# ## scalability figure -- parallel implementation
-# $(LOGS)/scal_par.log: $(PSCAL_FILES)
-# 	python $(PSCAL) --header > $@ && \
-# 	tail -qn +2 $(PSCAL_FILES) >> $@ && \
-# 	rm -rf $(PSCAL_FILES)
-
-# $(LOGS)/part.scal.%.log: $(INST)/scal/instances.list
-# 	python $(PSCAL) -i $<.$* -o $@ -d $(INST)/scal/
-
-# $(INST)/scal/instances.list: ./gen_BDD_pair.py
-# 	@echo Preparing instances for the scalability set...
-# 	i=0 && \
-# 	rm -rf $(INST)/scal && \
-# 	mkdir -p $(INST)/scal && \
-# 	for S in $(SCAL_N); do \
-# 		python ./gen_BDD_pair.py -s $$(( ${SCAL_K} * $${i} )) -n $(SCAL_K) -v $$S -p $p -RU $(INST)/scal/ > /dev/null &&\
-# 		i=$$(( $${i} + 1 ));\
-# 	done && \
-# 	ls $(INST)/scal | grep -Po "A\\K[^\\.]*" > $@ && \
-# 	shuf $@ > $@.shuffled && \
-# 	split -d -nl/$(PAR_SOL) $@.shuffled $(INST)/scal/instances.list. && \
-# 	rm $@.shuffled
-
-# # was: ls $(INST)/$*/A*.bdd | grep -Po "$(INST)/$*/A\\K[^\\.]*" > $@ &&\
-# # basename -a `ls $(INST)/$*/A*.bdd` | sed -n -e's/^A//p' | sed -n -e's/\.bdd//p' > $@ && \
-# #
 # ######################################################################
-# ## Main calculations (creating .log-files)
-# .SECONDEXPANSION:
-# $(LOGS)/solved_%.log: $$(SOL_FILES_%)
-# 	python $(SOLVE) --header > $@ && \
-# 	tail -qn +2 $(SOL_FILES_$*) >> $@
 
-
-# $(LOGS)/part.solved_R.%.log: $(INST)/R/instances.list $(SOLVE)
-# 	python $(SOLVE) -i $<.$* -o $@ -d $(INST)/R/
-# ######################################################################
-# $(FIGS)/LB.eps: $(LOGS)/LBs.log $(PP)/fig_LBs.R
-# 	Rscript $(PP)/fig_LBs.R -i $< -o $@
-
-# $(LOGS)/LBs.log: $(CMP_LBs)
-# 	mkdir -p $(INST)/LBs && \
-# 	python ./gen_BDD_pair.py -n $(n_LBs) -v $N -p $p -RU $(INST)/LBs/ > $(LOGS)/$(DTE)_gen_$(N)var_LBs.log && \
-# 	ls $(INST)/LBs | grep -Po "A\\K[^\\.]*" > $(INST)/LBs/instances.list && \
-# 	python $(CMP_LBs) -d $(INST)/LBs/ -l $(INST)/LBs/instances.list > $@
-
-# ## Generating and solving instances
-# $(INST)/%/instances.list:
-# 	@echo Preparing the $*-instances dataset...
-# 	mkdir -p $(INST)/$* && \
-# 	if [ -f $(ARC)/dataset_$*.tar.gz ]; then tar -zxmf $(ARC)/dataset_$*.tar.gz; \
-# 	else \
-# 	python ./gen_BDD_pair.py -n $n -v $N -p $p -$*U $(INST)/$*/ > $(LOGS)/$(DTE)_gen_$(N)var_R.log; fi && \
-# 	ls $(INST)/$* | grep -Po "A\\K[^\\.]*" > $@ && \
-# 	split -d -nl/$(PAR_SOL) $@ $(INST)/$*/instances.list.
-
-# # was: ls $(INST)/$*/A*.bdd | grep -Po "$(INST)/$*/A\\K[^\\.]*" > $@ &&\
-# # basename -a `ls $(INST)/$*/A*.bdd` | sed -n -e's/^A//p' | sed -n -e's/\.bdd//p' > $@ && \
-# #
-# ######################################################################
-# ## Main calculations (creating .log-files)
-# .SECONDEXPANSION:
-# $(LOGS)/solved_%.log: $$(SOL_FILES_%)
-# 	python $(SOLVE) --header > $@ && \
-# 	tail -qn +2 $(SOL_FILES_$*) >> $@
-
-
-# $(LOGS)/part.solved_R.%.log: $(INST)/R/instances.list $(SOLVE)
-# 	python $(SOLVE) -i $<.$* -o $@ -d $(INST)/R/
-
-# $(LOGS)/part.solved_N.%.log: $(INST)/N/instances.list $(SOLVE)
-# 	python $(SOLVE) -i $<.$* -o $@ -d $(INST)/N/
 
 # $(LOGS)/BB_bounds_%.log: $$(BB_FILES_%)
 # 	python $(BBLOG) --header > $@ && \
@@ -353,40 +305,6 @@ $(LOGS)/tUFLP_runtimes.csv: experiments/tUFLP_runtimes.py
 # $(LOGS)/part.BB_bounds_N.%.log: $(INST)/N/instances.list $(SOLVE)
 # 	python $(BBLOG) -i $<.$* -o $@ -d $(INST)/N/
 
-# ## scalability experiment
-# $(LOGS)/scal_$(SCAL_R)%.log: $(SCAL)
-# 	mkdir -p $(INST)/sc$* && \
-# 	python ./gen_BDD_pair.py -n $(SCAL_K) -v $* -p $(SCAL_P) -U$(SCAL_R) $(INST)/sc$* > $(INST)/sc$*/gen.log && \
-# 	basename -a -s .bdd $(INST)/sc$*/A*.bdd | sed 's/A//' > $(INST)/sc$*/inst.list && \
-# 	python $(SCAL) -l $(INST)/sc$*/inst.list -d $(INST)/sc$*/ > $@
-
-# $(LOGS)/scalability.log: $(SCAL) $(SCAL_FILES)
-# 	python $(SCAL) --header > $@ && \
-# 	cat $(SCAL_FILES) >> $@ && \
-# 	tar --remove-files -czf $(ARC)/scalability_p$(SCAL_P)$(SCAL_R)x$(SCAL_K).tar.gz $(INST)/sc* && \
-# 	rm -rf $(INST)/sc$* && \
-# 	rm $(LOGS)/scal_N*.log
-# ## end of scalability experiment
-
-# ## random dataset stats
-# GEN_LW_LOGS =	mkdir -p $(INST)/ds_stats/$(DS_FLAG)p$* && \
-# 	python ./gen_BDD_pair.py -n $(LW_n) -v $(LW_N) -p $* -$(DS_FLAG)U $(INST)/ds_stats/$(DS_FLAG)p$* > /dev/null && \
-# 	ls $(INST)/ds_stats/$(DS_FLAG)p$*/*.bdd > $(INST)/ds_stats/$(DS_FLAG)p$*/lwidths_$(DS_FLAG)p$*.list && \
-# 	python $(STATS) -s $* $(INST)/ds_stats/$(DS_FLAG)p$*/lwidths_$(DS_FLAG)p$*.list > $@ && \
-# 	rm -rf $(INST)/ds_stats/$(DS_FLAG)p$*
-
-# $(LOGS)/lwidths_Np%.log: $(STATS)
-# 	$(GEN_LW_LOGS)
-
-# $(LOGS)/lwidths_Rp%.log: $(STATS)
-# 	$(GEN_LW_LOGS)
-
-# .SECONDEXPANSION:
-# $(LOGS)/lwidths_%.log: $$(LW_FILES_%)
-# 	ls $(LOGS)/lwidths_$(DS_FLAG)p*.log && \
-# 	tail -qn +2 $(LOGS)/lwidths_$(DS_FLAG)p*.log > $@
-
-# ## end of random dataset stats
 
 # ######################################################################
 # # auxiliary recipes

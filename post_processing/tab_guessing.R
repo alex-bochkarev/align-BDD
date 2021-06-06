@@ -5,11 +5,13 @@
 ##
 ## (c) Alexey Bochkarev, Clemson University, 2020
 
-library(xtable)
-library(dplyr)
-library(tidyr)
-library(latex2exp)
-library(optparse)
+suppressPackageStartupMessages({
+  library(xtable)
+  library(dplyr)
+  library(tidyr)
+  library(latex2exp)
+  library(optparse)
+})
 
 ## Internal parameters for the figure
 SIMPL_BASE_COL = "simpl_BB_obj" # exact solution

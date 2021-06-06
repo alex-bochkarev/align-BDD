@@ -5,12 +5,14 @@
 ## (c) Alexey Bochkarev, Clemson University, 2021
 ## abochka@clemson.edu
 
-library(ggplot2)
-library(dplyr)
-library(tidyr)
-library(gridExtra)
-library(optparse)
-library(viridis)
+suppressPackageStartupMessages({
+  library(ggplot2)
+  library(dplyr)
+  library(tidyr)
+  library(gridExtra)
+  library(optparse)
+  library(viridis)
+})
 
 ######################################################################
 ## unpack the command line arguments

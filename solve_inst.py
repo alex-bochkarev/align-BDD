@@ -41,7 +41,6 @@ if __name__ == "__main__":
 
     with open(args.inst_list,"r") as inst_list:
         with open(args.logfile,"w") as logf:
-            log("instance","num_type","value",outfile=logf, comment="comment")
 
             # process instances
             for inst_id in inst_list:
