@@ -16,8 +16,9 @@ cd $HOME/BDD/align-BDD
 tgs -m "starting the run: end-to-end build"
 # run-command
 
+make fresh
 make prep_dirs PREF=$TMPDIR/
-make -j 2 figures PARFLAG=32 PREF=$TMPDIR/
+make -j 2 figures PARFLAG=64 PREF=$TMPDIR/
 tgs -m "All figures built. Come check out!"
 make save_data PREF=$TMPDIR/
 tgs -m "Logs saved."

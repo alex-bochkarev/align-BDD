@@ -84,7 +84,9 @@ $(LOGS)/simpl_LB.csv: $(INST)/orig_problem.list compare_simpl_LBs.py
 				python -m compare_simpl_LBs --header > $@ && \
 				cat $@.tmp.* >> $@ && \
 				rm $@.tmp.* && \
-				rm $<.LBs.tmp.*
+				rm $<.LBs.tmp.* && \
+				if [ "$PREF" != "./" ]; then cp $@ ./run_logs/simpl_LB.csv; fi
+
 
 
 ## Histograms of the original objective value
@@ -98,13 +100,21 @@ $(LOGS)/main_rnd_run.csv: $(INST)/orig_problem.list
 				python -m solve_inst --header > $@ && \
 				cat $@.tmp.* >> $@ && \
 				rm $@.tmp.* && \
-				rm $<.tmp.*
+				rm $<.tmp.* && \
+				if [ "$PREF" != "./" ]; then \
+					cp $@ ./run_logs/main_rnd_run.csv ; \
+					cp -r $(INST)/orig_problem ./instances/ ; \
+				fi
 
 $(INST)/orig_problem.list: gen_BDD_pair.py
 				rm -rf $(INST)/orig_problem && \
 				mkdir $(INST)/orig_problem && \
 				parallel -j $(PARFLAG) 'python -m gen_BDD_pair -s $$(( $(ORIG_K) * {#} - $(ORIG_K)))' -K $(ORIG_K) -v $(ORIG_N) -p $(RND_P) -R -U $(INST)/orig_problem/ --quiet ::: $(shell seq 1 $(PARFLAG)) && \
-				ls $(INST)/orig_problem | grep -Po "A\\K[^\\.]*" > $@
+				ls $(INST)/orig_problem | grep -Po "A\\K[^\\.]*" > $@ && \
+				if [ "$PREF" != "./" ]; then \
+					cp -r $(INST)/orig_problem ./instances/; \
+					cp $@ ./instances/; \
+				fi
 
 ## Original problem (rnd) scaling figure
 $(FIGS)/orig_runtimes.eps: $(LOGS)/orig_scal.csv $(PP)/fig_scal.R
@@ -118,13 +128,20 @@ $(LOGS)/orig_scal.csv: $(INST)/scal/instances.list par_scal_test.py
 				python -m par_scal_test --header > $@ && \
 				cat $@.tmp.* >> $@ && \
 				rm $@.tmp.* && \
-				tar czf $(INST)/orig_scal.tar.gz -C $(INST)/scal . --remove-files
-
+				tar czf $(INST)/orig_scal.tar.gz -C $(INST)/scal . --remove-files && \
+				if [ "$PREF" != "./" ]; then \
+					cp $(INST)/orig_scal.tar.gz ./instances/; \
+					cp $@ ./run_logs/; \
+					rm -f ./instances/scal; \
+				fi
 
 $(INST)/scal/instances.list: gen_BDD_pair.py
 				mkdir -p $(INST)/scal && \
-				parallel -j $(PARFLAG) 'python -m gen_BDD_pair -s $$(( $(SCAL_K) * {#} - $(SCAL_K)))' -K $(SCAL_K) -v {} -p $(RND_P) -R -U $(INST)/scal/ --quiet ::: $(shell seq 5 25 | shuf) && \
-				ls $(INST)/scal | grep -Po "A\\K[^\\.]*" > $@
+				parallel -j $(PARFLAG) 'python -m gen_BDD_pair -s $$(( $(SCAL_K) * {#} - $(SCAL_K)))' -K $(SCAL_K) -v {} -p $(RND_P) -R -U $(INST)/scal/ --quiet ::: $(shell seq 5 10 | shuf) && \
+				ls $(INST)/scal | grep -Po "A\\K[^\\.]*" > $@ && \
+				if [ "$PREF" != "./" ]; then \
+					cp -r $(INST)/scal ./instances/; \
+				fi
 
 
 ## Optima stats for the simplified problem
@@ -135,16 +152,23 @@ $(FIGS)/.opts_stats: $(LOGS)/simpl_sol_struct.csv $(PP)/figs_simpl_opt_struct.R
 				touch $(FIGS)/.opts_stats
 
 $(LOGS)/simpl_sol_struct.csv: experiments/heu_sol_struct.py
-				python -m experiments.heu_sol_struct -k 500 -n 7 > $@
+				python -m experiments.heu_sol_struct -k 500 -n 7 > $@ && \
+				if [ "$PREF" != "./" ]; then cp $@ ./run_logs/; fi
 
 ## t-UFLP runtimes overview (scaling)
 $(FIGS)/tUFLP_runtimes_overview.eps: $(LOGS)/tUFLP_runtimes_scal.csv $(PP)/fig_tUFLP_runtimes_scal.R
 				Rscript $(PP)/fig_tUFLP_runtimes_scal.R -i $< -o $@
 
 $(LOGS)/tUFLP_runtimes_scal.csv: experiments/tUFLP_runtimes.py
-				parallel -j $(PARFLAG) python -m experiments.tUFLP_runtimes -K 100 -n {} --with-gsifts ">" $@.tmp.{} ::: $(shell seq 5 25 | shuf) && \
+				parallel -j $(PARFLAG) python -m experiments.tUFLP_runtimes -K 100 -n {} --with-gsifts -l $(INST)/tUFLP_scal_inst.json.tmp.{} ">" $@.tmp.{} ::: $(shell seq 5 15 | shuf) && \
 				python -m experiments.tUFLP_runtimes -H > $@ && \
-				cat $@.tmp.* >> $@ && rm $@.tmp.*
+				cat $@.tmp.* >> $@ && rm $@.tmp.* && \
+				:> $(INST)/tUFLP_scal_inst.json && \
+				cat $(INST)/tUFLP_scal_inst.json.tmp.* >> $(INST)/tUFLP_scal_inst.json && rm $(INST)/tUFLP_scal_inst.json.tmp.* && \
+				if [ "$PREF" != "./" ]; then
+					cp $@ ./run_logs/; \
+					cp $(INST)/tUFLP_scal_inst.json ./instances/ ; \
+				fi
 
 $(FIGS)/various_simpl_vs_min.eps: $(PP)/fig_simpl_vs_min.R $(LOGS)/heu_bm/jUFLP.csv $(LOGS)/heu_bm/tUFLP_nat.csv $(LOGS)/heu_bm/tUFLP_rnd.csv $(LOGS)/heu_bm/rnd_dia.csv
 				Rscript post_processing/fig_simpl_vs_min.R --indir $(LOGS)/heu_bm --out $@
@@ -158,7 +182,12 @@ $(LOGS)/heu_bm/jUFLP.csv: experiments/jUFL_hist_sizes.py
 				parallel -j $(PARFLAG) python -m experiments.jUFL_hist_sizes -n $(JUFL_N) -K $(HEU_BM_K) -p $(JUFL_P) -P {} -l $(INST)/jUFLP_inst.tmp.{} ">>" $@.tmp.{} ::: $(shell seq 1 $(PARFLAG)) && \
 				cat $@.tmp.* >> $@ && rm $@.tmp.* && \
 				cat $(INST)/jUFLP_inst.tmp* > $(INST)/jUFLP_instances.json && \
-				rm $(INST)/jUFLP_inst.tmp*
+				rm $(INST)/jUFLP_inst.tmp* && \
+				if [ "$PREF" != "./" ]; then \
+					mkdir -p ./run_logs/heu_bm ; \
+					cp $@ ./run_logs/heu_bm/; \
+					cp $(INST)/jUFLP_instances.json ./instances/ ; \
+				fi
 
 
 $(LOGS)/heu_bm/tUFLP_nat.csv: experiments/tUFL_hist_sizes_control.py
@@ -167,7 +196,12 @@ $(LOGS)/heu_bm/tUFLP_nat.csv: experiments/tUFL_hist_sizes_control.py
 				parallel -j $(PARFLAG) python -m experiments.tUFL_hist_sizes_control -n $(TUFL_N) -K $(HEU_BM_K) -p $(TUFL_P) -P {} -l $(INST)/tUFLP_nat_inst.tmp.{} ">>" $@.tmp.{} ::: $(shell seq 1 $(PARFLAG)) && \
 				cat $@.tmp.* >> $@ && rm $@.tmp.* && \
 				cat $(INST)/tUFLP_nat_inst.tmp* > $(INST)/tUFLP_nat_instances.json && \
-				rm $(INST)/tUFLP_nat_inst.tmp*
+				rm $(INST)/tUFLP_nat_inst.tmp* && \
+				if [ "$PREF" != "./" ]; then \
+					mkdir -p ./run_logs/heu_bm ; \
+					cp $@ ./run_logs/heu_bm/ ; \
+					cp $(INST)/tUFLP_nat_instances.json ./instances/ ; \
+				fi
 
 
 $(LOGS)/heu_bm/tUFLP_rnd.csv: experiments/tUFL_hist_sizes_control.py
@@ -176,7 +210,12 @@ $(LOGS)/heu_bm/tUFLP_rnd.csv: experiments/tUFL_hist_sizes_control.py
 				parallel -j $(PARFLAG) python -m experiments.tUFL_hist_sizes_control -R -n $(TUFL_N) -K $(HEU_BM_K) -p $(TUFL_P) -P {} -l $(INST)/tUFLP_rnd_inst.tmp.{} ">>" $@.tmp.{} ::: $(shell seq 1 $(PARFLAG)) && \
 				cat $@.tmp.* >> $@ && rm $@.tmp.* && \
 				cat $(INST)/tUFLP_rnd_inst.tmp* > $(INST)/tUFLP_rnd_instances.json && \
-				rm $(INST)/tUFLP_rnd_inst.tmp*
+				rm $(INST)/tUFLP_rnd_inst.tmp* && \
+				if [ "$PREF" != "./" ]; then \
+					mkdir -p ./run_logs/heu_bm/ ; \
+					cp $@ ./run_logs/heu_bm/ ; \
+					cp $(INST)/tUFLP_rnd_instances.json ./instances/ ; \
+				fi
 
 
 $(LOGS)/heu_bm/rnd_dia.csv: experiments/rnd_dia_hist_sizes_control.py
@@ -186,7 +225,12 @@ $(LOGS)/heu_bm/rnd_dia.csv: experiments/rnd_dia_hist_sizes_control.py
 				python -m experiments.rnd_dia_hist_sizes_control -H > $@ && \
 				parallel -j $(PARFLAG) python -m experiments.rnd_dia_hist_sizes_control -n $(RND_N) -K $(HEU_BM_K) -p $(RND_P) -P {} -l $(INST)/bm_heu_inst ">>" $@.tmp.{} ::: $(shell seq 1 $(PARFLAG)) && \
 				cat $@.tmp.* >> $@ && rm $@.tmp.* && \
-				tar czf $(INST)/bm_heu_random_diagrams.tar.gz -C $(INST)/bm_heu_inst . --remove-files
+				tar czf $(INST)/bm_heu_random_diagrams.tar.gz -C $(INST)/bm_heu_inst . --remove-files && \
+				if [ "$PREF" != "./" ]; then \
+					mkdir -p ./run_logs/heu_bm ; \
+					cp $@ ./run_logs/heu_bm/ ; \
+					cp $(INST)/bm_heu_random_diagrams.tar.gz ./instances/ ; \
+				fi
 
 
 ## Random dataset stats
@@ -201,7 +245,11 @@ $(LOGS)/lwidths.log: gen_BDD_pair.py
 				$(STATS) -H $@ && \
 				parallel $(STATS) -s {} $(INST)/orig_stats/{}/inst.list ">" $(LOGS)/lwidths.tmp.{} ::: $(STAT_PS) && \
 				cat $(LOGS)/lwidths.tmp.* >> $@ && rm $(LOGS)/lwidths.tmp.* && \
-				tar czf $(INST)/orig_stats.tar.gz -C $(INST)/orig_stats . --remove-files
+				tar czf $(INST)/orig_stats.tar.gz -C $(INST)/orig_stats . --remove-files && \
+				if [ "$PREF" != "./" ]; then \
+					cp $@ ./run_logs/ ; \
+					cp $(INST)/orig_stats.tar.gz ./instances/ ; \
+				fi
 
 
 ## Breakdown of runtimes (CPP)
@@ -211,7 +259,11 @@ $(FIGS)/tUFLP_runtimes_breakdown.eps: $(LOGS)/tUFLP_runtimes.csv $(PP)/fig_tUFLP
 
 $(LOGS)/tUFLP_runtimes.csv: experiments/tUFLP_runtimes.py
 				python -m experiments.tUFLP_runtimes -H > $@ && \
-				python -m experiments.tUFLP_runtimes -K 500 -n 20 -l $(INST)/tUFLP_steps_breakdown.json >> $@
+				python -m experiments.tUFLP_runtimes -K 500 -n 20 -l $(INST)/tUFLP_steps_breakdown.json >> $@ && \
+				if [ "$PREF" != "./" ]; then \
+					cp $@ ./run_logs/ ; \
+					cp $(INST)/tUFLP_steps_breakdown.json ./instances/ ; \
+				fi
 
 ## clean-up
 save-orig-instances:
@@ -312,12 +364,19 @@ save-orig-instances:
 # # auxiliary recipes
 
 prep_dirs:
-				mkdir -p $(INST)
-				mkdir -p $(LOGS)
+				cp --preserve=timestamps -r ./run_logs $(LOGS)
+				cp --preserve=timestamps -r ./instances $(INST)
 
-save_data:
-				cp -r $(INST)/* ./instances/
-				cp -r $(LOGS)/* ./run_logs/
+clean:
+				rm -rf $(INST)/*
+				rm -rf $(LOGS)/*
+				touch ./clean
+
+fresh: clean
+				rm -rf $(FIGS)/*.eps
+				mkdir -p ./run_logs
+				mkdir -p ./instances
+				rm ./clean
 
 # check_src:
 # 	egrep -nr --color 'TODO|FIXME|BUG|NOTE'
