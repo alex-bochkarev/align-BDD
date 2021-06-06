@@ -1,0 +1,32 @@
+Lmod has detected the following error: The following module(s) are unknown:
+"R/3.6.0"
+
+Please check the spelling or version number. Also try "module spider ..."
+It is also possible your cache file is out-of-date; it may help to try:
+  $ module --ignore-cache load "R/3.6.0"
+
+Also make sure that all modulefiles written in TCL start with the string
+#%Module
+
+
+
+/var/spool/pbs/mom_priv/jobs/2622671.pbs02.SC: line 18: cd: /home/abochka/align-BDD: No such file or directory
+make: *** No rule to make target 'prep_dirs'.  Stop.
+make: *** No rule to make target 'figures'.  Stop.
+make: *** No rule to make target 'save_data'.  Stop.
+{"ok":true,"result":{"message_id":1298,"from":{"id":931364299,"is_bot":true,"first_name":"Wintermute","username":"ab_wintermute_bot"},"chat":{"id":122533105,"first_name":"Alex","last_name":"Bochkarev","username":"abochka","type":"private"},"date":1623001157,"sticker":{"width":512,"height":512,"emoji":"\ud83d\ude0a","set_name":"KookyCat","is_animated":false,"thumb":{"file_id":"AAMCAgADGQMAAgUSYL0IRYY4dzOaYR3vmlk6Toy9_SgAAjwBAAIYQu4IxnWTmVt_iR508nANAAQBAAdtAANCWQACHwQ","file_unique_id":"AQADdPJwDQAEQlkAAg","file_size":4638,"width":128,"height":128},"file_id":"CAACAgIAAxkDAAIFEmC9CEWGOHczmmEd75pZOk6Mvf0oAAI8AQACGELuCMZ1k5lbf4keHwQ","file_unique_id":"AgADPAEAAhhC7gg","file_size":29142}}} 
+ 
++------------------------------------------+ 
+| PALMETTO CLUSTER PBS RESOURCES REQUESTED | 
++------------------------------------------+ 
+ 
+mem=500gb,walltime=05:00:00,ncpus=32
+ 
+ 
++-------------------------------------+ 
+| PALMETTO CLUSTER PBS RESOURCES USED | 
++-------------------------------------+ 
+ 
+cput=00:00:03,mem=25208kb,walltime=00:00:06,ncpus=32,cpupercent=0,vmem=25208kb
+ 
+ 

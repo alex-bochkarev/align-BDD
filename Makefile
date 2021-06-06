@@ -22,15 +22,17 @@ TUFL_N=20
 TUFL_P=0.3
 RND_N=15
 RND_P=0.6
-HEU_BM_NO_INST=10
+HEU_BM_NO_INST=1000
 
-ORIG_N = 10
-ORIG_K_TOTAL = 100
+# Number of vars of the main run experiment
+ORIG_N=15
+ORIG_K_TOTAL=3200
 
-STAT_N = 10
+STAT_N = 320
 STAT_PS = 0.2 0.5 0.8
 
-SCAL_K=1
+# Scaling figure: how many instances per size?
+SCAL_K=100
 
 ## Technical constants
 # how many jobs to run in parallel?
@@ -121,7 +123,7 @@ $(LOGS)/orig_scal.csv: $(INST)/scal/instances.list par_scal_test.py
 
 $(INST)/scal/instances.list: gen_BDD_pair.py
 				mkdir -p $(INST)/scal && \
-				parallel -j $(PARFLAG) 'python -m gen_BDD_pair -s $$(( $(SCAL_K) * {#} - $(SCAL_K)))' -K $(SCAL_K) -v {} -p $(RND_P) -R -U $(INST)/scal/ --quiet ::: $(shell seq 5 7 | shuf) && \
+				parallel -j $(PARFLAG) 'python -m gen_BDD_pair -s $$(( $(SCAL_K) * {#} - $(SCAL_K)))' -K $(SCAL_K) -v {} -p $(RND_P) -R -U $(INST)/scal/ --quiet ::: $(shell seq 5 25 | shuf) && \
 				ls $(INST)/scal | grep -Po "A\\K[^\\.]*" > $@
 
 
@@ -133,14 +135,14 @@ $(FIGS)/.opts_stats: $(LOGS)/simpl_sol_struct.csv $(PP)/figs_simpl_opt_struct.R
 				touch $(FIGS)/.opts_stats
 
 $(LOGS)/simpl_sol_struct.csv: experiments/heu_sol_struct.py
-				python -m experiments.heu_sol_struct -k 10 -n 6 > $@
+				python -m experiments.heu_sol_struct -k 500 -n 7 > $@
 
 ## t-UFLP runtimes overview (scaling)
 $(FIGS)/tUFLP_runtimes_overview.eps: $(LOGS)/tUFLP_runtimes_scal.csv $(PP)/fig_tUFLP_runtimes_scal.R
 				Rscript $(PP)/fig_tUFLP_runtimes_scal.R -i $< -o $@
 
 $(LOGS)/tUFLP_runtimes_scal.csv: experiments/tUFLP_runtimes.py
-				parallel -j $(PARFLAG) python -m experiments.tUFLP_runtimes -K 100 -n {} --with-gsifts ">" $@.tmp.{} ::: $(shell seq 5 10 | shuf) && \
+				parallel -j $(PARFLAG) python -m experiments.tUFLP_runtimes -K 100 -n {} --with-gsifts ">" $@.tmp.{} ::: $(shell seq 5 25 | shuf) && \
 				python -m experiments.tUFLP_runtimes -H > $@ && \
 				cat $@.tmp.* >> $@ && rm $@.tmp.*
 
@@ -209,7 +211,7 @@ $(FIGS)/tUFLP_runtimes_breakdown.eps: $(LOGS)/tUFLP_runtimes.csv $(PP)/fig_tUFLP
 
 $(LOGS)/tUFLP_runtimes.csv: experiments/tUFLP_runtimes.py
 				python -m experiments.tUFLP_runtimes -H > $@ && \
-				python -m experiments.tUFLP_runtimes -K 20 -n 20 -l $(INST)/tUFLP_steps_breakdown.json >> $@
+				python -m experiments.tUFLP_runtimes -K 500 -n 20 -l $(INST)/tUFLP_steps_breakdown.json >> $@
 
 ## clean-up
 save-orig-instances:
