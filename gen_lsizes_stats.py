@@ -16,9 +16,13 @@ if __name__ == "__main__":
     parser.add_argument(dest="filename", help="list of instance names to process (filenames with paths)")
     parser.add_argument("-s","--suffix",help="a suffix to append to each row (such as p value)",
                         action="store")
+    parser.add_argument("-H", "--header", action="store_true", dest="header", help="show header only and exit")
 
     args = parser.parse_args()
-    log("# instance","N", "is_reduced", comment="<comma-separated layer-widths>,<suffix>")
+
+    if args.header:
+        log("# instance","N", "is_reduced", comment="<comma-separated layer-widths>,<suffix>")
+        exit(0)
 
     bdd_no = 0
     with open(args.filename,"r") as inst_list:

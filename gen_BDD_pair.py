@@ -39,7 +39,7 @@ def count_inversions(X, Y):
 if __name__ == "__main__":
     parser = ap.ArgumentParser(description="Generates align-BDD instances. (c) A. Bochkarev, Clemson University, 2020",
                                formatter_class=ap.ArgumentDefaultsHelpFormatter)
-    parser.add_argument("-n", "--no_instances", action="store", dest="n", help="number of instances to generate",
+    parser.add_argument("-K", "--no_instances", action="store", dest="n", help="number of instances to generate",
                         type=int,default=1)
     parser.add_argument("-v","--no_variables",action="store", dest="V",
                         help="number of variables per instance",
@@ -54,7 +54,6 @@ if __name__ == "__main__":
 
     group = parser.add_mutually_exclusive_group()
     group.add_argument("-R","--reduced", help="generate reduced instances",action="store_true")
-    group.add_argument("-N","--nonreduced", help="generate reduced instances",action="store_true")
 
     args = parser.parse_args()
 

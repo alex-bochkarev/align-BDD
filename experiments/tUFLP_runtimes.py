@@ -16,6 +16,7 @@ import varseq as vs
 import BDD as DD
 import BB_search as bb
 from copy import deepcopy
+import json
 
 
 def show_header():
@@ -23,7 +24,7 @@ def show_header():
     print("run,k,n,method,step,time")
 
 
-def benchmark(K=10, TOL=1e-3, n=5, prefix=0, do_sifts=False):
+def benchmark(K=10, TOL=1e-3, n=5, prefix=0, do_sifts=False, logging=None):
     """Runs the solution for three different methods.
 
     Compares plain MIP, CPP MIP, and network-flow from DD (LP)
@@ -50,6 +51,9 @@ def benchmark(K=10, TOL=1e-3, n=5, prefix=0, do_sifts=False):
         S, f, fc, kb = cUFL.generate_test_instance(n=n)
         t1 = time()
         print(f"{prefix},{k},{n},gen_instance,all, {(t1-t0)*1000:.1f}")
+        if logging != None:
+            logging.write(json.dumps({
+                'S':S, 'f':f, 'fc':fc, 'kb':kb})+"\n")
 
         # Generate and solve plain MIP
         t0 = time()
@@ -199,6 +203,12 @@ def main():
                         dest="prefix",
                         default="0",
                         help="prefix string (ID of the run)")
+    parser.add_argument("-l",
+                        "--instance-log",
+                        action="store",
+                        dest="inst_log",
+                        default="none",
+                        help="file to save the instances (json)")
 
     args = parser.parse_args()
 
@@ -206,7 +216,15 @@ def main():
         show_header()
         exit(0)
 
-    benchmark(int(args.K), n=int(args.n), prefix="test", do_sifts=args.do_sifts)
+    if args.inst_log == "none":
+        inst_log = None
+    else:
+        inst_log = open(args.inst_log, "w")
+
+    benchmark(int(args.K), n=int(args.n), prefix="test", do_sifts=args.do_sifts, logging=inst_log)
+
+    if not inst_log is None:
+        inst_log.close()
 
 if __name__ == '__main__':
     main()

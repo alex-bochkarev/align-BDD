@@ -47,7 +47,7 @@ max_lw = quantile(df_m$value,quantile_to_show)
 # df_m$var_label = paste(df_m$var_label,"]",sep="")
 # df_m$layer = factor(df_m$var_label, levels = as.character(unique(df_m$var_label)))
 
-plt = ggplot(df_m, aes(x=factor(P, levels=unique(df_m$P)), y=value, fill=P))+
+plt = ggplot(df_m, aes(x=factor(P, levels=unique(P)), y=value, fill=P))+
     ## coord_flip(xlim=c(1,max_lw))+
     ylab("Layer widths")+
     xlab("Generation parameter value (for each layer)")+
@@ -66,7 +66,7 @@ plt = ggplot(df_m, aes(x=factor(P, levels=unique(df_m$P)), y=value, fill=P))+
         legend.position = c(0.1,0.9),
         axis.text.x = element_text(angle=90,hjust=1)
     )+
-    guides(fill=FALSE)+
+    guides(fill="none")+
     theme(
         legend.position = c(0.2, 0.8),
         legend.direction = "vertical",
@@ -85,4 +85,5 @@ plt = ggplot(df_m, aes(x=factor(P, levels=unique(df_m$P)), y=value, fill=P))+
         strip.text.x = element_text(size = 22)
     )
 
-ggsave(plot=plt, device = cairo_ps, outfile,width = 16, height = 9, dpi=300)
+ggsave(plot=plt, device = cairo_ps(family="Arial"),
+       outfile, width = 16, height = 9)

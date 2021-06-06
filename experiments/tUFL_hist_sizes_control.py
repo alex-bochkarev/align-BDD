@@ -86,7 +86,7 @@ def main():
 
         if not inst_log is None:
             inst_log.write(json.dumps({
-                'S':S, 'f':f, 'fc':fc, 'kb':kb}))
+                'S':S, 'f':f, 'fc':fc, 'kb':kb})+"\n")
 
         cover_DD, _ = cUFL.build_cover_DD(S, f)
         pref_order = [int(x[1:]) for x in cover_DD.vars]

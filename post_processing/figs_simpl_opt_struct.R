@@ -13,19 +13,19 @@ suppressPackageStartupMessages({
 ######################################################################
 ## unpack the command line arguments
 option_list = list(
-  make_option(c("-d", "--outdir"), type="character", default=null,
+  make_option(c("-d", "--outdir"), type="character", default=NULL,
               help="output directory to create files", metavar="character"),
-  make_option(c("-i", "--input"), type="character", default=null,
+  make_option(c("-i", "--input"), type="character", default=NULL,
               help="input file (run log)", metavar="character"));
 
 opt_parser = OptionParser(option_list=option_list);
 opt = parse_args(opt_parser);
 infile <- opt$input
 
-outfile_no_opts <- paste0(opt$outdir, "/figures/no_opts.eps")
-outfile_opts_diam <- paste0(opt$outdir, "/figures/opts_diam.eps")
-outfile_simscore_vs <- paste0(opt$outdir, "/figures/heuristic_simscore.eps")
-outfile_bin2d <- paste0(opt$outdir, "/figures/heuristic_simscore_vs_AB_simscore.eps")
+outfile_no_opts <- paste0(opt$outdir, "/no_opts.eps")
+outfile_opts_diam <- paste0(opt$outdir, "/opts_diam.eps")
+outfile_simscore_vs <- paste0(opt$outdir, "/heuristic_simscore.eps")
+outfile_bin2d <- paste0(opt$outdir, "/heuristic_simscore_vs_AB_simscore.eps")
 ######################################################################
 ## Number of optima
 

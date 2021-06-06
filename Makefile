@@ -13,6 +13,7 @@ INST=$(PREF)/instances
 LOGS=$(PREF)/run_logs
 PP=./post_processing
 
+STATS=python -m gen_lsizes_stats
 ######################################################################
 ## Constants
 JUFL_P=0.3
@@ -22,6 +23,9 @@ TUFL_P=0.3
 RND_N=15
 RND_P=0.6
 HEU_BM_NO_INST=10
+
+STAT_N = 10
+STAT_PS = 0.2 0.5 0.8
 
 ## Technical constants
 # how many jobs to run in parallel?
@@ -36,30 +40,46 @@ figures: \
 ######################################################################
 ## Calculated values
 HEU_BM_K=$(shell expr $(HEU_BM_NO_INST) / $(PARFLAG) + 1)
+STAT_K=$(shell expr $(STAT_N) / $(PARFLAG) + 1)
 
 ######################################################################
 ## Figures description
 
+
 $(FIGS)/simpl_heuristics.eps: $(LOGS)/simplified_problem.csv $(PP)/fig_simpl_heuristics.R
 				Rscript $(PP)/fig_simpl_heuristics.R -i $< -o $@
 
+## Different approaches to lower bound
 $(FIGS)/LB.eps: $(LOGS)/simpl_LB.csv $(PP)/fig_LBs.R
 				Rscript $(PP)/fig_LBs.R -i $< -o $@
 
+
+## Histograms of the original objective value
 $(FIGS)/orig_obj_histograms.eps: $(LOGS)/original_problem.csv $(PP)/fig_obj_hist.R
 				Rscript $(PP)/fig_obj_hist.R -i $< -o $@
 
 $(FIGS)/orig_runtimes.eps: $(LOGS)/orig_scal.csv $(PP)/fig_scal.R
 				Rscript $(PP)/fig_scal.R -i $< -o $@
 
-$(FIGS)/no_opts.eps $(FIGS)/opts_diam.eps $(FIGS)/heuristic_simscore.eps $(FIGS)/heuristic_simscore_vs_AB_simscore.eps: .opts_stats
+
+## Optima stats for the simplified problem
+$(FIGS)/no_opts.eps $(FIGS)/opts_diam.eps $(FIGS)/heuristic_simscore.eps $(FIGS)/heuristic_simscore_vs_AB_simscore.eps: $(FIGS)/.opts_stats
 
 $(FIGS)/.opts_stats: $(LOGS)/simpl_sol_struct.csv $(PP)/figs_simpl_opt_struct.R
-				Rscript $(PP)/figs_simpl_opt_struct.R --outdir $< && \
+				Rscript $(PP)/figs_simpl_opt_struct.R -i $< --outdir $(FIGS) && \
 				touch $(FIGS)/.opts_stats
 
+$(LOGS)/simpl_sol_struct.csv: experiments/heu_sol_struct.py
+				python -m experiments.heu_sol_struct -k 10 -n 6 > $@
+
+## t-UFLP runtimes overview (scaling)
 $(FIGS)/tUFLP_runtimes_overview.eps: $(LOGS)/tUFLP_runtimes_scal.csv $(PP)/fig_tUFLP_runtimes_scal.R
 				Rscript $(PP)/fig_tUFLP_runtimes_scal.R -i $< -o $@
+
+$(LOGS)/tUFLP_runtimes_scal.csv: experiments/tUFLP_runtimes.py
+				python -m experiments.tUFLP_runtimes -H > $@ && \
+				parallel -j $(PARFLAG) python -m experiments.tUFLP_runtimes -K 100 -n {} --with-gsifts ">" $@.tmp.{} ::: $(shell seq 5 25 | shuf) && \
+				cat $@.tmp.* > $@ && rm $@.tmp.*
 
 $(FIGS)/various_simpl_vs_min.eps: $(PP)/fig_simpl_vs_min.R $(LOGS)/heu_bm/jUFLP.csv $(LOGS)/heu_bm/tUFLP_nat.csv $(LOGS)/heu_bm/tUFLP_rnd.csv $(LOGS)/heu_bm/rnd_dia.csv
 				Rscript post_processing/fig_simpl_vs_min.R --indir $(LOGS)/heu_bm --out $@
@@ -99,6 +119,30 @@ $(LOGS)/heu_bm/rnd_dia.csv: experiments/rnd_dia_hist_sizes_control.py
 				cat $@.tmp.* >> $@ && rm $@.tmp.* && \
 				tar czf $(INST)/bm_heu_random_diagrams.tar.gz -C $(INST)/bm_heu_inst . --remove-files
 
+
+## Random dataset stats
+$(FIGS)/orig_lwidth_stats.eps: $(LOGS)/lwidths.log $(PP)/fig_summary.R
+				Rscript $(PP)/fig_summary.R -i $< -o $@
+
+$(LOGS)/lwidths.log: gen_BDD_pair.py
+				mkdir -p $(INST)/orig_stats && \
+				parallel mkdir -p $(INST)/orig_stats/{} ::: $(STAT_PS) && \
+				parallel -j $(PARFLAG) python -m gen_BDD_pair -v $(RND_N) -K $(STAT_K) -p $(RND_P) -R -U $(INST)/orig_stats/{1} ::: $(STAT_PS) ::: $(shell seq 1 $(PARFLAG)) && \
+				parallel find $(INST)/orig_stats/{}/*.bdd ">" $(INST)/orig_stats/{}/inst.list ::: $(STAT_PS) && \
+				$(STATS) -H $@ && \
+				parallel $(STATS) -s {} $(INST)/orig_stats/{}/inst.list ">" $(LOGS)/lwidths.tmp.{} ::: $(STAT_PS) && \
+				cat $(LOGS)/lwidths.tmp.* >> $@ && rm $(LOGS)/lwidths.tmp.* && \
+				tar czf $(INST)/orig_stats.tar.gz -C $(INST)/orig_stats . --remove-files
+
+
+## Breakdown of runtimes (CPP)
+
+$(FIGS)/tUFLP_runtimes_breakdown.eps: $(LOGS)/tUFLP_runtimes.csv $(PP)/fig_tUFLP_runtimes_breakdown.R
+				Rscript $(PP)/fig_tUFLP_runtimes_breakdown.R -i $< -o $@
+
+$(LOGS)/tUFLP_runtimes.csv: experiments/tUFLP_runtimes.py
+				python -m experiments.tUFLP_runtimes -H > $@ && \
+				python -m experiments.tUFLP_runtimes -K 20 -n 20 -l $(INST)/tUFLP_steps_breakdown.json >> $@
 
 ######################################################################
 ## Files and directories
@@ -170,8 +214,6 @@ $(LOGS)/heu_bm/rnd_dia.csv: experiments/rnd_dia_hist_sizes_control.py
 # figures/fig_simpl_vs_min.png: post_processing/fig_simpl_vs_min.R run_logs/jUFL/logfile.csv run_logs/jUFL/logfile_tUFL_nat.csv run_logs/jUFL/logfile_tUFL_rnd.csv run_logs/jUFL/logfile_rnd_dia.csv
 # 				Rscript post_processing/fig_simpl_vs_min.R -o $@
 
-# figures/fig_tUFLP_runtimes_breakdown.eps: run_logs/cUFL_runtimes.csv post_processing/fig_cUFL_runtimes_breakdown.R
-# 				Rscript post_processing/fig_cUFL_runtimes_breakdown.R -i $< -o $@
 
 # ######################################################################
 # ## High-level recipes
