@@ -1,5 +1,5 @@
 ######################################################################
-## Creates ggplot for the original problem:
+## Creates ggplot for the original problem (several versions):
 ## estimates the efficiency of the simplified-problem based heuristic
 ## as compared to the naive `minAB` heuristic.
 ##
@@ -18,9 +18,10 @@ suppressPackageStartupMessages({
 ######################################################################
 ## unpack the command line arguments
 option_list = list(
-    make_option(c("-o", "--out"), type="character", default="./out.eps",
-                help="output file name [default= %default]", metavar="character")
-);
+  make_option(c("-o", "--out"), type="character", default="./out.eps",
+              help="output file name [default= %default]", metavar="character"),
+  make_option(c("-i", "--indir"), type="character", default="./out.eps",
+              help="directory for input files", metavar="character"))
 
 opt_parser = OptionParser(option_list=option_list);
 opt = parse_args(opt_parser);
@@ -30,33 +31,45 @@ if (is.null(opt$out)){
     stop("Please specify output file", call.=FALSE)
 }
 
+if (is.null(opt$indir)){
+  print_help(opt_parser)
+  stop("Please specify the input directory", call.=FALSE)
+}
+
 ######################################################################
 ## parse the input file
-df = read.csv("./run_logs/jUFL/logfile_tUFL_nat.csv", stringsAsFactors = FALSE)
-df$inst_type = "(a) tUFL (natural order)"
+indir = opt$indir
+df = read.csv(paste0(indir,"/tUFLP_nat.csv"), stringsAsFactors = FALSE)
+df$inst_type = "(a) t-UFLP (natural order)"
+cat("Number of t-UFLP (nat) instances:", nrow(df)/2,"\n")
 
-df_rnd <- read.csv("./run_logs/jUFL/logfile_tUFL_rnd.csv", stringsAsFactors = FALSE)
-df_rnd$inst_type = "(b) tUFL (random order)"
+df_rnd <- read.csv(paste0(indir, "/tUFLP_rnd.csv"), stringsAsFactors = FALSE)
+df_rnd$inst_type = "(b) t-UFLP (random order)"
+cat("Number of t-UFLP (rnd) instances:", nrow(df_rnd)/2,"\n")
 
-dfjUFL <- read.csv("./run_logs/jUFL/logfile.csv", stringsAsFactors = FALSE)
-dfjUFL$inst_type <- "(c) jUFL"
+dfjUFL <- read.csv(paste0(indir, "/jUFLP.csv"), stringsAsFactors = FALSE)
+dfjUFL$inst_type <- "(c) Joint UFLP"
+cat("Number of j-UFLP instances:", nrow(dfjUFL)/2,"\n")
 
-
-df_rnd_dia <- read.csv("./run_logs/jUFL/logfile_rnd_dia.csv", stringsAsFactors = FALSE)
+df_rnd_dia <- read.csv(paste0(indir, "/rnd_dia.csv"), stringsAsFactors = FALSE)
 df_rnd_dia$inst_type <- "(d) Random diagrams"
+cat("Number of rnd-dia instances:", nrow(df_rnd_dia)/2,"\n")
 
 df = rbind(df, df_rnd, dfjUFL, df_rnd_dia)
 
-df_wide = pivot_wider(filter(df, n==20),
-                        id_cols = c("instance", "inst_type", "n", "prob"),
+df_wide = pivot_wider(df,
+                        id_cols = c("instance", "inst_type"),
                         names_from = "num_type",
                         values_from = "value"
                         )
 
+no_insts = nrow(filter(df_wide, inst_type=="(a) t-UFLP (natural order)"))
+cat("Number used for the title: ", no_insts,"\n")
+
 df_wide$simpl_rel_obj = with(df_wide, orig_simpl_obj / orig_minAB_obj)
 
-problems = c("(a) tUFL (natural order)", "(b) tUFL (random order)",
-             "(c) jUFL", "(d) Random diagrams")
+problems = c("(a) t-UFLP (natural order)", "(b) t-UFLP (random order)",
+             "(c) Joint UFLP", "(d) Random diagrams")
 
 df_wide$problem = factor(df_wide$inst_type, levels=problems)
 
@@ -66,18 +79,15 @@ plt_dens =
     geom_vline(xintercept = 1.0, size=0.5, color="red", linetype="dashed")+
     ## styling
     scale_y_continuous(
-        "No. of instances",
+        paste0("Number of instances, out of ", no_insts),
         labels = scales::number_format(accuracy = 1),
         position = "right"
     )+
     scale_x_continuous(
-        "Itersection diagram size (relative)",
+        "Itersection diagram size (relative to 'Best of A and B')",
         labels = scales::percent,
-        ## breaks = seq(xmin,xmax,length.out=11),
-        ## minor_breaks = seq(xmin,xmax,length.out=21),
         limits = c(0.0, 2.5)
     )+
-  ggtitle("Intersection diagram size of the proposed heuristic relative to the minAB heuristic.")+
   theme(
     legend.position = c(0.6, 0.8),
     legend.direction = "vertical",
@@ -86,8 +96,8 @@ plt_dens =
     legend.text.align = 0,
     axis.text.x = element_text(size=15,angle=45,vjust = 0.7),
     axis.text.y = element_text(size=15),
-    axis.title.x = element_text(size = 18),
-    axis.title.y = element_text(size = 18),
+    axis.title.x = element_text(size = 23),
+    axis.title.y = element_text(size = 23),
     panel.background = element_blank(),
     panel.grid.major = element_line(size = 0.5, linetype = 'solid',
                                     colour = "lightgrey"),
@@ -95,12 +105,14 @@ plt_dens =
     panel.grid.minor.y = element_line(size=0.5,linetype = 'solid', colour = "lightgrey"),
     strip.text.y.left = element_text(size=15, angle=0),
     strip.background = element_blank(),
-    strip.text.x.top = element_text(size=15, angle=0),
+    strip.text.x.bottom = element_text(size=20, angle=0),
     )+
-  facet_grid(. ~ problem, switch="y")+
+  facet_grid(. ~ problem, switch="x")+
   coord_flip()
     ## end of styling
 
+cat("************************\n")
+cat("Performance summary:\n")
 df_wide %>%
   group_by(inst_type) %>%
   summarize(

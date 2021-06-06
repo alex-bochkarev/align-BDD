@@ -3,15 +3,16 @@
 ## benchmarking different heuristics
 ## (objective values histogram)
 ##
-## (c) Alexey Bochkarev, Clemson University, 2020
+## (c) Alexey Bochkarev, Clemson University, 2021
 
-library(ggplot2)
-library(gridExtra)
-library(dplyr)
-library(tidyr)
-library(stringr)
-library(latex2exp)
-library(optparse)
+suppressPackageStartupMessages({
+  library(ggplot2)
+  library(gridExtra)
+  library(dplyr)
+  library(tidyr)
+  library(stringr)
+  library(latex2exp)
+  library(optparse)})
 
 ## Internal parameters for the figure
 X_QUANTILE=0.98 # quantile to filter for the histogram(Ox axis)
@@ -40,7 +41,8 @@ if (is.null(opt$input) | is.null(opt$out)){
 
 ######################################################################
 ## parse the input file
-df = read.csv(opt$input, stringsAsFactors = FALSE)
+infile = opt$input
+df = read.csv(infile, stringsAsFactors = FALSE)
 
 df_legend = select(filter(df, num_type=="legend"), value,comment)
 df = filter(df, num_type != "legend")
@@ -96,16 +98,12 @@ latex_label = parse(text = TeX("try $S_A$, $S_B$, choose the best one"))
 plt_dens =
     ggplot(df_time_o, aes(x=obj))+
     geom_histogram(binwidth = 0.01,position = "identity")+
-    #geom_density(alpha=0.1,size=1.5)+
-    ## guides(fill=guide_legend(title="Heuristic:"), color = guide_legend(title="Heuristic:"))+
-#    ggtitle("Objective values distribution for different heuristics (original problem, 15vars 100k dataset, non-reduced instances)")+
     geom_vline(xintercept = 1.0, size=0.5, color="red", linetype="dashed")+
-    ## annotate("text",x=1.0, y=4.2,label = "100% = greedy BDD sifts", color="red")+
     ## styling
     labs(fill="Heuristic used:", color="Heuristic used:")+
     scale_y_continuous(
-        "No. of instances",
-        labels = scales::number_format(accuracy = 0.5),
+        paste0("Number of instances, out of ", length(unique(df$instance))),
+        labels = scales::number_format(accuracy = 1),
         position = "right"
     )+
     scale_x_continuous(
@@ -122,7 +120,7 @@ plt_dens =
         legend.text = element_text(size=24),
         legend.text.align = 0,
         axis.text.x = element_text(size=22,angle=45,vjust = 0.7),
-        axis.text.y = element_text(size=22),
+        axis.text.y = element_text(size=13),
         axis.title.x = element_text(size = 26),
         axis.title.y = element_text(size = 26),
         panel.background = element_blank(),
@@ -133,7 +131,7 @@ plt_dens =
         strip.text.y = element_text(size=22, angle=180),
         strip.background = element_blank()
     )+
-    facet_grid(comment ~ ., scales="free_y", switch="y")
+    facet_grid(comment ~ ., scales="fixed", switch="y")
     ## end of styling
 
 ggsave(opt$out,plt_dens, device = cairo_ps, width = 16, height = 10)

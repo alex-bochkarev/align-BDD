@@ -1,14 +1,31 @@
+######################################################################
+## Generates stats for the set of optima (simplified problem)
+##
+## (c) Alexey Bochkarev, Clemson University, 2020
+
 suppressPackageStartupMessages({
   library(ggplot2)
   library(dplyr)
   library(tidyr)
+  library(optparse)
 })
 
-infile <- "./run_logs/heu_sol_struct_6vars.csv"
-outfile_no_opts <- "./figures/no_opts.eps"
-outfile_opts_diam <- "./figures/opts_diam.eps"
-outfile_simscore_vs <- "./figures/heuristic_simscore.eps"
-outfile_bin2d <- "./figures/heuristic_simscore_vs_AB_simscore.eps"
+######################################################################
+## unpack the command line arguments
+option_list = list(
+  make_option(c("-d", "--outdir"), type="character", default=null,
+              help="output directory to create files", metavar="character"),
+  make_option(c("-i", "--input"), type="character", default=null,
+              help="input file (run log)", metavar="character"));
+
+opt_parser = OptionParser(option_list=option_list);
+opt = parse_args(opt_parser);
+infile <- opt$input
+
+outfile_no_opts <- paste0(opt$outdir, "/figures/no_opts.eps")
+outfile_opts_diam <- paste0(opt$outdir, "/figures/opts_diam.eps")
+outfile_simscore_vs <- paste0(opt$outdir, "/figures/heuristic_simscore.eps")
+outfile_bin2d <- paste0(opt$outdir, "/figures/heuristic_simscore_vs_AB_simscore.eps")
 ######################################################################
 ## Number of optima
 

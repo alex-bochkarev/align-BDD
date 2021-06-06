@@ -17,6 +17,7 @@ import varseq as vs
 import BDD as DD
 import BB_search as bb
 import numpy as np
+import json
 
 
 def main():
@@ -61,6 +62,12 @@ def main():
                         dest="randomize",
                         default=False,
                         help="randomize the order of the two diagrams.")
+    parser.add_argument("-l",
+                        "--instance-log",
+                        action="store",
+                        dest="inst_log",
+                        default="none",
+                        help="file to save the instances (json)")
 
     args = parser.parse_args()
 
@@ -68,13 +75,19 @@ def main():
         print("instance,n,prob,num_type,value")
         exit(0)
 
+    if args.inst_log == "none":
+        inst_log = None
+    else:
+        inst_log = open(args.inst_log, "w")
+
     for k in range(int(args.K)):
-        # S_1, S_2, f_1, f_2 = jUFL.generate_instance(int(args.n), p=float(args.prob))
         S, f, fc, kb = cUFL.generate_test_instance(int(args.n),
                                                    p=float(args.prob))
 
-        # C_1, _ = cUFL.build_randomized_cover_DD(S_1, f_1)
-        # C_2, _ = cUFL.build_randomized_cover_DD(S_2, f_2)
+        if not inst_log is None:
+            inst_log.write(json.dumps({
+                'S':S, 'f':f, 'fc':fc, 'kb':kb}))
+
         cover_DD, _ = cUFL.build_cover_DD(S, f)
         pref_order = [int(x[1:]) for x in cover_DD.vars]
         type_DD, _ = cUFL.build_color_DD(f, fc, kb,
@@ -117,6 +130,9 @@ def main():
         print(f"{args.prefix}-{k},{args.n},{args.prob},orig_simpl_obj,{int_DD_VS.size()}")
 
         sys.stdout.flush()
+
+    if not inst_log is None:
+        inst_log.close()
 
 if __name__ == '__main__':
     main()

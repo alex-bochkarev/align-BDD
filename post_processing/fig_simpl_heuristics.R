@@ -1,9 +1,7 @@
 ######################################################################
-## Creates ggplot for the simplified problem:
-## Calculation wall-clock time vs. objective for different
-## heuristics
+## Creates Figure 7: runtime and objectives for different heuristics
 ##
-## (c) Alexey Bochkarev, Clemson University, 2020
+## (c) Alexey Bochkarev, Clemson University, 2021
 
 suppressPackageStartupMessages({
   library(ggplot2)

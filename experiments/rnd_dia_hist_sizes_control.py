@@ -53,6 +53,12 @@ def main():
                         action="store_true",
                         dest="header",
                         help="show header only and exit")
+    parser.add_argument("-l",
+                        "--instance-log",
+                        action="store",
+                        dest="logdir",
+                        default="none",
+                        help="dir name to save the instances (bdd format)")
 
     args = parser.parse_args()
 
@@ -67,6 +73,10 @@ def main():
 
         A.make_reduced()
         B.make_reduced()
+
+        if args.logdir != "none":
+            A.save(f"{args.logdir}/A{args.prefix}-{k}.bdd")
+            B.save(f"{args.logdir}/B{args.prefix}-{k}.bdd")
 
         A2B = A.align_to(B.vars, inplace=False)
         B2A = B.align_to(A.vars, inplace=False)
