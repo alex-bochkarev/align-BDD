@@ -309,9 +309,13 @@ save-orig-instances:
 # ######################################################################
 # # auxiliary recipes
 
-# prep_dirs:
-# 	mkdir -p $(INST)/R $(INST)/N
-# 	mkdir -p $(LOGS)
+prep_dirs:
+				mkdir -p $(INST)
+				mkdir -p $(LOGS)
+
+save_data:
+				cp -r $(INST)/* ./instances/
+				cp -r $(LOGS)/* ./run_logs/
 
 # check_src:
 # 	egrep -nr --color 'TODO|FIXME|BUG|NOTE'

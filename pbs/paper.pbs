@@ -1,0 +1,26 @@
+# -*- mode: sh -*-
+#PBS -N paper_build
+#PBS -l select=1:ncpus=32:mem=500Gb:interconnect=any,walltime=3:00:00
+#PBS -j oe
+#PBS -M abochka@clemson.edu
+#PBS -m abe
+
+module add anaconda3/5.1.0-gcc/8.3.1
+source activate ab-local
+module add gnu-parallel
+module add R/3.6.0
+
+cd $(HOME)/align-BDD
+
+tgs -m "starting the run: end-to-end build"
+# run-command
+
+make prep_dirs PREF=$TMPDIR/
+make -j 2 figures PARFLAG=32 PREF=$TMPDIR/
+tgs -m "All figures built. Come check out!"
+make save_data PREF=$TMPDIR/
+tgs -m "Logs saved."
+tgs -s happycat
+
+# deactivate the env
+source deactivate ab-local
