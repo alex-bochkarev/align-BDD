@@ -26,7 +26,7 @@ HEU_BM_NO_INST=1000
 
 # Number of vars of the main run experiment
 ORIG_N=15
-ORIG_K_TOTAL=3200
+ORIG_K_TOTAL=5000
 
 STAT_K_TOTAL = 500
 STAT_PS = 0.2 0.5 0.8
@@ -137,7 +137,7 @@ $(LOGS)/orig_scal.csv: $(INST)/scal/instances.list par_scal_test.py
 
 $(INST)/scal/instances.list: gen_BDD_pair.py
 				mkdir -p $(INST)/scal && \
-				parallel -j $(PARFLAG) 'python -m gen_BDD_pair -s $$(( $(SCAL_K) * {#} - $(SCAL_K)))' -K $(SCAL_K) -v {} -p $(RND_P) -R -U $(INST)/scal/ --quiet ::: $(shell seq 5 10 | shuf) && \
+				parallel -j $(PARFLAG) 'python -m gen_BDD_pair -s $$(( $(SCAL_K) * {#} - $(SCAL_K)))' -K $(SCAL_K) -v {} -p $(RND_P) -R -U $(INST)/scal/ --quiet ::: $(shell seq 5 25 | shuf) && \
 				ls $(INST)/scal | grep -Po "A\\K[^\\.]*" > $@ && \
 				if [ "$(PREF)" != "./" ]; then \
 					cp -r $(INST)/scal ./instances/; \
@@ -376,6 +376,10 @@ fresh: clean
 				mkdir -p ./run_logs
 				mkdir -p ./instances
 				rm ./clean
+
+pack_instances:
+	CURRD=$(shell pwd) && cd $(INST) && tar -czf orig_problem.tar.gz ./orig_problem/*.bdd --remove-files && cd $(CURRD)
+	CURRD=$(shell pwd) && cd $(INST) && tar -czf orig_scal.tar.gz ./scal/*.bdd --remove-files && cd $(CURRD)
 
 # check_src:
 # 	egrep -nr --color 'TODO|FIXME|BUG|NOTE'
