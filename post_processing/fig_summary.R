@@ -49,15 +49,17 @@ max_lw = quantile(df_m$value,quantile_to_show)
 # df_m$var_label = paste(df_m$var_label,"]",sep="")
 # df_m$layer = factor(df_m$var_label, levels = as.character(unique(df_m$var_label)))
 
-plt = ggplot(df_m, aes(x=factor(P, levels=unique(P)), y=value, fill=P))+
+plt =
+  ggplot(df_m, aes(x=factor(P, levels=unique(P)), y=value, fill=P))+
     ## coord_flip(xlim=c(1,max_lw))+
     ylab("Layer widths")+
     xlab("Generation parameter value (for each layer)")+
-  scale_y_continuous(
-    limits = quantile(df_m$value, c(0, quantile_to_show)),
-    breaks = seq(1,max_lw,by = floor((max_lw-1)/Nticks)+1))+
+  scale_y_continuous()+
+    ## limits = quantile(df_m$value, c(0, quantile_to_show)),
+    ## breaks = seq(1,max_lw,by = floor((max_lw-1)/Nticks)+1))+
   scale_x_discrete(breaks = unique(df_m$P))+
-    geom_boxplot(outlier.shape = NA)+
+  geom_jitter(width=0.07, shape=4, alpha=0.05)+
+  geom_boxplot(outlier.shape = NA, alpha=0.5, notch=TRUE)+
   facet_wrap(~variable, nrow=1)+ #, label = "label_parsed"
     theme(
         panel.background = element_rect(fill = "lightgrey",
@@ -87,5 +89,4 @@ plt = ggplot(df_m, aes(x=factor(P, levels=unique(P)), y=value, fill=P))+
         strip.text.x = element_text(size = 22)
     )
 
-ggsave(plot=plt, device = cairo_ps(family="Arial"),
-       outfile, width = 16, height = 9)
+ggsave(plot=plt, device = cairo_ps(family="Arial"), outfile, width = 16, height = 9)

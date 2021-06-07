@@ -9,6 +9,7 @@ abochka@clemson.edu
 import BDD as exact
 from experiments.misc import log
 import argparse as ap
+import sys
 
 if __name__ == "__main__":
     parser = ap.ArgumentParser(description="Produces a layer widths statistics (dataset). (c) A. Bochkarev, Clemson University, 2020",
