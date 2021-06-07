@@ -28,7 +28,7 @@ HEU_BM_NO_INST=1000
 ORIG_N=15
 ORIG_K_TOTAL=3200
 
-STAT_N = 320
+STAT_K_TOTAL = 100
 STAT_PS = 0.2 0.5 0.8
 
 # Scaling figure: how many instances per size?
@@ -54,7 +54,7 @@ figures: \
 ######################################################################
 ## Calculated values
 HEU_BM_K=$(shell expr $(HEU_BM_NO_INST) / $(PARFLAG) + 1)
-STAT_K=$(shell expr $(STAT_N) / $(PARFLAG) + 1)
+STAT_K=$(shell expr $(STAT_K_TOTAL) / $(PARFLAG) + 1)
 ORIG_K=$(shell expr $(ORIG_K_TOTAL) / $(PARFLAG) + 1)
 
 
@@ -242,7 +242,7 @@ $(LOGS)/lwidths.log: gen_BDD_pair.py
 				parallel mkdir -p $(INST)/orig_stats/{} ::: $(STAT_PS) && \
 				parallel -j $(PARFLAG) python -m gen_BDD_pair -v $(RND_N) -K $(STAT_K) -p $(RND_P) -R -U $(INST)/orig_stats/{1} --quiet ::: $(STAT_PS) ::: $(shell seq 1 $(PARFLAG)) && \
 				parallel find $(INST)/orig_stats/{}/*.bdd ">" $(INST)/orig_stats/{}/inst.list ::: $(STAT_PS) && \
-				$(STATS) -H $@ && \
+				$(STATS) -H none > $@ && \
 				parallel $(STATS) -s {} $(INST)/orig_stats/{}/inst.list ">" $(LOGS)/lwidths.tmp.{} ::: $(STAT_PS) && \
 				cat $(LOGS)/lwidths.tmp.* >> $@ && rm $(LOGS)/lwidths.tmp.* && \
 				tar czf $(INST)/orig_stats.tar.gz -C $(INST)/orig_stats . --remove-files && \
