@@ -1,6 +1,6 @@
 # -*- mode: sh -*-
 #PBS -N paper_build
-#PBS -l select=1:ncpus=32:mem=500gb:interconnect=any,walltime=8:00:00
+#PBS -l select=1:ncpus=32:mem=500gb:interconnect=any,walltime=48:00:00
 #PBS -j oe
 #PBS -M abochka@clemson.edu
 #PBS -m abe
@@ -20,8 +20,6 @@ make fresh
 make prep_dirs PREF=$TMPDIR/
 make -j 2 figures PARFLAG=64 PREF=$TMPDIR/
 tgs -m "All figures built. Come check out!"
-make save_data PREF=$TMPDIR/
-tgs -m "Logs saved."
 tgs -s happycat
 
 # deactivate the env

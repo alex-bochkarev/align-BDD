@@ -15,11 +15,13 @@ import argparse as ap
 import sys
 from time import time
 import cUFL
+import json
 
-
-def run_experiment(N=5, k=0, inst_type="rnd"):
+def run_experiment(N=5, k=0, inst_type="rnd", logdest="none"):
     """Runs the experiment with diagrams of `N` layers."""
     # prepare an align-BDD instance
+    inst_log = None
+
     t0 = time()
     if inst_type == "rnd":
         A = DD.BDD.random(N=N)
@@ -28,8 +30,21 @@ def run_experiment(N=5, k=0, inst_type="rnd"):
             dict(
                 zip([i for i in range(1, N + 1)],
                     np.random.permutation([i for i in range(1, N + 1)]))))
+
+        if logdest != "none":
+            A.make_reduced()
+            B.make_reduced()
+            A.save(f"{logdest}/A{k}.bdd")
+            B.save(f"{logdest}/B{k}.bdd")
+
     elif inst_type == "tUFL":
         S, f, fc, kb = cUFL.generate_test_instance(n=N)
+
+        if logdest != "none":
+            inst_log = open(logdest, "w")
+            inst_log.write(json.dumps({
+                'S':S, 'f':f, 'fc':fc, 'kb':kb})+"\n")
+
         A, _ = cUFL.build_cover_DD(S, f)
         pref_order = [int(x[1:]) for x in A.vars]
         B, _ = cUFL.build_color_DD(f, fc, kb, pref_order)
@@ -83,6 +98,8 @@ def run_experiment(N=5, k=0, inst_type="rnd"):
     t1 = time()
 
     print(f"{k}, {b.status}, {AB_simscore*100:.1f}, {no_opts}, {opts_diam*100:.1f}, {best_VS_simscore*100:.1f}, {worst_VS_simscore*100:.1f}, {t1-t0:.1f}")
+    if inst_log is not None:
+        inst_log.close()
 
 if __name__ == '__main__':
     parser = ap.ArgumentParser(description=" Experiment: analyzing heuristic solutions. (c) A. Bochkarev, 2021",
@@ -91,6 +108,7 @@ if __name__ == '__main__':
     parser.add_argument("-n", action="store", dest="n", help="number of layers")
     parser.add_argument("-k", action="store", dest="k", help="number of instances to generate")
     parser.add_argument("-t", action="store", dest="inst_type", help="instance type 'rnd' (random) or 'tUFL", default="rnd")
+    parser.add_argument("-l", action="store", dest="logdest", help="Logging destination (a file, or a folder for 'rnd' type)", default="none")
 
     args = parser.parse_args()
     assert int(args.k) > 0, "Please specify a positive no of instances to generate."
@@ -99,5 +117,5 @@ if __name__ == '__main__':
 
     print("k, VS_status, AB_simscore, no_opts, opts_diam, best_VS_simscore, worst_VS_simscore, exp_time")
     for k in range(int(args.k)):
-        run_experiment(N=int(args.n), k=k)
+        run_experiment(N=int(args.n), k=k, logdest=args.logdest)
         sys.stdout.flush()

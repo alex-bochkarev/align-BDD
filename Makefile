@@ -22,17 +22,17 @@ TUFL_N=20
 TUFL_P=0.3
 RND_N=15
 RND_P=0.6
-HEU_BM_NO_INST=1000
+HEU_BM_NO_INST=2000
 
 # Number of vars of the main run experiment
 ORIG_N=15
-ORIG_K_TOTAL=5000
+ORIG_K_TOTAL=10000
 
-STAT_K_TOTAL = 500
+STAT_K_TOTAL = 1000
 STAT_PS = 0.2 0.5 0.8
 
 # Scaling figure: how many instances per size?
-SCAL_K=100
+SCAL_K=200
 
 ## Technical constants
 # how many jobs to run in parallel?
@@ -152,15 +152,20 @@ $(FIGS)/.opts_stats: $(LOGS)/simpl_sol_struct.csv $(PP)/figs_simpl_opt_struct.R
 				touch $(FIGS)/.opts_stats
 
 $(LOGS)/simpl_sol_struct.csv: experiments/heu_sol_struct.py
-				python -m experiments.heu_sol_struct -k 500 -n 7 > $@ && \
-				if [ "$(PREF)" != "./" ]; then cp $@ ./run_logs/; fi
+				mkdir -p $(INST)/simpl_sol_struct && \
+				python -m experiments.heu_sol_struct -k 1000 -n 7 -l $(INST)/simpl_sol_struct > $@ && \
+				tar czf $(INST)/heu_sol_struct.tar.gz -C $(INST)/simpl_sol_struct . --remove-files ;  \
+				if [ "$(PREF)" != "./" ]; then \
+					cp $@ ./run_logs/; \
+					mv $(INST)/heu_sol_struct.tar.gz ./instances/ ; \
+				fi
 
 ## t-UFLP runtimes overview (scaling)
 $(FIGS)/tUFLP_runtimes_overview.eps: $(LOGS)/tUFLP_runtimes_scal.csv $(PP)/fig_tUFLP_runtimes_scal.R
 				Rscript $(PP)/fig_tUFLP_runtimes_scal.R -i $< -o $@
 
 $(LOGS)/tUFLP_runtimes_scal.csv: experiments/tUFLP_runtimes.py
-				parallel -j $(PARFLAG) python -m experiments.tUFLP_runtimes -K 100 -n {} --with-gsifts -l $(INST)/tUFLP_scal_inst.json.tmp.{} ">" $@.tmp.{} ::: $(shell seq 5 15 | shuf) && \
+				parallel -j $(PARFLAG) python -m experiments.tUFLP_runtimes -K 200 -n {} --with-gsifts -l $(INST)/tUFLP_scal_inst.json.tmp.{} ">" $@.tmp.{} ::: $(shell seq 5 15 | shuf) && \
 				python -m experiments.tUFLP_runtimes -H > $@ && \
 				cat $@.tmp.* >> $@ && rm $@.tmp.* && \
 				:> $(INST)/tUFLP_scal_inst.json && \
@@ -225,7 +230,7 @@ $(LOGS)/heu_bm/rnd_dia.csv: experiments/rnd_dia_hist_sizes_control.py
 				python -m experiments.rnd_dia_hist_sizes_control -H > $@ && \
 				parallel -j $(PARFLAG) python -m experiments.rnd_dia_hist_sizes_control -n $(RND_N) -K $(HEU_BM_K) -p $(RND_P) -P {} -l $(INST)/bm_heu_inst ">>" $@.tmp.{} ::: $(shell seq 1 $(PARFLAG)) && \
 				cat $@.tmp.* >> $@ && rm $@.tmp.* && \
-				tar czf $(INST)/bm_heu_random_diagrams.tar.gz -C $(INST)/bm_heu_inst . --remove-files && \
+				tar czf $(INST)/bm_heu_random_diagrams.tar.gz -C $(INST) ./bm_heu_inst --remove-files && \
 				if [ "$(PREF)" != "./" ]; then \
 					mkdir -p ./run_logs/heu_bm ; \
 					cp $@ ./run_logs/heu_bm/ ; \
@@ -258,7 +263,7 @@ $(FIGS)/tUFLP_runtimes_breakdown.eps: $(LOGS)/tUFLP_runtimes.csv $(PP)/fig_tUFLP
 
 $(LOGS)/tUFLP_runtimes.csv: experiments/tUFLP_runtimes.py
 				python -m experiments.tUFLP_runtimes -H > $@ && \
-				python -m experiments.tUFLP_runtimes -K 500 -n 20 -l $(INST)/tUFLP_steps_breakdown.json >> $@ && \
+				python -m experiments.tUFLP_runtimes -K 1000 -n 20 -l $(INST)/tUFLP_steps_breakdown.json >> $@ && \
 				if [ "$(PREF)" != "./" ]; then \
 					cp $@ ./run_logs/ ; \
 					cp $(INST)/tUFLP_steps_breakdown.json ./instances/ ; \

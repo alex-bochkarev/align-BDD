@@ -1,24 +1,21 @@
+# -*- mode: sh -*-
 #PBS -N Figs
-#PBS -l select=1:ncpus=1:mem=1gb,walltime=00:10:00
+#PBS -l select=1:ncpus=1:mem=1gb,walltime=00:20:00
 #PBS -j oe
 #PBS -o run_logs/sending.log
 
 # boilerplate things
 
-tg=/home/abochka/bin/tgsend.sh
-tgi=/home/abochka/bin/tgsend_img.sh
-tgs=/home/abochka/bin/tgsend_st.sh
-
 cd /home/abochka/BDD/align-BDD
 
 cd figures
 ls | $tg > /dev/null
-for file in $(ls); do
+for file in $(ls ./*.eps); do
     convert $file $file.png
-    $tgi $file.png
+    tgs -i $file.png
 done
 mkdir -p ./png
 mv ./*.png png/
 cd ..
 
-echo "done sending images" | $tg > /dev/null
+tgs -m "done sending images"
