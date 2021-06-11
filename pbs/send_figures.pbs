@@ -5,6 +5,7 @@
 #PBS -o run_logs/sending.log
 
 # boilerplate things
+module add imagemagick/7.0.8-7-gcc
 
 cd /home/abochka/BDD/align-BDD
 

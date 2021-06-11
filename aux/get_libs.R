@@ -1,0 +1,13 @@
+install.packages(c("dplyr",
+"ggplot2",
+"ggridges",
+"gridExtra",
+"latex2exp",
+"optparse",
+"optparse)",
+"optparse)}",
+"reshape",
+"stringr",
+"tidyr",
+"viridis",
+"xtable"), repo="http://cran.rstudio.com/")

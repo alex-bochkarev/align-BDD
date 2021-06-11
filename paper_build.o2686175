@@ -1,0 +1,85 @@
+cp --preserve=timestamps -r ./run_logs /local_scratch/pbs.2686175.pbs02//run_logs
+cp --preserve=timestamps -r ./instances /local_scratch/pbs.2686175.pbs02//instances
+Rscript ./post_processing/tab_guessing.R -i /local_scratch/pbs.2686175.pbs02//run_logs/main_rnd_run.csv -o figures/guessing.tex
+Rscript ./post_processing/fig_simpl_heuristics.R -i /local_scratch/pbs.2686175.pbs02//run_logs/main_rnd_run.csv -o figures/simpl_heuristics.eps
+Rscript ./post_processing/fig_LBs.R -i /local_scratch/pbs.2686175.pbs02//run_logs/simpl_LB.csv -o figures/LB.eps
+Rscript ./post_processing/fig_scal.R -i /local_scratch/pbs.2686175.pbs02//run_logs/orig_scal.csv -o figures/orig_runtimes.eps
+Rscript ./post_processing/figs_simpl_opt_struct.R -i /local_scratch/pbs.2686175.pbs02//run_logs/simpl_sol_struct.csv --outdir ./figures && \
+			touch ./figures/.opts_stats
+Fig: stats on optima 
+Input file: /local_scratch/pbs.2686175.pbs02//run_logs/simpl_sol_struct.csv 
+Warning message:
+NAs introduced by coercion 
+Instances read: 1000, showing 938 with no more than 100 optima. 
+No. of unsolved instances (total):  0 
+Optima stats: 
+==================== 
+Out of 1000 instances, 
+More than one optimum: 961 
+More than five: 596 
+More than fifty: 73 
+******************** 
+Fig: opts diam 
+Opts simscore stats: 
+==================== 
+Out of 1000 instances, 
+Min simscore <= 25: 693 (69.3 %) 
+******************** 
+Fig: varseq vs. optima, simscores. 
+`stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+Rscript ./post_processing/fig_tUFLP_runtimes_scal.R -i /local_scratch/pbs.2686175.pbs02//run_logs/tUFLP_runtimes_scal.csv -o figures/tUFLP_runtimes_overview.eps
+Warning messages:
+1: Removed 16 rows containing non-finite values (stat_bin). 
+2: Removed 16 rows containing missing values (geom_bar). 
+null device 
+          1 
+Rscript post_processing/fig_simpl_vs_min.R --indir /local_scratch/pbs.2686175.pbs02//run_logs/heu_bm --out figures/various_simpl_vs_min.eps
+Number of t-UFLP (nat) instances: 2048 
+Number of t-UFLP (rnd) instances: 2048 
+Number of j-UFLP instances: 2048 
+Number of rnd-dia instances: 2048 
+Number used for the title:  2048 
+************************
+Performance summary:
+null device 
+          1 
+Rscript ./post_processing/fig_summary.R -i /local_scratch/pbs.2686175.pbs02//run_logs/lwidths.log -o figures/orig_lwidth_stats.eps
+# A tibble: 4 x 4
+  inst_type                  total better_than_minAB better_than_minAB_percent
+  <chr>                      <int>             <int>                     <dbl>
+1 (a) t-UFLP (natural order)  2048               341                     0.167
+2 (b) t-UFLP (random order)   2048               603                     0.294
+3 (c) Joint UFLP              2048               623                     0.304
+4 (d) Random diagrams         2048              1303                     0.636
+Warning messages:
+1: Removed 50 rows containing non-finite values (stat_bin). 
+2: Removed 8 rows containing missing values (geom_bar). 
+Rscript ./post_processing/fig_tUFLP_runtimes_breakdown.R -i /local_scratch/pbs.2686175.pbs02//run_logs/tUFLP_runtimes.csv -o figures/tUFLP_runtimes_breakdown.eps
+notch went outside hinges. Try setting notch=FALSE.
+notch went outside hinges. Try setting notch=FALSE.
+Error in unit(yticks$start, "cm") : 'x' and 'units' must have length > 0
+Calls: ggsave ... with.default -> eval -> eval -> segmentsGrob -> is.unit -> unit
+Execution halted
+make: *** [Makefile:262: figures/tUFLP_runtimes_breakdown.eps] Error 1
+make: *** Waiting for unfinished jobs....
+notch went outside hinges. Try setting notch=FALSE.
+notch went outside hinges. Try setting notch=FALSE.
+Warning message:
+In grid.Call.graphics(C_points, x$x, x$y, x$pch, x$size) :
+  semi-transparency is not supported on this device: reported only once per page
+{"ok":true,"result":{"message_id":1321,"from":{"id":931364299,"is_bot":true,"first_name":"Wintermute","username":"ab_wintermute_bot"},"chat":{"id":122533105,"first_name":"Alex","last_name":"Bochkarev","username":"abochka","type":"private"},"date":1623335125,"sticker":{"width":512,"height":512,"emoji":"\ud83d\ude0a","set_name":"KookyCat","is_animated":false,"thumb":{"file_id":"AAMCAgADGQMAAgUpYMIg1KB0lujO02p4_2KG7jj91QIAAjwBAAIYQu4IxnWTmVt_iR508nANAAQBAAdtAANCWQACHwQ","file_unique_id":"AQADdPJwDQAEQlkAAg","file_size":4638,"width":128,"height":128},"file_id":"CAACAgIAAxkDAAIFKWDCINSgdJboztNqeP9ihu44_dUCAAI8AQACGELuCMZ1k5lbf4keHwQ","file_unique_id":"AgADPAEAAhhC7gg","file_size":29142}}} 
+ 
++------------------------------------------+ 
+| PALMETTO CLUSTER PBS RESOURCES REQUESTED | 
++------------------------------------------+ 
+ 
+mem=500gb,walltime=48:00:00,ncpus=32
+ 
+ 
++-------------------------------------+ 
+| PALMETTO CLUSTER PBS RESOURCES USED | 
++-------------------------------------+ 
+ 
+cput=00:00:19,mem=1038340kb,walltime=00:00:29,ncpus=32,cpupercent=0,vmem=1038340kb
+ 
+ 
