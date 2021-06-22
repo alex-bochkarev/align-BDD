@@ -75,7 +75,7 @@ cat(sprintf("More than fifty: %d", nrow(filter(df, no_opts > 50))), "\n")
 ## Optima set diameter
 cat(sprintf("********************"), "\n")
 cat(sprintf("Fig: opts diam"), "\n")
-
+p_diam =
 ggplot(df) +
   geom_histogram(aes(x=opts_diam), binwidth=5) +
   xlab("Min. simscore between optima, percent") +
@@ -97,7 +97,7 @@ ggplot(df) +
       breaks = seq(0, 100, by = 10),
       )
 
-ggsave(outfile_opts_diam, p_opts, width=10, height=10)
+ggsave(outfile_opts_diam, p_diam, width=10, height=10)
 
 cat(sprintf("Opts simscore stats:"), "\n")
 cat(sprintf("===================="), "\n")
