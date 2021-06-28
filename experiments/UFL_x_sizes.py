@@ -1,13 +1,12 @@
 """Benchmarks DD sizes for different solution methods (UFL): test x-only DDs.
 
 An experiment concerning the Uncapacitated Facility Location (UFL):
-- compares diagram sizes for availability, covering, and DP-inspired DDs vs the number of
-  variables in 'naive' MIPs.
-- experiment runner file: `get_sizes.sh`
 
----
-(c) A. Bochkarev, Clemson University, 2021
-abochka@clemson.edu
+    - compares diagram sizes for availability, covering, and
+        DP-inspired DDs vs the number of variables in 'naive' MIPs.
+    - experiment runner file: `get_sizes.sh`
+
+(c) A. Bochkarev, Clemson University, 2021, abochka@clemson.edu
 """
 from time import time
 import argparse as ap

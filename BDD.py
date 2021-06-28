@@ -81,10 +81,10 @@ class node(object):
         layer: layer number (id)
 
     Note:
-    There are special node IDs:
-        0   for the root
-        -1  for True sink
-        -2  for the False sink
+        There are special node IDs:
+            0   for the root
+            -1  for True sink
+            -2  for the False sink
     """
 
     def __init__(self, id, hi=None, lo=None, layer=-1):
@@ -451,9 +451,9 @@ class BDD(object):
         """Perform greedy sifts to align with `with_whom`.
 
         Runs a simplistic implementation of Rudell'93
-        sifting alorithm extension to minimize |A|+|B|
+        sifting alorithm extension to minimize \|A\|+\|B\|
 
-        starts with aligning to self or start_order (if given)
+        starts with aligning to self or `start_order` (if given)
         """
         N = len(self.layers)-1
         if start_order is None:
@@ -521,18 +521,29 @@ class BDD(object):
     def save(self, filename):
         """Saves a BDD to an ASCII(text) file.
 
+        Args:
+            filename (string): destination file name.
+
         Note:
             File format is as follows.
-            File header:
-                N=<no-of-layers>
-                vars=<var1, var2, var3, ...> (variables' names)
-            Then, one node description = one line of the format:
-                id:hi,lo
+
+                - File header, two lines
+                    | N= `<no-of-layers>`
+                    | vars= `<comma-separated layer labels>`
+
+                - Then, one node description = one line of the format:
+                    `id` : `hi` , `lo`
 
             where `id` is node's ID, `hi` and `lo` are IDs(!) of the
             nodes corresponding to hi and lo pointers of the node "ID"
             The procedure performs breadth-first search and just saves
             all the nodes.
+
+            Three nodes have reserved ID values:
+
+                - **Root** node: 0
+                - **True** terminal: -1
+                - **False** terminal: -2
         """
         S = deque()  # a deque of node IDs to explore (FIFO)
         V = set()  # set of visited (saved) nodes (by ID)
@@ -723,12 +734,14 @@ class BDD(object):
         return bdd
 
     def profile(self):
-        """Returns a BDD ``profile'' -- an (almost) BFS-ordered list of nodes.
+        """Returns a BDD "profile" -- an (almost) BFS-ordered list of nodes.
 
-        A string of the format <vars>:<BFS-nodes>, where:
-        <vars>      --  comma-separated variable names by layer;
-        <BFS-nodes> --  comma-separated list of node-numbers (not IDs!)
-                        in a BFS-traverse order
+        Note:
+            A 'profile' is string of the format `<vars>`:`<BFS-nodes>`, where:
+
+            - `vars`      :  comma-separated variable names by layer;
+            - `BFS-nodes` :  comma-separated list of node-numbers (not IDs!)
+              in a BFS-traverse order
         """
         Q = deque()
         V = set()
@@ -840,7 +853,7 @@ class BDD(object):
         return [alternatives, A_aligned, B_aligned]
 
     def is_reduced(self):
-        """Checks if the BDD is reduced (no ``redundant'' nodes)."""
+        """Checks if the BDD is reduced (no "redundant" nodes)."""
         checked_nodes = set()
 
         for layer in range(len(self.layers)-2, -1, -1):
@@ -896,8 +909,10 @@ class BDD(object):
             x (dict): of {var_name: value}, where value is in {0,1}.
 
         Returns:
-            terminal (bool or `-1`): terminal node corresponding to the path
-                            implied by x, encoded as Boolean (or -1 if error)
+            terminal (bool or `-1`):
+                terminal node corresponding to the path
+                implied by x, encoded as Boolean (or -1 if error)
+
             cost (float): if the BDD is weighted, cost of the path.
         """
         (node,) = self.layers[0]

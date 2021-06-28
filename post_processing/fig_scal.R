@@ -132,7 +132,7 @@ ggplot(dfn, aes(x=rel_obj))+
     )+
     scale_y_continuous(
       paste0("Number of instances, out of ",
-             nrow(filter(df, N == Ns[1]))),
+             nrow(filter(df, N == Ns[1])),"\n"),
       position="right")+
     theme(
       legend.title = element_text(size=24),

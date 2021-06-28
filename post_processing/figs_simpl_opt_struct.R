@@ -46,10 +46,10 @@ ggplot(df_less_than_hundred) +
   xlab("Number of optimal solutions") +
   ylab(paste0("Count of instances (out of ", nrow(df), ")"))+
   theme(
-    axis.text.x = element_text(size = 18),
-    axis.text.y = element_text(size = 18),
-    axis.title.x = element_text(size = 23),
-    axis.title.y = element_text(size = 23),
+    axis.text.x = element_text(size = 22),
+    axis.text.y = element_text(size = 22),
+    axis.title.x = element_text(size = 26, margin = margin(t=25)),
+    axis.title.y = element_text(size = 26, margin = margin(r=15)),
     panel.background = element_blank(),
     panel.grid.major = element_line(
       size = 0.5, linetype = "solid",
@@ -81,10 +81,10 @@ ggplot(df) +
   xlab("Min. simscore between optima, percent") +
   ylab(paste0("Count of instances (out of ", nrow(df), ")"))+
   theme(
-    axis.text.x = element_text(size = 18),
-    axis.text.y = element_text(size = 18),
-    axis.title.x = element_text(size = 23),
-    axis.title.y = element_text(size = 23),
+    axis.text.x = element_text(size = 22),
+    axis.text.y = element_text(size = 22),
+    axis.title.x = element_text(size = 26, margin = margin(t=25)),
+    axis.title.y = element_text(size = 26, margin = margin(r=15)),
     panel.background = element_blank(),
     panel.grid.major = element_line(
       size = 0.5, linetype = "solid",
@@ -135,12 +135,12 @@ ggplot(df_m) +
     legend.title = element_text(size=18),
     legend.text = element_text(size=18),
     legend.text.align = 0,
-    axis.text.x = element_text(size = 18),
-    axis.text.y = element_text(size = 18),
-    axis.title.x = element_text(size = 23),
-    axis.title.y = element_text(size = 23),
+    axis.text.x = element_text(size = 22),
+    axis.text.y = element_text(size = 22),
+    axis.title.x = element_text(size = 26, margin = margin(t=25)),
+    axis.title.y = element_text(size = 26, margin = margin(t=15)),
     strip.background = element_blank(),
-    strip.text.x = element_text(size = 18, face="bold"),
+    strip.text.x = element_text(size = 26, face="bold"),
     panel.background = element_blank(),
     panel.grid.major = element_line(
       size = 0.5, linetype = "solid",
@@ -167,13 +167,13 @@ ggplot(df) +
   theme(
     ## legend.position = c(0.2, 0.8),
     ## legend.direction = "vertical",
-    legend.title = element_text(size=18),
-    legend.text = element_text(size=18),
+    legend.title = element_text(size=26),
+    legend.text = element_text(size=26),
     ## legend.text.align = 0,
-    axis.text.x = element_text(size = 18),
-    axis.text.y = element_text(size = 18),
-    axis.title.x = element_text(size = 23),
-    axis.title.y = element_text(size = 23),
+    axis.text.x = element_text(size = 22),
+    axis.text.y = element_text(size = 22),
+    axis.title.x = element_text(size = 28, margin = margin(t=15)),
+    axis.title.y = element_text(size = 28),
     panel.background = element_blank(),
     panel.grid.major = element_line(
       size = 0.5, linetype = "solid",
@@ -184,10 +184,3 @@ ggplot(df) +
   )
 
 ggsave(outfile_bin2d, p_bin2d, width = 16, height = 10)
-
-## str(df)
-## sum(df$opts_diam < 25)
-
-## str(df)
-
-## sum(df$best_VS_simscore > 75)

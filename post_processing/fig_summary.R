@@ -11,6 +11,7 @@ suppressPackageStartupMessages({
   library(optparse)
   library(latex2exp)
   library(stringr)
+  library(viridis)
 })
 
 ######################################################################
@@ -36,7 +37,7 @@ if (is.null(opt$input) | is.null(opt$out)){
 infile = opt$input
 outfile = opt$out
 Nticks = 15
-quantile_to_show = 0.95
+quantile_to_show = 0.88
 
 df = read.csv(file=infile, header=FALSE, sep=",",stringsAsFactors=FALSE)
 ## colnames(df) = c("ID","N","LR",paste('n',seq(1,length(colnames(df))-4),sep="_"),"P")
@@ -50,28 +51,31 @@ max_lw = quantile(df_m$value,quantile_to_show)
 # df_m$layer = factor(df_m$var_label, levels = as.character(unique(df_m$var_label)))
 
 plt =
-  ggplot(df_m, aes(x=factor(P, levels=unique(P)), y=value, fill=P))+
+  ggplot(df_m, aes(x=factor(P, levels=unique(P)), y=value, color=P))+
     ## coord_flip(xlim=c(1,max_lw))+
-    ylab("Layer widths")+
+    ylab("Layer widths (number of nodes)")+
     xlab("Generation parameter value (for each layer)")+
-  scale_y_continuous()+
-    ## limits = quantile(df_m$value, c(0, quantile_to_show)),
+  scale_y_continuous(
+    limits = quantile(df_m$value, c(0, quantile_to_show)))+
     ## breaks = seq(1,max_lw,by = floor((max_lw-1)/Nticks)+1))+
   scale_x_discrete(breaks = unique(df_m$P))+
-  geom_jitter(width=0.07, shape=4, alpha=0.05)+
-  geom_boxplot(outlier.shape = NA, alpha=0.5, notch=TRUE)+
+  geom_jitter(width=0.25, shape=4)+
+  ## geom_boxplot(outlier.shape = NA, notch=TRUE)+
   facet_wrap(~variable, nrow=1)+ #, label = "label_parsed"
     theme(
-        panel.background = element_rect(fill = "lightgrey",
-                                        colour = "lightgrey",
-                                        size = 0.5, linetype = "solid"),
-        panel.grid.major = element_line(size = 0.5, linetype = 'solid',
-                                        colour = "darkgrey"),
-        legend.position = c(0.1,0.9),
-        axis.text.x = element_text(angle=90,hjust=1)
+      panel.background = element_rect(fill = "lightgrey",
+                                      colour = "lightgrey",
+                                      size = 0.5, linetype = "solid"),
+      panel.grid.major = element_line(size = 0.5, linetype = 'solid',
+                                      colour = "darkgrey"),
+      legend.position = c(0.1,0.9),
+      axis.text.x = element_text(angle=90,hjust=1),
+      axis.title.x = element_text(margin = margin(t = 20)),
+      axis.title.y = element_text(margin = margin(r = 20))
     )+
-    guides(fill="none")+
-    theme(
+  scale_color_viridis() +
+  guides(color="none")+
+  theme(
         legend.position = c(0.2, 0.8),
         legend.direction = "vertical",
         legend.title = element_text(size=24),
@@ -89,4 +93,4 @@ plt =
         strip.text.x = element_text(size = 22)
     )
 
-ggsave(plot=plt, device = cairo_ps(family="Arial"), outfile, width = 16, height = 9)
+ggsave(plot=plt, device = cairo_ps(family="Arial", fallback_resolution = 600), outfile, width = 16, height = 9)

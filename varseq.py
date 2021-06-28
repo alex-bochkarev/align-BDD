@@ -222,11 +222,15 @@ class VarSeq:
 ## Auxiliary functions (outside of the varseq class)
 
 def non_dominated(e, A, B):
-    """checks if the element "e" is non-dominated
-    (as a candidate for the last position) in VarSeq-s A and B
+    """Checks if the element "e" is non-dominated.
 
-    Returns: True = non-dominated, False = dominated"""
+    Considering `e` as a candidate for the last position
+    in the target alignment of `VarSeq` -s `A` and `B`,
+    check if it is non-dominated.
 
+    Returns:
+        True = non-dominated, False = dominated
+    """
     if A.p[e]==len(A)-1 or B.p[e]==len(B)-1:
         return True
     else:

@@ -75,7 +75,7 @@ ggplot(df)+
               size=2, alpha=0.3, width = 0.1, shape=3)+
   geom_jitter(aes(x=n, y = align_gsifts_SP, color="CPP align-BDD (gsifts) + SP"),
               size=2, alpha=0.3, width = 0.1, shape=4)+
-  labs(x="No. of variables (nodes in the original graph)",y="Solution time, msec")+
+  labs(x="No. of variables (points in the original graph)",y="Solution time, msec")+
   geom_line(data=df_means, aes(x=n, y=med_naive_MIP,
                                color="Naive MIP", linetype="Naive MIP"), size=2)+
   geom_line(data=df_means, aes(x=n, y=med_BDD_MIP,

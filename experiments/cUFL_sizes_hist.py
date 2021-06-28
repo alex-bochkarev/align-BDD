@@ -1,13 +1,11 @@
 """Benchmarks DD sizes for different solution methods (colored UFL)
 
 An experiment concerning the Uncapacitated Facility Location with colors (colored UFL):
-- compares diagram sizes for color, covering, and intersection DDs vs the number of
-  variables in 'naive' MIPs.
-- experiment runner file: `get_cUFL_sizes.sh`
+    - compares diagram sizes for color, covering, and intersection DDs
+        vs the number of variables in 'naive' MIPs.
+    - experiment runner file: `get_cUFL_sizes.sh`
 
----
-(c) A. Bochkarev, Clemson University, 2021
-abochka@clemson.edu
+(c) A. Bochkarev, Clemson University, 2021, abochka@clemson.edu
 """
 from time import time
 import argparse as ap

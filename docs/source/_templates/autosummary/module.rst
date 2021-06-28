@@ -1,0 +1,105 @@
+.. module:: {{ fullname }}
+.. currentmodule:: {{ fullname }}
+
+{{ fullname | escape | underline}}
+
+Module summary
+---------------
+.. automodule:: {{ fullname }}
+   :no-members:
+   :noindex:
+
+In the implementation details below, click on class/functions names for additional documentation and links to the source codes.
+
+.. centered:: ❖❖❖
+{% if classes %}
+Implements classes:
+^^^^^^^^^^^^^^^^^^^
+.. autosummary::
+
+{% for item in classes %}
+   {{ item }}
+{%- endfor %}
+{% endif %}
+
+{% if functions %}
+Implements functions (outside the classes above):
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. autosummary::
+   :recursive:
+
+{% for item in functions %}
+   {{ item }}
+{%- endfor %}
+{% endif %}
+
+{% block attributes %}
+{% if attributes %}
+.. rubric:: {{ _('Module Attributes') }}
+
+.. autosummary::
+{% for item in attributes %}
+  {{ item }}
+{%- endfor %}
+{% endif %}
+{% endblock %}
+
+.. centered:: ❖❖❖
+.. centered:: Implementation details
+
+{% block classes %}
+{% if classes %}
+
+{% for item in classes %}
+
+.. centered:: ❖❖❖
+{{ item }}
+----------------------------------------------------------------------
+
+.. autoclass:: {{ item }}
+   :members:
+
+
+{%- endfor %}
+
+{% endif %}
+{% endblock %}
+
+{% block functions %}
+{% if functions %}
+
+.. centered:: ❖❖❖
+Functions
+---------
+
+{% for item in functions %}
+.. autofunction:: {{ item }}
+
+{%- endfor %}
+{% endif %}
+{% endblock %}
+
+
+{% block exceptions %}
+{% if exceptions %}
+.. rubric:: {{ _('Exceptions') }}
+
+.. autosummary::
+{% for item in exceptions %}
+  {{ item }}
+{%- endfor %}
+{% endif %}
+{% endblock %}
+
+{% block modules %}
+{% if modules %}
+.. rubric:: Modules
+
+.. autosummary::
+   :toctree:
+   :recursive:
+{% for item in modules %}
+   {{ item }}
+{%- endfor %}
+{% endif %}
+{% endblock %}

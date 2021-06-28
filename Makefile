@@ -239,10 +239,10 @@ $(LOGS)/heu_bm/rnd_dia.csv: experiments/rnd_dia_hist_sizes_control.py
 
 
 ## Random dataset stats
-$(FIGS)/orig_lwidth_stats.eps: $(LOGS)/lwidths.log $(PP)/fig_summary.R
+$(FIGS)/orig_lwidth_stats.eps: $(LOGS)/lwidths.csv $(PP)/fig_summary.R
 				Rscript $(PP)/fig_summary.R -i $< -o $@
 
-$(LOGS)/lwidths.log: gen_BDD_pair.py
+$(LOGS)/lwidths.csv: gen_BDD_pair.py
 				mkdir -p $(INST)/orig_stats && \
 				parallel mkdir -p $(INST)/orig_stats/{} ::: $(STAT_PS) && \
 				parallel -j $(PARFLAG) python -m gen_BDD_pair -v $(RND_N) -K $(STAT_K) -p {1} -R -U $(INST)/orig_stats/{1} '-s $$(( $(STAT_K) * {#} - $(STAT_K)))' --quiet ::: $(STAT_PS) ::: $(shell seq 1 $(PARFLAG)) && \
