@@ -10,9 +10,13 @@ Module summary
    :no-members:
    :noindex:
 
+In the implementation details below, click on class/functions names for additional documentation and links to the source codes.
+
+.. centered:: ❖❖❖
 
 Implements classes:
 ^^^^^^^^^^^^^^^^^^^
+
 .. autosummary::
 
 
@@ -24,7 +28,6 @@ Implements classes:
 Implements functions (outside the classes above):
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 .. autosummary::
-   :recursive:
 
 
    gen_4BDD
@@ -61,18 +64,26 @@ Implements functions (outside the classes above):
 
 
 .. centered:: ❖❖❖
+
 BDD
 ----------------------------------------------------------------------
 
 .. autoclass:: BDD
    :members:
+   :undoc-members:
+
+   .. autoclasstoc::
 
 .. centered:: ❖❖❖
+
 node
 ----------------------------------------------------------------------
 
 .. autoclass:: node
    :members:
+   :undoc-members:
+
+   .. autoclasstoc::
 
 
 
@@ -81,6 +92,7 @@ node
 
 
 .. centered:: ❖❖❖
+
 Functions
 ---------
 

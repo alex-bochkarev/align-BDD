@@ -30,6 +30,7 @@ author = 'Alexey Bochkarev'
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
+    'autoclasstoc',
     'sphinx.ext.autodoc',
     'sphinx.ext.viewcode',
     'sphinx.ext.autosummary',
@@ -46,7 +47,15 @@ templates_path = ['_templates']
 # This pattern also affects html_static_path and html_extra_path.
 exclude_patterns = []
 
-autodoc_default_flags = ['members']
+autodoc_default_options = {
+    'members': True,
+    # 'special-members': True,
+    # 'private-members': True,
+    # 'inherited-members': True,
+    'undoc-members': True
+    # 'exclude-members': '__weakref__',
+}
+
 autosummary_generate = True
 
 # -- Options for HTML output -------------------------------------------------
@@ -68,4 +77,3 @@ html_static_path = ['_static']
 html_context = {
     'css_files': ['_static/tables.css'],
 }
-

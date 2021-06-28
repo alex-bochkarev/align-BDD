@@ -10,6 +10,9 @@ Module summary
    :no-members:
    :noindex:
 
+In the implementation details below, click on class/functions names for additional documentation and links to the source codes.
+
+.. centered:: ❖❖❖
 
 
 

@@ -10,13 +10,15 @@ Module summary
    :no-members:
    :noindex:
 
+In the implementation details below, click on class/functions names for additional documentation and links to the source codes.
+
+.. centered:: ❖❖❖
 
 
 
 Implements functions (outside the classes above):
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 .. autosummary::
-   :recursive:
 
 
    count_inversions
@@ -37,6 +39,7 @@ Implements functions (outside the classes above):
 
 
 .. centered:: ❖❖❖
+
 Functions
 ---------
 

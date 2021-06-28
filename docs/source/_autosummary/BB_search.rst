@@ -10,9 +10,13 @@ Module summary
    :no-members:
    :noindex:
 
+In the implementation details below, click on class/functions names for additional documentation and links to the source codes.
+
+.. centered:: ❖❖❖
 
 Implements classes:
 ^^^^^^^^^^^^^^^^^^^
+
 .. autosummary::
 
 
@@ -24,7 +28,6 @@ Implements classes:
 Implements functions (outside the classes above):
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 .. autosummary::
-   :recursive:
 
 
    LB_by_level
@@ -51,18 +54,26 @@ Implements functions (outside the classes above):
 
 
 .. centered:: ❖❖❖
+
 BBSearch
 ----------------------------------------------------------------------
 
 .. autoclass:: BBSearch
    :members:
+   :undoc-members:
+
+   .. autoclasstoc::
 
 .. centered:: ❖❖❖
+
 SearchNode
 ----------------------------------------------------------------------
 
 .. autoclass:: SearchNode
    :members:
+   :undoc-members:
+
+   .. autoclasstoc::
 
 
 
@@ -71,6 +82,7 @@ SearchNode
 
 
 .. centered:: ❖❖❖
+
 Functions
 ---------
 

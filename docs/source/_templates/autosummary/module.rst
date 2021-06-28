@@ -15,10 +15,11 @@ In the implementation details below, click on class/functions names for addition
 {% if classes %}
 Implements classes:
 ^^^^^^^^^^^^^^^^^^^
+
 .. autosummary::
 
 {% for item in classes %}
-   {{ item }}
+   {{ item }} 
 {%- endfor %}
 {% endif %}
 
@@ -26,7 +27,6 @@ Implements classes:
 Implements functions (outside the classes above):
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 .. autosummary::
-   :recursive:
 
 {% for item in functions %}
    {{ item }}
@@ -53,12 +53,15 @@ Implements functions (outside the classes above):
 {% for item in classes %}
 
 .. centered:: ❖❖❖
+
 {{ item }}
 ----------------------------------------------------------------------
 
 .. autoclass:: {{ item }}
    :members:
+   :undoc-members:
 
+   .. autoclasstoc:: 
 
 {%- endfor %}
 
@@ -69,6 +72,7 @@ Implements functions (outside the classes above):
 {% if functions %}
 
 .. centered:: ❖❖❖
+
 Functions
 ---------
 

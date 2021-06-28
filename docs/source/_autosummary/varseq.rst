@@ -10,9 +10,13 @@ Module summary
    :no-members:
    :noindex:
 
+In the implementation details below, click on class/functions names for additional documentation and links to the source codes.
+
+.. centered:: ❖❖❖
 
 Implements classes:
 ^^^^^^^^^^^^^^^^^^^
+
 .. autosummary::
 
 
@@ -23,7 +27,6 @@ Implements classes:
 Implements functions (outside the classes above):
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 .. autosummary::
-   :recursive:
 
 
    non_dominated
@@ -42,11 +45,15 @@ Implements functions (outside the classes above):
 
 
 .. centered:: ❖❖❖
+
 VarSeq
 ----------------------------------------------------------------------
 
 .. autoclass:: VarSeq
    :members:
+   :undoc-members:
+
+   .. autoclasstoc::
 
 
 
@@ -55,6 +62,7 @@ VarSeq
 
 
 .. centered:: ❖❖❖
+
 Functions
 ---------
 
