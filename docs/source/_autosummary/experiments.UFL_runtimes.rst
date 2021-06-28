@@ -1,4 +1,4 @@
-﻿.. module:: experiments.UFL_runtimes
+.. module:: experiments.UFL_runtimes
 .. currentmodule:: experiments.UFL_runtimes
 
 experiments.UFL\_runtimes
@@ -10,7 +10,7 @@ Module summary
    :no-members:
    :noindex:
 
-In the implementation details below, click on class/functions names for additional documentation and links to the source codes.
+(In the implementation details below, click on class/function names for additional documentation and links to the source code.)
 
 .. centered:: ❖❖❖
 

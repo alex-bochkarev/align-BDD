@@ -10,7 +10,7 @@ Module summary
    :no-members:
    :noindex:
 
-In the implementation details below, click on class/functions names for additional documentation and links to the source codes.
+(In the implementation details below, click on class/function names for additional documentation and links to the source code.)
 
 .. centered:: ❖❖❖
 
@@ -22,6 +22,7 @@ Implements functions (outside the classes above):
 
 
    count_inversions
+   main
 
 
 
@@ -45,6 +46,7 @@ Functions
 
 
 .. autofunction:: count_inversions
+.. autofunction:: main
 
 
 

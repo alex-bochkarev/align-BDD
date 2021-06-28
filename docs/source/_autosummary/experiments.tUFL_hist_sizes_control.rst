@@ -1,4 +1,4 @@
-﻿.. module:: experiments.tUFL_hist_sizes_control
+.. module:: experiments.tUFL_hist_sizes_control
 .. currentmodule:: experiments.tUFL_hist_sizes_control
 
 experiments.tUFL\_hist\_sizes\_control
@@ -10,7 +10,7 @@ Module summary
    :no-members:
    :noindex:
 
-In the implementation details below, click on class/functions names for additional documentation and links to the source codes.
+(In the implementation details below, click on class/function names for additional documentation and links to the source code.)
 
 .. centered:: ❖❖❖
 

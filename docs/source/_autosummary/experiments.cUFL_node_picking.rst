@@ -1,4 +1,4 @@
-﻿.. module:: experiments.cUFL_node_picking
+.. module:: experiments.cUFL_node_picking
 .. currentmodule:: experiments.cUFL_node_picking
 
 experiments.cUFL\_node\_picking
@@ -10,7 +10,7 @@ Module summary
    :no-members:
    :noindex:
 
-In the implementation details below, click on class/functions names for additional documentation and links to the source codes.
+(In the implementation details below, click on class/function names for additional documentation and links to the source code.)
 
 .. centered:: ❖❖❖
 

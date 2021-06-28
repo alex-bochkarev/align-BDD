@@ -1,4 +1,4 @@
-﻿.. module:: experiments.heu_sol_struct
+.. module:: experiments.heu_sol_struct
 .. currentmodule:: experiments.heu_sol_struct
 
 experiments.heu\_sol\_struct
@@ -10,7 +10,7 @@ Module summary
    :no-members:
    :noindex:
 
-In the implementation details below, click on class/functions names for additional documentation and links to the source codes.
+(In the implementation details below, click on class/function names for additional documentation and links to the source code.)
 
 .. centered:: ❖❖❖
 

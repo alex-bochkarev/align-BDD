@@ -1,4 +1,4 @@
-﻿.. module:: experiments.cUFL_dia_sizes
+.. module:: experiments.cUFL_dia_sizes
 .. currentmodule:: experiments.cUFL_dia_sizes
 
 experiments.cUFL\_dia\_sizes
@@ -10,7 +10,7 @@ Module summary
    :no-members:
    :noindex:
 
-In the implementation details below, click on class/functions names for additional documentation and links to the source codes.
+(In the implementation details below, click on class/function names for additional documentation and links to the source code.)
 
 .. centered:: ❖❖❖
 

@@ -1,14 +1,16 @@
-"""
-Aux script: generates random align-BDD instances
-(``original problems'') given dataset parameters
-and prints key instance parameters to the stdout (in a .csv format):
-    instance     -- instance ID
-    inversions   -- number of inversions between var(A) and var(B)
-    reduced[A/B] -- whether A (resp., B) is layer-reduced
-    gen_trial    -- number of trials until a unique entry is generated
+"""Generates a pair of random BDDs ("original problem" instance).
 
-(c) A. Bochkarev, Clemson University, 2020
-abochka@clemson.edu
+Generates random align-BDD instances ("original problems") given
+dataset parameters, and prints key instance parameters to the stdout
+in a ``.csv`` format with the following fields:
+
+    - instance     : instance ID
+    - inversions   : number of inversions between `var(A)` and `var(B)`
+    - reducedA     : whether `A` is quasi-reduced
+    - reducedB     : same for `B`
+    - gen_trial    : number of trials until a unique entry is generated
+
+(c) A. Bochkarev, Clemson University, 2020, abochka@clemson.edu
 """
 
 import BDD as exact
@@ -18,6 +20,7 @@ import os
 import argparse as ap
 
 def count_inversions(X, Y):
+    """Count inversions between (label lists) X and Y."""
     invs = 0
     p = dict()
 
@@ -36,7 +39,8 @@ def count_inversions(X, Y):
     return invs
 
 
-if __name__ == "__main__":
+def main():
+    """Implements the main code."""
     parser = ap.ArgumentParser(description="Generates align-BDD instances. (c) A. Bochkarev, Clemson University, 2020",
                                formatter_class=ap.ArgumentDefaultsHelpFormatter)
     parser.add_argument("-K", "--no_instances", action="store", dest="n", help="number of instances to generate",
@@ -105,3 +109,6 @@ if __name__ == "__main__":
         if not args.quiet:
             print("{},{},{},{},{}".format(inst_id,count_inversions(bdd_A.vars, bdd_B.vars), bdd_A.is_reduced(), bdd_B.is_reduced(), trials))
             sys.stdout.flush() # otherwise we are risking not to have anyting on job kill...
+
+if __name__ == "__main__":
+    main()

@@ -1,4 +1,4 @@
-﻿.. module:: experiments.tUFL_generation_tests
+.. module:: experiments.tUFL_generation_tests
 .. currentmodule:: experiments.tUFL_generation_tests
 
 experiments.tUFL\_generation\_tests
@@ -10,7 +10,7 @@ Module summary
    :no-members:
    :noindex:
 
-In the implementation details below, click on class/functions names for additional documentation and links to the source codes.
+(In the implementation details below, click on class/function names for additional documentation and links to the source code.)
 
 .. centered:: ❖❖❖
 

@@ -1,4 +1,4 @@
-﻿.. module:: experiments.UFL_x_sizes
+.. module:: experiments.UFL_x_sizes
 .. currentmodule:: experiments.UFL_x_sizes
 
 experiments.UFL\_x\_sizes
@@ -10,7 +10,7 @@ Module summary
    :no-members:
    :noindex:
 
-In the implementation details below, click on class/functions names for additional documentation and links to the source codes.
+(In the implementation details below, click on class/function names for additional documentation and links to the source code.)
 
 .. centered:: ❖❖❖
 

@@ -124,9 +124,10 @@ class VarSeq:
 
     # weighted variable sequence transformations (revisions)
     def greedy_sort(self, to_what = None):
-        """revises a varseq to a given order of labels (list/varseq)
+        """Revises a varseq to a given order of labels (list/varseq).
 
-        Note: a naive implementation, ``sift-align'' procedure, O(N^2)
+        Note:
+            A naive implementation, "sift-align" procedure, O(N^2)
         """
         if to_what is None:
             to_what = np.sort(self.layer_var)

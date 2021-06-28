@@ -1,4 +1,4 @@
-﻿.. module:: experiments.rnd_dia_hist_sizes_control
+.. module:: experiments.rnd_dia_hist_sizes_control
 .. currentmodule:: experiments.rnd_dia_hist_sizes_control
 
 experiments.rnd\_dia\_hist\_sizes\_control
@@ -10,7 +10,7 @@ Module summary
    :no-members:
    :noindex:
 
-In the implementation details below, click on class/functions names for additional documentation and links to the source codes.
+(In the implementation details below, click on class/function names for additional documentation and links to the source code.)
 
 .. centered:: ❖❖❖
 

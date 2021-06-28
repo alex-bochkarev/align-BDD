@@ -41,6 +41,9 @@ numpydoc_show_class_members = False
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
+# note that an empty "searchbox.html" in _templates folder
+# actually disables the search bar
+
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.

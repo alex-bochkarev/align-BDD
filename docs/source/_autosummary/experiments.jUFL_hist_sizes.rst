@@ -1,4 +1,4 @@
-﻿.. module:: experiments.jUFL_hist_sizes
+.. module:: experiments.jUFL_hist_sizes
 .. currentmodule:: experiments.jUFL_hist_sizes
 
 experiments.jUFL\_hist\_sizes
@@ -10,7 +10,7 @@ Module summary
    :no-members:
    :noindex:
 
-In the implementation details below, click on class/functions names for additional documentation and links to the source codes.
+(In the implementation details below, click on class/function names for additional documentation and links to the source code.)
 
 .. centered:: ❖❖❖
 

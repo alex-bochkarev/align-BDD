@@ -392,41 +392,8 @@ pack_instances:
 # install_R_pkg:
 # 	Rscript ./aux/R_install_packages.R
 
-# move-logs:
-# 	@echo moving logs away from $(LOGS) to $(ARC)
-# 	rm -f $(LOGS)/part.* && \
-# 	tar --remove-files -czf $(ARC)/$(DTE)_$(TS)_logs.tar.gz -C $(LOGS) .
-
-# # clean recipes
-# clean-raw-inst:
-# 	@echo Cleaning up raw instances in $(INST)...
-# 	rm -f $(INST)/R/*.bdd
-# 	rm -f $(INST)/R/*.list*
-# 	rm -f $(INST)/N/*.bdd
-# 	rm -f $(INST)/N/*.list*
-# 	rm -rf $(INST)/ds_stats
-# 	rm -f $(INST)/*.bdd
-
-# clean-archive:
-# 	@echo Cleaning up instance archives...
-# 	rm -f $(ARC)/*.tar.gz
-
-# clean-logs:
-# 	@echo Cleaning up log files...
-# 	rm -f $(LOGS)/*.log
-
-# clean-figures:
-# 	@echo Cleaning up figures...
-# 	rm -f $(FIGS)/*.eps
-
-# clean: clean-raw-inst clean-logs clean-figures
-# clean-tmp: clean-raw-inst clean-logs
-
-# test: $(LOGS)/BB.test
-# 	@echo Running tests...
-
-# $(LOGS)/BB.test: $(LOGS)/BB_bounds_R.log $(LOGS)/solved_R.log tests/BB_log_correct.R
-# 	Rscript tests/BB_log_correct.R -b $(LOGS)/BB_bounds_R.log -s $(LOGS)/solved_R.log > $(LOGS)/BB.test
-
 # qtest:
 # 	python -m pytest tests/UFL_test.py
+
+tests:
+				python -m tests/BDD_test.py

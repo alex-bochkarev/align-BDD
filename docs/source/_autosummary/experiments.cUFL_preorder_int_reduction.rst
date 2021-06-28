@@ -1,4 +1,4 @@
-﻿.. module:: experiments.cUFL_preorder_int_reduction
+.. module:: experiments.cUFL_preorder_int_reduction
 .. currentmodule:: experiments.cUFL_preorder_int_reduction
 
 experiments.cUFL\_preorder\_int\_reduction
@@ -10,7 +10,7 @@ Module summary
    :no-members:
    :noindex:
 
-In the implementation details below, click on class/functions names for additional documentation and links to the source codes.
+(In the implementation details below, click on class/function names for additional documentation and links to the source code.)
 
 .. centered:: ❖❖❖
 
