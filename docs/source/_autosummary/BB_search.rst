@@ -43,6 +43,12 @@ Implements functions (outside the classes above):
 
 
 
+Attributes defined in the module:
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+.. autodata:: LOWER_BOUNDS
+
 
 
 .. centered:: ❖❖❖
@@ -61,6 +67,7 @@ BBSearch
 .. autoclass:: BBSearch
    :members:
    :undoc-members:
+   :private-members:
 
    .. autoclasstoc::
 
@@ -72,6 +79,7 @@ SearchNode
 .. autoclass:: SearchNode
    :members:
    :undoc-members:
+   :private-members:
 
    .. autoclasstoc::
 

@@ -13,7 +13,7 @@ INST=$(PREF)/instances
 LOGS=$(PREF)/run_logs
 PP=./post_processing
 
-STATS=python -m gen_lsizes_stats
+STATS=python -m experiments.gen_lsizes_stats
 ######################################################################
 ## Constants
 JUFL_P=0.3
@@ -77,11 +77,11 @@ $(FIGS)/simpl_heuristics.eps: $(LOGS)/main_rnd_run.csv $(PP)/fig_simpl_heuristic
 $(FIGS)/LB.eps: $(LOGS)/simpl_LB.csv $(PP)/fig_LBs.R
 				Rscript $(PP)/fig_LBs.R -i $< -o $@
 
-$(LOGS)/simpl_LB.csv: $(INST)/orig_problem.list compare_simpl_LBs.py
+$(LOGS)/simpl_LB.csv: $(INST)/orig_problem.list experiments/compare_simpl_LBs.py
 				rm -f $<.tmp.* && \
 				split -d -nl/$(PARFLAG) $< $<.LBs.tmp. && \
-				parallel -j $(PARFLAG) python -m compare_simpl_LBs -l {} ">" $@.tmp.{#} -d $(INST)/orig_problem/ ::: $$(ls $<.LBs.tmp.*) && \
-				python -m compare_simpl_LBs --header > $@ && \
+				parallel -j $(PARFLAG) python -m experiments.compare_simpl_LBs -l {} ">" $@.tmp.{#} -d $(INST)/orig_problem/ ::: $$(ls $<.LBs.tmp.*) && \
+				python -m experiments.compare_simpl_LBs --header > $@ && \
 				cat $@.tmp.* >> $@ && \
 				rm $@.tmp.* && \
 				rm $<.LBs.tmp.* && \
@@ -121,11 +121,11 @@ $(FIGS)/orig_runtimes.eps: $(LOGS)/orig_scal.csv $(PP)/fig_scal.R
 				Rscript $(PP)/fig_scal.R -i $< -o $@
 
 
-$(LOGS)/orig_scal.csv: $(INST)/scal/instances.list par_scal_test.py
+$(LOGS)/orig_scal.csv: $(INST)/scal/instances.list experiments/par_scal_test.py
 				rm -f $(INST)/scal/instances.list.* && \
 				split -d -nl/$(PARFLAG) $< $(INST)/scal/instances.list. && \
-				parallel -j $(PARFLAG) python -m par_scal_test -i {} -o $@.tmp.{#} -d $(INST)/scal/ ::: $$(ls $(INST)/scal/instances.list.*) && \
-				python -m par_scal_test --header > $@ && \
+				parallel -j $(PARFLAG) python -m experiments.par_scal_test -i {} -o $@.tmp.{#} -d $(INST)/scal/ ::: $$(ls $(INST)/scal/instances.list.*) && \
+				python -m experiments.par_scal_test --header > $@ && \
 				cat $@.tmp.* >> $@ && \
 				rm $@.tmp.* && \
 				tar czf $(INST)/orig_scal.tar.gz -C $(INST)/scal . --remove-files && \
@@ -270,102 +270,11 @@ $(LOGS)/tUFLP_runtimes.csv: experiments/tUFLP_runtimes.py
 				fi
 
 ## clean-up
-save-orig-instances:
-				tar czf $(INST)/orig_problem.tar.gz -C $(INST)/orig_problem . --remove-files
-######################################################################
-## Files and directories
-# INST=$(PREF)/instances/raw
-# ARC=./data_archive
-# FIGS=./figures
-# SOLVE=./solve_inst.py
-# BBLOG=./log_bb.py
-# SCAL=./scal_test.py
-# STATS=./gen_lsizes_stats.py
-# CMP_LBs=./compare_simpl_LBs.py
-# PSCAL=./par_scal_test.py
-# ######################################################################
-# ## Numerical parameters
-# PAR_SOL=8
-
-# ### random dataset stats
-# LW_n=10000
-# LW_N=15
-# LW_Ps=0.2 0.4 0.6 0.8
-
-# ### dataset generation parameters:
-# p=0.6# dataset generation parameter
-# n=10000# number of instances
-# N=15# number of variables per instance
-# n_LBs=1000
-
-# ### scalability figure
-# SCAL_N=5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 #26 27 28 29 30
-# SCAL_P=$(p)
-# SCAL_R=R
-
-# ######################################################################
-# ## calculated vars/parameters
-# SCAL_FILES=$(addsuffix .log, $(addprefix $(LOGS)/scal_$(SCAL_R),$(SCAL_N)))
-# LW_FILES_R=$(addsuffix .log, $(addprefix $(LOGS)/lwidths_Rp,$(LW_Ps)))
-# LW_FILES_N=$(addsuffix .log, $(addprefix $(LOGS)/lwidths_Np,$(LW_Ps)))
-
-# MAX_I=$(shell expr $(PAR_SOL) - 1 )
-# SOL_FILES_R = $(addsuffix .log, $(addprefix $(LOGS)/part.solved_R., $(shell seq -f %02g 0 $(MAX_I))))
-# SOL_FILES_N = $(addsuffix .log, $(addprefix $(LOGS)/part.solved_N., $(shell seq -f %02g 0 $(MAX_I))))
-
-# BB_FILES_R = $(addsuffix .log, $(addprefix $(LOGS)/part.BB_bounds_R., $(shell seq -f %02g 0 $(MAX_I))))
-# BB_FILES_N = $(addsuffix .log, $(addprefix $(LOGS)/part.BB_bounds_N., $(shell seq -f %02g 0 $(MAX_I))))
-
-# PSCAL_FILES = $(addsuffix .log, $(addprefix $(LOGS)/part.scal., $(shell seq -f %02g 0 $(MAX_I))))
-
-# DTE=$(shell date +%F)
-# TS=$(shell date +%H-%M-%S)
-
-# MAX_I=$(shell expr $(PAR_SOL) - 1 )
-
-# .PHONY: all figures clean-raw-inst clean-insts move-logs figures/sample_BB_tree.png
-
-# ######################################################################
-# ## High-level recipes
-# .SECONDARY: # keep all the intermediary logfiles (will not work o/w)
-
-# all:
-
-# figures/sample_BB_tree.png: ./sample_BB_tree.py
-# 	python ./sample_BB_tree.py -v -V 8 -n 10 -o ./run_logs/sample_BB_tree.dot && \
-# 	dot -Tpng ./run_logs/sample_BB_tree.dot > ./figures/sample_BB_tree.png
-
-
-# ######################################################################
-# ## Figure recipes
-# SOL_RECIPE = Rscript $(PP)/fig_$*.R -i $< -o $@
-# BB_RECIPE = Rscript $(PP)/fig_BB_$*.R -i $< -o $@
-
-
-# $(FIGS)/fig_BB_%_R.eps: $(LOGS)/BB_bounds_R.log $(PP)/fig_BB_%.R
-# 	$(BB_RECIPE)
-
-# $(FIGS)/fig_BB_%_N.eps: $(LOGS)/BB_bounds_N.log $(PP)/fig_BB_%.R
-# 	$(BB_RECIPE)
-
-
-# ######################################################################
-# ######################################################################
-
-
-# $(LOGS)/BB_bounds_%.log: $$(BB_FILES_%)
-# 	python $(BBLOG) --header > $@ && \
-# 	tail -qn +2 $(BB_FILES_$*) >> $@
-
-# $(LOGS)/part.BB_bounds_R.%.log: $(INST)/R/instances.list $(SOLVE)
-# 	python $(BBLOG) -i $<.$* -o $@ -d $(INST)/R/
-
-# $(LOGS)/part.BB_bounds_N.%.log: $(INST)/N/instances.list $(SOLVE)
-# 	python $(BBLOG) -i $<.$* -o $@ -d $(INST)/N/
-
-
 # ######################################################################
 # # auxiliary recipes
+
+save-orig-instances:
+				tar czf $(INST)/orig_problem.tar.gz -C $(INST)/orig_problem . --remove-files
 
 prep_dirs:
 				cp --preserve=timestamps -r ./run_logs $(LOGS)
@@ -382,18 +291,18 @@ fresh: clean
 				mkdir -p ./instances
 				rm ./clean
 
-pack_instances:
-	CURRD=$(shell pwd) && cd $(INST) && tar -czf orig_problem.tar.gz ./orig_problem/*.bdd --remove-files && cd $(CURRD)
-	CURRD=$(shell pwd) && cd $(INST) && tar -czf orig_scal.tar.gz ./scal/*.bdd --remove-files && cd $(CURRD)
-
-# check_src:
-# 	egrep -nr --color 'TODO|FIXME|BUG|NOTE'
+check_src:
+	egrep -nr --color 'TODO|FIXME|BUG|NOTE'
 
 # install_R_pkg:
 # 	Rscript ./aux/R_install_packages.R
 
-# qtest:
-# 	python -m pytest tests/UFL_test.py
-
-tests:
-				python -m tests/BDD_test.py
+cross-checks:
+				python -m pytest tests/BDD_test.py
+				python -m pytest BDD.py --doctest-modules
+				python -m pytest tests/varseq_test.py
+				python -m pytest varseq.py --doctest-modules
+				python -m pytest tests/BB_search_test.py
+				python -m pytest BB_search.py --doctest-modules
+				python -m pytest tests/UFLP_test.py
+				python -m pytest tests/tUFLP_test.py

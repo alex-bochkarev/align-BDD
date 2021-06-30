@@ -49,6 +49,13 @@ Implements functions (outside the classes above):
 
 
 
+Attributes defined in the module:
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+.. autodata:: SIMPL_HEU
+.. autodata:: ORIG_HEU
+
 
 
 .. centered:: ❖❖❖

@@ -1,13 +1,9 @@
-"""Test unit: equivalence of BDDs after operations.
+"""Tests equivalence of BDDs after operations.
 
-Tests if BDDs encode the same Boolean functions after the manipulations (swap, sift, align_to)
-against randomly generated instances (not necessarily unique)
-
-(c) A. Bochkarev, Clemson University, 2020
-a@bochkarev.io
-
+Tests if :py:class:`BDD.BDD` encode the same Boolean function after
+some manipulations (``swap``, ``sift``, ``align_to``) against randomly generated
+instances (not necessarily unique)
 """
-
 import sys
 import numpy as np
 import pandas as pd

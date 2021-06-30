@@ -1,11 +1,5 @@
-"""
-An auxiliary script: working with datasets
-of saved align-varseq instances
-
-(non-interactive version)
-
-(c) A. Bochkarev, Clemson University, 2020
-abochka@clemson.edu
+"""An auxiliary script: parser for working with datasets of saved align-varseq
+instances.
 """
 
 ######################################################################

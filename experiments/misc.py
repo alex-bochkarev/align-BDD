@@ -1,10 +1,4 @@
-"""
-Contains common misc utilities for numerical experiments
-(mostly run on the cluster)
-
-(c) A. Bochkarev, Clemson University, 2019
-abochka@clemson.edu
-"""
+"""Contains common misc utilities for numerical experiments"""
 import sys
 
 def log(instance, *what_to_print, outfile = sys.stdout, comment="--none--"):

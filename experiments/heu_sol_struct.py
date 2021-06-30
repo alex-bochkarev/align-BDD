@@ -1,10 +1,7 @@
-"""
-Examines heuristic solutions to a random align-BDD instance.
-(inspired by the reviewer's comment)
+"""Examines heuristic solutions to a random align-BDD instance.
 
----
-(c) A. Bochkarev, Clemson University, 2021
-abochka@clemson.edu
+Used to look into the number of optima and ``simscore`` related
+experiments.
 """
 import BDD as DD
 import varseq as vs
@@ -14,7 +11,7 @@ from copy import deepcopy
 import argparse as ap
 import sys
 from time import time
-import cUFL
+import tUFLP
 import json
 
 def run_experiment(N=5, k=0, inst_type="rnd", logdest="none"):
@@ -38,16 +35,16 @@ def run_experiment(N=5, k=0, inst_type="rnd", logdest="none"):
             B.save(f"{logdest}/B{k}.bdd")
 
     elif inst_type == "tUFL":
-        S, f, fc, kb = cUFL.generate_test_instance(n=N)
+        S, f, fc, kb = tUFLP.generate_test_instance(n=N)
 
         if logdest != "none":
             inst_log = open(logdest, "w")
             inst_log.write(json.dumps({
                 'S':S, 'f':f, 'fc':fc, 'kb':kb})+"\n")
 
-        A, _ = cUFL.build_cover_DD(S, f)
+        A, _ = tUFLP.build_cover_DD(S, f)
         pref_order = [int(x[1:]) for x in A.vars]
-        B, _ = cUFL.build_color_DD(f, fc, kb, pref_order)
+        B, _ = tUFLP.build_type_DD(f, fc, kb, pref_order)
     else:
         print(f"Wrong instance inst_type: {inst_type} (expected: 'rnd' or 'tUFL')")
 

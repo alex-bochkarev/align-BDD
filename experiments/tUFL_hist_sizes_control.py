@@ -1,10 +1,7 @@
-"""Benchmarks DD sizes for different solution methods (colored UFL)
+"""Benchmarks DD sizes for different solution methods for typed UFLP.
 
-An experiment concerning the Uncapacitated Facility Location with types (typed UFL)
-
----
-(c) A. Bochkarev, Clemson University, 2021
-abochka@clemson.edu
+Compares simplified problem-based heuristic to "Best of A and B" for
+the original problem (in terms of intersection DD sizes).
 """
 from time import time
 import argparse as ap
@@ -12,7 +9,7 @@ import sys
 from gurobipy import GRB
 
 import jUFL
-import cUFL
+import tUFLP
 import varseq as vs
 import BDD as DD
 import BB_search as bb
@@ -81,16 +78,16 @@ def main():
         inst_log = open(args.inst_log, "w")
 
     for k in range(int(args.K)):
-        S, f, fc, kb = cUFL.generate_test_instance(int(args.n),
+        S, f, fc, kb = tUFLP.generate_test_instance(int(args.n),
                                                    p=float(args.prob))
 
         if not inst_log is None:
             inst_log.write(json.dumps({
                 'S':S, 'f':f, 'fc':fc, 'kb':kb})+"\n")
 
-        cover_DD, _ = cUFL.build_cover_DD(S, f)
+        cover_DD, _ = tUFLP.build_cover_DD(S, f)
         pref_order = [int(x[1:]) for x in cover_DD.vars]
-        type_DD, _ = cUFL.build_color_DD(f, fc, kb,
+        type_DD, _ = tUFLP.build_type_DD(f, fc, kb,
                                          preferred_order=pref_order)
 
         cover_DD.make_reduced()

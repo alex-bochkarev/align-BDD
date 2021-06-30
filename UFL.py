@@ -1,14 +1,8 @@
-"""UFL -- Uncapacitated Facility Location.
+"""Implements basic functions for UFL -- Uncapacitated Facility Location.
 
-(testing align-BDD machinery for specific applications)
+Used as a basis for :py:mod:`tUFLP`.
 
-General notes:
---------------
-- on indices: `j` is used for consumers, `i` -- for facilities
-
----
-(c) A. Bochkarev, Clemson University, 2021
-abochka@clemson.edu
+Tests coverage: :py:mod:`UFLP_test`
 """
 from graphviz import Digraph
 import numpy as np
@@ -616,6 +610,7 @@ def build_DP_DD(S, f, g):
 # =====================================================================
 
 def make_simple_problem():
+    """Creates a 'toy' UFLP instance (for debugging)."""
     S = [[1], [1, 2], [1, 2, 3], [2, 3]]
     f = {1: 1, 2: 2, 3: 3}
     g = {
@@ -724,10 +719,12 @@ def generate_test_instance(n, m):
        m (int): number of customers
 
     Returns:
-        S (list): neighborhood list
-        f (dict): costs of facility location
-                    (generated uniformly random int from `f_min` to `f_max`)
-        g (dict): overlap costs, keys: (customer, overlap)
+        A tuple of the following values.
+
+            - S (list): neighborhood list
+            - f (dict): costs of facility location
+              (generated uniformly random int from `f_min` to `f_max`)
+            - g (dict): overlap costs, keys: (customer, overlap)
     """
     N = [i for i in range(1, n+1)]
     M = [j for j in range(1, m+1)]
@@ -766,10 +763,12 @@ def generate_dense_instance(n, m, covering=0.95):
         covering (float): share of facilities covering each customer
 
     Returns:
-        S (list): neighborhood list
-        f (dict): costs of facility location
-                    (generated uniformly random int from `f_min` to `f_max`)
-        g (dict): overlap costs, keys: (customer, overlap)
+        A tuple of the following values.
+
+            - S (list): neighborhood list
+            - f (dict): costs of facility location
+              (generated uniformly random int from `f_min` to `f_max`)
+            - g (dict): overlap costs, keys: (customer, overlap)
     """
     N = [i for i in range(1, n+1)]
     M = [j for j in range(1, m+1)]
@@ -800,13 +799,13 @@ def generate_dense_instance(n, m, covering=0.95):
 def test_MIPs_protocol():
     """Runs a series of cross-checks.
 
+    Uses :py:func:`generate_test_instance`.
+
     Covers functions:
         - build_MIP
         - create_covering_BDD_wg
         - create_availability_BDD
         - add_BDD_to_MIP
-    Uses:
-    - generate_test_instance
     """
     test_protocol = [(1000, 10, 20), (1000, 20, 10),
                      (500, 20, 20), (500, 50, 100),

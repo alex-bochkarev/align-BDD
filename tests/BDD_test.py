@@ -10,7 +10,7 @@ import copy
 @pytest.mark.parametrize("D", [BDD.BDD.random(N = 1 + np.random.randint(1, 10),
                                               p = np.random.uniform(),
                                               weighted=np.random.choice([True, False]))
-                               for _ in range(500)])
+                               for _ in range(100)])
 def test_load_save(D):
     """Tests that load/save functionality works as intended."""
     D.save("tests/BDD_load_save.bdd")
@@ -22,7 +22,7 @@ def test_load_save(D):
 
 @pytest.mark.parametrize("test_inst", [(1+np.random.randint(5, 15),
                                         np.random.uniform())
-                                       for _ in range(500)])
+                                       for _ in range(100)])
 def test_shortest_path(test_inst):
     """Tests the shortest path procedure (with Gurobi model)"""
     N, p = test_inst
@@ -159,7 +159,7 @@ def test_swaps_w():
     assert eq, msg
 
 
-@pytest.mark.parametrize("i", [i for i in range(1000)])
+@pytest.mark.parametrize("i", [i for i in range(100)])
 def test_swaps_weighted(i):
     """Tests swap operation for weighted diagrams (random instances)."""
     A = BDD.BDD.random(N=5, weighted=True)
@@ -181,7 +181,7 @@ def test_swaps_weighted(i):
         assert eq, f"{i}: for swap at {pos}: {msg}"
 
 
-@pytest.mark.parametrize("i", [i for i in range(1000)])
+@pytest.mark.parametrize("i", [i for i in range(100)])
 def test_swaps_uweighted(i):
     A = BDD.BDD.random(N=7, weighted=False)
     B = copy.deepcopy(A)
@@ -202,7 +202,7 @@ def test_swaps_uweighted(i):
         assert eq, msg
 
 
-@pytest.mark.parametrize("i", [i for i in range(500)])
+@pytest.mark.parametrize("i", [i for i in range(100)])
 def test_intersect(i):
     """Tests intersection function, :py:func:`BDD.intersect`."""
     A = BDD.BDD.random(N=7, weighted=True)
@@ -226,11 +226,11 @@ def save_load(bdd):
 
     must result in two equivalent graphs (BDDs) on the screen
     """
-    bdd.save("./test_save.bdd")
-    bdd2 = BDD()
-    bdd2.load("./test_save.bdd")
-    bdd.dump_gv().view("./before_save.dot",cleanup=True)
-    bdd2.dump_gv().view("./after_save.dot",cleanup=True)
+    bdd.save("./tmp/test_save.bdd")
+    bdd2 = BDD.BDD()
+    bdd2.load("./tmp/test_save.bdd")
+    # bdd.dump_gv().view("./tmp/before_save.dot",cleanup=True)
+    # bdd2.dump_gv().view("./tmp/after_save.dot",cleanup=True)
     eq, msg = bdd.is_equivalent(bdd2)
     assert eq, msg
 
@@ -238,7 +238,7 @@ def save_load(bdd):
 def gen_4BDD():
     """creates a simple 4-var BDD"""
 
-    bdd = BDD(4)
+    bdd = BDD.BDD(4)
     root = bdd.addnode(None)
     nh = bdd.addnode(root,"hi")
     nl = bdd.addnode(root,"lo")
@@ -320,7 +320,7 @@ def show_swap_sift(bdd):
 
     ### more complex sifting example
 
-    bdd = BDD(4)
+    bdd = BDD.BDD(4)
     root = bdd.addnode(None)
     n1 = bdd.addnode(root, "hi")
     n2 = bdd.addnode(root, "lo")
@@ -359,20 +359,20 @@ def show_swap_sift(bdd):
 
 def show_intersections():
     """Tests intersection function."""
-    A = BDD()
+    A = BDD.BDD()
     A.load("./tests/int_A.wbdd", weighted=True)
-    B = BDD()
+    B = BDD.BDD()
     B.load("./tests/int_B.wbdd", weighted=True)
 
     C = intersect(A, B)
-    A.show(dir="testing", filename="A.dot")
-    B.show(dir="testing", filename="B.dot")
-    C.show(dir="testing", filename="C.dot")
+    A.show(dir="tmp", filename="A.dot")
+    B.show(dir="tmp", filename="B.dot")
+    C.show(dir="tmp", filename="C.dot")
 
 
 def show_rnd():
     bdd = BDD.BDD.random(N=5,p=0.8)
-    bdd.dump_gv().view("./random.dot",directory="./testing",cleanup = True)
+    bdd.dump_gv().view("./random.dot",directory="./tmp",cleanup = True)
 
 def show_align():
     bdd_A = BDD.BDD.random(N=4,p=0.8)
@@ -381,10 +381,10 @@ def show_align():
     alts, Aa, Ba = bdd_A.OA_bruteforce(bdd_B)
     print("Opt order: {}, opt size:{}".format(Aa[0].vars, Aa[0].size()+Ba[0].size()))
 
-    bdd_A.dump_gv().render("./testing/A.dot",view=True)
-    bdd_B.dump_gv().render("./testing/B.dot",view=True)
-    Aa[0].dump_gv().render("./testing/Aa.dot",view=True)
-    Ba[0].dump_gv().render("./testing/Ba.dot", view=True)
+    bdd_A.dump_gv().render("./tmp/A.dot",view=True)
+    bdd_B.dump_gv().render("./tmp/B.dot",view=True)
+    Aa[0].dump_gv().render("./tmp/Aa.dot",view=True)
+    Ba[0].dump_gv().render("./tmp/Ba.dot", view=True)
 
 
 def show_bruteforcing():
@@ -417,7 +417,7 @@ def show_swapping_2():
 
     bdds = copy.deepcopy(mybdd)
     bdds.swap_up(3)
-    bdds.dump_gv().render("./testing/after_swap.dot",view=True, cleanup=True)
+    bdds.dump_gv().render("./tmp/after_swap.dot",view=True, cleanup=True)
 
 
     mybdd = BDD.BDD.random(N=4,p=0.8)
@@ -425,4 +425,4 @@ def show_swapping_2():
 
     bdds = copy.deepcopy(mybdd)
     bdds.swap_up(3)
-    bdds.dump_gv().render("./testing/after_swap.dot", view=True, cleanup=True)
+    bdds.dump_gv().render("./tmp/after_swap.dot", view=True, cleanup=True)

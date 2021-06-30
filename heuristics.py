@@ -1,11 +1,9 @@
-"""
-Implements several heuristics
-to be tested with a separate script
+"""Implements several heuristics
+to be used with a separate script.
 
-(also contains some legacy testing code)
+The module also contains some code related to possible further
+research and testing.
 
-(c) A. Bochkarev, Clemson University, 2019
-abochka@clemson.edu
 """
 
 # TODO: review the legacy code / consider moving
@@ -28,14 +26,17 @@ import pstats
 
 
 def toA(A,B):
+    """Helper: align to ``A`` heuristic."""
     Bp = B.align_to(A)
     return [A.size()+Bp.size(),A.layer_var]
 
 def toB(A,B):
+    """Helper: align to ``B`` heuristic."""
     return toA(B,A)
 
 # min { toA, toB}
 def minAB(A,B):
+    """Best of A and B heuristic (simplified problem)."""
     sA,vA = toA(A,B)
     sB,vB = toA(B,A)
 
@@ -51,7 +52,7 @@ def simpl_greedy_swaps(A,B):
     (picking the best improvement at each step)
     """
     cur_size, T = minAB(A,B)
-    T = vs.VarSeq(T,[1 for i in range(len(T))])
+    T = vs.VarSeq(T,[1 for _ in range(len(T))])
     improvement_possible = True
 
     while improvement_possible:
@@ -73,7 +74,7 @@ def simpl_greedy_swaps(A,B):
 
 # gr sifts
 def simpl_greedy_sifts(A,B,passes=-1):
-    """finds a good alignment target with greedy sifts
+    """Finds a good alignment target with greedy sifts
 
     Makes sifts while it can improve the objective
     or for a given number of passes,
@@ -81,7 +82,7 @@ def simpl_greedy_sifts(A,B,passes=-1):
     (one pass = examining all the variables)
     """
     cur_size, T = minAB(A,B)
-    T = vs.VarSeq(T,[1 for i in range(len(T))])
+    T = vs.VarSeq(T,[1 for _ in range(len(T))])
     improvement_possible = True
     pass_no = 0
 
@@ -107,18 +108,23 @@ def simpl_greedy_sifts(A,B,passes=-1):
     return [A.align_to(T).size() + B.align_to(T).size(),T]
 
 def simpl_gsifts_1p(A,B):
+    """Greedy sifts: one pass."""
     return simpl_greedy_sifts(A,B,passes=1)
 
 def simpl_gsifts_2p(A,B):
+    """Greedy sifts: two passes."""
     return simpl_greedy_sifts(A,B,passes=2)
 
 def simpl_gsifts_inf(A,B):
+    """Greedy sifts: all passes."""
     return simpl_greedy_sifts(A,B,passes=-1)
 
 def simpl_gsifts_3p(A,B):
+    """Greedy sifts: three passes."""
     return simpl_greedy_sifts(A,B,passes=3)
 
 def simpl_5random(A,B):
+    """Implements 'Best of 5 random orders' heuristic."""
     best_size = -1
     for i in range(5):
         o = np.random.permutation(A.layer_var)
@@ -130,7 +136,7 @@ def simpl_5random(A,B):
     return [best_size, best_o]
 
 def simpl_greedy_2sifts(A,B, passes=-1):
-    """finds a good alignment target with greedy pairs of sifts
+    """Finds a good alignment target with greedy pairs of sifts.
 
     Makes sifts while it can improve the objective,
     or for a given number of passes,
@@ -167,15 +173,18 @@ def simpl_greedy_2sifts(A,B, passes=-1):
     return [A.align_to(T).size() + B.align_to(T).size(),T]
 
 def simpl_g2sifts_1p(A,B):
+    """Experimental: greedy pairs of sifts (simplified problem), one pass."""
     return simpl_greedy_2sifts(A,B,1)
 
 def simpl_g2sifts_2p(A,B):
+    """Experimental: greedy pairs of sifts (simplified problem), two passes."""
     return simpl_greedy_2sifts(A,B,2)
 
 ######################################################################
 ## an optimized version
 # TODO: invent
 def fastslide(X,a,p):
+    """An experimental function implementing faster 'sift' operation."""
     if X[p]==a:
         return X
 
@@ -213,7 +222,7 @@ def fastslide(X,a,p):
     return X
 
 def fast_greedy_sifts(A,B):
-    """finds a good alignment target with greedy sifts
+    """Finds a good alignment target with greedy sifts.
 
     Makes sifts while it can improve the objective
     (picking the best improvement at each step)
@@ -282,29 +291,17 @@ def fast_greedy_2sifts(A,B):
     return [T, A.align_to(T).size() + B.align_to(T).size(),no_of_ops]
 
 
-# heuristics = [
-#     minAB,
-#     greedy_swaps,
-#     greedy_sifts,
-#     greedy_2sifts
-# ]
-
-# heu_description = [
-#     "minAB",
-#     "gswaps",
-#     "gsifts",
-#     "g2sifts",
-#     "smart_last_elem"
-# ]
-
 def orig_simpl(A,B,simpl):
+    """A heuristic for the **original** problem involving simplified problem."""
     Ap = deepcopy(A); Bp = deepcopy(B)
     Ap.align_to(simpl["simpl_BB"][2],inplace=True)
     Bp.align_to(simpl["simpl_BB"][2],inplace=True)
     assert Ap.is_aligned(Bp)
     return [Ap.size()+Bp.size(),simpl["simpl_BB"][1], simpl["simpl_BB"][2]]
 
+
 def orig_gsifts1p(A,B,simpl):
+    """Greedy sifts heuristic for the **original** problem."""
     ApA = deepcopy(A);BpA = deepcopy(B)
     ApB = deepcopy(A);BpB = deepcopy(B)
     ApB.gsifts(BpB)
@@ -326,6 +323,7 @@ def orig_gsifts1p(A,B,simpl):
         return [-1,0,ApA.vars]
 
 def orig_bestAB(A,B,simpl):
+    """Best of ``A`` and ``B`` (original problem)."""
     Ap = deepcopy(A); Bp = deepcopy(B)
     Ap.align_to(B.vars,inplace=True)
     Bp.align_to(A.vars,inplace=True)
@@ -335,6 +333,7 @@ def orig_bestAB(A,B,simpl):
         return [A.size()+Bp.size(),0,Bp.vars]
 
 def orig_5random(A,B,simpl):
+    """Five random orders (original problem)."""
     best_size = -1
     for i in range(5):
         Ap = deepcopy(A);
@@ -348,6 +347,7 @@ def orig_5random(A,B,simpl):
     return [best_size, 0, best_o]
 
 def orig_interleaved(A,B,simpl):
+    """Experimental heuristic (further research)."""
     N = len(A)
     Nlast = N
     Ac = deepcopy(A); Bc = deepcopy(B);
@@ -379,6 +379,7 @@ def orig_interleaved(A,B,simpl):
     return [Ac.size()+Bc.size(),0,Ac.vars]
 
 def orig_meta(A,B,simpl):
+    """Another experimental heuristic (further research)."""
     N = len(A)
     Ac = deepcopy(A); Bc = deepcopy(B);
     vsA = vs.VarSeq(Ac.vars, [Ac.n(j) for j in range(N)])
@@ -392,6 +393,7 @@ def orig_meta(A,B,simpl):
     return [Ac.size()+Bc.size(),0,Ac.vars]
 
 def orig_interleave_when_diverge(A,B,simpl):
+    """Another experimental heuristic (further research)."""
     ALLOWANCE = 0.99
     Ap = deepcopy(A); Bp = deepcopy(B)
     N = len(Ap)
@@ -424,6 +426,7 @@ def orig_interleave_when_diverge(A,B,simpl):
     return [Ap.size()+Bp.size(),simpl["simpl_BB"][1], simpl_order]
 
 def orig_rnd_starts(A,B,simpl):
+    """Another experimental heuristic (further research)."""
     best_o = simpl["simpl_BB"][2] # retrieve opt order
     best_size = deepcopy(A).align_to(best_o).size() + deepcopy(B).align_to(best_o).size()
 
@@ -463,6 +466,8 @@ SIMPL_HEU = [
     ["simpl_gsifts_inf",simpl_gsifts_inf,"Greedy sifts (all)"]
     # ["simpl_g2sifts_1p",simpl_g2sifts_1p,"greedy 2-sifts (1 pass)"]
 ]
+"""List of heuristics for the **simplified** problem."""
+
 
 ORIG_HEU = [
     ["orig_simpl",orig_simpl,"Simplified problem"],
@@ -473,6 +478,8 @@ ORIG_HEU = [
     #["orig_simpl_rnd",orig_rnd_starts,"Simplified problem w/randomized starts"]
     # ["orig_meta",orig_meta,"greedy sifts + simplified problem"]
 ]
+"""List of heuristics for the **original** problem."""
+
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:

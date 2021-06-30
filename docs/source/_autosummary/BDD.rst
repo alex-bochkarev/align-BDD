@@ -54,6 +54,7 @@ BDD
 .. autoclass:: BDD
    :members:
    :undoc-members:
+   :private-members:
 
    .. autoclasstoc::
 
@@ -65,6 +66,7 @@ node
 .. autoclass:: node
    :members:
    :undoc-members:
+   :private-members:
 
    .. autoclasstoc::
 

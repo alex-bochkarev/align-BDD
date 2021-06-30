@@ -35,11 +35,12 @@ Implements functions (outside the classes above):
 
 {% block attributes %}
 {% if attributes %}
-.. rubric:: {{ _('Module Attributes') }}
+Attributes defined in the module:
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. autosummary::
 {% for item in attributes %}
-  {{ item }}
+.. autodata:: {{item}}
+
 {%- endfor %}
 {% endif %}
 {% endblock %}
@@ -60,6 +61,7 @@ Implements functions (outside the classes above):
 .. autoclass:: {{ item }}
    :members:
    :undoc-members:
+   :private-members:
 
    .. autoclasstoc:: 
 

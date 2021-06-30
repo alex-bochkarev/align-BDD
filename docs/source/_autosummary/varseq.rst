@@ -52,6 +52,7 @@ VarSeq
 .. autoclass:: VarSeq
    :members:
    :undoc-members:
+   :private-members:
 
    .. autoclasstoc::
 

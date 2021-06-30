@@ -1,15 +1,8 @@
-"""Benchmarks runtimes for different solution methods (colored-UFL)
-
-An experiment concerning the colored Uncapacitated Facility Location (UFL).
-
----
-(c) A. Bochkarev, Clemson University, 2021
-abochka@clemson.edu
-"""
+"""Benchmarks runtimes for different solution methods of typed-UFLP."""
 from time import time
 import argparse as ap
 import sys
-import cUFL
+import tUFLP
 from gurobipy import GRB
 import UFL
 import varseq as vs
@@ -48,7 +41,7 @@ def benchmark(K=10, TOL=1e-3, n=5, prefix=0, do_sifts=False, logging=None):
     """
     for k in range(K):
         t0 = time()
-        S, f, fc, kb = cUFL.generate_test_instance(n=n)
+        S, f, fc, kb = tUFLP.generate_test_instance(n=n)
         t1 = time()
         print(f"{prefix},{k},{n},gen_instance,all, {(t1-t0)*1000:.1f}")
         if logging != None:
@@ -57,7 +50,7 @@ def benchmark(K=10, TOL=1e-3, n=5, prefix=0, do_sifts=False, logging=None):
 
         # Generate and solve plain MIP
         t0 = time()
-        model = cUFL.build_cUFL_MIP(S, f, fc, kb)
+        model = tUFLP.build_tUFLP_MIP(S, f, fc, kb)
         model.setParam("OutputFlag", 0)
         model.optimize()
         t1 = time()
@@ -72,10 +65,10 @@ def benchmark(K=10, TOL=1e-3, n=5, prefix=0, do_sifts=False, logging=None):
 
         # Generate and solve CPP MIP
         t0 = time()
-        cover_DD, _ = cUFL.build_cover_DD(S, f)
+        cover_DD, _ = tUFLP.build_cover_DD(S, f)
         cover_DD.make_reduced()
         pref_order = [int(x[1:]) for x in cover_DD.vars]
-        color_DD, _ = cUFL.build_color_DD(f, fc, kb, pref_order)
+        color_DD, _ = tUFLP.build_type_DD(f, fc, kb, pref_order)
         color_DD.make_reduced()
         t1 = time()
         DD_build_time = t1 - t0

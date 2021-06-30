@@ -1,8 +1,7 @@
-"""Tests jUFL.py module (joint-UFLP code).
+"""Tests joint-UFLP code (:py:mod:`jUFL`).
 
----
-(c) A. Bochkarev, Clemson University, 2021
-abochka@g.clemson.edu
+Essentially, tests if the construction of diagrams is implemented
+correctly.
 """
 import pytest
 from jUFL import *
@@ -11,6 +10,11 @@ from jUFL import *
 @pytest.mark.parametrize("test_inst", [generate_instance(np.random.randint(5, 15))
                                        for _ in range(100)])
 def test_jUFL(test_inst):
+    """Implements the testing code.
+
+    Generates random jUFLP instances and compares
+    "Naive MIP" and "CPP MIP".
+    """
     m, _ = solve_with_naive_MIP(test_inst)
     o_MIP = m.objVal
     assert m.status == GRB.OPTIMAL

@@ -1,17 +1,14 @@
-"""
-BB_search.py -- a branch-and-bound search scheme
-implementation for the align-sequences problem.
+""" A branch-and-bound search scheme
+implementation for the align-sequences problem:
+alignts two :py:class:`varseq.VarSeq` objects.
 
-(c) A. Bochkarev, Clemson University, 2020
-abochka@clemson.edu
+Tests coverage: :py:mod:`BB_search_test`.
 """
-
 import varseq as vs
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 import copy as copy
-import math as math
 import anytree as at
 from anytree.exporter import DotExporter
 import heapq as heap
@@ -26,20 +23,23 @@ ALWAYS_FAST = True
 ######################################################################
 ## Lower bound calculations
 def LB_current(A,B):
-    """current size (before the alignment)"""
+    """LB: current size (before the alignment)."""
     return A.size()+B.size()
 
 def LB_first_aligned(A,B):
-    """min current size after aligning the first element only"""
+    """LB: min current size after aligning the first element only."""
     return min(A.size()+B.slide(A.layer_var[0],0).size(), A.slide(B.layer_var[0],0).size()+B.size())
 
 def LB_last_aligned(A,B):
-    """min current size after aligning the last element (enumeration)"""
+    """LB: min current size after aligning the last element (enumeration)."""
     N = len(A)-1
     return min([A.slide(A.layer_var[i],N).size() + B.slide(A.layer_var[i],N).size() for i in range(N+1)])
 
 def LB_by_level(A,B):
-    """inversions-driven heuristic"""
+    """LB: Inversions-driven heuristic.
+
+    The one based on the lemma presented in the paper.
+    """
     N = len(A)
     LB = LB_current(A,B)
 
@@ -56,7 +56,7 @@ def LB_by_level(A,B):
     return LB
 
 def LB_by_level_complicated(A,B):
-    """inversions-driven heuristic (improved)"""
+    """LB: Another variant of the inversions-driven heuristic (improved)"""
     N = len(A)
     LB = LB_current(A,B)
 
@@ -73,11 +73,11 @@ def LB_by_level_complicated(A,B):
     return LB
 
 def LB_lvl_compl_symm(A,B):
-    """symmetric version of the previous one"""
+    """LB: Symmetric version of the previous one."""
     return max(LB_by_level_complicated(A,B), LB_by_level_complicated(B,A))
 
 def LB_lvl_symm(A,B):
-    """symmetric version of the `LB_by_level`"""
+    """Symmetric version of the :py:func:`LB_by_level`."""
 
     return max(LB_by_level(A,B), LB_by_level(B,A))
 
@@ -91,6 +91,7 @@ LOWER_BOUNDS = [
 #    ["LB_lvl_symm",LB_lvl_symm,"inversion-driven (symmetric)"]
 #    ["LB_lvl_symm_amd",LB_lvl_compl_symm,"inversion-driven (amd, symm)"]
 ]
+"""List of lower bounds to examine (used in a separate experiment)."""
 
 ######################################################################
 ## auxiliary functions
@@ -98,14 +99,14 @@ LOWER_BOUNDS = [
 ## DOT graph (tree) export-specific
 ## adding labels (for DOT export)
 def nodenamefunc(node):
-    """generates node names for graphviz export"""
+    """Helper: Generates node names for graphviz export."""
 
     fixed_A_start = node.A_tail_start #len(node.A)-node.depth
     fixed_B_start = node.B_tail_start #len(node.B)-node.depth
     return "{}[{}]\nA:{}{}({: >3d})\nB:{}{}({: >3d})\n|A|+|B|={}, LB:{}, UB:{}".format(node.name, node.status, node.A.layer_var[:fixed_A_start],node.A.layer_var[fixed_A_start:],node.A.size(), node.B.layer_var[:fixed_B_start],node.B.layer_var[fixed_B_start:], node.B.size(),node.size(), node.LB, node.UB)
 
 def nodeattrfunc(node):
-    """generates node attributes for graphviz export"""
+    """Helper: Generates node attributes for graphviz export."""
 
     nlabel = "xlabel=\"Tree: LB={}, UB={}, obj={}\"".format(node.tree_LB,node.tree_UB, node.best_obj)
     ncolor = ""
@@ -122,15 +123,28 @@ def nodeattrfunc(node):
     return "{},{}".format(nlabel,ncolor)
 
 ######################################################################
-## class SearchNode
-## node-level search logic
-## node status chars: I - init-d, ? - open, E - expanded, P - pruned,
-##                    T - terminal
-
 class SearchNode(at.NodeMixin):
-    """Implements search tree node-related logic"""
+    """Implements search tree node.
+
+    Attributes:
+        name (str): node name,
+        parent (:py:class:`SearchNode`): parent node,
+        A, B (:py:class:`varseq.VarSeq`): sequences to align,
+        Ar, Br (:py:class:`varseq.VarSeq`): not-yet-aligned parts of ``A`` and ``B``.
+        A_tail_start, B_tail_start (int) : position for the already-aligned tail start.
+        status (str): node type (see the note below),
+        tree_UB, tree_LB (int): current (tree) upper / lower bound,
+        best_obj (int): current best objective seen,
+
+    Note:
+
+        - possible node types are: ``T`` = Terminal, ``O`` = Optimal,
+          ``I`` = initialized, ``P`` = pruned, ``?`` = unknown
+          ('open', not processed), ``E`` = processed ('expanded')
+
+    """
     def __init__(self, name, parent, Aresid, Bresid, A_tail_start, B_tail_start,A,B):
-        """class constructor"""
+        """Class constructor"""
         self.name = name
         self.parent = parent
         self.Ar = copy.deepcopy(Aresid)
@@ -148,12 +162,12 @@ class SearchNode(at.NodeMixin):
         self.UB = None
 
     def size(self):
-        """returns node size (total no. of nodes in both diagrams)"""
+        """Returns node size (total no. of nodes in both diagrams)."""
         return self.A.size() + self.B.size()
 
     # upper bound at the current node
     def calculate_UB(self, t='fast'):
-        """returns an upper bound for the specific node"""
+        """Returns an upper bound for the specific node."""
         if self.status == "T":
             self.UB = self.A.size()+self.B.size()
             order = self.A.layer_var
@@ -167,7 +181,7 @@ class SearchNode(at.NodeMixin):
 
     # lower bound at the current node
     def calculate_LB(self):
-        """returns a lower bound for the current search tree node"""
+        """Returns a lower bound for the current search tree node."""
         if self.status=="T":
             LB = self.size()
         else:
@@ -180,13 +194,31 @@ class SearchNode(at.NodeMixin):
     # if lower bounds are equal
     # approach: break ties arbitrarily
     def __lt__(self, other):
+        """A special methods used to break ties (if LBs are equal) -- randomly."""
         return np.random.ranf() > 0.5
 
 ######################################################################
 class BBSearch:
-    """keeps the search tree and search tree-level logic"""
+    """Implements the search tree.
+
+    Attributes:
+        A, B (:py:class:`varseq.VarSeq`): first sequence,
+        step (int): current step number,
+        tree_size (int): current number of nodes in the tree,
+        verbose (Boolean): debug information printing flag,
+        logging (Boolean): log bounds flag,
+        logs_UB, logs_LB (list): upper/lower bounds by step (if ``verbose``),
+        logs_step (list): step numbers (if ``verbose``),
+        status (str): search status,
+        root (class SearchNode): root node,
+        Ap_cand, Bp_cand (:py:class:`varseq.VarSeq`): ``A`` / ``B`` aligned to the current candidate optimum,
+        node_cand, cand_parent (:py:class:`SearchNode`): node corresponding to the current candidate and its parent,
+        open_nodes (list): list of nodes to process during the search,
+            each entry is a tuple (``<lower bound>``,``SearchNode``).
+    """
+
     def __init__(self, A,B):
-        """class constructor"""
+        """Class constructor"""
         self.A = A
         self.B = B
         self.step = 0
@@ -217,12 +249,12 @@ class BBSearch:
         heap.heapify(self.open_nodes) # create a heap, key = lower bound
 
     def current_best(self):
-        """returns current upper bound (best objective seen)"""
+        """Returns current upper bound (best objective seen)."""
 
         return self.Ap_cand.size()+self.Bp_cand.size()
 
     def dump(self, filename=None):
-        """technical: dump the tree into a DOT-file (graphivz)"""
+        """Technical: dump the tree into a DOT-file (graphivz)."""
         if filename and self.root:
             DotExporter(self.root, nodenamefunc=nodenamefunc,nodeattrfunc = nodeattrfunc).to_dotfile(filename)
 
@@ -246,7 +278,7 @@ class BBSearch:
         ax.text(ax.get_xlim()[1]*0.55,ax.get_ylim()[1]*0.8,"B:\n{}".format(self.B))
 
     def set_logging(self, logfile, prefix, steps_list):
-        """sets up the logging process for BB search"""
+        """Sets up the logging process for BB search."""
         self.logging = True
         self.log_file = logfile
         self.log_prefix = prefix
@@ -254,7 +286,18 @@ class BBSearch:
 
     ## MAIN LOGIC
     def search(self):
-        """main procedure: performs BB search"""
+        """Performs BB search (the main procedure).
+
+        Note:
+            After the call, the following attributes allow to recover the
+            solution:
+
+                - ``status`` (str): ``optimal``, ``timeout`` (``initialized``
+                  before),
+                - ``Ap_cand``, ``Bp_cand``
+                  (:py:class:`varseq.VarSeq`): ``A`` and ``B`` after aligning
+                  to the candidate (optimum if ``status`` = ``optimal``).
+        """
 
         # calculate the initial UB and LB
         if self.status=="optimal" or len(self.open_nodes)==0:

@@ -1,8 +1,10 @@
+"""Provides an example when simplified-problem based heuristic is tight for the original problem."""
 import BDD
 import itertools
 from copy import deepcopy
 
-if __name__ == '__main__':
+def main():
+    """Makes an illustration with enumeration of all possible alignments."""
     A = BDD.BDD()
     A.load("experiments/exp_BDD.bdd")
     A.dump_gv().save("./run_logs/exp_BDD_example/exp_BDD.gv")
@@ -15,3 +17,6 @@ if __name__ == '__main__':
         print(f"v={list(v)+A.vars[3:]}, |B|={B.size()} (reduced={B.is_reduced()}), cross-check: {A.is_equivalent(B)[0]}")
 
     B.show()
+
+if __name__ == '__main__':
+    main()

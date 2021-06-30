@@ -1,10 +1,6 @@
-"""Benchmarks DD sizes for different solution methods (colored UFL)
+"""Benchmarks DD sizes for different solution methods of joint UFLP.
 
-An experiment concerning the Uncapacitated Facility Location with types (typed UFL)
-
----
-(c) A. Bochkarev, Clemson University, 2021
-abochka@clemson.edu
+Compares "Best of A and B" and "Simplified problem based" heuristics to the original problem in terms of the intersection diagram sizes.
 """
 from time import time
 import argparse as ap
@@ -12,7 +8,7 @@ import sys
 from gurobipy import GRB
 
 import jUFL
-import cUFL
+import tUFLP
 import varseq as vs
 import BDD as DD
 import BB_search as bb
@@ -79,8 +75,8 @@ def main():
         if not inst_log is None:
             inst_log.write(json.dumps({'S_1':S_1, 'S_2':S_2,
                                        'f_1':f_1, 'f_2':f_2})+"\n")
-        C_1, _ = cUFL.build_cover_DD(S_1, f_1)
-        C_2, _ = cUFL.build_cover_DD(S_2, f_2)
+        C_1, _ = tUFLP.build_cover_DD(S_1, f_1)
+        C_2, _ = tUFLP.build_cover_DD(S_2, f_2)
 
         C_1.make_reduced()
         C_2.make_reduced()

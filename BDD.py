@@ -4,10 +4,11 @@ Defines the "original" BDD-related machinery (as opposed to the
 simplification defined in :py:class:`varseq.VarSeq`), including
 actual simultaneous variable reordering (inspired by Rudell'93) and
 other BDD alignment-related functions, along with technical utilities
-(such as load/save to file, etc.). A simple auxiliary class ``node``
-keeps the necessary data related to BDD nodes.
+(such as load/save to file, etc.). A simple auxiliary class
+:py:class:`node` keeps the necessary data related to BDD nodes.
 
-Tests coverage: ``tests/BDD_test.py``
+Tests coverage: :py:mod:`BDD_test`
+
 """
 
 import numpy as np
@@ -49,7 +50,7 @@ def simscore(seq_A, seq_B, p_B = None):
         p_B (dict): dict of element positions in B (default: None, will be built)
 
     Returns:
-        simscore (num): share of possible inversions (between 0 and 1).
+        number (between 0 and 1): share of possible inversions.
 
     Examples:
         >>> simscore([1,2,3], [1,2,3])
@@ -79,22 +80,23 @@ def simscore(seq_A, seq_B, p_B = None):
 
 
 class node(object):
-    """Encodes a node of the BDD.
+    """Represents a BDD node, with the following attributes.
 
     Attributes:
-        id: an int node ID
-        hi: a pointer to the hi-node
-        lo: a pointer to the lo-node
+        id: an integer node ID
+        hi: a pointer to the ``hi``-node
+        lo: a pointer to the ``lo``-node
         layer: layer number (id)
 
     Note:
         There are special node IDs:
-            0   for the root
-            -1  for True sink
-            -2  for the False sink
+        ``0``   for the root, 
+        ``-1``  for True sink, 
+        ``-2``  for the False sink.
     """
 
     def __init__(self, id, hi=None, lo=None, layer=-1):
+        """A simple class constructor."""
         self.id = id
         self.hi = hi
         self.lo = lo
@@ -115,6 +117,7 @@ class BDD(object):
     """Encodes a BDD and implements layer-ordering (revision) methods.
 
     Attributes:
+        N (int): number of variables (equals number of layers - 1)
         layers (list): a list of layers (sets/hashes), including {T, F}-nodes
         nodes (dict): a set/hash of nodes, key by node ID
         vars (list): variables associated with layers
@@ -152,16 +155,15 @@ class BDD(object):
     # some helper functions
 
     def link(self, parent, child, etype="hi", edge_weight=0.0):
-        """Creates a link between two nodes.
+        """Creates a link between two nodes in the BDD.
 
         (Saving auxiliary info as appropriate)
 
         Args:
-           self (type): description
            parent (int): parent node id
            child (int): child node id
-           etype (str): edge type, "hi" or "lo" (default "hi")
-           edge_weight (float): edge weight to e imposed (default 0.0)
+           etype (str): edge type, ``hi`` or ``lo`` (default ``hi``)
+           edge_weight (float): edge weight (default 0.0)
         """
         assert parent in self.nodes.keys()
         assert child in self.nodes.keys()
@@ -172,14 +174,10 @@ class BDD(object):
     def llink(self, parent, child, etype="hi", edge_weight=0.0):
         """Creates a link between two nodes.
 
-        (Saving auxiliary info as appropriate)
+        A version of :py:func:`BDD.BDD.link` that takes
+        :py:class:`BDD.node` objects as arguments instead of node
+        IDs.
 
-        Args:
-           self (type): description
-           parent (class node): parent node
-           child (class node): child node
-           etype (str): edge type, "hi" or "lo" (default "hi")
-           edge_weight (float): edge weight to e imposed (default 0.0)
         """
         parent.link(child, etype)
         if self.weighted:
@@ -194,7 +192,7 @@ class BDD(object):
         return len(self.layers[i])
 
     def p(self, a):
-        """Returns the position (layer index) of the variable `a`."""
+        """Returns position (0-based layer index) of variable ``a``."""
         return self.var_pos[a]
 
     def size(self):
@@ -205,7 +203,7 @@ class BDD(object):
         """Returns a unique name for the next node to be created.
 
         Picks the one to re-cycle after some node deletions, when available;
-        when it is not -- just takes the `max_id+1` (adjusting the `max_id` itself)
+        when it is not -- just takes the ``max_id+1`` (adjusting the ``max_id``)
         """
         if len(self.av_node_ids) > 0:
             return self.av_node_ids.popleft()
@@ -214,11 +212,14 @@ class BDD(object):
             return self.max_id
 
     def dump_gv(self, layerCapt=True, x_prefix="x", node_labels=None):
-        """Exports the BDD to the Graphviz format (`.dot`).
+        """Exports the BDD to the Graphviz format (``.dot``).
+
         Args:
             layerCapt (bool): whether to generate layer captions.
             x_prefix (str): a prefix to be shown for layer name (default 'x')
-        Returns: a Digraph object (see `graphviz` module).
+
+        Returns:
+            a Digraph object (see ``graphviz`` package).
         """
         g = Digraph()
 
@@ -298,17 +299,18 @@ class BDD(object):
     def swap_up(self, layer_idx):
         """Swaps the layer with the one immediately above it (in-place).
 
-        (by _index_! in-place operation)
+        (by *index* ! in-place operation)
 
         Args:
-            layer_idx (int): number (index) of the layer to be ''bubbled up''
+            layer_idx (int): number (0-based index) of the layer to be ''bubbled up''
 
         Note:
-            Operation takes O (no-of-nodes in the upper layer) time.
-            Drops the layer being swapped. Then iterates through the nodes
-            of the layer immediately above it and creates nodes as necessary
-            (re-cycling new nodes to avoid redundancy in terms of logical
-            functions)
+            Operation takes O (`no-of-nodes in the upper layer`)
+            time. Drops the layer being swapped. Then iterates
+            through the nodes of the layer immediately above it and
+            creates nodes as necessary (re-cycling new nodes to avoid
+            redundancy: a quasi-reduced BDD keeps this property)
+
         """
         assert layer_idx >= 1  # otherwise there's no layer to swap to
         assert layer_idx <= len(self.layers)-2  # can't swap-up the last layer
@@ -435,7 +437,9 @@ class BDD(object):
         self.vars[layer_idx] = v_1
 
     def sift(self, var, pos):
-        """Sifts variable `var` (name) to position `pos`, in-place."""
+        """Sifts variable ``var`` (by name) to (0-based) position ``pos``.
+
+        Uses :py:func:`BDD.sift` under the hood, in-place operation."""
         assert pos >= 0 and pos < len(self.layers)-1
         assert var in self.vars
 
@@ -454,12 +458,12 @@ class BDD(object):
                 self.swap_up(self.p(var)+1)
 
     def gsifts(self, with_whom, start_order=None):
-        """Perform greedy sifts to align with `with_whom`.
+        """Performs greedy sifts to align with ``with_whom``.
 
         Runs a simplistic implementation of Rudell'93
         sifting alorithm extension to minimize \|A\|+\|B\|
 
-        starts with aligning to self or `start_order` (if given)
+        starts with aligning to ``self`` or ``start_order`` (if given)
         """
         N = len(self.layers)-1
         if start_order is None:
@@ -525,7 +529,7 @@ class BDD(object):
 
     # file manipulation procedures
     def save(self, filename):
-        """Saves a BDD to an ASCII(text) file.
+        """Saves a BDD to a text file.
 
         Args:
             filename (string): destination file name.
@@ -533,23 +537,24 @@ class BDD(object):
         Note:
             File format is as follows.
 
-                - File header, two lines
+                - File header, the first two lines
                     | N= `<no-of-layers>`
                     | vars= `<comma-separated layer labels>`
 
                 - Then, one node description = one line of the format:
                     `id` : `hi` , `lo`
 
-            where `id` is node's ID, `hi` and `lo` are IDs(!) of the
-            nodes corresponding to hi and lo pointers of the node "ID"
-            The procedure performs breadth-first search and just saves
-            all the nodes.
+            where ``id`` is node's ID, ``hi`` and ``lo`` are IDs of
+            the nodes corresponding to one- and zero- pointers of the
+            node ``ID``. The procedure performs breadth-first search
+            and just saves all the nodes.
 
             Three nodes have reserved ID values:
 
                 - **Root** node: 0
                 - **True** terminal: -1
                 - **False** terminal: -2
+
         """
         S = deque()  # a deque of node IDs to explore (FIFO)
         V = set()  # set of visited (saved) nodes (by ID)
@@ -581,10 +586,10 @@ class BDD(object):
                 V.add(n_id)
 
     def load(self, filename, weighted=False):
-        """Loads a BDD from an ASCII(text) file.
+        """Loads a BDD from a (text) file.
 
         Note:
-            The format corresponds to the one described in the `save` function
+            The format is described in :py:func:`save`.
         """
         with open(filename, "r") as f:
             line = f.readline()
@@ -698,6 +703,9 @@ class BDD(object):
     def random(cls, N=5, p=0.5, weighted=False):
         """Generates a random BDD with `N` variables (N+1 layers).
 
+        Layers are numbered with consecutive integers by default,
+        starting with ``1``.
+
         Args:
             N (int):   number of variables (results in N+1 layers, incl. T,F)
             p (float):   tree size parameter
@@ -705,7 +713,8 @@ class BDD(object):
                     1 will result in a single node per layer.
             weighted (bool): whether to generate a weighted diagram.
         Returns:
-            A generated BDD
+            A generated :py:class:`BDD`.
+
         """
         bdd = BDD(N, weighted=weighted)
 
@@ -743,11 +752,14 @@ class BDD(object):
         """Returns a BDD "profile" -- an (almost) BFS-ordered list of nodes.
 
         Note:
-            A 'profile' is string of the format `<vars>`:`<BFS-nodes>`, where:
+            This is used to determine, e.g., if the generated
+            instance is unique. A 'profile' is a string of the format
+            ``<vars>``:``<BFS-nodes>``, where:
 
-            - `vars`      :  comma-separated variable names by layer;
-            - `BFS-nodes` :  comma-separated list of node-numbers (not IDs!)
+            - ``<vars>``      :  comma-separated variable names by layer;
+            - ``<BFS-nodes>`` :  comma-separated list of node-numbers (not IDs!)
               in a BFS-traverse order
+
         """
         Q = deque()
         V = set()
@@ -783,20 +795,23 @@ class BDD(object):
         return p[0] + ",".join(p[1:])
 
     def show(self,
-             dir="testing",
+             dir="tmp",
              filename="showfunc.dot",
              layerCapt=True,
              x_prefix="x",
              node_labels=None):
-        """Shows the diagram.
+        """Shows the diagram on the screen (saving the auxiliary pdf).
 
-        Generates a `.dot` file and compiles it to `.pdf`.
+        Generates a ``.dot`` file and compiles it to ``.pdf``.
+        Requires ``graphviz`` (``dot`` program)
 
         Args:
-            dir (str): directory to place files (default: "testing")
-            filename (str): `.dot` filename (default: "showfunc.dot")
-            layerCapt (bool): whether to show layer captions (default: True)
-            x_prefix(str): a prefix for variable captions (default:'x')
+            dir (str): directory to place files (default: ``tmp``)
+            filename (str): `.dot` filename (default: ``showfunc.dot``)
+            layerCapt (bool): whether to show layer captions (default: ``True``)
+            x_prefix(str): a prefix for variable captions (default: ``x``)
+            node_labels(dict): node labels to display (optional).
+
         """
         self.dump_gv(layerCapt, x_prefix, node_labels).view(filename,
                                                directory=dir,
@@ -818,18 +833,20 @@ class BDD(object):
         return aligned
 
     def OA_bruteforce(self, with_what, LR=False):
-        """Finds the best (smallest) alignment with BDD `with_what`.
+        """Finds the best (smallest) alignment with BDD ``with_what``.
 
-        Uses brute-force enumeration.
+        Uses brute-force enumeration of all possible orders.
 
         Args:
             with_what (BDD): target diagram.
             LR (bool): if set, layer-reduces each candidate BDD.
 
         Returns:
-            alternatives (int): number of alternative optima
-            A_aligned (list): of A-aligned (in each optimum)
-            B_aligned (list): of B-aligned (in respective optimum"""""")
+            A tuple of values
+
+                - alternatives (int): number of alternative optima
+                - A_aligned (list): of A-aligned (in each optimum)
+                - B_aligned (list): of B-aligned (in respective optimum)
         """
         # generate all possible permutations
         perms = iters.permutations(self.vars)
@@ -859,7 +876,7 @@ class BDD(object):
         return [alternatives, A_aligned, B_aligned]
 
     def is_reduced(self):
-        """Checks if the BDD is reduced (no "redundant" nodes)."""
+        """Checks if the BDD is quasi-reduced (no "redundant" nodes)."""
         checked_nodes = set()
 
         for layer in range(len(self.layers)-2, -1, -1):
@@ -872,9 +889,12 @@ class BDD(object):
         return True
 
     def make_reduced(self):
-        """Makes the BDD reduced.
+        """Makes the BDD quasi-reduced.
 
-        Swaps each layer back and forth, starting from the last one.
+        Swaps each layer back and forth, starting from the last one,
+        (which makes sure the results is quasi-reduced due to
+        :py:func:`BDD.BDD.swap` implementation.)
+
         """
         for i in range(len(self.vars)-1, 0, -1):
             self.swap_up(i)
@@ -883,10 +903,9 @@ class BDD(object):
     def rename_vars(self, ren_dict):
         """Helper function: renames variables.
 
-        Note: expects a dict of variables (of length <= `N`)
-
         Args:
-          ren_dict (dict): labels in the form {`before`: `after`}
+            ren_dict (dict): a dict of <= :py:attr:`BDD.N` labels
+                in the form {``before``: ``after``}
         """
         for v in ren_dict.keys():
             assert v in self.vars, f"{v} is not in {self.vars}"
@@ -897,29 +916,32 @@ class BDD(object):
         self.var_pos = dict(zip(self.vars, [i for i in range(len(self.vars))]))
 
     def shuffle_vars(self):
-        """Randomly shuffles variables."""
+        """Randomly renames the variables (shuffles their order)."""
         self.rename_vars(
             dict(zip(self.vars, np.random.permutation(self.vars))))
 
     def is_aligned(self, to_what):
-        """Helper function: checks if the BDD is aligned w/ to_what."""
+        """Checks if the BDD is aligned with ``to_what``."""
         return np.array_equal(self.vars, to_what.vars)
 
     # functions related to testing equivalence and finding truth tables
     def get_value(self, x):
-        """Finds the terminal node (T or F) -- an endpoint for `x`.
+        """Finds the terminal node (T or F) -- an endpoint for ``x``.
 
-        Finds a terminal node corresponding to the variable choices in `x`.
+        Returns a terminal node ID corresponding to the variable choices in ``x``.
 
         Args:
             x (dict): of {var_name: value}, where value is in {0,1}.
 
         Returns:
-            terminal (bool or `-1`):
-                terminal node corresponding to the path
-                implied by x, encoded as Boolean (or -1 if error)
+            A tuple of values
 
-            cost (float): if the BDD is weighted, cost of the path.
+                - terminal (bool or `-1`):
+                    terminal node corresponding to the path
+                    implied by x, encoded as Boolean (or -1 if error)
+
+                - cost (float):
+                    if the BDD is weighted, cost of the path.
         """
         (node,) = self.layers[0]
         cost = 0.0
@@ -956,7 +978,16 @@ class BDD(object):
             return -1
 
     def truth_table(self):
-        """Returns a truth table for the BDD (as a Boolean function)."""
+        """Returns a "truth table" for the encoded Boolean function.
+
+        Returns:
+
+        ``pandas`` dataframe: column numbers correspond to
+        variable names with two additional columns: ``Terminal`` for
+        the function value (of Boolean type) and ``Cost`` if the
+        diagram is :py:attr:`BDD.weighted`.
+
+        """
         tt = []
         ind = []
         for x_num in range(2**len(self)):
@@ -977,12 +1008,17 @@ class BDD(object):
     def is_equivalent(self, B):
         """Checks if two BDDs (A and B) are equivalent.
 
-        Equivalent in the sense that they define the same Boolean function,
-        by checking:
-        - if the corresponding truth tables coincide.
-        - (if the BDD is weighted) if all paths have the same costs.
+        Equivalent in the sense that they define the same Boolean
+        function and the corresponding path costs coincide. Checks:
 
-        Returns Bool.
+            - if the corresponding truth tables coincide.
+            - (if the BDD is weighted) if all paths have the same costs.
+
+        Returns:
+            A tuple of
+
+                - result (bool): whether the diagrams are equivalent,
+                - message (str): information regarding the difference, if found.
         """
         assert self.weighted == B.weighted
 
@@ -1020,10 +1056,21 @@ class BDD(object):
         return [True, msg]
 
     def shortest_path(self):
-        """Finds a shortest-path in O(`no-of-nodes`) time, returns a dict of node labels (by ID)."""
+        """Finds a shortest-path in O(`no-of-nodes`) time.
+
+        Returns:
+            dict: node labels (using node IDs as keys)
+            corresponding to a shortest path from the current node to
+            **True** terminal.
+
+        Note:
+            Expects the diagram to be :py:attr:`BDD.weighted`. (An
+            unweighted version, in terms of 'number of hops', does
+            not make any sense for a quasi-reduced BDD: the answer
+            would be ``len(self)``.)
+
+        """
         assert self.weighted
-        # NOTE: alternative would be: no. of hops.
-        #       Doesn't make sense for our BDD, perhaps. The answer is `len(self)`.
 
         node_labels = {NTRUE: 0}
 
@@ -1050,17 +1097,17 @@ class BDD(object):
         return node_labels
 
     def simscore(self, B):
-        """Computes a simscore with another diagram, `B` (see `simscore`)."""
+        """Computes a simscore with another diagram, `B` (see :py:func:`simscore`)."""
         return simscore(self.vars, B.vars, B.var_pos)
 
 def intersect(A, B):
-    """Produces an intersection BDD of `A` and `B`.
+    """Produces an intersection BDD of ``A`` and ``B``.
 
     Notes:
         BDDs need to be order-associated (same vars in the same order).
 
     Returns:
-        C (class BDD): an intersection BDD.
+        :py:class:`BDD` : an intersection BDD.
     """
     assert A.vars == B.vars
     assert A.weighted == B.weighted

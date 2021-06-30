@@ -1,7 +1,7 @@
 * Immediate TODOs
   - [X] =build_cover_DD=: make single overlap version
   - [X] =build_color_DD=: fix the procedure (linear DD growth is doable!)
-  - [X] =build_cUFL_MIP=: revise to single overlap version
+  - [X] =build_tUFLP_MIP=: revise to single overlap version
   - [X] cross-check DDs with the MIP (simple)
   - [X] fix the bug in cover DD generation (infinite loop?..)
   - [X] cross-check DDs with the MIP (random set)

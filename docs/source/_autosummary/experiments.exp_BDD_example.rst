@@ -16,6 +16,13 @@ Module summary
 
 
 
+Implements functions (outside the classes above):
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. autosummary::
+
+
+   main
+
 
 
 
@@ -29,6 +36,15 @@ Module summary
 
 
 
+
+
+.. centered:: ❖❖❖
+
+Functions
+---------
+
+
+.. autofunction:: main
 
 
 

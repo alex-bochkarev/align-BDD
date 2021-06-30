@@ -1,16 +1,15 @@
-"""Benchmarks DD sizes for different solution methods (typed UFL)
+"""Benchmarks DD sizes for different solution methods (random diagrams)
 
+A control experiment for tUFLP: compares "Best of A and B" to the
+simplified problem based heuristics for **randomly generated diagrams**.
 
----
-(c) A. Bochkarev, Clemson University, 2021
-abochka@clemson.edu
 """
 from time import time
 import argparse as ap
 import sys
 from gurobipy import GRB
 
-import cUFL
+import tUFLP
 import varseq as vs
 import BDD as DD
 import BB_search as bb

@@ -1,13 +1,11 @@
-"""Joint UFL example: a proof-of-concept
+"""Joint UFL example: another proof-of-concept
 for aligning BDDs.
 
----
-(c) A. Bochkarev, Clemson University, 2021
-abochka@g.clemson.edu
+Tests coverage: :py:mod:`jUFL_test`.
 """
 
 import pytest
-import cUFL
+import tUFLP
 import BDD as DD
 import numpy as np
 import varseq as vs
@@ -23,11 +21,11 @@ def solve_with_DD_MIP(inst):
         x (gurobipy var): location-decision varaibles.
     """
     S_1, S_2, f_1, f_2 = inst
-    cov_1, _ = cUFL.build_cover_DD(S_1, f_1)
-    cov_2, _ = cUFL.build_cover_DD(S_2, f_2)
+    cov_1, _ = tUFLP.build_cover_DD(S_1, f_1)
+    cov_2, _ = tUFLP.build_cover_DD(S_2, f_2)
 
-    m, c, v, x = cUFL.add_BDD_to_MIP(cov_1)
-    m, c, v, x = cUFL.add_BDD_to_MIP(cov_2, m, x)
+    m, c, v, x = tUFLP.add_BDD_to_MIP(cov_1)
+    m, c, v, x = tUFLP.add_BDD_to_MIP(cov_2, m, x)
 
     m.optimize()
     return m, x
@@ -64,8 +62,8 @@ def generate_instance(n, p=0.25):
     status = GRB.INFEASIBLE
 
     while status != GRB.OPTIMAL:
-        S_1, f_1, _, _ = cUFL.generate_test_instance(n, p=p)
-        S_2, f_2, _, _ = cUFL.generate_test_instance(n, p=p)
+        S_1, f_1, _, _ = tUFLP.generate_test_instance(n, p=p)
+        S_2, f_2, _, _ = tUFLP.generate_test_instance(n, p=p)
         m, _ = solve_with_naive_MIP((S_1, S_2, f_1, f_2))
         status = m.status
 
@@ -76,8 +74,8 @@ def solve_with_align_BDD(instance):
     """Solves the problem by generating two BDDs, aligning them, and solving a NF.
     """
     S_1, S_2, f_1, f_2 = instance
-    C_1, _ = cUFL.build_randomized_cover_DD(S_1, f_1)
-    C_2, _ = cUFL.build_randomized_cover_DD(S_2, f_2)
+    C_1, _ = tUFLP.build_randomized_cover_DD(S_1, f_1)
+    C_2, _ = tUFLP.build_randomized_cover_DD(S_2, f_2)
 
     C_1.make_reduced()
     C_2.make_reduced()
