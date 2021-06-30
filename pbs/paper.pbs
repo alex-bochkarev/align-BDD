@@ -23,6 +23,7 @@ make prep_dirs PREF=$TMPDIR/
 make -j 2 figures PARFLAG=64 PREF=$TMPDIR/
 tgs -m "All figures built. Come check out!"
 make save-orig-instances PREF=$TMPDIR/
+tgs -m "original instances saved."
 tgs -s happycat
 
 # deactivate the env

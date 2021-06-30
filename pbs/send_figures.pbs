@@ -10,7 +10,8 @@ module add imagemagick/7.0.8-7-gcc
 cd /home/abochka/BDD/align-BDD
 
 cd figures
-ls | $tg > /dev/null
+ls | tgs -m -
+
 for file in $(ls ./*.eps); do
     convert $file $file.png
     tgs -i $file.png

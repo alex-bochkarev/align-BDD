@@ -113,4 +113,4 @@ ggplot(df, aes(x=time))+
   ylab(paste("Instances count (out of ", length(unique(df$ID)), ")", sep=""))+
   my_ticks  # isn't it wonderful?..
 
-ggsave(opt$out, breakdown_plot, width=16, height=10)
+ggsave(opt$out, breakdown_plot, device=cairo_ps(family="Arial"), width=16, height=10)

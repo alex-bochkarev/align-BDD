@@ -132,7 +132,7 @@ $(LOGS)/orig_scal.csv: $(INST)/scal/instances.list experiments/par_scal_test.py
 				if [ "$(PREF)" != "./" ]; then \
 					cp $(INST)/orig_scal.tar.gz ./instances/; \
 					cp $@ ./run_logs/; \
-					rm -f ./instances/scal; \
+					rm -rf ./instances/scal; \
 				fi
 
 $(INST)/scal/instances.list: gen_BDD_pair.py
@@ -301,8 +301,6 @@ cross-checks:
 				python -m pytest tests/BDD_test.py
 				python -m pytest BDD.py --doctest-modules
 				python -m pytest tests/varseq_test.py
-				python -m pytest varseq.py --doctest-modules
 				python -m pytest tests/BB_search_test.py
-				python -m pytest BB_search.py --doctest-modules
 				python -m pytest tests/UFLP_test.py
 				python -m pytest tests/tUFLP_test.py

@@ -1,0 +1,508 @@
+python -m pytest tests/BDD_test.py
+============================= test session starts ==============================
+platform linux -- Python 3.7.4, pytest-5.0.1, py-1.10.0, pluggy-0.13.1
+rootdir: /home/abochka/BDD/align-BDD
+collected 602 items
+
+tests/BDD_test.py ...................................................... [  8%]
+........................................................................ [ 20%]
+........................................................................ [ 32%]
+........................................................................ [ 44%]
+........................................................................ [ 56%]
+........................................................................ [ 68%]
+........................................................................ [ 80%]
+........................................................................ [ 92%]
+...........................................F                             [100%]
+
+=================================== FAILURES ===================================
+____________________________ test_save_load_noargs _____________________________
+
+    def test_save_load_noargs():
+        """Tests load/save for a specific situation."""
+        bdd = gen_4BDD()
+        bdd.sift(3,0)
+>       save_load(bdd)
+
+tests/BDD_test.py:270: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/BDD_test.py:229: in save_load
+    bdd.save("./tmp/test_save.bdd")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <BDD.BDD object at 0x14d23529e1d0>, filename = './tmp/test_save.bdd'
+
+    def save(self, filename):
+        """Saves a BDD to a text file.
+    
+        Args:
+            filename (string): destination file name.
+    
+        Note:
+            File format is as follows.
+    
+                - File header, the first two lines
+                    | N= `<no-of-layers>`
+                    | vars= `<comma-separated layer labels>`
+    
+                - Then, one node description = one line of the format:
+                    `id` : `hi` , `lo`
+    
+            where ``id`` is node's ID, ``hi`` and ``lo`` are IDs of
+            the nodes corresponding to one- and zero- pointers of the
+            node ``ID``. The procedure performs breadth-first search
+            and just saves all the nodes.
+    
+            Three nodes have reserved ID values:
+    
+                - **Root** node: 0
+                - **True** terminal: -1
+                - **False** terminal: -2
+    
+        """
+        S = deque()  # a deque of node IDs to explore (FIFO)
+        V = set()  # set of visited (saved) nodes (by ID)
+    
+        for n in self.layers[0]:
+            S.append(n.id)
+    
+>       with open(filename, "w") as f:
+E       FileNotFoundError: [Errno 2] No such file or directory: './tmp/test_save.bdd'
+
+BDD.py:565: FileNotFoundError
+=============================== warnings summary ===============================
+BDD.py:467
+  /home/abochka/BDD/align-BDD/BDD.py:467: DeprecationWarning: invalid escape sequence \|
+    """
+
+tests/BDD_test.py::test_shortest_path[test_inst0]
+  /home/abochka/BDD/align-BDD/varseq.py:36: DeprecationWarning: invalid escape sequence \l
+    """
+
+tests/BDD_test.py::test_shortest_path[test_inst0]
+tests/BDD_test.py::test_shortest_path[test_inst0]
+tests/BDD_test.py::test_shortest_path[test_inst0]
+  /home/abochka/.conda/envs/ab-local/lib/python3.7/importlib/_bootstrap.py:219: RuntimeWarning: numpy.ufunc size changed, may indicate binary incompatibility. Expected 192 from C header, got 216 from PyObject
+    return f(*args, **kwds)
+
+-- Docs: https://docs.pytest.org/en/latest/warnings.html
+============== 1 failed, 601 passed, 5 warnings in 56.86 seconds ===============
+make: *** [Makefile:301: cross-checks] Error 1
+rm -rf .//instances/*
+rm -rf .//run_logs/*
+touch ./clean
+rm -rf ./figures/*.eps
+mkdir -p ./run_logs
+mkdir -p ./instances
+rm ./clean
+cp --preserve=timestamps -r ./run_logs /local_scratch/pbs.2891717.pbs02//run_logs
+cp --preserve=timestamps -r ./instances /local_scratch/pbs.2891717.pbs02//instances
+rm -rf /local_scratch/pbs.2891717.pbs02//instances/orig_problem && \
+			mkdir /local_scratch/pbs.2891717.pbs02//instances/orig_problem && \
+			parallel -j 64 'python -m gen_BDD_pair -s $(( 157 * {#} - 157))' -K 157 -v 15 -p 0.6 -R -U /local_scratch/pbs.2891717.pbs02//instances/orig_problem/ --quiet ::: 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 && \
+			ls /local_scratch/pbs.2891717.pbs02//instances/orig_problem | grep -Po "A\\K[^\\.]*" > /local_scratch/pbs.2891717.pbs02//instances/orig_problem.list && \
+			if [ "/local_scratch/pbs.2891717.pbs02/" != "./" ]; then \
+				cp -r /local_scratch/pbs.2891717.pbs02//instances/orig_problem ./instances/; \
+				cp /local_scratch/pbs.2891717.pbs02//instances/orig_problem.list ./instances/; \
+			fi
+mkdir -p /local_scratch/pbs.2891717.pbs02//instances/scal && \
+			parallel -j 64 'python -m gen_BDD_pair -s $(( 200 * {#} - 200))' -K 200 -v {} -p 0.6 -R -U /local_scratch/pbs.2891717.pbs02//instances/scal/ --quiet ::: 10 18 7 5 8 11 22 24 17 15 25 6 12 19 16 14 23 20 9 13 21 && \
+			ls /local_scratch/pbs.2891717.pbs02//instances/scal | grep -Po "A\\K[^\\.]*" > /local_scratch/pbs.2891717.pbs02//instances/scal/instances.list && \
+			if [ "/local_scratch/pbs.2891717.pbs02/" != "./" ]; then \
+				cp -r /local_scratch/pbs.2891717.pbs02//instances/scal ./instances/; \
+			fi
+mkdir -p /local_scratch/pbs.2891717.pbs02//instances/simpl_sol_struct && \
+			python -m experiments.heu_sol_struct -k 1000 -n 7 -l /local_scratch/pbs.2891717.pbs02//instances/simpl_sol_struct > /local_scratch/pbs.2891717.pbs02//run_logs/simpl_sol_struct.csv && \
+			tar czf /local_scratch/pbs.2891717.pbs02//instances/heu_sol_struct.tar.gz -C /local_scratch/pbs.2891717.pbs02//instances/simpl_sol_struct . --remove-files ;  \
+			if [ "/local_scratch/pbs.2891717.pbs02/" != "./" ]; then \
+				cp /local_scratch/pbs.2891717.pbs02//run_logs/simpl_sol_struct.csv ./run_logs/; \
+				mv /local_scratch/pbs.2891717.pbs02//instances/heu_sol_struct.tar.gz ./instances/ ; \
+			fi
+parallel -j 64 python -m experiments.tUFLP_runtimes -K 200 -n {} --with-gsifts -l /local_scratch/pbs.2891717.pbs02//instances/tUFLP_scal_inst.json.tmp.{} ">" /local_scratch/pbs.2891717.pbs02//run_logs/tUFLP_runtimes_scal.csv.tmp.{} ::: 6 14 12 5 8 9 7 11 10 15 13 && \
+			python -m experiments.tUFLP_runtimes -H > /local_scratch/pbs.2891717.pbs02//run_logs/tUFLP_runtimes_scal.csv && \
+			cat /local_scratch/pbs.2891717.pbs02//run_logs/tUFLP_runtimes_scal.csv.tmp.* >> /local_scratch/pbs.2891717.pbs02//run_logs/tUFLP_runtimes_scal.csv && rm /local_scratch/pbs.2891717.pbs02//run_logs/tUFLP_runtimes_scal.csv.tmp.* && \
+			:> /local_scratch/pbs.2891717.pbs02//instances/tUFLP_scal_inst.json && \
+			cat /local_scratch/pbs.2891717.pbs02//instances/tUFLP_scal_inst.json.tmp.* >> /local_scratch/pbs.2891717.pbs02//instances/tUFLP_scal_inst.json && rm /local_scratch/pbs.2891717.pbs02//instances/tUFLP_scal_inst.json.tmp.* && \
+			if [ "/local_scratch/pbs.2891717.pbs02/" != "./" ]; then \
+				cp /local_scratch/pbs.2891717.pbs02//run_logs/tUFLP_runtimes_scal.csv ./run_logs/; \
+				cp /local_scratch/pbs.2891717.pbs02//instances/tUFLP_scal_inst.json ./instances/ ; \
+			fi
+mkdir -p /local_scratch/pbs.2891717.pbs02//run_logs/heu_bm && \
+			python -m experiments.jUFL_hist_sizes -H > /local_scratch/pbs.2891717.pbs02//run_logs/heu_bm/jUFLP.csv && \
+			parallel -j 64 python -m experiments.jUFL_hist_sizes -n 20 -K 32 -p 0.3 -P {} -l /local_scratch/pbs.2891717.pbs02//instances/jUFLP_inst.tmp.{} ">>" /local_scratch/pbs.2891717.pbs02//run_logs/heu_bm/jUFLP.csv.tmp.{} ::: 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 && \
+			cat /local_scratch/pbs.2891717.pbs02//run_logs/heu_bm/jUFLP.csv.tmp.* >> /local_scratch/pbs.2891717.pbs02//run_logs/heu_bm/jUFLP.csv && rm /local_scratch/pbs.2891717.pbs02//run_logs/heu_bm/jUFLP.csv.tmp.* && \
+			cat /local_scratch/pbs.2891717.pbs02//instances/jUFLP_inst.tmp* > /local_scratch/pbs.2891717.pbs02//instances/jUFLP_instances.json && \
+			rm /local_scratch/pbs.2891717.pbs02//instances/jUFLP_inst.tmp* && \
+			if [ "/local_scratch/pbs.2891717.pbs02/" != "./" ]; then \
+				mkdir -p ./run_logs/heu_bm ; \
+				cp /local_scratch/pbs.2891717.pbs02//run_logs/heu_bm/jUFLP.csv ./run_logs/heu_bm/; \
+				cp /local_scratch/pbs.2891717.pbs02//instances/jUFLP_instances.json ./instances/ ; \
+			fi
+mkdir -p /local_scratch/pbs.2891717.pbs02//run_logs/heu_bm && \
+			python -m experiments.tUFL_hist_sizes_control -H > /local_scratch/pbs.2891717.pbs02//run_logs/heu_bm/tUFLP_nat.csv && \
+			parallel -j 64 python -m experiments.tUFL_hist_sizes_control -n 20 -K 32 -p 0.3 -P {} -l /local_scratch/pbs.2891717.pbs02//instances/tUFLP_nat_inst.tmp.{} ">>" /local_scratch/pbs.2891717.pbs02//run_logs/heu_bm/tUFLP_nat.csv.tmp.{} ::: 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 && \
+			cat /local_scratch/pbs.2891717.pbs02//run_logs/heu_bm/tUFLP_nat.csv.tmp.* >> /local_scratch/pbs.2891717.pbs02//run_logs/heu_bm/tUFLP_nat.csv && rm /local_scratch/pbs.2891717.pbs02//run_logs/heu_bm/tUFLP_nat.csv.tmp.* && \
+			cat /local_scratch/pbs.2891717.pbs02//instances/tUFLP_nat_inst.tmp* > /local_scratch/pbs.2891717.pbs02//instances/tUFLP_nat_instances.json && \
+			rm /local_scratch/pbs.2891717.pbs02//instances/tUFLP_nat_inst.tmp* && \
+			if [ "/local_scratch/pbs.2891717.pbs02/" != "./" ]; then \
+				mkdir -p ./run_logs/heu_bm ; \
+				cp /local_scratch/pbs.2891717.pbs02//run_logs/heu_bm/tUFLP_nat.csv ./run_logs/heu_bm/ ; \
+				cp /local_scratch/pbs.2891717.pbs02//instances/tUFLP_nat_instances.json ./instances/ ; \
+			fi
+mkdir -p /local_scratch/pbs.2891717.pbs02//run_logs/heu_bm && \
+			python -m experiments.tUFL_hist_sizes_control -H > /local_scratch/pbs.2891717.pbs02//run_logs/heu_bm/tUFLP_rnd.csv && \
+			parallel -j 64 python -m experiments.tUFL_hist_sizes_control -R -n 20 -K 32 -p 0.3 -P {} -l /local_scratch/pbs.2891717.pbs02//instances/tUFLP_rnd_inst.tmp.{} ">>" /local_scratch/pbs.2891717.pbs02//run_logs/heu_bm/tUFLP_rnd.csv.tmp.{} ::: 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 && \
+			cat /local_scratch/pbs.2891717.pbs02//run_logs/heu_bm/tUFLP_rnd.csv.tmp.* >> /local_scratch/pbs.2891717.pbs02//run_logs/heu_bm/tUFLP_rnd.csv && rm /local_scratch/pbs.2891717.pbs02//run_logs/heu_bm/tUFLP_rnd.csv.tmp.* && \
+			cat /local_scratch/pbs.2891717.pbs02//instances/tUFLP_rnd_inst.tmp* > /local_scratch/pbs.2891717.pbs02//instances/tUFLP_rnd_instances.json && \
+			rm /local_scratch/pbs.2891717.pbs02//instances/tUFLP_rnd_inst.tmp* && \
+			if [ "/local_scratch/pbs.2891717.pbs02/" != "./" ]; then \
+				mkdir -p ./run_logs/heu_bm/ ; \
+				cp /local_scratch/pbs.2891717.pbs02//run_logs/heu_bm/tUFLP_rnd.csv ./run_logs/heu_bm/ ; \
+				cp /local_scratch/pbs.2891717.pbs02//instances/tUFLP_rnd_instances.json ./instances/ ; \
+			fi
+mkdir -p /local_scratch/pbs.2891717.pbs02//run_logs/heu_bm && \
+			rm -rf /local_scratch/pbs.2891717.pbs02//instances/bm_heu_inst && \
+			mkdir -p /local_scratch/pbs.2891717.pbs02//instances/bm_heu_inst && \
+			python -m experiments.rnd_dia_hist_sizes_control -H > /local_scratch/pbs.2891717.pbs02//run_logs/heu_bm/rnd_dia.csv && \
+			parallel -j 64 python -m experiments.rnd_dia_hist_sizes_control -n 15 -K 32 -p 0.6 -P {} -l /local_scratch/pbs.2891717.pbs02//instances/bm_heu_inst ">>" /local_scratch/pbs.2891717.pbs02//run_logs/heu_bm/rnd_dia.csv.tmp.{} ::: 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 && \
+			cat /local_scratch/pbs.2891717.pbs02//run_logs/heu_bm/rnd_dia.csv.tmp.* >> /local_scratch/pbs.2891717.pbs02//run_logs/heu_bm/rnd_dia.csv && rm /local_scratch/pbs.2891717.pbs02//run_logs/heu_bm/rnd_dia.csv.tmp.* && \
+			tar czf /local_scratch/pbs.2891717.pbs02//instances/bm_heu_random_diagrams.tar.gz -C /local_scratch/pbs.2891717.pbs02//instances ./bm_heu_inst --remove-files && \
+			if [ "/local_scratch/pbs.2891717.pbs02/" != "./" ]; then \
+				mkdir -p ./run_logs/heu_bm ; \
+				cp /local_scratch/pbs.2891717.pbs02//run_logs/heu_bm/rnd_dia.csv ./run_logs/heu_bm/ ; \
+				cp /local_scratch/pbs.2891717.pbs02//instances/bm_heu_random_diagrams.tar.gz ./instances/ ; \
+			fi
+mkdir -p /local_scratch/pbs.2891717.pbs02//instances/orig_stats && \
+			parallel mkdir -p /local_scratch/pbs.2891717.pbs02//instances/orig_stats/{} ::: 0.2 0.5 0.8 && \
+			parallel -j 64 python -m gen_BDD_pair -v 15 -K 16 -p {1} -R -U /local_scratch/pbs.2891717.pbs02//instances/orig_stats/{1} '-s $(( 16 * {#} - 16))' --quiet ::: 0.2 0.5 0.8 ::: 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 && \
+			parallel find /local_scratch/pbs.2891717.pbs02//instances/orig_stats/{}/*.bdd ">" /local_scratch/pbs.2891717.pbs02//instances/orig_stats/{}/inst.list ::: 0.2 0.5 0.8 && \
+			parallel python -m experiments.gen_lsizes_stats -s {} /local_scratch/pbs.2891717.pbs02//instances/orig_stats/{}/inst.list ">" /local_scratch/pbs.2891717.pbs02//run_logs/lwidths.tmp.{} ::: 0.2 0.5 0.8 && \
+			cat /local_scratch/pbs.2891717.pbs02//run_logs/lwidths.tmp.* >> /local_scratch/pbs.2891717.pbs02//run_logs/lwidths.csv && rm /local_scratch/pbs.2891717.pbs02//run_logs/lwidths.tmp.* && \
+			tar czf /local_scratch/pbs.2891717.pbs02//instances/orig_stats.tar.gz -C /local_scratch/pbs.2891717.pbs02//instances/orig_stats . --remove-files && \
+			if [ "/local_scratch/pbs.2891717.pbs02/" != "./" ]; then \
+				cp /local_scratch/pbs.2891717.pbs02//run_logs/lwidths.csv ./run_logs/ ; \
+				cp /local_scratch/pbs.2891717.pbs02//instances/orig_stats.tar.gz ./instances/ ; \
+			fi
+python -m experiments.tUFLP_runtimes -H > /local_scratch/pbs.2891717.pbs02//run_logs/tUFLP_runtimes.csv && \
+			python -m experiments.tUFLP_runtimes -K 1000 -n 20 -l /local_scratch/pbs.2891717.pbs02//instances/tUFLP_steps_breakdown.json >> /local_scratch/pbs.2891717.pbs02//run_logs/tUFLP_runtimes.csv && \
+			if [ "/local_scratch/pbs.2891717.pbs02/" != "./" ]; then \
+				cp /local_scratch/pbs.2891717.pbs02//run_logs/tUFLP_runtimes.csv ./run_logs/ ; \
+				cp /local_scratch/pbs.2891717.pbs02//instances/tUFLP_steps_breakdown.json ./instances/ ; \
+			fi
+rm -f /local_scratch/pbs.2891717.pbs02//instances/orig_problem.list.tmp.* && \
+			split -d -nl/64 /local_scratch/pbs.2891717.pbs02//instances/orig_problem.list /local_scratch/pbs.2891717.pbs02//instances/orig_problem.list.tmp. && \
+			parallel -j 64 python -m solve_inst -i {} -o /local_scratch/pbs.2891717.pbs02//run_logs/main_rnd_run.csv.tmp.{#} -d /local_scratch/pbs.2891717.pbs02//instances/orig_problem/ ::: $(ls /local_scratch/pbs.2891717.pbs02//instances/orig_problem.list.tmp.*) && \
+			python -m solve_inst --header > /local_scratch/pbs.2891717.pbs02//run_logs/main_rnd_run.csv && \
+			cat /local_scratch/pbs.2891717.pbs02//run_logs/main_rnd_run.csv.tmp.* >> /local_scratch/pbs.2891717.pbs02//run_logs/main_rnd_run.csv && \
+			rm /local_scratch/pbs.2891717.pbs02//run_logs/main_rnd_run.csv.tmp.* && \
+			rm /local_scratch/pbs.2891717.pbs02//instances/orig_problem.list.tmp.* && \
+			if [ "/local_scratch/pbs.2891717.pbs02/" != "./" ]; then \
+				cp /local_scratch/pbs.2891717.pbs02//run_logs/main_rnd_run.csv ./run_logs/main_rnd_run.csv ; \
+				cp -r /local_scratch/pbs.2891717.pbs02//instances/orig_problem ./instances/ ; \
+			fi
+rm -f /local_scratch/pbs.2891717.pbs02//instances/orig_problem.list.tmp.* && \
+			split -d -nl/64 /local_scratch/pbs.2891717.pbs02//instances/orig_problem.list /local_scratch/pbs.2891717.pbs02//instances/orig_problem.list.LBs.tmp. && \
+			parallel -j 64 python -m experiments.compare_simpl_LBs -l {} ">" /local_scratch/pbs.2891717.pbs02//run_logs/simpl_LB.csv.tmp.{#} -d /local_scratch/pbs.2891717.pbs02//instances/orig_problem/ ::: $(ls /local_scratch/pbs.2891717.pbs02//instances/orig_problem.list.LBs.tmp.*) && \
+			python -m experiments.compare_simpl_LBs --header > /local_scratch/pbs.2891717.pbs02//run_logs/simpl_LB.csv && \
+			cat /local_scratch/pbs.2891717.pbs02//run_logs/simpl_LB.csv.tmp.* >> /local_scratch/pbs.2891717.pbs02//run_logs/simpl_LB.csv && \
+			rm /local_scratch/pbs.2891717.pbs02//run_logs/simpl_LB.csv.tmp.* && \
+			rm /local_scratch/pbs.2891717.pbs02//instances/orig_problem.list.LBs.tmp.* && \
+			if [ "/local_scratch/pbs.2891717.pbs02/" != "./" ]; then cp /local_scratch/pbs.2891717.pbs02//run_logs/simpl_LB.csv ./run_logs/simpl_LB.csv; fi
+Rscript ./post_processing/fig_obj_hist.R -i /local_scratch/pbs.2891717.pbs02//run_logs/main_rnd_run.csv -o figures/orig_obj_histograms.eps
+Warning messages:
+1: Removed 603 rows containing non-finite values (stat_bin). 
+2: Removed 6 rows containing missing values (geom_bar). 
+rm -f /local_scratch/pbs.2891717.pbs02//instances/scal/instances.list.* && \
+			split -d -nl/64 /local_scratch/pbs.2891717.pbs02//instances/scal/instances.list /local_scratch/pbs.2891717.pbs02//instances/scal/instances.list. && \
+			parallel -j 64 python -m experiments.par_scal_test -i {} -o /local_scratch/pbs.2891717.pbs02//run_logs/orig_scal.csv.tmp.{#} -d /local_scratch/pbs.2891717.pbs02//instances/scal/ ::: $(ls /local_scratch/pbs.2891717.pbs02//instances/scal/instances.list.*) && \
+			python -m experiments.par_scal_test --header > /local_scratch/pbs.2891717.pbs02//run_logs/orig_scal.csv && \
+			cat /local_scratch/pbs.2891717.pbs02//run_logs/orig_scal.csv.tmp.* >> /local_scratch/pbs.2891717.pbs02//run_logs/orig_scal.csv && \
+			rm /local_scratch/pbs.2891717.pbs02//run_logs/orig_scal.csv.tmp.* && \
+			tar czf /local_scratch/pbs.2891717.pbs02//instances/orig_scal.tar.gz -C /local_scratch/pbs.2891717.pbs02//instances/scal . --remove-files && \
+			if [ "/local_scratch/pbs.2891717.pbs02/" != "./" ]; then \
+				cp /local_scratch/pbs.2891717.pbs02//instances/orig_scal.tar.gz ./instances/; \
+				cp /local_scratch/pbs.2891717.pbs02//run_logs/orig_scal.csv ./run_logs/; \
+				rm -f ./instances/scal; \
+			fi
+make: *** Deleting file '/local_scratch/pbs.2891717.pbs02//run_logs/simpl_sol_struct.csv'
+make: *** [Makefile:155: /local_scratch/pbs.2891717.pbs02//run_logs/simpl_sol_struct.csv] Terminated
+make: *** [Makefile:125: /local_scratch/pbs.2891717.pbs02//run_logs/orig_scal.csv] Terminated
+ 
+ 
++------------------------------------------+ 
+| PALMETTO CLUSTER PBS RESOURCES REQUESTED | 
++------------------------------------------+ 
+ 
+mem=500gb,walltime=24:00:00,ncpus=32
+ 
+ 
++-------------------------------------+ 
+| PALMETTO CLUSTER PBS RESOURCES USED | 
++-------------------------------------+ 
+ 
+cput=24:15:06,mem=14893868kb,walltime=01:17:39,ncpus=32,cpupercent=1850,vmem=14893868kb
+ 
+ 
+python -m pytest tests/BDD_test.py
+============================= test session starts ==============================
+platform linux -- Python 3.7.4, pytest-5.0.1, py-1.10.0, pluggy-0.13.1
+rootdir: /home/abochka/BDD/align-BDD
+collected 602 items
+
+tests/BDD_test.py ...................................................... [  8%]
+........................................................................ [ 20%]
+........................................................................ [ 32%]
+........................................................................ [ 44%]
+........................................................................ [ 56%]
+........................................................................ [ 68%]
+........................................................................ [ 80%]
+........................................................................ [ 92%]
+...........................................F                             [100%]
+
+=================================== FAILURES ===================================
+____________________________ test_save_load_noargs _____________________________
+
+    def test_save_load_noargs():
+        """Tests load/save for a specific situation."""
+        bdd = gen_4BDD()
+        bdd.sift(3,0)
+>       save_load(bdd)
+
+tests/BDD_test.py:270: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/BDD_test.py:229: in save_load
+    bdd.save("./tmp/test_save.bdd")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <BDD.BDD object at 0x151b624479d0>, filename = './tmp/test_save.bdd'
+
+    def save(self, filename):
+        """Saves a BDD to a text file.
+    
+        Args:
+            filename (string): destination file name.
+    
+        Note:
+            File format is as follows.
+    
+                - File header, the first two lines
+                    | N= `<no-of-layers>`
+                    | vars= `<comma-separated layer labels>`
+    
+                - Then, one node description = one line of the format:
+                    `id` : `hi` , `lo`
+    
+            where ``id`` is node's ID, ``hi`` and ``lo`` are IDs of
+            the nodes corresponding to one- and zero- pointers of the
+            node ``ID``. The procedure performs breadth-first search
+            and just saves all the nodes.
+    
+            Three nodes have reserved ID values:
+    
+                - **Root** node: 0
+                - **True** terminal: -1
+                - **False** terminal: -2
+    
+        """
+        S = deque()  # a deque of node IDs to explore (FIFO)
+        V = set()  # set of visited (saved) nodes (by ID)
+    
+        for n in self.layers[0]:
+            S.append(n.id)
+    
+>       with open(filename, "w") as f:
+E       FileNotFoundError: [Errno 2] No such file or directory: './tmp/test_save.bdd'
+
+BDD.py:565: FileNotFoundError
+=============================== warnings summary ===============================
+tests/BDD_test.py::test_shortest_path[test_inst0]
+tests/BDD_test.py::test_shortest_path[test_inst0]
+tests/BDD_test.py::test_shortest_path[test_inst0]
+  /home/abochka/.conda/envs/ab-local/lib/python3.7/importlib/_bootstrap.py:219: RuntimeWarning: numpy.ufunc size changed, may indicate binary incompatibility. Expected 192 from C header, got 216 from PyObject
+    return f(*args, **kwds)
+
+-- Docs: https://docs.pytest.org/en/latest/warnings.html
+============== 1 failed, 601 passed, 3 warnings in 39.65 seconds ===============
+make: *** [Makefile:301: cross-checks] Error 1
+rm -rf .//instances/*
+rm -rf .//run_logs/*
+touch ./clean
+rm -rf ./figures/*.eps
+mkdir -p ./run_logs
+mkdir -p ./instances
+rm ./clean
+cp --preserve=timestamps -r ./run_logs /local_scratch/pbs.2891717.pbs02//run_logs
+cp --preserve=timestamps -r ./instances /local_scratch/pbs.2891717.pbs02//instances
+rm -rf /local_scratch/pbs.2891717.pbs02//instances/orig_problem && \
+			mkdir /local_scratch/pbs.2891717.pbs02//instances/orig_problem && \
+			parallel -j 64 'python -m gen_BDD_pair -s $(( 157 * {#} - 157))' -K 157 -v 15 -p 0.6 -R -U /local_scratch/pbs.2891717.pbs02//instances/orig_problem/ --quiet ::: 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 && \
+			ls /local_scratch/pbs.2891717.pbs02//instances/orig_problem | grep -Po "A\\K[^\\.]*" > /local_scratch/pbs.2891717.pbs02//instances/orig_problem.list && \
+			if [ "/local_scratch/pbs.2891717.pbs02/" != "./" ]; then \
+				cp -r /local_scratch/pbs.2891717.pbs02//instances/orig_problem ./instances/; \
+				cp /local_scratch/pbs.2891717.pbs02//instances/orig_problem.list ./instances/; \
+			fi
+mkdir -p /local_scratch/pbs.2891717.pbs02//instances/scal && \
+			parallel -j 64 'python -m gen_BDD_pair -s $(( 200 * {#} - 200))' -K 200 -v {} -p 0.6 -R -U /local_scratch/pbs.2891717.pbs02//instances/scal/ --quiet ::: 22 20 15 7 24 11 19 8 12 10 18 6 14 16 13 21 23 17 25 5 9 && \
+			ls /local_scratch/pbs.2891717.pbs02//instances/scal | grep -Po "A\\K[^\\.]*" > /local_scratch/pbs.2891717.pbs02//instances/scal/instances.list && \
+			if [ "/local_scratch/pbs.2891717.pbs02/" != "./" ]; then \
+				cp -r /local_scratch/pbs.2891717.pbs02//instances/scal ./instances/; \
+			fi
+mkdir -p /local_scratch/pbs.2891717.pbs02//instances/simpl_sol_struct && \
+			python -m experiments.heu_sol_struct -k 1000 -n 7 -l /local_scratch/pbs.2891717.pbs02//instances/simpl_sol_struct > /local_scratch/pbs.2891717.pbs02//run_logs/simpl_sol_struct.csv && \
+			tar czf /local_scratch/pbs.2891717.pbs02//instances/heu_sol_struct.tar.gz -C /local_scratch/pbs.2891717.pbs02//instances/simpl_sol_struct . --remove-files ;  \
+			if [ "/local_scratch/pbs.2891717.pbs02/" != "./" ]; then \
+				cp /local_scratch/pbs.2891717.pbs02//run_logs/simpl_sol_struct.csv ./run_logs/; \
+				mv /local_scratch/pbs.2891717.pbs02//instances/heu_sol_struct.tar.gz ./instances/ ; \
+			fi
+parallel -j 64 python -m experiments.tUFLP_runtimes -K 200 -n {} --with-gsifts -l /local_scratch/pbs.2891717.pbs02//instances/tUFLP_scal_inst.json.tmp.{} ">" /local_scratch/pbs.2891717.pbs02//run_logs/tUFLP_runtimes_scal.csv.tmp.{} ::: 5 10 9 8 15 13 11 12 7 14 6 && \
+			python -m experiments.tUFLP_runtimes -H > /local_scratch/pbs.2891717.pbs02//run_logs/tUFLP_runtimes_scal.csv && \
+			cat /local_scratch/pbs.2891717.pbs02//run_logs/tUFLP_runtimes_scal.csv.tmp.* >> /local_scratch/pbs.2891717.pbs02//run_logs/tUFLP_runtimes_scal.csv && rm /local_scratch/pbs.2891717.pbs02//run_logs/tUFLP_runtimes_scal.csv.tmp.* && \
+			:> /local_scratch/pbs.2891717.pbs02//instances/tUFLP_scal_inst.json && \
+			cat /local_scratch/pbs.2891717.pbs02//instances/tUFLP_scal_inst.json.tmp.* >> /local_scratch/pbs.2891717.pbs02//instances/tUFLP_scal_inst.json && rm /local_scratch/pbs.2891717.pbs02//instances/tUFLP_scal_inst.json.tmp.* && \
+			if [ "/local_scratch/pbs.2891717.pbs02/" != "./" ]; then \
+				cp /local_scratch/pbs.2891717.pbs02//run_logs/tUFLP_runtimes_scal.csv ./run_logs/; \
+				cp /local_scratch/pbs.2891717.pbs02//instances/tUFLP_scal_inst.json ./instances/ ; \
+			fi
+mkdir -p /local_scratch/pbs.2891717.pbs02//run_logs/heu_bm && \
+			python -m experiments.jUFL_hist_sizes -H > /local_scratch/pbs.2891717.pbs02//run_logs/heu_bm/jUFLP.csv && \
+			parallel -j 64 python -m experiments.jUFL_hist_sizes -n 20 -K 32 -p 0.3 -P {} -l /local_scratch/pbs.2891717.pbs02//instances/jUFLP_inst.tmp.{} ">>" /local_scratch/pbs.2891717.pbs02//run_logs/heu_bm/jUFLP.csv.tmp.{} ::: 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 && \
+			cat /local_scratch/pbs.2891717.pbs02//run_logs/heu_bm/jUFLP.csv.tmp.* >> /local_scratch/pbs.2891717.pbs02//run_logs/heu_bm/jUFLP.csv && rm /local_scratch/pbs.2891717.pbs02//run_logs/heu_bm/jUFLP.csv.tmp.* && \
+			cat /local_scratch/pbs.2891717.pbs02//instances/jUFLP_inst.tmp* > /local_scratch/pbs.2891717.pbs02//instances/jUFLP_instances.json && \
+			rm /local_scratch/pbs.2891717.pbs02//instances/jUFLP_inst.tmp* && \
+			if [ "/local_scratch/pbs.2891717.pbs02/" != "./" ]; then \
+				mkdir -p ./run_logs/heu_bm ; \
+				cp /local_scratch/pbs.2891717.pbs02//run_logs/heu_bm/jUFLP.csv ./run_logs/heu_bm/; \
+				cp /local_scratch/pbs.2891717.pbs02//instances/jUFLP_instances.json ./instances/ ; \
+			fi
+mkdir -p /local_scratch/pbs.2891717.pbs02//run_logs/heu_bm && \
+			python -m experiments.tUFL_hist_sizes_control -H > /local_scratch/pbs.2891717.pbs02//run_logs/heu_bm/tUFLP_nat.csv && \
+			parallel -j 64 python -m experiments.tUFL_hist_sizes_control -n 20 -K 32 -p 0.3 -P {} -l /local_scratch/pbs.2891717.pbs02//instances/tUFLP_nat_inst.tmp.{} ">>" /local_scratch/pbs.2891717.pbs02//run_logs/heu_bm/tUFLP_nat.csv.tmp.{} ::: 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 && \
+			cat /local_scratch/pbs.2891717.pbs02//run_logs/heu_bm/tUFLP_nat.csv.tmp.* >> /local_scratch/pbs.2891717.pbs02//run_logs/heu_bm/tUFLP_nat.csv && rm /local_scratch/pbs.2891717.pbs02//run_logs/heu_bm/tUFLP_nat.csv.tmp.* && \
+			cat /local_scratch/pbs.2891717.pbs02//instances/tUFLP_nat_inst.tmp* > /local_scratch/pbs.2891717.pbs02//instances/tUFLP_nat_instances.json && \
+			rm /local_scratch/pbs.2891717.pbs02//instances/tUFLP_nat_inst.tmp* && \
+			if [ "/local_scratch/pbs.2891717.pbs02/" != "./" ]; then \
+				mkdir -p ./run_logs/heu_bm ; \
+				cp /local_scratch/pbs.2891717.pbs02//run_logs/heu_bm/tUFLP_nat.csv ./run_logs/heu_bm/ ; \
+				cp /local_scratch/pbs.2891717.pbs02//instances/tUFLP_nat_instances.json ./instances/ ; \
+			fi
+mkdir -p /local_scratch/pbs.2891717.pbs02//run_logs/heu_bm && \
+			python -m experiments.tUFL_hist_sizes_control -H > /local_scratch/pbs.2891717.pbs02//run_logs/heu_bm/tUFLP_rnd.csv && \
+			parallel -j 64 python -m experiments.tUFL_hist_sizes_control -R -n 20 -K 32 -p 0.3 -P {} -l /local_scratch/pbs.2891717.pbs02//instances/tUFLP_rnd_inst.tmp.{} ">>" /local_scratch/pbs.2891717.pbs02//run_logs/heu_bm/tUFLP_rnd.csv.tmp.{} ::: 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 && \
+			cat /local_scratch/pbs.2891717.pbs02//run_logs/heu_bm/tUFLP_rnd.csv.tmp.* >> /local_scratch/pbs.2891717.pbs02//run_logs/heu_bm/tUFLP_rnd.csv && rm /local_scratch/pbs.2891717.pbs02//run_logs/heu_bm/tUFLP_rnd.csv.tmp.* && \
+			cat /local_scratch/pbs.2891717.pbs02//instances/tUFLP_rnd_inst.tmp* > /local_scratch/pbs.2891717.pbs02//instances/tUFLP_rnd_instances.json && \
+			rm /local_scratch/pbs.2891717.pbs02//instances/tUFLP_rnd_inst.tmp* && \
+			if [ "/local_scratch/pbs.2891717.pbs02/" != "./" ]; then \
+				mkdir -p ./run_logs/heu_bm/ ; \
+				cp /local_scratch/pbs.2891717.pbs02//run_logs/heu_bm/tUFLP_rnd.csv ./run_logs/heu_bm/ ; \
+				cp /local_scratch/pbs.2891717.pbs02//instances/tUFLP_rnd_instances.json ./instances/ ; \
+			fi
+mkdir -p /local_scratch/pbs.2891717.pbs02//run_logs/heu_bm && \
+			rm -rf /local_scratch/pbs.2891717.pbs02//instances/bm_heu_inst && \
+			mkdir -p /local_scratch/pbs.2891717.pbs02//instances/bm_heu_inst && \
+			python -m experiments.rnd_dia_hist_sizes_control -H > /local_scratch/pbs.2891717.pbs02//run_logs/heu_bm/rnd_dia.csv && \
+			parallel -j 64 python -m experiments.rnd_dia_hist_sizes_control -n 15 -K 32 -p 0.6 -P {} -l /local_scratch/pbs.2891717.pbs02//instances/bm_heu_inst ">>" /local_scratch/pbs.2891717.pbs02//run_logs/heu_bm/rnd_dia.csv.tmp.{} ::: 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 && \
+			cat /local_scratch/pbs.2891717.pbs02//run_logs/heu_bm/rnd_dia.csv.tmp.* >> /local_scratch/pbs.2891717.pbs02//run_logs/heu_bm/rnd_dia.csv && rm /local_scratch/pbs.2891717.pbs02//run_logs/heu_bm/rnd_dia.csv.tmp.* && \
+			tar czf /local_scratch/pbs.2891717.pbs02//instances/bm_heu_random_diagrams.tar.gz -C /local_scratch/pbs.2891717.pbs02//instances ./bm_heu_inst --remove-files && \
+			if [ "/local_scratch/pbs.2891717.pbs02/" != "./" ]; then \
+				mkdir -p ./run_logs/heu_bm ; \
+				cp /local_scratch/pbs.2891717.pbs02//run_logs/heu_bm/rnd_dia.csv ./run_logs/heu_bm/ ; \
+				cp /local_scratch/pbs.2891717.pbs02//instances/bm_heu_random_diagrams.tar.gz ./instances/ ; \
+			fi
+mkdir -p /local_scratch/pbs.2891717.pbs02//instances/orig_stats && \
+			parallel mkdir -p /local_scratch/pbs.2891717.pbs02//instances/orig_stats/{} ::: 0.2 0.5 0.8 && \
+			parallel -j 64 python -m gen_BDD_pair -v 15 -K 16 -p {1} -R -U /local_scratch/pbs.2891717.pbs02//instances/orig_stats/{1} '-s $(( 16 * {#} - 16))' --quiet ::: 0.2 0.5 0.8 ::: 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 && \
+			parallel find /local_scratch/pbs.2891717.pbs02//instances/orig_stats/{}/*.bdd ">" /local_scratch/pbs.2891717.pbs02//instances/orig_stats/{}/inst.list ::: 0.2 0.5 0.8 && \
+			parallel python -m experiments.gen_lsizes_stats -s {} /local_scratch/pbs.2891717.pbs02//instances/orig_stats/{}/inst.list ">" /local_scratch/pbs.2891717.pbs02//run_logs/lwidths.tmp.{} ::: 0.2 0.5 0.8 && \
+			cat /local_scratch/pbs.2891717.pbs02//run_logs/lwidths.tmp.* >> /local_scratch/pbs.2891717.pbs02//run_logs/lwidths.csv && rm /local_scratch/pbs.2891717.pbs02//run_logs/lwidths.tmp.* && \
+			tar czf /local_scratch/pbs.2891717.pbs02//instances/orig_stats.tar.gz -C /local_scratch/pbs.2891717.pbs02//instances/orig_stats . --remove-files && \
+			if [ "/local_scratch/pbs.2891717.pbs02/" != "./" ]; then \
+				cp /local_scratch/pbs.2891717.pbs02//run_logs/lwidths.csv ./run_logs/ ; \
+				cp /local_scratch/pbs.2891717.pbs02//instances/orig_stats.tar.gz ./instances/ ; \
+			fi
+python -m experiments.tUFLP_runtimes -H > /local_scratch/pbs.2891717.pbs02//run_logs/tUFLP_runtimes.csv && \
+			python -m experiments.tUFLP_runtimes -K 1000 -n 20 -l /local_scratch/pbs.2891717.pbs02//instances/tUFLP_steps_breakdown.json >> /local_scratch/pbs.2891717.pbs02//run_logs/tUFLP_runtimes.csv && \
+			if [ "/local_scratch/pbs.2891717.pbs02/" != "./" ]; then \
+				cp /local_scratch/pbs.2891717.pbs02//run_logs/tUFLP_runtimes.csv ./run_logs/ ; \
+				cp /local_scratch/pbs.2891717.pbs02//instances/tUFLP_steps_breakdown.json ./instances/ ; \
+			fi
+rm -f /local_scratch/pbs.2891717.pbs02//instances/orig_problem.list.tmp.* && \
+			split -d -nl/64 /local_scratch/pbs.2891717.pbs02//instances/orig_problem.list /local_scratch/pbs.2891717.pbs02//instances/orig_problem.list.tmp. && \
+			parallel -j 64 python -m solve_inst -i {} -o /local_scratch/pbs.2891717.pbs02//run_logs/main_rnd_run.csv.tmp.{#} -d /local_scratch/pbs.2891717.pbs02//instances/orig_problem/ ::: $(ls /local_scratch/pbs.2891717.pbs02//instances/orig_problem.list.tmp.*) && \
+			python -m solve_inst --header > /local_scratch/pbs.2891717.pbs02//run_logs/main_rnd_run.csv && \
+			cat /local_scratch/pbs.2891717.pbs02//run_logs/main_rnd_run.csv.tmp.* >> /local_scratch/pbs.2891717.pbs02//run_logs/main_rnd_run.csv && \
+			rm /local_scratch/pbs.2891717.pbs02//run_logs/main_rnd_run.csv.tmp.* && \
+			rm /local_scratch/pbs.2891717.pbs02//instances/orig_problem.list.tmp.* && \
+			if [ "/local_scratch/pbs.2891717.pbs02/" != "./" ]; then \
+				cp /local_scratch/pbs.2891717.pbs02//run_logs/main_rnd_run.csv ./run_logs/main_rnd_run.csv ; \
+				cp -r /local_scratch/pbs.2891717.pbs02//instances/orig_problem ./instances/ ; \
+			fi
+rm -f /local_scratch/pbs.2891717.pbs02//instances/orig_problem.list.tmp.* && \
+			split -d -nl/64 /local_scratch/pbs.2891717.pbs02//instances/orig_problem.list /local_scratch/pbs.2891717.pbs02//instances/orig_problem.list.LBs.tmp. && \
+			parallel -j 64 python -m experiments.compare_simpl_LBs -l {} ">" /local_scratch/pbs.2891717.pbs02//run_logs/simpl_LB.csv.tmp.{#} -d /local_scratch/pbs.2891717.pbs02//instances/orig_problem/ ::: $(ls /local_scratch/pbs.2891717.pbs02//instances/orig_problem.list.LBs.tmp.*) && \
+			python -m experiments.compare_simpl_LBs --header > /local_scratch/pbs.2891717.pbs02//run_logs/simpl_LB.csv && \
+			cat /local_scratch/pbs.2891717.pbs02//run_logs/simpl_LB.csv.tmp.* >> /local_scratch/pbs.2891717.pbs02//run_logs/simpl_LB.csv && \
+			rm /local_scratch/pbs.2891717.pbs02//run_logs/simpl_LB.csv.tmp.* && \
+			rm /local_scratch/pbs.2891717.pbs02//instances/orig_problem.list.LBs.tmp.* && \
+			if [ "/local_scratch/pbs.2891717.pbs02/" != "./" ]; then cp /local_scratch/pbs.2891717.pbs02//run_logs/simpl_LB.csv ./run_logs/simpl_LB.csv; fi
+Rscript ./post_processing/fig_obj_hist.R -i /local_scratch/pbs.2891717.pbs02//run_logs/main_rnd_run.csv -o figures/orig_obj_histograms.eps
+Warning messages:
+1: Removed 603 rows containing non-finite values (stat_bin). 
+2: Removed 6 rows containing missing values (geom_bar). 
+rm -f /local_scratch/pbs.2891717.pbs02//instances/scal/instances.list.* && \
+			split -d -nl/64 /local_scratch/pbs.2891717.pbs02//instances/scal/instances.list /local_scratch/pbs.2891717.pbs02//instances/scal/instances.list. && \
+			parallel -j 64 python -m experiments.par_scal_test -i {} -o /local_scratch/pbs.2891717.pbs02//run_logs/orig_scal.csv.tmp.{#} -d /local_scratch/pbs.2891717.pbs02//instances/scal/ ::: $(ls /local_scratch/pbs.2891717.pbs02//instances/scal/instances.list.*) && \
+			python -m experiments.par_scal_test --header > /local_scratch/pbs.2891717.pbs02//run_logs/orig_scal.csv && \
+			cat /local_scratch/pbs.2891717.pbs02//run_logs/orig_scal.csv.tmp.* >> /local_scratch/pbs.2891717.pbs02//run_logs/orig_scal.csv && \
+			rm /local_scratch/pbs.2891717.pbs02//run_logs/orig_scal.csv.tmp.* && \
+			tar czf /local_scratch/pbs.2891717.pbs02//instances/orig_scal.tar.gz -C /local_scratch/pbs.2891717.pbs02//instances/scal . --remove-files && \
+			if [ "/local_scratch/pbs.2891717.pbs02/" != "./" ]; then \
+				cp /local_scratch/pbs.2891717.pbs02//instances/orig_scal.tar.gz ./instances/; \
+				cp /local_scratch/pbs.2891717.pbs02//run_logs/orig_scal.csv ./run_logs/; \
+				rm -f ./instances/scal; \
+			fi
+Rscript ./post_processing/fig_tUFLP_runtimes_scal.R -i /local_scratch/pbs.2891717.pbs02//run_logs/tUFLP_runtimes_scal.csv -o figures/tUFLP_runtimes_overview.eps
+null device 
+          1 
+Rscript post_processing/fig_simpl_vs_min.R --indir /local_scratch/pbs.2891717.pbs02//run_logs/heu_bm --out figures/various_simpl_vs_min.eps
+Number of t-UFLP (nat) instances: 2048 
+Number of t-UFLP (rnd) instances: 2048 
+Number of j-UFLP instances: 2048 
+Number of rnd-dia instances: 2048 
+Number used for the title:  2048 
+************************
+Performance summary:
+# A tibble: 4 x 4
+  inst_type                  total better_than_minAB better_than_minAB_percent
+  <chr>                      <int>             <int>                     <dbl>
+1 (a) t-UFLP (natural order)  2048               321                     0.157
+2 (b) t-UFLP (random order)   2048               606                     0.296
+3 (c) Joint UFLP              2048               610                     0.298
+4 (d) Random diagrams         2048              1305                     0.637
+Warning messages:
+1: Removed 40 rows containing non-finite values (stat_bin). 
+2: Removed 8 rows containing missing values (geom_bar). 
+Rscript ./post_processing/fig_summary.R -i /local_scratch/pbs.2891717.pbs02//run_logs/lwidths.csv -o figures/orig_lwidth_stats.eps
+Warning message:
+Removed 31561 rows containing missing values (geom_point). 
+Rscript ./post_processing/fig_tUFLP_runtimes_breakdown.R -i /local_scratch/pbs.2891717.pbs02//run_logs/tUFLP_runtimes.csv -o figures/tUFLP_runtimes_breakdown.eps
+Error in unit(yticks$start, "cm") : 'x' and 'units' must have length > 0
+Calls: ggsave ... with.default -> eval -> eval -> segmentsGrob -> is.unit -> unit
+Execution halted
+make: *** [Makefile:262: figures/tUFLP_runtimes_breakdown.eps] Error 1
+make: *** Waiting for unfinished jobs....
+make: *** [Makefile:125: /local_scratch/pbs.2891717.pbs02//run_logs/orig_scal.csv] Terminated
+ 
+ 
++------------------------------------------+ 
+| PALMETTO CLUSTER PBS RESOURCES REQUESTED | 
++------------------------------------------+ 
+ 
+mem=500gb,walltime=24:00:00,ncpus=32
+ 
+ 
++-------------------------------------+ 
+| PALMETTO CLUSTER PBS RESOURCES USED | 
++-------------------------------------+ 
+ 
+cput=47:49:50,mem=14295764kb,walltime=04:53:05,ncpus=32,cpupercent=977,vmem=14295764kb
+ 
+ 

@@ -1,7 +1,6 @@
 convert: profile 'icc': 'RGB ': RGB color space not permitted on grayscale PNG `./heuristic_simscore.eps.png' @ warning/png.c/MagickPNGWarningHandler/1744.
 convert: profile 'icc': 'RGB ': RGB color space not permitted on grayscale PNG `./no_opts.eps.png' @ warning/png.c/MagickPNGWarningHandler/1744.
 convert: profile 'icc': 'RGB ': RGB color space not permitted on grayscale PNG `./opts_diam.eps.png' @ warning/png.c/MagickPNGWarningHandler/1744.
-convert: profile 'icc': 'RGB ': RGB color space not permitted on grayscale PNG `./orig_lwidth_stats.eps.png' @ warning/png.c/MagickPNGWarningHandler/1744.
 convert: profile 'icc': 'RGB ': RGB color space not permitted on grayscale PNG `./simpl_heuristics.eps.png' @ warning/png.c/MagickPNGWarningHandler/1744.
 convert: profile 'icc': 'RGB ': RGB color space not permitted on grayscale PNG `./tUFLP_runtimes_breakdown.eps.png' @ warning/png.c/MagickPNGWarningHandler/1744.
  
@@ -17,6 +16,6 @@ mem=1gb,walltime=00:20:00,ncpus=1
 | PALMETTO CLUSTER PBS RESOURCES USED | 
 +-------------------------------------+ 
  
-cput=00:00:08,mem=76544kb,walltime=00:00:18,ncpus=1,cpupercent=22,vmem=76544kb
+cput=00:00:11,mem=168524kb,walltime=00:00:26,ncpus=1,cpupercent=0,vmem=168524kb
  
  
