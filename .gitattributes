@@ -1,1 +1,2 @@
-*.eps linguist-vendored
+*.eps linguist-vendored=true
+figures/*.eps linguist-vendored

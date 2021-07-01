@@ -1,0 +1,31 @@
+# -*- mode: sh -*-
+#PBS -N QuFix
+#PBS -l select=1:ncpus=32:mem=500gb:interconnect=any,walltime=4:00:00
+#PBS -j oe
+#PBS -M abochka@clemson.edu
+#PBS -m abe
+
+module add anaconda3/5.1.0-gcc/8.3.1
+source activate ab-local
+module add gnu-parallel
+module add r/4.0.3-gcc
+module add gurobi
+
+cd $HOME/BDD/align-BDD
+
+tgs -m "running cross-checks..."
+make cross-checks
+tgs -m "done. Starting the quick-fix..."
+# run-command
+
+make prep_dirs PREF=$TMPDIR/
+make -j 2 figures/various_simpl_vs_min.eps PARFLAG=64 PREF=$TMPDIR/
+tgs -m "Command executed."
+
+module add imagemagick/7.0.8-7-gcc
+convert figures/various_simpl_vs_min.eps ./tmp/newfig.png
+tgs -i ./tmp/newfig.png
+tgs -s happycat
+
+# deactivate the env
+source deactivate ab-local
