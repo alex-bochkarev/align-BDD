@@ -49,7 +49,8 @@ figures: \
 	$(FIGS)/tUFLP_runtimes_overview.eps \
 	$(FIGS)/various_simpl_vs_min.eps \
 	$(FIGS)/orig_lwidth_stats.eps \
-	$(FIGS)/tUFLP_runtimes_breakdown.eps
+	$(FIGS)/tUFLP_runtimes_breakdown.eps \
+	$(FIGS)/aux_hist_orig.eps
 
 ######################################################################
 ## Calculated values
@@ -92,6 +93,9 @@ $(LOGS)/simpl_LB.csv: $(INST)/orig_problem.list experiments/compare_simpl_LBs.py
 ## Histograms of the original objective value
 $(FIGS)/orig_obj_histograms.eps: $(LOGS)/main_rnd_run.csv $(PP)/fig_obj_hist.R
 				Rscript $(PP)/fig_obj_hist.R -i $< -o $@
+
+$(FIGS)/aux_hist_orig.eps: $(LOGS)/main_rnd_run.csv $(PP)/fig_obj_int.R
+				Rscript $(PP)/fig_obj_int.R -i $< -o $@ > ./run_logs/orig_hist_numbers.txt
 
 $(LOGS)/main_rnd_run.csv: $(INST)/orig_problem.list
 				rm -f $<.tmp.* && \
@@ -223,12 +227,14 @@ $(LOGS)/heu_bm/tUFLP_rnd.csv: experiments/tUFL_hist_sizes_control.py
 				fi
 
 
+# in the following experiment we deliberately choose number of layers
+# as TUFL_N: for the number of layers to correspond to the one above.
 $(LOGS)/heu_bm/rnd_dia.csv: experiments/rnd_dia_hist_sizes_control.py
 				mkdir -p $(LOGS)/heu_bm && \
 				rm -rf $(INST)/bm_heu_inst && \
 				mkdir -p $(INST)/bm_heu_inst && \
 				python -m experiments.rnd_dia_hist_sizes_control -H > $@ && \
-				parallel -j $(PARFLAG) python -m experiments.rnd_dia_hist_sizes_control -n $(RND_N) -K $(HEU_BM_K) -p $(RND_P) -P {} -l $(INST)/bm_heu_inst ">>" $@.tmp.{} ::: $(shell seq 1 $(PARFLAG)) && \
+				parallel -j $(PARFLAG) python -m experiments.rnd_dia_hist_sizes_control -n $(TUFL_N) -K $(HEU_BM_K) -p $(RND_P) -P {} -l $(INST)/bm_heu_inst ">>" $@.tmp.{} ::: $(shell seq 1 $(PARFLAG)) && \
 				cat $@.tmp.* >> $@ && rm $@.tmp.* && \
 				tar czf $(INST)/bm_heu_random_diagrams.tar.gz -C $(INST) ./bm_heu_inst --remove-files && \
 				if [ "$(PREF)" != "./" ]; then \

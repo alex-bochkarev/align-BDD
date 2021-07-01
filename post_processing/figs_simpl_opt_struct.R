@@ -157,6 +157,12 @@ ggplot(df_m) +
 
 ggsave(outfile_simscore_vs, p_simscore, width = 16, height = 10)
 
+df_best = filter(df_m, labels=="Best")
+no_75plus = sum(df_best$value >= 75, na.rm=TRUE)
+no_total = length(df_best$value)
+
+cat(paste0("Number of instances where best simscore >= 75%: ", no_75plus, " (", no_75plus*100 / no_total, " %)"))
+
 p_bin2d =
 ggplot(df) +
   geom_bin2d(aes(AB_simscore, best_VS_simscore), bins = 10) +

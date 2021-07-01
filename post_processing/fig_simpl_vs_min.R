@@ -48,14 +48,14 @@ df_rnd$inst_type = "(b) t-UFLP (random order)"
 cat("Number of t-UFLP (rnd) instances:", nrow(df_rnd)/2,"\n")
 
 dfjUFL <- read.csv(paste0(indir, "/jUFLP.csv"), stringsAsFactors = FALSE)
-dfjUFL$inst_type <- "(c) Joint UFLP"
+dfjUFL$inst_type <- "Joint UFLP"
 cat("Number of j-UFLP instances:", nrow(dfjUFL)/2,"\n")
 
 df_rnd_dia <- read.csv(paste0(indir, "/rnd_dia.csv"), stringsAsFactors = FALSE)
-df_rnd_dia$inst_type <- "(d) Random diagrams"
+df_rnd_dia$inst_type <- "(c) Random diagrams"
 cat("Number of rnd-dia instances:", nrow(df_rnd_dia)/2,"\n")
 
-df = rbind(df, df_rnd, dfjUFL, df_rnd_dia)
+df = rbind(df, df_rnd, df_rnd_dia)
 
 df_wide = pivot_wider(df,
                         id_cols = c("instance", "inst_type"),
@@ -69,7 +69,7 @@ cat("Number used for the title: ", no_insts,"\n")
 df_wide$simpl_rel_obj = with(df_wide, orig_simpl_obj / orig_minAB_obj)
 
 problems = c("(a) t-UFLP (natural order)", "(b) t-UFLP (random order)",
-             "(c) Joint UFLP", "(d) Random diagrams")
+             "(c) Random diagrams")
 
 df_wide$problem = factor(df_wide$inst_type, levels=problems)
 
