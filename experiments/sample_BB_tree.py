@@ -1,5 +1,5 @@
 """Aux script: draws a sample B&B search tree
-for the auxiliary problem (with varseqs)
+for the auxiliary problem (with :py:class:`varseq.VarSeq`)
 """
 # import timeit
 
@@ -7,7 +7,8 @@ import varseq as vs
 import BB_search as BB
 import argparse as ap
 
-if __name__ == "__main__":
+def main():
+    """Generates a random align-VS instance and saves the BB search tree."""
     parser = ap.ArgumentParser(description=" Produces a sample BB search tree (a .dot file) (c) A. Bochkarev, Clemson University, 2020",
                                formatter_class=ap.ArgumentDefaultsHelpFormatter)
     parser.add_argument("-n", "--nodes", action="store", dest="n", help="max. number of search tree nodes ",
@@ -32,3 +33,6 @@ if __name__ == "__main__":
     print("Instance generated:")
     print(A)
     print(B)
+
+if __name__ == "__main__":
+    main()

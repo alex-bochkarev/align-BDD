@@ -3,8 +3,8 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Code documentation for Align-BDD project
-========================================
+Implementation details for Align-BDD project
+============================================
 
 .. toctree::
    :caption: Contents:

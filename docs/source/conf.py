@@ -21,7 +21,7 @@ sys.path.insert(0, os.path.abspath('../../tests/'))
 # -- Project information -----------------------------------------------------
 
 project = 'Align-BDD'
-copyright = '2021, Alexey Bochkarev'
+copyright = '2021, Alexey Bochkarev, Clemson University'
 author = 'Alexey Bochkarev'
 
 
@@ -78,6 +78,6 @@ html_theme_options = {
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
-html_context = {
-    'css_files': ['_static/tables.css'],
-}
+# html_context = {
+#     'css_files': ['_static/tables.css'],
+# }

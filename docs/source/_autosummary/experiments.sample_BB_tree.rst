@@ -1,4 +1,4 @@
-.. module:: experiments.sample_BB_tree
+﻿.. module:: experiments.sample_BB_tree
 .. currentmodule:: experiments.sample_BB_tree
 
 experiments.sample\_BB\_tree
@@ -16,6 +16,13 @@ Module summary
 
 
 
+Implements functions (outside the classes above):
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. autosummary::
+
+
+   main
+
 
 
 
@@ -29,6 +36,15 @@ Module summary
 
 
 
+
+
+.. centered:: ❖❖❖
+
+Functions
+---------
+
+
+.. autofunction:: main
 
 
 
