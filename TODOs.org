@@ -1,4 +1,7 @@
 * Immediate TODOs
+  - [ ] 1: soft cover constraints (general type) -- see the revision notes
+  - [ ] idea 2a (cross-terms, x1x2, etc.)
+  - [ ] idea 2b (function of cross-terms) -- ?
   - [X] =build_cover_DD=: make single overlap version
   - [X] =build_color_DD=: fix the procedure (linear DD growth is doable!)
   - [X] =build_tUFLP_MIP=: revise to single overlap version
@@ -22,6 +25,28 @@
     distribute the first facility into every bin, and then sort them randomly?
 
 * Current project TODOs
+** DONE Soft overlap: generate long instances
+CLOSED: [2022-01-20 Thu 13:48]
+- State "DONE"       from "TODO"       [2022-01-20 Thu 13:48]
+:LOGBOOK:
+CLOCK: [2022-01-20 Thu 12:30]--[2022-01-20 Thu 13:45] =>  1:15
+CLOCK: [2022-01-19 Wed 15:29]--[2022-01-19 Wed 15:56] =>  0:27
+CLOCK: [2022-01-19 Wed 14:59]--[2022-01-19 Wed 15:17] =>  0:18
+CLOCK: [2022-01-19 Wed 14:05]--[2022-01-19 Wed 14:30] =>  0:25
+CLOCK: [2022-01-19 Wed 13:54]--[2022-01-19 Wed 14:01] =>  0:07
+CLOCK: [2022-01-19 Wed 13:28]--[2022-01-19 Wed 13:53] =>  0:25
+CLOCK: [2022-01-19 Wed 13:05]--[2022-01-19 Wed 13:14] =>  0:09
+:END:
+It seems getting slow for already N=42 points...
+
+** TODO sum of subset products
+:LOGBOOK:
+CLOCK: [2022-01-20 Thu 11:14]--[2022-01-20 Thu 12:04] =>  0:50
+CLOCK: [2022-01-19 Wed 15:56]--[2022-01-19 Wed 16:55] =>  0:59
+:END:
+  OK, seems slow for N=500 vars, M=500 terms and Jmax = 25 vars per term max
+  (my single experiment took )
+
 ** TODO Kill already merged branches
  [2020-07-11 Sat 09:49]
 
@@ -29,12 +54,9 @@
 - scal_update (major scal update)
 
 As of beginning of the day <2020-07-11> all of these are merged into =master=
-** TODO Introduce a proper testing framework
 ** TODO Clean-up testing code (remove unnecessary, add separate testing)
  [2021-02-19 Fri 12:47]
 ** TODO add diagram generation tests :UFL:
-** TODO Structure the code into a package + submodules
-** TODO Maybe look into Sphinx?.. Or what is the best practice? :doc:
 ** TODO Revise tests for key functions
 ** TODO Requires =gurobi= to run examples :doc:
  [2021-02-06 Sat 17:40]
@@ -49,10 +71,6 @@ As of beginning of the day <2020-07-11> all of these are merged into =master=
 ** TODO rename =VarSeq.layer_var= into =vars=, I suppose...
  [2021-02-22 Mon 17:52]
 ** TODO rename =cUFL= (streamlining names)
-** DONE Move =are_equivalent= method to =BDD.py=
-   CLOSED: [2020-08-13 Thu 11:14]
- [2020-08-12 Wed 12:07]
- [[file:~/projects/align-BDD/experiments/BDD_size_illustration/BDD_size_illustration.py::B.load("./sample_5var_inst.bdd")]]
 ** TODO let S NOT contain the node itself -- amended later :cUFL:
  [2021-03-22 Mon 18:34]
 ** TODO figure (1) the order of colors and (2) order of nodes within a color
@@ -61,5 +79,20 @@ As of beginning of the day <2020-07-11> all of these are merged into =master=
    - makefile
    - pytest and testing framework
 ** TODO maybe instances gallery for tUFL?
+
+** DONE Introduce a proper testing framework
+CLOSED: [2022-01-19 Wed 14:16]
+- State "DONE"       from "TODO"       [2022-01-19 Wed 14:16]
+** CANCELED Structure the code into a package + submodules
+CLOSED: [2022-01-19 Wed 14:16]
+** DONE Move =are_equivalent= method to =BDD.py=
+   CLOSED: [2020-08-13 Thu 11:14]
+ [2020-08-12 Wed 12:07]
+ [[file:~/projects/align-BDD/experiments/BDD_size_illustration/BDD_size_illustration.py::B.load("./sample_5var_inst.bdd")]]
+** DONE Maybe look into Sphinx?.. Or what is the best practice?         :doc:
+CLOSED: [2022-01-19 Wed 14:15]
+- State "DONE"       from "TODO"       [2022-01-19 Wed 14:15]
+
 * Notes
+  - revision notes:  [[mu4e:msgid:CO1PR01MB658375A8FEDC337330803037DE609@CO1PR01MB6583.prod.exchangelabs.com][Two ideas]] from JCS.
   - first submission corresponds to =master= commit =04a5b38=

@@ -1,6 +1,6 @@
 # Accompanying code for the paper: Aligning BDDs
 ## Contact info
-- Alexey Bochkarev | [contact info](https://abochka.people.clemson.edu/contact/)
+- Alexey Bochkarev | [contact info](https://www.bochkarev.io/contact/)
 
 ## General information and software requirements
 The repo is built around the main [makefile](https://en.wikipedia.org/wiki/Makefile) which contains all recipes to build the figures from the paper.

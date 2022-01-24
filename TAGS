@@ -1,0 +1,2160 @@
+
+heuristics.py,2057
+import numpy as npnp13,259
+import opt_parser as alsals15,279
+import varseq as vsvs16,304
+import BB_search as BBBB17,324
+import BDD as BDDBDD18,347
+def toA(A,B):toA28,482
+def toB(A,B):toB33,608
+def minAB(A,B):minAB38,705
+def simpl_greedy_swaps(A,B):simpl_greedy_swaps48,890
+def simpl_greedy_sifts(A,B,passes=-1):simpl_greedy_sifts76,1707
+def simpl_gsifts_1p(A,B):simpl_gsifts_1p110,2740
+def simpl_gsifts_2p(A,B):simpl_gsifts_2p114,2845
+def simpl_gsifts_inf(A,B):simpl_gsifts_inf118,2952
+def simpl_gsifts_3p(A,B):simpl_gsifts_3p122,3061
+def simpl_5random(A,B):simpl_5random126,3170
+def simpl_greedy_2sifts(A,B, passes=-1):simpl_greedy_2sifts138,3568
+def simpl_g2sifts_1p(A,B):simpl_g2sifts_1p175,4839
+def simpl_g2sifts_2p(A,B):simpl_g2sifts_2p179,4983
+def fastslide(X,a,p):fastslide186,5239
+def fast_greedy_sifts(A,B):fast_greedy_sifts224,6047
+def fast_greedy_2sifts(A,B):fast_greedy_2sifts257,6997
+def orig_simpl(A,B,simpl):orig_simpl294,8264
+def orig_gsifts1p(A,B,simpl):orig_gsifts1p303,8620
+def orig_bestAB(A,B,simpl):orig_bestAB325,9192
+def orig_5random(A,B,simpl):orig_5random335,9539
+def orig_interleaved(A,B,simpl):orig_interleaved349,9996
+def orig_meta(A,B,simpl):orig_meta381,10923
+def orig_interleave_when_diverge(A,B,simpl):orig_interleave_when_diverge395,11351
+def orig_rnd_starts(A,B,simpl):orig_rnd_starts428,12513
+SIMPL_HEU = [SIMPL_HEU458,13496
+ORIG_HEU = [ORIG_HEU472,14083
+    inst_dir = sys.argv[1]inst_dir489,14745
+    pr = cProfile.Profile()pr493,14887
+    n = 0n495,15007
+        inst_no = file.split('.')[-2]inst_no499,15075
+        inst_no = inst_no.split('/vs')[-1]inst_no500,15113
+        inst = als.alignments(file)inst502,15157
+        A = inst.As[0]A505,15227
+        B = inst.Bs[0]B506,15250
+        objs = []objs508,15274
+        steps = []steps509,15292
+            T, obj,st = h(A,B)T512,15341
+            T, obj,st = h(A,B)obj512,15341
+            T, obj,st = h(A,B)st512,15341
+    ps = pstats.Stats(pr).sort_stats('time')ps522,15630
+
+BDD.py,2558
+import numpy as npnp14,486
+import pandas as pdpd15,505
+from numpy.random import random as rndrnd16,525
+from random import choice as rnd_choosernd_choose17,564
+import itertools as itersiters21,630
+GSIFTS_MAX_INCREASE_MUL = 100000  # max increase of the BDD size (e.g., 100 times) during greedyGSIFTS_MAX_INCREASE_MUL29,766
+WEIGHT_TOL = 3  # number of decimal points for the arc weights tolerance (swap_up)WEIGHT_TOL30,869
+C_MAX = 50  # max edge cost (for random generation, non-inclusive)C_MAX31,952
+NROOT = 0NROOT34,1070
+NTRUE = -1NTRUE35,1080
+NFALSE = -2NFALSE36,1091
+def simscore(seq_A, seq_B, p_B = None):simscore39,1175
+class node(object):node82,2349
+    def __init__(self, id, hi=None, lo=None, layer=-1):__init__98,2748
+    def link(self, to_whom, arc="hi"):link105,2937
+class BDD(object):BDD116,3348
+    def __init__(self, N=2, vars=None, weighted=False):__init__130,3976
+    def link(self, parent, child, etype="hi", edge_weight=0.0):link157,4922
+    def llink(self, parent, child, etype="hi", edge_weight=0.0):llink174,5555
+    def __len__(self):__len__186,5944
+    def n(self, i):n190,6067
+    def p(self, a):p194,6169
+    def size(self):size198,6293
+    def new_node_name(self):new_node_name202,6411
+    def dump_gv(self, layerCapt=True, x_prefix="x", node_labels=None):dump_gv214,6836
+    def addnode(self, parent_node, arc="hi", node_id=None, edge_weight=0.0):addnode265,8847
+    def swap_up(self, layer_idx):swap_up299,10009
+    def sift(self, var, pos):sift439,15922
+    def gsifts(self, with_whom, start_order=None):gsifts460,16557
+    def save(self, filename):save531,18806
+    def load(self, filename, weighted=False):load588,20757
+    def random(cls, N=5, p=0.5, weighted=False):random703,24797
+    def profile(self):profile751,26683
+    def show(self,show797,28026
+    def align_to(self, vars_order, inplace=False):align_to820,28961
+    def OA_bruteforce(self, with_what, LR=False):OA_bruteforce835,29328
+    def is_reduced(self):is_reduced878,30725
+    def make_reduced(self):make_reduced891,31143
+    def rename_vars(self, ren_dict):rename_vars903,31511
+    def shuffle_vars(self):shuffle_vars918,32067
+    def is_aligned(self, to_what):is_aligned923,32259
+    def get_value(self, x):get_value928,32483
+    def truth_table(self):truth_table980,34209
+    def is_equivalent(self, B):is_equivalent1008,35307
+    def shortest_path(self):shortest_path1058,37247
+    def simscore(self, B):simscore1099,38769
+def intersect(A, B):intersect1103,38938
+
+shell_scripts/gen_cUFL_runtimes_overview.sh,0
+
+shell_scripts/get_cUFL_randomized_figs.sh,0
+
+shell_scripts/get_cUFL_sizes_hist.sh,0
+
+shell_scripts/scal_get.sh,0
+
+shell_scripts/get_cUFL_runtimes.sh,0
+
+shell_scripts/figs_noscal_get.sh,0
+
+shell_scripts/get_x_sizes.sh,31
+experiment() {experiment2,12
+
+shell_scripts/tUFL_bm_static.sh,0
+
+shell_scripts/test_gen_colors.sh,0
+
+shell_scripts/preorder_exp.sh,0
+
+shell_scripts/get_jUFL_hist.sh,0
+
+shell_scripts/get_cUFL_sizes_AB_hist.sh,0
+
+shell_scripts/test_generation.sh,0
+
+shell_scripts/gen_cUFL_runtimes_breakdown.sh,0
+
+shell_scripts/get_cUFL_sizes.sh,0
+
+shell_scripts/get_sizes.sh,0
+
+shell_scripts/clean_fig_logs.sh,0
+
+shell_scripts/time_test.sh,0
+
+pbs/make_R_fig.pbs,0
+
+pbs/preorder_effect.pbs,0
+
+pbs/jUFL_hists.pbs,0
+
+pbs/tUFL_hists_rnd.pbs,0
+
+pbs/setup_R_env.pbs,0
+
+pbs/reproduce.pbs,0
+
+pbs/tUFL_rnd_sizes.pbs,0
+
+pbs/quick_fix.pbs,0
+
+pbs/scaltest.pbs,0
+
+pbs/make_summary_fig.pbs,0
+
+pbs/tUFL_hists_nat.pbs,0
+
+pbs/make_figs_noscal.pbs,0
+
+pbs/tUFL_rnd_var_sizes.pbs,0
+
+pbs/rnd_hists_control.pbs,0
+
+pbs/quick_fig_sizes.pbs,0
+
+pbs/tUFL_benchmark.pbs,0
+
+pbs/send_scal.pbs,0
+
+pbs/start_orders.pbs,0
+
+pbs/send_figures.pbs,0
+
+pbs/paper.pbs,0
+
+opt_parser.py,598
+import seaborn as snssns9,246
+import matplotlib.pyplot as pltplt10,268
+import pandas as pdpd11,300
+class alignments:alignments13,321
+    def __init__(self, filename):__init__14,339
+    def fmt_err(self, msg, ln):fmt_err25,630
+    def get_instance(self,inst):get_instance28,747
+    def show_instance(self,inst):show_instance33,888
+    def fmt_instance(self,A,B):fmt_instance48,2172
+    def load(self, verbose = True):load63,3295
+    def check_conditions(self, conditions, names, instances=-1):check_conditions159,7449
+    def save_case(self, A,B,i_no = -1):save_case200,9088
+
+gurobi.env,0
+
+paper_build.o2892699,0
+
+data_archive/2020-08-12_18-40-49_solution_logs.tar.gz,0
+
+data_archive/2020-08-12_17-57-44_lwidths_logs.tar.gz,0
+
+data_archive/2020-08-12_14-51-52_scal_logs.tar.gz,0
+
+GRTAGS,0
+
+README.md,323
+# Accompanying code for the paper: Aligning BDDsAccompanying code for the paper: Aligning BDDs1,0
+## Contact infoContact info2,49
+## General information and software requirementsGeneral information and software requirements5,137
+## Repo structureRepo structure11,396
+## Steps to reproduceSteps to reproduce14,464
+
+experiments/gen_lsizes_stats.py,390
+import BDD as exactexact6,153
+import argparse as apap8,206
+    parser = ap.ArgumentParser(description="Produces a layer widths statistics (dataset). (c) A.parser12,267
+    args = parser.parse_args()args19,839
+    bdd_no = 0bdd_no25,1003
+            inst_name = inst_name.rstrip()inst_name28,1101
+            bdd = exact.BDD()bdd29,1144
+            N = len(bdd.vars)N31,1206
+
+experiments/compare_simpl_LBs.py,1001
+import varseq as simplsimpl7,244
+import BDD as exactexact8,267
+import BB_search as bbsbbs9,287
+import argparse as apap10,311
+    parser = ap.ArgumentParser(description="Compares various LB performance for the simplified pparser15,416
+    args = parser.parse_args()args20,950
+            inst_id = int(inst_id.rstrip())inst_id28,1140
+            A = exact.BDD(); B = exact.BDD()A29,1184
+            A = exact.BDD(); B = exact.BDD()B29,1184
+            N = len(A.vars)N33,1352
+            vsA = simpl.VarSeq(A.vars, [len(l) for l in A.layers[:-1]])vsA35,1381
+            vsB = simpl.VarSeq(B.vars, [len(l) for l in B.layers[:-1]])vsB36,1453
+            t0 = time()t037,1525
+            bb = bbs.BBSearch(vsA,vsB)bb38,1549
+            t1 = time()t140,1612
+            curr_size = vsA.size()+vsB.size()curr_size43,1689
+            opt_size = bb.Ap_cand.size()+bb.Bp_cand.size()opt_size44,1735
+                t0 = time()t049,1928
+                t1 = time()t151,2050
+
+experiments/softcover.py,849
+import numpy as npnp4,89
+import gurobipy as gpgp5,108
+import argparse as apap8,177
+def make_MIP(S, c, f):make_MIP10,200
+def generate_S(n, p=0.25):generate_S45,1226
+def generate_overlaps(S):generate_overlaps65,1634
+def make_instance(n, p=0.25):make_instance82,2032
+def test_make_MIP():test_make_MIP92,2390
+    parser = ap.ArgumentParser(description="''Soft overlap'' instance generator. (c) A. Bochkareparser119,3281
+    args = parser.parse_args()args124,3578
+    S, f, c = make_instance(int(args.N))S126,3610
+    S, f, c = make_instance(int(args.N))f126,3610
+    S, f, c = make_instance(int(args.N))c126,3610
+    m, x, y = make_MIP(S, c, f)m127,3651
+    m, x, y = make_MIP(S, c, f)x127,3651
+    m, x, y = make_MIP(S, c, f)y127,3651
+    t = time()t128,3683
+    aobj = m.objVal + sum(fs[0] for fs in f)aobj132,3751
+
+experiments/exp_BDD_example.py,23
+def main():main6,156
+
+experiments/tUFL_hist_sizes_control.py,174
+import argparse as apap7,224
+import varseq as vsvs13,308
+import BDD as DDDD14,328
+import BB_search as bbbb15,345
+import numpy as npnp16,368
+def main():main20,401
+
+experiments/__init__.py,0
+
+experiments/exp_BDD.bdd,0
+
+experiments/other_experiments/UFL_x_sizes.py,146
+import argparse as apap12,413
+import varseq as vsvs17,483
+import BDD as DDDD18,503
+import BB_search as bbbb19,520
+def main():main22,545
+
+experiments/other_experiments/start_orders.py,796
+import numpy as npnp9,183
+import matplotlib.pyplot as pltplt14,321
+N = 8N16,354
+A = BDD.random(N=N); B = BDD.random(N=N)A19,424
+A = BDD.random(N=N); B = BDD.random(N=N)B19,424
+no_opts, As, Bs = A.OA_bruteforce(B)no_opts29,900
+no_opts, As, Bs = A.OA_bruteforce(B)As29,900
+no_opts, As, Bs = A.OA_bruteforce(B)Bs29,900
+perms = permutations(A.vars)perms32,1084
+orders = [o for o in perms]orders33,1113
+        c = [orders[i],orders[j]]c38,1346
+        Ap = deepcopy(A); Bp = deepcopy(B)Ap40,1381
+        Ap = deepcopy(A); Bp = deepcopy(B)Bp40,1381
+        vsA = VarSeq(Ap.vars,[Ap.n(i) for i in range(N)])vsA42,1494
+        vsB = VarSeq(Bp.vars,[Bp.n(i) for i in range(N)])vsB43,1552
+        b = BBSearch(vsA,vsB)b44,1610
+        obj = Ap.size()+Bp.size()obj47,1762
+
+experiments/other_experiments/UFL_dia_sizes.py,146
+import argparse as apap15,386
+import varseq as vsvs20,456
+import BDD as DDDD21,476
+import BB_search as bbbb22,493
+def main():main25,518
+
+experiments/other_experiments/tUFLP_dia_sizes.py,146
+import argparse as apap12,418
+import varseq as vsvs17,490
+import BDD as DDDD18,510
+import BB_search as bbbb19,527
+def main():main22,552
+
+experiments/other_experiments/tUFLP_random_orders.py,175
+import argparse as apap13,443
+import varseq as vsvs18,515
+import BDD as DDDD19,535
+import BB_search as bbbb20,552
+import numpy as npnp21,575
+def main():main23,595
+
+experiments/other_experiments/UFL_runtimes.py,127
+import argparse as apap10,223
+def benchmark(K=100, TOL=1e-3, n=5, m=7, prefix=0):benchmark16,294
+def main():main144,4662
+
+experiments/other_experiments/scal_test.py,1312
+import varseq as simplsimpl12,288
+import BDD as exactexact13,311
+import numpy as npnp14,331
+import BB_search as bbsbbs15,350
+import gc as garbagegarbage20,466
+import argparse as apap21,487
+start_id = 0start_id23,510
+Ns_short = [5,6,7,8] # 9,10,11,12,13,14,15]Ns_short24,523
+    parser = ap.ArgumentParser(description="Performs scalability test. (c) A. Bochkarev, Clemsonparser27,595
+    args = parser.parse_args()args33,1089
+    inst_profiles = set()inst_profiles39,1223
+    inst_id = 0inst_id40,1249
+        inst_id = int(inst_id.rstrip())inst_id44,1340
+        A = exact.BDD(); B = exact.BDD()A45,1380
+        A = exact.BDD(); B = exact.BDD()B45,1380
+        N = len(A.vars)N49,1536
+        t0 = time()t052,1611
+        vsA = simpl.VarSeq(A.vars, [len(l) for l in A.layers[:-1]])vsA53,1631
+        vsB = simpl.VarSeq(B.vars, [len(l) for l in B.layers[:-1]])vsB54,1699
+        t1 = time()t155,1767
+        t0 = time()t058,1835
+        bb = bbs.BBSearch(vsA,vsB)bb59,1855
+        t1 = time()t161,1910
+        t0 = time()t064,1979
+        order = bb.Ap_cand.layer_varorder65,1999
+        simpl_obj = A.align_to(order).size() + B.align_to(order).size()simpl_obj66,2036
+        t1 = time()t167,2108
+        t0 = time()t072,2308
+        t1 = time()t178,2478
+
+experiments/other_experiments/BB_orig_solve.py,2211
+import BDD as exactexact4,112
+import varseq as simplsimpl5,132
+import BB_search as bbbb7,177
+import heuristics as heuheu8,200
+import numpy as npnp9,225
+import argparse as apap12,281
+    parser = ap.ArgumentParser(description="Processes (solves) a list of align-BDD instances (c)parser16,364
+    args = parser.parse_args()args23,1026
+    simpl_heu = dict()simpl_heu25,1058
+    orig_heu = dict()orig_heu26,1081
+    inst_dir = args.inst_dirinst_dir41,1520
+                inst_id = inst_id.rstrip()inst_id47,1713
+                t0=time()t051,1820
+                fnameA = "".join([inst_dir, "A",inst_id,".bdd"])fnameA52,1846
+                fnameB = "".join([inst_dir, "B",inst_id,".bdd"])fnameB53,1911
+                bdd_A = exact.BDD(); bdd_A.load(fnameA)bdd_A54,1976
+                bdd_B = exact.BDD(); bdd_B.load(fnameB)bdd_B55,2032
+                vs_A = simpl.VarSeq(bdd_A.vars, [len(l) for l in bdd_A.layers[:-1]])vs_A59,2202
+                vs_B = simpl.VarSeq(bdd_B.vars, [len(l) for l in bdd_B.layers[:-1]])vs_B60,2287
+                N = len(vs_A)N62,2373
+                t0 = time()t065,2467
+                b = bb.BBSearch(vs_A,vs_B)b66,2495
+                status = b.search()status67,2538
+                simpl_obj = b.Ap_cand.size() + b.Bp_cand.size()simpl_obj69,2678
+                t1 = time()t170,2742
+                simpl_time = t1 - t0simpl_time71,2770
+                simpl_results = dict({"simpl_BB":[b.Ap_cand.size()+b.Bp_cand.size(), simpl_time,simpl_results75,2923
+                t0 = time()t078,3153
+                o = b.Ap_cand.layer_var # optimal order found by the BBSearcho79,3181
+                bdd_Aa = bdd_A.align_to(o)bdd_Aa80,3259
+                bdd_Ba = bdd_B.align_to(o)bdd_Ba81,3302
+                oo_simpl_order = bdd_Aa.size() + bdd_Ba.size()oo_simpl_order82,3345
+                    t0 = time()t085,3495
+                    s,t_add,v = heuristic[1](bdd_A,bdd_B,simpl_results)s86,3527
+                    s,t_add,v = heuristic[1](bdd_A,bdd_B,simpl_results)t_add86,3527
+                    s,t_add,v = heuristic[1](bdd_A,bdd_B,simpl_results)v86,3527
+                    t1 = time()t187,3599
+
+experiments/other_experiments/tUFLP_sizes_hist.py,175
+import argparse as apap11,416
+import varseq as vsvs16,488
+import BDD as DDDD17,508
+import BB_search as bbbb18,525
+import numpy as npnp19,548
+def main():main22,569
+
+experiments/other_experiments/tUFLP_sizes_hist_ex.py,175
+import argparse as apap12,417
+import varseq as vsvs17,489
+import BDD as DDDD18,509
+import BB_search as bbbb19,526
+import numpy as npnp20,549
+def main():main23,570
+
+experiments/other_experiments/log_bb.py,1115
+import varseq as vsvs4,115
+import BDD as exactexact5,135
+import BB_search as bbbb6,155
+import argparse as apap11,254
+snapshot_steps = [i*10 for i in range(1,100)]snapshot_steps13,277
+    parser = ap.ArgumentParser(description="Creates B&B logs for the simplified problem. (c) A. parser16,351
+    args = parser.parse_args()args23,1076
+    inst_dir = args.inst_dirinst_dir28,1214
+                inst_id = inst_id.rstrip()inst_id38,1581
+                fnameA = "".join([inst_dir, "A",inst_id,".bdd"])fnameA43,1748
+                fnameB = "".join([inst_dir, "B",inst_id,".bdd"])fnameB44,1813
+                bdd_A = exact.BDD(); bdd_A.load(fnameA)bdd_A45,1878
+                bdd_B = exact.BDD(); bdd_B.load(fnameB)bdd_B46,1934
+                vs_A = vs.VarSeq(bdd_A.vars, [len(l) for l in bdd_A.layers[:-1]])vs_A49,2057
+                vs_B = vs.VarSeq(bdd_B.vars, [len(l) for l in bdd_B.layers[:-1]])vs_B50,2139
+                t0 = time()t053,2264
+                b = bb.BBSearch(vs_A,vs_B)b54,2292
+                o = b.search()o57,2418
+                t1 = time()t158,2449
+
+experiments/other_experiments/tUFL_rand_orders_nosifts.py,175
+import argparse as apap12,435
+import varseq as vsvs17,507
+import BDD as DDDD18,527
+import BB_search as bbbb19,544
+import numpy as npnp20,567
+def main():main22,587
+
+experiments/other_experiments/tUFL_benchmark_one_size.py,175
+import argparse as apap13,376
+import varseq as vsvs18,448
+import BDD as DDDD19,468
+import BB_search as bbbb20,485
+import numpy as npnp21,508
+def main():main23,528
+
+experiments/other_experiments/tUFL_generation_tests.py,175
+import argparse as apap13,443
+import varseq as vsvs18,515
+import BDD as DDDD19,535
+import BB_search as bbbb20,552
+import numpy as npnp21,575
+def main():main23,595
+
+experiments/other_experiments/tUFLP_preorder_int_reduction.py,293
+import seaborn as snssns10,180
+import pandas as pdpd11,202
+import matplotlib.pyplot as pltplt12,222
+import varseq as vsvs13,254
+import BB_search as bbbb14,274
+import numpy as npnp15,297
+def get_sizes(n=10, K=1):get_sizes19,329
+    int_sizes = get_sizes(K=1000)int_sizes76,2439
+
+experiments/other_experiments/tUFLP_node_picking.py,223
+import seaborn as snssns11,194
+import pandas as pdpd12,216
+import numpy as npnp13,236
+import matplotlib.pyplot as pltplt15,266
+def get_sizes(n=10, K=1):get_sizes19,326
+    DDs = get_sizes(n=7, K=1000)DDs46,1402
+
+experiments/other_experiments/tUFLP_preorder_effect.py,146
+import argparse as apap12,417
+import varseq as vsvs17,489
+import BDD as DDDD18,509
+import BB_search as bbbb19,526
+def main():main22,576
+
+experiments/other_experiments/start_orders_long.py,1103
+import numpy as npnp12,247
+N = 3N19,458
+    parser = ArgumentParser(description="Iterates through all permutations for a random align-BDparser21,491
+    args = parser.parse_args()args27,947
+    N = args.NN28,978
+    out_dir = args.out_dirout_dir29,993
+    A = BDD.random(N=N); B = BDD.random(N=N)A30,1020
+    A = BDD.random(N=N); B = BDD.random(N=N)B30,1020
+    A_vars = copy(A.vars)A_vars40,1521
+    B_vars = copy(B.vars)B_vars41,1547
+    iters_A = permutations(A_vars)iters_A43,1574
+    iters_B = deepcopy(iters_A)iters_B44,1609
+            vsA = VarSeq(A.vars,[A.n(i) for i in range(N)])vsA48,1760
+            vsB = VarSeq(B.vars,[B.n(i) for i in range(N)])vsB49,1820
+            b = BBSearch(vsA,vsB)b50,1880
+            aligned = A.is_aligned(B)aligned52,1937
+            size = A.size() + B.size()size53,1975
+            orig_simpl_objective = A.size() + B.size()orig_simpl_objective55,2119
+            vA = "-".join([str(x) for x in pA])vA56,2174
+            vB = "-".join([str(x) for x in pB])vB57,2222
+        iters_B = deepcopy(iters_A)iters_B59,2353
+
+experiments/heu_sol_struct.py,390
+import BDD as DDDD6,146
+import varseq as vsvs7,163
+import BB_search as bbbb8,183
+import numpy as npnp9,206
+import argparse as apap11,251
+def run_experiment(N=5, k=0, inst_type="rnd", logdest="none"):run_experiment17,332
+    parser = ap.ArgumentParser(description=" Experiment: analyzing heuristic solutions. (c) A. Bparser102,3109
+    args = parser.parse_args()args110,3750
+
+experiments/sample_BB_tree.py,116
+import varseq as vsvs6,126
+import BB_search as BBBB7,146
+import argparse as apap8,169
+def main():main10,192
+
+experiments/sumofproducts.py,159
+import numpy as npnp3,62
+import gurobipy as gpgp5,103
+def gen_instance(n, M=3, jmax=3, Cmax=10.0):gen_instance8,151
+def make_MIP(I, c):make_MIP44,1171
+
+experiments/BDD_size_illustration/BDD_size_illustration.py,434
+import numpy as npnp14,257
+import pandas as pdpd15,276
+B = BDD.BDD()B25,437
+min_o = None; max_o = Nonemin_o29,508
+min_o = None; max_o = Nonemax_o29,508
+min_s = 0; max_s = 0min_s30,535
+min_s = 0; max_s = 0max_s30,535
+    Bp = deepcopy(B)Bp34,589
+        min_o = omin_o39,738
+        min_s = Bp.size()min_s40,756
+        max_o = omax_o43,826
+        max_s = Bp.size()max_s44,844
+Bp = B.align_to(max_o)Bp49,980
+
+experiments/BDD_size_illustration/orig_BDD.dot,0
+
+experiments/BDD_size_illustration/sample_5var_inst.bdd,0
+
+experiments/BDD_size_illustration/max_BDD.dot,0
+
+experiments/rnd_dia_hist_sizes_control.py,174
+import argparse as apap8,239
+import varseq as vsvs13,311
+import BDD as DDDD14,331
+import BB_search as bbbb15,348
+import numpy as npnp16,371
+def main():main19,392
+
+experiments/tUFLP_runtimes.py,275
+import argparse as apap3,94
+import varseq as vsvs8,176
+import BDD as DDDD9,196
+import BB_search as bbbb10,213
+def show_header():show_header15,276
+def benchmark(K=10, TOL=1e-3, n=5, prefix=0, do_sifts=False, logging=None):benchmark20,369
+def main():main164,5459
+
+experiments/jUFL_hist_sizes.py,174
+import argparse as apap6,233
+import varseq as vsvs12,317
+import BDD as DDDD13,337
+import BB_search as bbbb14,354
+import numpy as npnp15,377
+def main():main18,409
+
+experiments/misc.py,86
+def log(instance, *what_to_print, outfile = sys.stdout, comment="--none--"):log4,75
+
+experiments/par_scal_test.py,1730
+import BDD as exactexact8,344
+import varseq as simplsimpl9,364
+import BB_search as bbbb11,409
+import heuristics as heuheu12,432
+import numpy as npnp13,457
+import argparse as apap16,513
+    parser = ap.ArgumentParser(description="Processes (solves) a list of align-BDD instances (c)parser20,596
+    args = parser.parse_args()args27,1258
+    inst_dir = args.inst_dirinst_dir36,1565
+                inst_id = inst_id.rstrip()inst_id42,1758
+                fnameA = "".join([inst_dir, "A",inst_id,".bdd"])fnameA46,1865
+                fnameB = "".join([inst_dir, "B",inst_id,".bdd"])fnameB47,1930
+                bdd_A = exact.BDD(); bdd_A.load(fnameA)bdd_A48,1995
+                bdd_B = exact.BDD(); bdd_B.load(fnameB)bdd_B49,2051
+                t0=time()t054,2238
+                vs_A = simpl.VarSeq(bdd_A.vars, [len(l) for l in bdd_A.layers[:-1]])vs_A55,2264
+                vs_B = simpl.VarSeq(bdd_B.vars, [len(l) for l in bdd_B.layers[:-1]])vs_B56,2349
+                N = len(vs_A)N58,2435
+                b = bb.BBSearch(vs_A,vs_B)b61,2529
+                status = b.search()status62,2572
+                o = b.Ap_cand.layer_var # optimal order found by the BBSearcho63,2608
+                orig_simpl_obj = bdd_A.align_to(o).size() + bdd_B.align_to(o).size()orig_simpl_obj64,2686
+                t1 = time()t165,2771
+                t0 = time()t073,3166
+                size,_,o = heu.orig_gsifts1p(bdd_A,bdd_B, None)size74,3194
+                size,_,o = heu.orig_gsifts1p(bdd_A,bdd_B, None)_74,3194
+                size,_,o = heu.orig_gsifts1p(bdd_A,bdd_B, None)o74,3194
+                t1 = time()t175,3258
+                    gs_status="aligned"gs_status78,3314
+
+rnd_inv_stats.py,758
+import matplotlib.pyplot as pltplt9,151
+import numpy as npnp10,183
+N = 8 # no. of varsN13,225
+n = 50 # no. of instances for the histogramn14,245
+MIN_I_OPT = []MIN_I_OPT16,290
+i = 0i17,305
+    t0 = time()t020,373
+    A = BDD.random(N=N); B = BDD.random(N=N)A21,389
+    A = BDD.random(N=N); B = BDD.random(N=N)B21,389
+    no_opts, As, Bs = A.OA_bruteforce(B)no_opts26,686
+    no_opts, As, Bs = A.OA_bruteforce(B)As26,686
+    no_opts, As, Bs = A.OA_bruteforce(B)Bs26,686
+    vsA = VarSeq(A.vars,[A.n(i) for i in range(N)])vsA27,727
+    vsB = VarSeq(B.vars,[B.n(i) for i in range(N)])vsB28,779
+    MIN_I_OPT = min([vsA.count_inversions_to(D.vars) for D in As]+[vsB.count_inversions_to(D.varMIN_I_OPT29,831
+    t1 = time()t131,955
+
+__init__.py,0
+
+tUFLP.py,2576
+from copy import copy as cpycpy10,313
+import numpy as npnp12,355
+import networkx as nxnx15,436
+import gurobipy as gpgp16,458
+import BDD as DDDD17,480
+import BB_search as bbbb18,497
+import varseq as vsvs19,520
+def make_label(state):make_label27,709
+class DegreeKeeper:DegreeKeeper32,870
+    def __init__(self, S=None, next_node_type="min"):__init__34,930
+    def __len__(self):__len__61,1898
+    def __getitem__(self, key):__getitem__65,2001
+    def get_next(self):get_next69,2104
+    def decrement(self, j):decrement79,2397
+    def push(self, i, d):push100,3127
+    def pop(self):pop105,3277
+    def has_freedom(self, key):has_freedom114,3593
+class TypeSorter:TypeSorter119,3727
+    def __init__(self, f_types, node_order):__init__121,3820
+    def rel_weight(self, elements_in_A, elements_in_B):rel_weight127,4052
+    def sort_types(self):sort_types150,4820
+def build_cover_DD(S, f, next_node_type='min'):build_cover_DD185,6014
+def build_randomized_cover_DD(S, f):build_randomized_cover_DD310,10514
+def build_type_DD(f, f_types, k_bar, preferred_order=None):  # pylint: disable=invalid-namebuild_type_DD427,14395
+def build_randomized_type_DD(f, f_types, k_bar):  # pylint: disable=invalid-namebuild_randomized_type_DD566,19738
+def build_tUFLP_MIP(S, f, f_types, k_bar):build_tUFLP_MIP589,20523
+def solve_with_MIP(S, f, fc, kb):solve_with_MIP625,21427
+def generate_test_instance(n, p=0.3):generate_test_instance633,21626
+def generate_test_instance_alt(n, p=0.3, nodes_per_type=5):generate_test_instance_alt690,23336
+def generate_string_instance(n):generate_string_instance746,24931
+def generate_organic_instance(n):generate_organic_instance796,26375
+def generate_d4_instance(n):generate_d4_instance869,28289
+def generate_simple_problem():generate_simple_problem944,30213
+def generate_5d_problem(n=None):generate_5d_problem956,30564
+def draw_problem_dia(S, f, f_types, k_bar,draw_problem_dia970,31007
+def check_simple_example():check_simple_example992,31900
+def solve_with_BDD_MIP(S, f, fc, kb):solve_with_BDD_MIP1004,32327
+def test_type_UFL():test_type_UFL1016,32754
+def solve_with_align_BDD(S, f, fc, kb):solve_with_align_BDD1027,33235
+def no_invs(order, blocks, target):no_invs1065,34374
+def bruteforce_correct_order(f_types, target_order):bruteforce_correct_order1100,35444
+def find_correct_order(f_types, target_order):find_correct_order1123,36154
+def make_instance(n):make_instance1131,36392
+def get_score(A, target):get_score1137,36628
+def show_cov(n, gen_func):show_cov1147,36936
+
+solve_inst.py,223
+import BDD as exactexact11,564
+import varseq as simplsimpl12,584
+import BB_search as bbbb14,629
+import heuristics as heuheu15,652
+import numpy as npnp16,677
+import argparse as apap19,733
+def main():main22,789
+
+figures/experimental/2021-04-22_heu_simscore/heu_simscore_tUFL.zip,0
+
+figures/experimental/2021-04-22_heu_simscore/heu_simscore_rnd.zip,0
+
+figures/.opts_stats,0
+
+figures/guessing.tex,0
+
+CHANGELOG.org,0
+
+QuFix.o2898392,0
+
+TAGS,0
+
+gen_BDD_pair.py,171
+import BDD as exactexact16,581
+import numpy as npnp17,601
+import argparse as apap20,641
+def count_inversions(X, Y):count_inversions22,664
+def main():main42,1100
+
+instances/bm_heu_random_diagrams.tar.gz,0
+
+instances/orig_problem.list,0
+
+instances/orig_stats.tar.gz,0
+
+instances/heu_sol_struct.tar.gz,0
+
+instances/orig_scal.tar.gz,0
+
+instances/orig_problem.tar.gz,0
+
+tests/int_A.wbdd,0
+
+tests/int_B.wbdd,0
+
+tests/simple_DD.bdd,0
+
+tests/jUFL_test.py,43
+def test_jUFL(test_inst):test_jUFL12,304
+
+tests/BDD_equivalence.py,1901
+import numpy as npnp8,247
+import pandas as pdpd9,266
+import argparse as apap10,286
+import BDD as BDDBDD15,379
+N = 8N17,398
+NO_SWAPS = 20NO_SWAPS18,404
+NO_SIFTS = 20NO_SIFTS19,418
+NO_ALIGNS = 20NO_ALIGNS20,432
+NO_GSIFTS = 20NO_GSIFTS21,447
+TIMEOUT = 600 # in secondsTIMEOUT22,462
+PROGRESS_STEPS = 100PROGRESS_STEPS23,489
+P_STEP = TIMEOUT / PROGRESS_STEPSP_STEP24,510
+def test_BDD_transformations(B,no_iters=250):test_BDD_transformations26,545
+def adhoc_test():adhoc_test78,2109
+def print_pair(B,Bp):print_pair83,2220
+    time_ctr = 0time_ctr96,2898
+    test_ctr = 0test_ctr97,2915
+    t0 = time()t098,2932
+    t1 = time()t199,2948
+        B = BDD.BDD.random(N)B104,3084
+        Bp = deepcopy(B)Bp108,3172
+        eq, msg = B.is_equivalent(Bp)eq109,3197
+        eq, msg = B.is_equivalent(Bp)msg109,3197
+        keep_trying = Truekeep_trying116,3400
+        Bp = BDD.BDD.random(N)Bp117,3427
+            eq, msg = B.is_equivalent(Bp)eq120,3486
+            eq, msg = B.is_equivalent(Bp)msg120,3486
+        Bp = deepcopy(B)Bp133,3943
+        eq, msg = B.is_equivalent(Bp)eq137,4050
+        eq, msg = B.is_equivalent(Bp)msg137,4050
+        Bp = deepcopy(B)Bp144,4257
+        eq, msg = B.is_equivalent(Bp)eq148,4389
+        eq, msg = B.is_equivalent(Bp)msg148,4389
+        Bp = deepcopy(B)Bp155,4611
+            Bp = Bp.align_to(np.random.permutation(B.vars), inplace=False)Bp157,4671
+        eq, msg = B.is_equivalent(Bp)eq159,4747
+        eq, msg = B.is_equivalent(Bp)msg159,4747
+        Bp = deepcopy(B)Bp166,4966
+        eq, msg = B.is_equivalent(Bp)eq170,5096
+        eq, msg = B.is_equivalent(Bp)msg170,5096
+        Bp = deepcopy(B)Bp177,5308
+            A = BDD.BDD.random(N)A179,5368
+        eq, msg = B.is_equivalent(Bp)eq183,5505
+        eq, msg = B.is_equivalent(Bp)msg183,5505
+        t1 = time()t1189,5700
+
+tests/simple_DD.wbdd,0
+
+tests/__init__.py,0
+
+tests/tUFLP_test.py,303
+def test_random_UFL(test_inst):test_random_UFL9,417
+def test_triple(test_inst):test_triple22,997
+def test_TypeSorter(test_inst):test_TypeSorter39,1906
+def test_randomized_cover_DD(test_inst):test_randomized_cover_DD49,2420
+def test_randomized_type_DD(test_inst):test_randomized_type_DD59,2763
+
+tests/UFLP_test.py,166
+import numpy as npnp7,119
+def gen_UFL_instance(n, m):gen_UFL_instance13,177
+def test_MIPs(test_inst):test_MIPs56,1601
+def test_DPs(test_inst):test_DPs87,2579
+
+tests/BB_search_test.py,108
+import varseq as vsvs11,311
+import BB_search as bbbb12,331
+def test_BB_search(N):test_BB_search15,410
+
+tests/BDD_load_save.bdd,0
+
+tests/varseq_test.py,100
+import numpy as npnp6,102
+import varseq as vsvs7,121
+def test_align_to(N):test_align_to10,219
+
+tests/simple_BDD_different_vars.bdd,0
+
+tests/edge_case_1.wbdd,0
+
+tests/BDD_test.py,919
+import numpy as npnp6,79
+def test_load_save(D):test_load_save14,430
+def test_shortest_path(test_inst):test_shortest_path26,868
+def test_random_swapping(test_inst):test_random_swapping54,1973
+def test_swaps_w():test_swaps_w133,4749
+def test_swaps_weighted(i):test_swaps_weighted163,5482
+def test_swaps_uweighted(i):test_swaps_uweighted185,6065
+def test_intersect(i):test_intersect206,6561
+def save_load(bdd):save_load224,7187
+def gen_4BDD():gen_4BDD238,7631
+def test_save_load_noargs():test_save_load_noargs266,8140
+def show_create_render():show_create_render274,8326
+def show_swap_sift(bdd):show_swap_sift303,8913
+def show_intersections():show_intersections360,9983
+def show_rnd():show_rnd373,10327
+def show_align():show_align377,10452
+def show_bruteforcing():show_bruteforcing390,10893
+def show_rnd_naming():show_rnd_naming401,11195
+def show_swapping_2():show_swapping_2414,11475
+
+tests/adhoc-tests/BB_search_runtimes.py,113
+SETUP_CODE = '''import varseq as vsSETUP_CODE12,204
+TEST_CODE='''A = vs.VarSeq.random(N = 10)TEST_CODE15,267
+
+tests/adhoc-tests/scal_runtimes.py,695
+import numpy as npnp10,167
+import BDD as exactexact13,216
+import BB_search as BBBB14,236
+import varseq as vsvs15,259
+def summarize_runtime(N):summarize_runtime19,303
+N=25N48,1327
+pr = cProfile.Profile()pr49,1332
+A = exact.BDD.random(N=N)A51,1368
+B = exact.BDD.random(N=N)B52,1394
+vsA = vs.VarSeq(A.vars, [len(l) for l in A.layers[:-1]])vsA54,1521
+vsB = vs.VarSeq(B.vars, [len(l) for l in B.layers[:-1]])vsB55,1578
+b = BB.BBSearch(vsA,vsB)b56,1635
+status = b.search()status57,1660
+order = b.Ap_cand.layer_varorder58,1680
+target_obj = A.align_to(order).size()+B.align_to(order).size()target_obj59,1708
+ps = pstats.Stats(pr).strip_dirs().sort_stats('time')ps62,1796
+
+tests/adhoc-tests/BB_log_correct.R,1312
+option_list = list(option_list13,525
+  make_option(c("-b", "--BBlog"), type="character", default="run_logs/BB_bounds_R.log",anonVec75d0af0b010614,545
+  make_option(c("-b", "--BBlog"), type="character", default="run_logs/BB_bounds_R.log",type14,545
+  make_option(c("-b", "--BBlog"), type="character", default="run_logs/BB_bounds_R.log",default14,545
+  make_option(c("-s", "--sollog"), type="character", default="run_logs/solved_R.log",anonVec75d0af0b020616,718
+  make_option(c("-s", "--sollog"), type="character", default="run_logs/solved_R.log",type16,718
+  make_option(c("-s", "--sollog"), type="character", default="run_logs/solved_R.log",default16,718
+opt_parser = OptionParser(option_list=option_list);opt_parser20,893
+opt = parse_args(opt_parser);opt21,945
+BB_log = opt$BBlogBB_log30,1195
+sol_log = opt$sollogsol_log31,1214
+BBs = read.csv(BB_log, stringsAsFactors = FALSE)BBs32,1235
+sols= read.csv(sol_log, stringsAsFactors = FALSE)sols33,1284
+sols = filter(sols, instance >= 0 & num_type == "simpl_BB_obj")sols34,1334
+BBopts = filter(BBs, num_type == "steplog" & comment == "status:optimal")BBopts39,1478
+neqs = filter(BBopts, LB != UB)neqs43,1651
+cross_check = merge(x=BBopts, y=sols, by="instance")cross_check51,1852
+neqs = filter(cross_check, UB != value)neqs53,1906
+
+docs/build/code_docs.zip,0
+
+docs/build/html/objects.inv,0
+
+docs/build/html/_static/fonts/fontawesome-webfont.woff,0
+
+docs/build/html/_static/fonts/fontawesome-webfont.eot,0
+
+docs/build/html/_static/fonts/fontawesome-webfont.ttf,0
+
+docs/build/html/_static/fonts/RobotoSlab/roboto-slab-v7-bold.ttf,0
+
+docs/build/html/_static/fonts/RobotoSlab/roboto-slab-v7-regular.eot,0
+
+docs/build/html/_static/fonts/RobotoSlab/roboto-slab-v7-bold.eot,0
+
+docs/build/html/_static/fonts/RobotoSlab/roboto-slab-v7-regular.ttf,0
+
+docs/build/html/_static/fonts/RobotoSlab/roboto-slab-v7-regular.woff,0
+
+docs/build/html/_static/fonts/RobotoSlab/roboto-slab-v7-bold.woff,0
+
+docs/build/html/_static/fonts/RobotoSlab/roboto-slab-v7-regular.woff2,0
+
+docs/build/html/_static/fonts/RobotoSlab/roboto-slab-v7-bold.woff2,0
+
+docs/build/html/_static/fonts/fontawesome-webfont.woff2,0
+
+docs/build/html/_static/fonts/Lato/lato-regular.woff2,0
+
+docs/build/html/_static/fonts/Lato/lato-italic.ttf,0
+
+docs/build/html/_static/fonts/Lato/lato-italic.woff2,0
+
+docs/build/html/_static/fonts/Lato/lato-bolditalic.ttf,0
+
+docs/build/html/_static/fonts/Lato/lato-bold.eot,0
+
+docs/build/html/_static/fonts/Lato/lato-bolditalic.woff2,0
+
+docs/build/html/_static/fonts/Lato/lato-regular.eot,0
+
+docs/build/html/_static/fonts/Lato/lato-bold.woff2,0
+
+docs/build/html/_static/fonts/Lato/lato-bold.ttf,0
+
+docs/build/html/_static/fonts/Lato/lato-bold.woff,0
+
+docs/build/html/_static/fonts/Lato/lato-bolditalic.eot,0
+
+docs/build/html/_static/fonts/Lato/lato-bolditalic.woff,0
+
+docs/build/html/_static/fonts/Lato/lato-regular.woff,0
+
+docs/build/html/_static/fonts/Lato/lato-italic.eot,0
+
+docs/build/html/_static/fonts/Lato/lato-italic.woff,0
+
+docs/build/html/_static/fonts/Lato/lato-regular.ttf,0
+
+docs/build/html/.buildinfo,0
+
+docs/build/doctrees/_autosummary/heuristics.doctree,0
+
+docs/build/doctrees/_autosummary/experiments.misc.doctree,0
+
+docs/build/doctrees/_autosummary/UFLP_test.doctree,0
+
+docs/build/doctrees/_autosummary/experiments.doctree,0
+
+docs/build/doctrees/_autosummary/experiments.jUFL_hist_sizes.doctree,0
+
+docs/build/doctrees/_autosummary/UFL.doctree,0
+
+docs/build/doctrees/_autosummary/experiments.par_scal_test.doctree,0
+
+docs/build/doctrees/_autosummary/varseq_test.doctree,0
+
+docs/build/doctrees/_autosummary/experiments.heu_sol_struct.doctree,0
+
+docs/build/doctrees/_autosummary/BDD_equivalence.doctree,0
+
+docs/build/doctrees/_autosummary/experiments.sample_BB_tree.doctree,0
+
+docs/build/doctrees/_autosummary/experiments.tUFLP_runtimes.doctree,0
+
+docs/build/doctrees/_autosummary/BB_search_test.doctree,0
+
+docs/build/doctrees/_autosummary/varseq.doctree,0
+
+docs/build/doctrees/_autosummary/tUFLP.doctree,0
+
+docs/build/doctrees/_autosummary/experiments.gen_lsizes_stats.doctree,0
+
+docs/build/doctrees/_autosummary/BDD.doctree,0
+
+docs/build/doctrees/_autosummary/tUFLP_test.doctree,0
+
+docs/build/doctrees/_autosummary/BB_search.doctree,0
+
+docs/build/doctrees/_autosummary/solve_inst.doctree,0
+
+docs/build/doctrees/_autosummary/experiments.rnd_dia_hist_sizes_control.doctree,0
+
+docs/build/doctrees/_autosummary/experiments.exp_BDD_example.doctree,0
+
+docs/build/doctrees/_autosummary/BDD_test.doctree,0
+
+docs/build/doctrees/_autosummary/gen_BDD_pair.doctree,0
+
+docs/build/doctrees/_autosummary/experiments.tUFL_hist_sizes_control.doctree,0
+
+docs/build/doctrees/_autosummary/experiments.compare_simpl_LBs.doctree,0
+
+docs/build/doctrees/overview.doctree,0
+
+docs/build/doctrees/index.doctree,0
+
+docs/build/doctrees/environment.pickle,0
+
+docs/source/_autosummary/experiments.heu_sol_struct.rst,233
+experiments.heu\_sol\_structexperiments.heu\_sol\_struct4,86
+Module summaryModule summary7,145
+Implements functions (outside the classes above):Implements functions (outside the classes above):19,405
+FunctionsFunctions43,642
+
+docs/source/_autosummary/varseq_test.rst,200
+varseq\_testvarseq\_test4,59
+Module summaryModule summary7,86
+Implements functions (outside the classes above):Implements functions (outside the classes above):19,331
+FunctionsFunctions43,567
+
+docs/source/_autosummary/tUFLP_test.rst,198
+tUFLP\_testtUFLP\_test4,57
+Module summaryModule summary7,82
+Implements functions (outside the classes above):Implements functions (outside the classes above):19,326
+FunctionsFunctions47,653
+
+docs/source/_autosummary/UFL.rst,182
+UFLUFL4,43
+Module summaryModule summary7,52
+Implements functions (outside the classes above):Implements functions (outside the classes above):19,289
+FunctionsFunctions63,943
+
+docs/source/_autosummary/varseq.rst,256
+varseqvarseq4,49
+Module summaryModule summary7,64
+Implements classes:Implements classes:17,302
+Implements functions (outside the classes above):Implements functions (outside the classes above):27,375
+VarSeqVarSeq49,609
+FunctionsFunctions67,817
+
+docs/source/_autosummary/experiments.tUFL_hist_sizes_control.rst,254
+experiments.tUFL\_hist\_sizes\_controlexperiments.tUFL\_hist\_sizes\_control4,104
+Module summaryModule summary7,183
+Implements functions (outside the classes above):Implements functions (outside the classes above):19,452
+FunctionsFunctions43,679
+
+docs/source/_autosummary/solve_inst.rst,198
+solve\_instsolve\_inst4,57
+Module summaryModule summary7,82
+Implements functions (outside the classes above):Implements functions (outside the classes above):19,326
+FunctionsFunctions43,553
+
+docs/source/_autosummary/experiments.sample_BB_tree.rst,233
+experiments.sample\_BB\_treeexperiments.sample\_BB\_tree4,89
+Module summaryModule summary7,148
+Implements functions (outside the classes above):Implements functions (outside the classes above):19,408
+FunctionsFunctions43,635
+
+docs/source/_autosummary/UFLP_test.rst,196
+UFLP\_testUFLP\_test4,55
+Module summaryModule summary7,78
+Implements functions (outside the classes above):Implements functions (outside the classes above):19,321
+FunctionsFunctions45,585
+
+docs/source/_autosummary/experiments.exp_BDD_example.rst,235
+experiments.exp\_BDD\_exampleexperiments.exp\_BDD\_example4,88
+Module summaryModule summary7,149
+Implements functions (outside the classes above):Implements functions (outside the classes above):19,410
+FunctionsFunctions43,637
+
+docs/source/_autosummary/heuristics.rst,272
+heuristicsheuristics4,57
+Module summaryModule summary7,80
+Implements functions (outside the classes above):Implements functions (outside the classes above):19,324
+Attributes defined in the module:Attributes defined in the module:52,873
+FunctionsFunctions73,1087
+
+docs/source/_autosummary/BDD_equivalence.rst,209
+BDD\_equivalenceBDD\_equivalence4,67
+Module summaryModule summary7,102
+Implements functions (outside the classes above):Implements functions (outside the classes above):19,351
+FunctionsFunctions45,626
+
+docs/source/_autosummary/BDD_test.rst,194
+BDD\_testBDD\_test4,53
+Module summaryModule summary7,74
+Implements functions (outside the classes above):Implements functions (outside the classes above):19,316
+FunctionsFunctions60,877
+
+docs/source/_autosummary/experiments.misc.rst,209
+experiments.miscexperiments.misc4,66
+Module summaryModule summary7,101
+Implements functions (outside the classes above):Implements functions (outside the classes above):19,351
+FunctionsFunctions43,577
+
+docs/source/_autosummary/experiments.rst,64
+experimentsexperiments4,59
+Module summaryModule summary7,84
+
+docs/source/_autosummary/experiments.jUFL_hist_sizes.rst,235
+experiments.jUFL\_hist\_sizesexperiments.jUFL\_hist\_sizes4,88
+Module summaryModule summary7,149
+Implements functions (outside the classes above):Implements functions (outside the classes above):19,410
+FunctionsFunctions43,637
+
+docs/source/_autosummary/BDD.rst,262
+BDDBDD4,43
+Module summaryModule summary7,52
+Implements classes:Implements classes:17,287
+Implements functions (outside the classes above):Implements functions (outside the classes above):28,365
+BDDBDD51,607
+nodenode63,803
+FunctionsFunctions81,1007
+
+docs/source/_autosummary/experiments.gen_lsizes_stats.rst,103
+experiments.gen\_lsizes\_statsexperiments.gen\_lsizes\_stats4,90
+Module summaryModule summary7,153
+
+docs/source/_autosummary/gen_BDD_pair.rst,204
+gen\_BDD\_pairgen\_BDD\_pair4,61
+Module summaryModule summary7,92
+Implements functions (outside the classes above):Implements functions (outside the classes above):19,338
+FunctionsFunctions44,585
+
+docs/source/_autosummary/experiments.par_scal_test.rst,97
+experiments.par\_scal\_testexperiments.par\_scal\_test4,84
+Module summaryModule summary7,141
+
+docs/source/_autosummary/BB_search_test.rst,209
+BB\_search\_testBB\_search\_test4,65
+Module summaryModule summary7,100
+Implements functions (outside the classes above):Implements functions (outside the classes above):19,348
+FunctionsFunctions43,585
+
+docs/source/_autosummary/experiments.compare_simpl_LBs.rst,105
+experiments.compare\_simpl\_LBsexperiments.compare\_simpl\_LBs4,92
+Module summaryModule summary7,157
+
+docs/source/_autosummary/experiments.tUFLP_runtimes.rst,231
+experiments.tUFLP\_runtimesexperiments.tUFLP\_runtimes4,86
+Module summaryModule summary7,143
+Implements functions (outside the classes above):Implements functions (outside the classes above):19,403
+FunctionsFunctions45,658
+
+docs/source/_autosummary/BB_search.rst,374
+BB\_searchBB\_search4,55
+Module summaryModule summary7,78
+Implements classes:Implements classes:17,319
+Implements functions (outside the classes above):Implements functions (outside the classes above):28,408
+Attributes defined in the module:Attributes defined in the module:46,694
+BBSearchBBSearch64,886
+SearchNodeSearchNode76,1092
+FunctionsFunctions94,1308
+
+docs/source/_autosummary/experiments.rnd_dia_hist_sizes_control.rst,262
+experiments.rnd\_dia\_hist\_sizes\_controlexperiments.rnd\_dia\_hist\_sizes\_control4,110
+Module summaryModule summary7,197
+Implements functions (outside the classes above):Implements functions (outside the classes above):19,469
+FunctionsFunctions43,696
+
+docs/source/_autosummary/tUFLP.rst,299
+tUFLPtUFLP4,47
+Module summaryModule summary7,60
+Implements classes:Implements classes:17,297
+Implements functions (outside the classes above):Implements functions (outside the classes above):28,390
+DegreeKeeperDegreeKeeper74,1147
+TypeSorterTypeSorter86,1361
+FunctionsFunctions104,1577
+
+docs/source/conf.py,635
+project = 'Align-BDD'project23,852
+copyright = '2021, Alexey Bochkarev, Clemson University'copyright24,874
+author = 'Alexey Bochkarev'author25,931
+extensions = [extensions33,1189
+numpydoc_show_class_members = Falsenumpydoc_show_class_members41,1339
+templates_path = ['_templates']templates_path44,1449
+exclude_patterns = []exclude_patterns52,1769
+autodoc_default_options = {autodoc_default_options54,1792
+autosummary_generate = Trueautosummary_generate63,2005
+html_theme = 'sphinx_rtd_theme'html_theme70,2220
+html_theme_options = {html_theme_options71,2252
+html_static_path = ['_static']html_static_path80,2584
+
+docs/source/index.rst,141
+Implementation details for Align-BDD projectImplementation details for Align-BDD project6,220
+Indices and tablesIndices and tables15,377
+
+docs/source/overview.rst,651
+Implementation: overviewImplementation: overview1,0
+Computational infrastructureComputational infrastructure12,632
+ReproducibilityReproducibility23,1463
+.. [#] obviously, they are dependent on specific software and hardware on the computation system#43,2668
+Problem instances and raw dataProblem instances and raw data45,2775
+Raw data formatRaw data format94,11616
+Code organizationCode organization131,13629
+Producing figuresProducing figures135,13720
+Key data structures and algorithms.Key data structures and algorithms.139,14063
+Numerical experimentsNumerical experiments152,14401
+Testing frameworkTesting framework167,14728
+
+docs/source/_templates/autosummary/module.rst,322
+Module summaryModule summary6,98
+Implements classes:Implements classes:16,360
+Implements functions (outside the classes above):Implements functions (outside the classes above):27,506
+Attributes defined in the module:Attributes defined in the module:38,736
+{{ item }}{{ item }}58,1052
+FunctionsFunctions78,1348
+
+docs/make.bat,155
+	set SPHINXBUILD=sphinx-buildSPHINXBUILD8,101
+set SOURCEDIR=sourceSOURCEDIR10,135
+set BUILDDIR=buildBUILDDIR11,157
+:helphelp31,715
+:endend34,787
+
+docs/Makefile,197
+SPHINXOPTS    ?=SPHINXOPTS6,151
+SPHINXBUILD   ?= sphinx-buildSPHINXBUILD7,168
+SOURCEDIR     = sourceSOURCEDIR8,198
+BUILDDIR      = buildBUILDDIR9,221
+help:help12,312
+%: Makefile%19,555
+
+tmp/tUFLP_runtimes.csv,0
+
+tmp/test_save.bdd,0
+
+tmp/bm_heu_inst/A2-1.bdd,0
+
+tmp/bm_heu_inst/B1-4.bdd,0
+
+tmp/bm_heu_inst/B2-5.bdd,0
+
+tmp/bm_heu_inst/A2-4.bdd,0
+
+tmp/bm_heu_inst/B1-2.bdd,0
+
+tmp/bm_heu_inst/A2-2.bdd,0
+
+tmp/bm_heu_inst/A1-2.bdd,0
+
+tmp/bm_heu_inst/A1-5.bdd,0
+
+tmp/bm_heu_inst/A1-0.bdd,0
+
+tmp/bm_heu_inst/A1-3.bdd,0
+
+tmp/bm_heu_inst/A2-0.bdd,0
+
+tmp/bm_heu_inst/B2-4.bdd,0
+
+tmp/bm_heu_inst/B2-1.bdd,0
+
+tmp/bm_heu_inst/A2-3.bdd,0
+
+tmp/bm_heu_inst/B1-5.bdd,0
+
+tmp/bm_heu_inst/A1-1.bdd,0
+
+tmp/bm_heu_inst/A1-4.bdd,0
+
+tmp/bm_heu_inst/B2-3.bdd,0
+
+tmp/bm_heu_inst/B1-1.bdd,0
+
+tmp/bm_heu_inst/B1-0.bdd,0
+
+tmp/bm_heu_inst/A2-5.bdd,0
+
+tmp/bm_heu_inst/B1-3.bdd,0
+
+tmp/bm_heu_inst/B2-2.bdd,0
+
+tmp/bm_heu_inst/B2-0.bdd,0
+
+TODOs.org,0
+
+.Rhistory,0
+
+aux/get_libs.R,108
+install.packages(c("dplyr",anonVec6bdf0ccb01061,0
+"xtable"), repo="http://cran.rstudio.com/")repo13,158
+
+aux/R_install_packages.R,0
+
+aux/packages.list,0
+
+Makefile,4070
+PREF=./PREF10,280
+FIGS=./figuresFIGS11,288
+INST=$(PREF)/instancesINST12,303
+LOGS=$(PREF)/run_logsLOGS13,326
+PP=./post_processingPP14,348
+STATS=python -m experiments.gen_lsizes_statsSTATS16,370
+JUFL_P=0.3JUFL_P19,499
+JUFL_N=20JUFL_N20,510
+TUFL_N=20TUFL_N21,520
+TUFL_P=0.3TUFL_P22,530
+RND_N=15RND_N23,541
+RND_P=0.6RND_P24,550
+HEU_BM_NO_INST=2000HEU_BM_NO_INST25,560
+ORIG_N=15ORIG_N28,625
+ORIG_K_TOTAL=10000ORIG_K_TOTAL29,635
+STAT_K_TOTAL = 1000STAT_K_TOTAL31,655
+STAT_PS = 0.2 0.5 0.8STAT_PS32,675
+SCAL_K=200SCAL_K35,745
+PARFLAG=2PARFLAG39,816
+figures: \figures42,842
+HEU_BM_K=$(shell expr $(HEU_BM_NO_INST) / $(PARFLAG) + 1)HEU_BM_K57,1282
+STAT_K=$(shell expr $(STAT_K_TOTAL) / $(PARFLAG) + 1)STAT_K58,1340
+ORIG_K=$(shell expr $(ORIG_K_TOTAL) / $(PARFLAG) + 1)ORIG_K59,1394
+$(FIGS)/guessing.tex: $(LOGS)/main_rnd_run.csv $(PP)/tab_guessing.R$(FIGS)/guessing.tex67,1591
+$(FIGS)/simpl_heuristics.eps: $(LOGS)/main_rnd_run.csv $(PP)/fig_simpl_heuristics.R$(FIGS)/simpl_heuristics.eps73,1767
+$(FIGS)/LB.eps: $(LOGS)/simpl_LB.csv $(PP)/fig_LBs.R$(FIGS)/LB.eps78,1945
+$(LOGS)/simpl_LB.csv: $(INST)/orig_problem.list experiments/compare_simpl_LBs.py$(LOGS)/simpl_LB.csv81,2039
+$(FIGS)/orig_obj_histograms.eps: $(LOGS)/main_rnd_run.csv $(PP)/fig_obj_hist.R$(FIGS)/orig_obj_histograms.eps94,2589
+$(FIGS)/aux_hist_orig.eps: $(LOGS)/main_rnd_run.csv $(PP)/fig_obj_int.R$(FIGS)/aux_hist_orig.eps97,2714
+$(LOGS)/main_rnd_run.csv: $(INST)/orig_problem.list$(LOGS)/main_rnd_run.csv100,2866
+$(INST)/orig_problem.list: gen_BDD_pair.py$(INST)/orig_problem.list113,3355
+$(FIGS)/orig_runtimes.eps: $(LOGS)/orig_scal.csv $(PP)/fig_scal.R$(FIGS)/orig_runtimes.eps124,3894
+$(LOGS)/orig_scal.csv: $(INST)/scal/instances.list experiments/par_scal_test.py$(LOGS)/orig_scal.csv128,4003
+$(INST)/scal/instances.list: gen_BDD_pair.py$(INST)/scal/instances.list142,4674
+$(FIGS)/no_opts.eps $(FIGS)/opts_diam.eps $(FIGS)/heuristic_simscore.eps $(FIGS)/heuristic_simsc$(FIGS)/no_opts.eps152,5117
+$(FIGS)/no_opts.eps $(FIGS)/opts_diam.eps $(FIGS)/heuristic_simscore.eps $(FIGS)/heuristic_simsc$(FIGS)/opts_diam.eps152,5117
+$(FIGS)/no_opts.eps $(FIGS)/opts_diam.eps $(FIGS)/heuristic_simscore.eps $(FIGS)/heuristic_simsc$(FIGS)/heuristic_simscore.eps152,5117
+$(FIGS)/no_opts.eps $(FIGS)/opts_diam.eps $(FIGS)/heuristic_simscore.eps $(FIGS)/heuristic_simsc$(FIGS)/heuristic_simscore_vs_AB_simscore.eps152,5117
+$(FIGS)/.opts_stats: $(LOGS)/simpl_sol_struct.csv $(PP)/figs_simpl_opt_struct.R$(FIGS)/.opts_stats154,5258
+$(LOGS)/simpl_sol_struct.csv: experiments/heu_sol_struct.py$(LOGS)/simpl_sol_struct.csv158,5439
+$(FIGS)/tUFLP_runtimes_overview.eps: $(LOGS)/tUFLP_runtimes_scal.csv $(PP)/fig_tUFLP_runtimes_sc$(FIGS)/tUFLP_runtimes_overview.eps168,5890
+$(LOGS)/tUFLP_runtimes_scal.csv: experiments/tUFLP_runtimes.py$(LOGS)/tUFLP_runtimes_scal.csv171,6048
+$(FIGS)/various_simpl_vs_min.eps: $(PP)/fig_simpl_vs_min.R $(LOGS)/heu_bm/jUFLP.csv $(LOGS)/heu_$(FIGS)/various_simpl_vs_min.eps182,6673
+$(LOGS)/heu_bm/jUFLP.csv: experiments/jUFL_hist_sizes.py$(LOGS)/heu_bm/jUFLP.csv188,7017
+$(LOGS)/heu_bm/tUFLP_nat.csv: experiments/tUFL_hist_sizes_control.py$(LOGS)/heu_bm/tUFLP_nat.csv202,7669
+$(LOGS)/heu_bm/tUFLP_rnd.csv: experiments/tUFL_hist_sizes_control.py$(LOGS)/heu_bm/tUFLP_rnd.csv216,8370
+$(LOGS)/heu_bm/rnd_dia.csv: experiments/rnd_dia_hist_sizes_control.py$(LOGS)/heu_bm/rnd_dia.csv232,9215
+$(FIGS)/orig_lwidth_stats.eps: $(LOGS)/lwidths.csv $(PP)/fig_summary.R$(FIGS)/orig_lwidth_stats.eps248,9994
+$(LOGS)/lwidths.csv: gen_BDD_pair.py$(LOGS)/lwidths.csv251,10110
+$(FIGS)/tUFLP_runtimes_breakdown.eps: $(LOGS)/tUFLP_runtimes.csv $(PP)/fig_tUFLP_runtimes_breakd$(FIGS)/tUFLP_runtimes_breakdown.eps267,10973
+$(LOGS)/tUFLP_runtimes.csv: experiments/tUFLP_runtimes.py$(LOGS)/tUFLP_runtimes.csv270,11137
+save-orig-instances:save-orig-instances282,11593
+prep_dirs:prep_dirs285,11696
+clean:clean289,11811
+fresh: cleanfresh294,11879
+check_src:check_src300,11982
+cross-checks:cross-checks306,12091
+
+run_logs/sending.log,0
+
+run_logs/simpl_sol_struct.csv,0
+
+run_logs/tUFLP_runtimes.csv,0
+
+run_logs/heu_bm/rnd_dia.csv,0
+
+run_logs/heu_bm/jUFLP.csv,0
+
+run_logs/heu_bm/tUFLP_nat.csv,0
+
+run_logs/heu_bm/tUFLP_rnd.csv,0
+
+run_logs/lwidths.csv,0
+
+run_logs/simpl_LB.csv,0
+
+run_logs/orig_scal.csv,0
+
+run_logs/main_rnd_run.csv,0
+
+run_logs/tUFLP_runtimes_scal.csv,0
+
+UFL.py,1440
+import numpy as npnp8,182
+import gurobipy as gpgp9,201
+import varseq as vsvs15,304
+import BB_search as bbbb16,324
+import BDD as DDDD17,347
+def draw_problem_dia(S, f, g, filename="run_logs/problem_dia.gv"):draw_problem_dia20,366
+def create_covering_BDD_wg(S, g):  # pylint: disable=allcreate_covering_BDD_wg41,1083
+def create_covering_BDD(S, c):create_covering_BDD93,2594
+def build_Sf(S):build_Sf173,4971
+def create_availability_BDD(S, f):create_availability_BDD190,5352
+def test_DD_creation(S, f, c, name):test_DD_creation283,8449
+def build_MIP(S, f, g):build_MIP294,8905
+def add_BDD_to_MIP(D, model=None, x=None, prefix=""):add_BDD_to_MIP352,10425
+def create_NF(D):create_NF441,13656
+def solve_with_intBDD(S, f, g):solve_with_intBDD511,15925
+def build_DP_DD(S, f, g):build_DP_DD544,16860
+def make_simple_problem():make_simple_problem612,19152
+def show_BDD_to_MIP():show_BDD_to_MIP624,19533
+def show_build_MIP():show_build_MIP640,19936
+def show_BDD_build():show_BDD_build657,20441
+def show_BDD_to_MIP_wg(S, f, g):show_BDD_to_MIP_wg675,21101
+def generate_test_figures():generate_test_figures688,21556
+def generate_test_instance(n, m):generate_test_instance714,22537
+def generate_dense_instance(n, m, covering=0.95):generate_dense_instance754,23736
+def test_MIPs_protocol():test_MIPs_protocol799,25106
+def test_BDD_and_plain_MIPs(K=500, TOL=1e-3, n=3, m=4):test_BDD_and_plain_MIPs821,25721
+
+post_processing/fig_LBs_old.R,1131
+option_list = list(option_list20,506
+    make_option(c("-i", "--input"), type="character", default=NULL,anonVec6b6a97aa010621,526
+    make_option(c("-i", "--input"), type="character", default=NULL,type21,526
+    make_option(c("-i", "--input"), type="character", default=NULL,default21,526
+    make_option(c("-o", "--out"), type="character", default="./out.eps",anonVec6b6a97aa020623,678
+    make_option(c("-o", "--out"), type="character", default="./out.eps",type23,678
+    make_option(c("-o", "--out"), type="character", default="./out.eps",default23,678
+opt_parser = OptionParser(option_list=option_list);opt_parser27,837
+opt = parse_args(opt_parser);opt28,889
+df = read.csv(opt$input, stringsAsFactors = FALSE)df37,1157
+df_legends = unique(select(df_legends38,1208
+df = merge(df41,1291
+  ggplot(filter(df, !grepl("timelog",legend.tech)), aes(x=gap))+plt_LBs55,1627
+        labels = scales::number_format(accuracy = 0.5)accuracy66,2263
+  ggplot(filter(df, grepl("timelog",legend.tech)), aes(y=gap*1000,x=0))+plt_LBs_time98,3576
+      labels = scales::number_format(accuracy = 0.1)accuracy107,3964
+
+post_processing/fig_tUFL_sols_hist.R,1859
+X_QUANTILE=0.98 # quantile to filter for the histogram(Ox axis)X_QUANTILE17,418
+option_list = list(option_list22,592
+    make_option(c("-i", "--input"), type="character", default=NULL,anonVec993e969d010623,612
+    make_option(c("-i", "--input"), type="character", default=NULL,type23,612
+    make_option(c("-i", "--input"), type="character", default=NULL,default23,612
+    make_option(c("-o", "--out"), type="character", default="./out.eps",anonVec993e969d020625,764
+    make_option(c("-o", "--out"), type="character", default="./out.eps",type25,764
+    make_option(c("-o", "--out"), type="character", default="./out.eps",default25,764
+opt_parser = OptionParser(option_list=option_list);opt_parser29,923
+opt = parse_args(opt_parser);opt30,975
+infile = opt$inputinfile39,1243
+df = read.csv(infile, stringsAsFactors = FALSE)df40,1262
+df_legend = select(filter(df, num_type=="legend"), value, comment)df_legend42,1311
+df = filter(df, num_type != "legend")df43,1378
+df_wide = pivot_wider(df,df_wide46,1449
+rnd_cols = grep("^orig.*_rnd_obj$", colnames(df_wide), value = TRUE)rnd_cols52,1643
+nat_cols = grep("^orig.*_nat_obj$", colnames(df_wide), value = TRUE)nat_cols53,1712
+for (col in rnd_cols) {col55,1782
+for (col in nat_cols) {col59,1903
+nat_cols = c(nat_cols, 'orig_MinSimpl_nat_obj')nat_cols69,2317
+rnd_cols = c(rnd_cols, "orig_MinSimpl_rnd_obj")rnd_cols70,2365
+df_rel = pivot_longer(df_wide,df_rel72,2414
+df_rel = df_rel %>%df_rel78,2602
+df_rel = filter(df_rel, ! heuristic %in% c('orig_gsifts1p_type2cov', 'orig_gsifts1p_cov2type'))df_rel90,3172
+xmin = min(df_rel$value)xmin91,3268
+xmax = 2.5 #quantile(df_rel$value,1.0, na.rm=TRUE)xmax92,3293
+    ggplot(filter(df_rel, entry_type != "aux_number"), aes(x=value))+plt_dens95,3356
+        labels = scales::number_format(accuracy = 1),accuracy106,4042
+
+post_processing/fig_summary.R,1113
+option_list = list(option_list19,423
+    make_option(c("-i", "--input"), type="character", default=NULL,anonVec8d4e5079010620,443
+    make_option(c("-i", "--input"), type="character", default=NULL,type20,443
+    make_option(c("-i", "--input"), type="character", default=NULL,default20,443
+    make_option(c("-o", "--out"), type="character", default="./out.eps",anonVec8d4e5079020622,595
+    make_option(c("-o", "--out"), type="character", default="./out.eps",type22,595
+    make_option(c("-o", "--out"), type="character", default="./out.eps",default22,595
+opt_parser = OptionParser(option_list=option_list);opt_parser26,754
+opt = parse_args(opt_parser);opt27,806
+infile = opt$inputinfile37,1075
+outfile = opt$outoutfile38,1094
+Nticks = 15Nticks39,1112
+quantile_to_show = 0.88quantile_to_show40,1124
+df = read.csv(file=infile, header=FALSE, sep=",",stringsAsFactors=FALSE)df42,1149
+df_m = melt(df, id.vars=c('ID', 'P','LR',"N"))df_m46,1392
+max_lw = quantile(df_m$value,quantile_to_show)max_lw47,1439
+  ggplot(df_m, aes(x=factor(P, levels=unique(P)), y=value, color=P))+plt54,1700
+
+post_processing/fig_obj_int.R,3057
+SHOW_HEU = c("all") # heuristics to show (codes)SHOW_HEU16,359
+ORIG_BASE_COL = "orig_gsifts1p_obj" # col to divide byORIG_BASE_COL17,408
+xNticks = 15xNticks18,463
+yNticks = 15yNticks19,476
+Npts = 50Npts20,489
+option_list = list(option_list23,607
+    make_option(c("-i", "--input"), type="character", default=NULL,anonVec2b714df0010624,627
+    make_option(c("-i", "--input"), type="character", default=NULL,type24,627
+    make_option(c("-i", "--input"), type="character", default=NULL,default24,627
+    make_option(c("-o", "--out"), type="character", default="./out.eps",anonVec2b714df0020626,779
+    make_option(c("-o", "--out"), type="character", default="./out.eps",type26,779
+    make_option(c("-o", "--out"), type="character", default="./out.eps",default26,779
+opt_parser = OptionParser(option_list=option_list);opt_parser30,938
+opt = parse_args(opt_parser);opt31,990
+df = read.csv(opt$input, stringsAsFactors = FALSE)df40,1258
+df_legend = select(filter(df, num_type=="legend"), value,comment)df_legend42,1310
+df = filter(df, num_type != "legend")df43,1376
+df_wide = pivot_wider(df,df_wide47,1448
+orig_obj_cols = grep("^orig.*_obj$",colnames(df_wide),value = TRUE)orig_obj_cols53,1642
+time_cols = grep(".+time$",colnames(df_wide),value = TRUE)time_cols54,1710
+for (col in orig_obj_cols){col56,1770
+df_rel = pivot_longer(df_wide,df_rel60,1885
+    SHOW_HEU = grep("^orig.*_obj_rel$",colnames(df_wide),value = TRUE)SHOW_HEU67,2100
+    SHOW_HEU = SHOW_HEU[ SHOW_HEU != paste(ORIG_BASE_COL,"_rel",sep="")]SHOW_HEU68,2171
+df_rel = filter(df_rel, num_type %in% SHOW_HEU)df_rel71,2247
+df_rel = df_rel %>%df_rel74,2368
+df_time_o = pivot_wider(select(df_rel,-num_type),names_from = "entry_type",values_from = "value"df_time_o82,2625
+df_time_o = merge(x=df_time_o, y=df_legend, by.x = "heuristic", by.y = "value")df_time_o83,2723
+df_time_o = filter(df_time_o, obj > 0)df_time_o87,2921
+pfrom = min(df_time_o$obj)pfrom89,2961
+pto = max(df_time_o$obj)pto90,2988
+opt_percent = seq(from = pfrom, to = pto,length.out = Npts)opt_percent92,3014
+cols = unique(df_rel$num_type)cols94,3075
+int_df = lapply(cols,int_df96,3107
+                     function(col){anonFunc2b714df0040097,3129
+                         idf = data.frame(mcol = sapply(opt_percent, function(p){idf98,3165
+                         idf = data.frame(mcol = sapply(opt_percent, function(p){mcol98,3165
+                         idf = data.frame(mcol = sapply(opt_percent, function(p){anonFunc2b714df0050098,3165
+int_df = bind_cols(int_df)int_df104,3501
+int_df_m = pivot_longer(int_df, names_to = "heuristic", values_to = "shares",cols=-c("opt_percenint_df_m106,3561
+int_df_m = merge(x=int_df_m, y=df_legend, by.x="heuristic", by.y = "value")int_df_m107,3662
+apprs = int_df_m %>%apprs111,3829
+apprs = int_df_m %>%apprs119,4038
+    ggplot(int_df_m)+plt_integrated128,4265
+        labels = scales::number_format(accuracy =0.01)accuracy143,4851
+        labels = scales::percent_format(accuracy = 0.1)accuracy148,5018
+
+post_processing/fig_obj_hist.R,2255
+X_QUANTILE=0.98 # quantile to filter for the histogram(Ox axis)X_QUANTILE18,446
+ORIG_BASE_COL = "orig_gsifts1p_obj" # col to divide byORIG_BASE_COL19,510
+SHOW_HEU = c("all")SHOW_HEU22,596
+option_list = list(option_list27,809
+    make_option(c("-i", "--input"), type="character", default=NULL,anonVec96ec01dd010628,829
+    make_option(c("-i", "--input"), type="character", default=NULL,type28,829
+    make_option(c("-i", "--input"), type="character", default=NULL,default28,829
+    make_option(c("-o", "--out"), type="character", default="./out.eps",anonVec96ec01dd020630,981
+    make_option(c("-o", "--out"), type="character", default="./out.eps",type30,981
+    make_option(c("-o", "--out"), type="character", default="./out.eps",default30,981
+opt_parser = OptionParser(option_list=option_list);opt_parser34,1140
+opt = parse_args(opt_parser);opt35,1192
+infile = opt$inputinfile44,1460
+df = read.csv(infile, stringsAsFactors = FALSE)df45,1479
+df_legend = select(filter(df, num_type=="legend"), value,comment)df_legend47,1528
+df = filter(df, num_type != "legend")df48,1594
+df_wide = pivot_wider(df,df_wide51,1665
+orig_obj_cols = grep("^orig.*_obj$",colnames(df_wide),value = TRUE)orig_obj_cols57,1859
+time_cols = grep(".+time$",colnames(df_wide),value = TRUE)time_cols58,1927
+for (col in orig_obj_cols){col60,1987
+df_rel = pivot_longer(df_wide,df_rel64,2102
+    SHOW_HEU = grep("^orig.*_obj_rel$",colnames(df_wide),value = TRUE)SHOW_HEU71,2317
+    SHOW_HEU = SHOW_HEU[ SHOW_HEU != paste(ORIG_BASE_COL,"_rel",sep="")]SHOW_HEU72,2388
+df_rel = filter(df_rel, num_type %in% SHOW_HEU)df_rel75,2464
+df_rel = df_rel %>%df_rel79,2586
+df_time_o = pivot_wider(select(df_rel,-num_type),names_from = "entry_type",values_from = "value"df_time_o86,2842
+df_time_o = merge(x=df_time_o, y=df_legend, by.x = "heuristic", by.y = "value")df_time_o87,2940
+df_time_o = filter(df_time_o, obj > 0)df_time_o89,3021
+xmin = min(df_time_o$obj)xmin94,3171
+xmax = quantile(df_time_o$obj,X_QUANTILE)xmax95,3197
+latex_label = parse(text = TeX("try $S_A$, $S_B$, choose the best one"))latex_label96,3239
+    ggplot(df_time_o, aes(x=obj))+plt_dens99,3324
+        labels = scales::number_format(accuracy = 1),accuracy106,3669
+
+post_processing/fig_tUFLP_runtimes_breakdown.R,2104
+option_list = list(option_list20,491
+    make_option(c("-i", "--input"), type="character", default=NULL,anonVecf4cc0e88010621,511
+    make_option(c("-i", "--input"), type="character", default=NULL,type21,511
+    make_option(c("-i", "--input"), type="character", default=NULL,default21,511
+    make_option(c("-o", "--out"), type="character", default="./out.eps",anonVecf4cc0e88020623,663
+    make_option(c("-o", "--out"), type="character", default="./out.eps",type23,663
+    make_option(c("-o", "--out"), type="character", default="./out.eps",default23,663
+opt_parser = OptionParser(option_list=option_list);opt_parser27,822
+opt = parse_args(opt_parser);opt28,874
+infile = opt$inputinfile37,1142
+df = read.csv(infile, stringsAsFactors = FALSE)df39,1162
+df$step <- sapply(df$step, function(x) gsub("[+-]", ".", x), USE.NAMES = FALSE)anonFuncf4cc0e88030045,1309
+df$step <- sapply(df$step, function(x) gsub("[+-]", ".", x), USE.NAMES = FALSE)USE.NAMES45,1309
+df = pivot_wider(df, id_cols = "ID", names_from = step, values_from = time)df47,1390
+df = df %>%df49,1467
+df = pivot_longer(select(df, ID,df61,1861
+steps = c("build_BDDs", "solve_VS", "align_BDDs", "intersect_BDDs", "solve_SP", "VS_pipeline", "steps72,2267
+captions = list("build_BDDs"="(1) Build BDDs",captions74,2396
+captions = list("build_BDDs"="(1) Build BDDs","build_BDDs"74,2396
+                "solve_VS"="(2) Solve VS","solve_VS"75,2443
+                "align_BDDs"="(3) Align BDDs","align_BDDs"76,2486
+                "intersect_BDDs"="(4) Build\nintersection","intersect_BDDs"77,2533
+                "solve_SP"="(5) Solve SP","solve_SP"78,2593
+                "VS_pipeline"="(6) TOTAL\nCPP+SP (VS)","VS_pipeline"79,2636
+                "CPP_MIP_pipeline"="(7) CPP MIP","CPP_MIP_pipeline"80,2692
+                "naive_MIP"="(8) Naive MIP")"naive_MIP"81,2742
+df = df %>%df83,2788
+                                 function(x) return(captions[[x]]))anonFuncf4cc0e88040089,2919
+my_ticks = annotation_logticks(sides = "l")my_ticks91,2988
+ggplot(df, aes(x=time))+breakdown_plot95,3094
+
+post_processing/figs_simpl_opt_struct.R,1429
+option_list = list(option_list15,405
+  make_option(c("-d", "--outdir"), type="character", default=NULL,anonVec53b64559010616,425
+  make_option(c("-d", "--outdir"), type="character", default=NULL,type16,425
+  make_option(c("-d", "--outdir"), type="character", default=NULL,default16,425
+  make_option(c("-i", "--input"), type="character", default=NULL,anonVec53b64559020618,569
+  make_option(c("-i", "--input"), type="character", default=NULL,type18,569
+  make_option(c("-i", "--input"), type="character", default=NULL,default18,569
+opt_parser = OptionParser(option_list=option_list);opt_parser21,702
+opt = parse_args(opt_parser);opt22,754
+infile <- opt$inputinfile23,784
+outfile_no_opts <- paste0(opt$outdir, "/no_opts.eps")outfile_no_opts25,805
+outfile_opts_diam <- paste0(opt$outdir, "/opts_diam.eps")outfile_opts_diam26,859
+outfile_simscore_vs <- paste0(opt$outdir, "/heuristic_simscore.eps")outfile_simscore_vs27,917
+outfile_bin2d <- paste0(opt$outdir, "/heuristic_simscore_vs_AB_simscore.eps")outfile_bin2d28,986
+df = read.csv(infile)df34,1243
+df_less_than_hundred = filter(df, no_opts <= 100)df_less_than_hundred41,1400
+ggplot(df_less_than_hundred) +p_opts44,1460
+ggplot(df) +p_diam79,2868
+df_m = pivot_longer(select(df,df_m115,4252
+cbbPalette <- c("#000000", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CcbbPalette124,4616
+ggplot(df_m) +p_simscore127,4733
+
+post_processing/rnd_inv_hist.R,768
+option_list = list(option_list6,143
+    make_option(c("-i", "--input"), type="character", default=NULL,anonVecc89bac9d01067,163
+    make_option(c("-i", "--input"), type="character", default=NULL,type7,163
+    make_option(c("-i", "--input"), type="character", default=NULL,default7,163
+    make_option(c("-o", "--out"), type="character", default="./out.eps",anonVecc89bac9d02069,319
+    make_option(c("-o", "--out"), type="character", default="./out.eps",type9,319
+    make_option(c("-o", "--out"), type="character", default="./out.eps",default9,319
+opt_parser = OptionParser(option_list=option_list);opt_parser13,487
+opt = parse_args(opt_parser);opt14,539
+infile = opt$inputinfile23,819
+df = read.csv(infile)df25,839
+plt = ggplot(df)+plt27,862
+
+post_processing/fig_guessing.R,3159
+SIMPL_BASE_COL = "simpl_BB_obj" # exact solutionSIMPL_BASE_COL15,352
+SHOW_HEU = c("all")SHOW_HEU17,431
+option_list = list(option_list21,560
+    make_option(c("-i", "--input"), type="character", default=NULL,anonVec9bbd3c50010622,580
+    make_option(c("-i", "--input"), type="character", default=NULL,type22,580
+    make_option(c("-i", "--input"), type="character", default=NULL,default22,580
+    make_option(c("-o", "--out"), type="character", default="./out.eps",anonVec9bbd3c50020624,732
+    make_option(c("-o", "--out"), type="character", default="./out.eps",type24,732
+    make_option(c("-o", "--out"), type="character", default="./out.eps",default24,732
+    make_option(c("-a","--allowance"),type="numeric",anonVec9bbd3c50030626,888
+    make_option(c("-a","--allowance"),type="numeric",type26,888
+opt_parser = OptionParser(option_list=option_list);opt_parser30,1043
+opt = parse_args(opt_parser);opt31,1095
+df = read.csv(opt$input, stringsAsFactors = FALSE)df41,1364
+df_legend = select(filter(df, num_type=="legend"), value,comment)df_legend43,1416
+df = filter(df, num_type != "legend")df44,1482
+df_wide = pivot_wider(df,df_wide47,1553
+simpl_obj_cols = grep("^simpl.*_obj$",colnames(df_wide),value = TRUE)simpl_obj_cols53,1739
+time_cols = grep(".+time$",colnames(df_wide),value = TRUE)time_cols54,1809
+    SHOW_HEU = c(grep("^simpl.*_obj$",simpl_obj_cols,value = TRUE))SHOW_HEU57,1896
+guessing_power = data.frame(heuristic = grep(".*obj$",SHOW_HEU,value = TRUE),stringsAsFactors = guessing_power60,1967
+guessing_power = data.frame(heuristic = grep(".*obj$",SHOW_HEU,value = TRUE),stringsAsFactors = heuristic60,1967
+guessing_power = data.frame(heuristic = grep(".*obj$",SHOW_HEU,value = TRUE),stringsAsFactors = stringsAsFactors60,1967
+guessing_power$exact_guesses = sapply(guessing_power$heuristic, function(h){anonFunc9bbd3c50040062,2071
+guessing_power$good_guesses = sapply(guessing_power$heuristic, function(h){anonFunc9bbd3c50050066,2205
+guessing_power = pivot_longer(guessing_power, cols = c("good_guesses","exact_guesses"), values_tguessing_power70,2352
+guessing_power = pivot_longer(guessing_power, cols = c("good_guesses","exact_guesses"), values_tanonVec9bbd3c50060670,2352
+guessing_power = pivot_longer(guessing_power, cols = c("good_guesses","exact_guesses"), values_tvalues_to70,2352
+guessing_power = pivot_longer(guessing_power, cols = c("good_guesses","exact_guesses"), values_tnames_to70,2352
+guessing_power = guessing_power %>%guessing_power72,2490
+guessing_power = merge(x=guessing_power, y=df_legend, by.x = "heuristic", by.y = "value")guessing_power77,2621
+    ggplot(guessing_power,plt82,2808
+    scale_fill_manual(values = c(anonVec9bbd3c50070688,3196
+                          "exact_guesses" = "blue","exact_guesses"89,3230
+                          "good_guesses" = "lightblue""good_guesses"90,3282
+                      labels = c(anonVec9bbd3c50080692,3362
+                          "exact_guesses" = "optimal","exact_guesses"93,3396
+                          "good_guesses" = paste("up to",opt$allowance,"of the optimum",sep=" ")"good_guesses"94,3451
+
+post_processing/fig_tUFLP_runtimes_scal.R,1437
+option_list = list(option_list19,435
+    make_option(c("-i", "--input"), type="character", default=NULL,anonVeca5dc274e010620,455
+    make_option(c("-i", "--input"), type="character", default=NULL,type20,455
+    make_option(c("-i", "--input"), type="character", default=NULL,default20,455
+    make_option(c("-o", "--out"), type="character", default="./out.eps",anonVeca5dc274e020622,607
+    make_option(c("-o", "--out"), type="character", default="./out.eps",type22,607
+    make_option(c("-o", "--out"), type="character", default="./out.eps",default22,607
+opt_parser = OptionParser(option_list=option_list);opt_parser26,766
+opt = parse_args(opt_parser);opt27,818
+infile = opt$inputinfile36,1086
+df = read.csv(infile, stringsAsFactors = FALSE)df38,1106
+df$step = sapply(df$step, function(x) gsub("[+-]",".", x), USE.NAMES=FALSE)anonFunca5dc274e030042,1186
+df$step = sapply(df$step, function(x) gsub("[+-]",".", x), USE.NAMES=FALSE)USE.NAMES42,1186
+df = pivot_wider(df, id_cols = c("k","n"), names_from = step, values_from = time)df44,1263
+df = pivot_wider(df, id_cols = c("k","n"), names_from = step, values_from = time)anonVeca5dc274e040644,1263
+df = pivot_wider(df, id_cols = c("k","n"), names_from = step, values_from = time)names_from44,1263
+df = pivot_wider(df, id_cols = c("k","n"), names_from = step, values_from = time)values_from44,1263
+df = df %>%df46,1346
+df_means = df %>%df_means55,1722
+
+post_processing/start_orders.R,777
+option_list = list(option_list6,143
+    make_option(c("-i", "--input"), type="character", default=NULL,anonVecc36f335201067,163
+    make_option(c("-i", "--input"), type="character", default=NULL,type7,163
+    make_option(c("-i", "--input"), type="character", default=NULL,default7,163
+    make_option(c("-o", "--out"), type="character", default="./out.eps",anonVecc36f335202069,319
+    make_option(c("-o", "--out"), type="character", default="./out.eps",type9,319
+    make_option(c("-o", "--out"), type="character", default="./out.eps",default9,319
+opt_parser = OptionParser(option_list=option_list);opt_parser13,487
+opt = parse_args(opt_parser);opt14,539
+infile = opt$inputinfile23,819
+df = read.csv(infile,skip = 7)df25,839
+plt = ggplot(df)+plt27,871
+
+post_processing/fig_violin.R,2022
+ORIG_BASE_COL = "simpl_BB_obj" # col to divide byORIG_BASE_COL17,403
+Nticks = 20Nticks18,453
+Y_QUANTILE=0.98 # show "2-sigmas"Y_QUANTILE19,465
+SHOW_HEU = c("all")SHOW_HEU22,530
+option_list = list(option_list26,659
+    make_option(c("-i", "--input"), type="character", default=NULL,anonVec96c88e1c010627,679
+    make_option(c("-i", "--input"), type="character", default=NULL,type27,679
+    make_option(c("-i", "--input"), type="character", default=NULL,default27,679
+    make_option(c("-o", "--out"), type="character", default="./out.eps",anonVec96c88e1c020629,831
+    make_option(c("-o", "--out"), type="character", default="./out.eps",type29,831
+    make_option(c("-o", "--out"), type="character", default="./out.eps",default29,831
+opt_parser = OptionParser(option_list=option_list);opt_parser33,990
+opt = parse_args(opt_parser);opt34,1042
+df = read.csv(opt$input, stringsAsFactors = FALSE)df44,1311
+df_legend = select(filter(df, num_type=="legend"), value,comment)df_legend46,1363
+df = filter(df, num_type != "legend")df47,1429
+df_wide = pivot_wider(df,df_wide50,1500
+simpl_obj_cols = grep("^simpl.*_obj$",colnames(df_wide),value = TRUE)simpl_obj_cols56,1686
+time_cols = grep(".+time$",colnames(df_wide),value = TRUE)time_cols57,1756
+for (col in simpl_obj_cols){col61,1906
+df_rel = pivot_longer(df_wide,df_rel65,2022
+    SHOW_HEU = c(grep("^simpl.*_obj_rel$",colnames(df_wide),value = TRUE),SHOW_HEU72,2237
+df_rel = filter(df_rel, num_type %in% SHOW_HEU)df_rel76,2387
+df_rel = df_rel %>%df_rel80,2509
+df_time_o = pivot_wider(select(df_rel,-num_type),names_from = "entry_type",values_from = "value"df_time_o87,2765
+df_time_o = merge(x=df_time_o, y=df_legend, by.x = "heuristic", by.y = "value")df_time_o88,2863
+omin = 1.0omin90,2944
+omax = quantile(df_time_o$obj, Y_QUANTILE)omax91,2955
+tmin = 0tmin92,2998
+tmax = max(df_time_o$time)tmax93,3007
+  ggplot(filter(df_time_o, !(comment %in% c("branch-and-bound","greedy sifts (all)"))), aes(x=coplt_zoomed96,3121
+
+post_processing/fig_hists_parameters.R,1154
+df = read.csv("./run_logs/tUFL_rnd_DDs_30vars.csv", stringsAsFactors = FALSE)df9,176
+legend_df = filter(df, num_type == "legend")legend_df12,274
+df = filter(df, num_type != "legend")df13,319
+df_wide = pivot_wider(df, id_cols = "instance", names_from = num_type, values_from = value)df_wide17,391
+df_wide = df_wide %>%df_wide20,497
+dfl = pivot_longer(select(df_wide, simpl_nat_rel, simpl_rnd_rel, instance), cols=c("simpl_nat_redfl29,736
+dfl = pivot_longer(select(df_wide, simpl_nat_rel, simpl_rnd_rel, instance), cols=c("simpl_nat_reanonVec0f0500e9010629,736
+dfl = pivot_longer(select(df_wide, simpl_nat_rel, simpl_rnd_rel, instance), cols=c("simpl_nat_renames_to29,736
+dfl = pivot_longer(select(df_wide, simpl_nat_rel, simpl_rnd_rel, instance), cols=c("simpl_nat_revalues_to29,736
+dfl = pivot_longer(select(df_wide, simpl_nat_rel, simpl_rnd_rel, instance), cols=c("simpl_nat_reanonVec0f0500e9020660,1708
+dfl = pivot_longer(select(df_wide, simpl_nat_rel, simpl_rnd_rel, instance), cols=c("simpl_nat_renames_to60,1708
+dfl = pivot_longer(select(df_wide, simpl_nat_rel, simpl_rnd_rel, instance), cols=c("simpl_nat_revalues_to60,1708
+
+post_processing/fig_simpl_heuristics.R,2302
+ORIG_BASE_COL = "simpl_BB_obj" # col to divide byORIG_BASE_COL17,425
+Nticks = 20Nticks18,475
+Y_QUANTILE=0.98 # show "2-sigmas"Y_QUANTILE19,487
+BINWIDTH=0.1BINWIDTH20,521
+SHOW_HEU = c("all")SHOW_HEU22,564
+option_list = list(option_list26,693
+    make_option(c("-i", "--input"), type="character", default=NULL,anonVecaffd9072010627,713
+    make_option(c("-i", "--input"), type="character", default=NULL,type27,713
+    make_option(c("-i", "--input"), type="character", default=NULL,default27,713
+    make_option(c("-o", "--out"), type="character", default="./out.eps",anonVecaffd9072020629,865
+    make_option(c("-o", "--out"), type="character", default="./out.eps",type29,865
+    make_option(c("-o", "--out"), type="character", default="./out.eps",default29,865
+opt_parser = OptionParser(option_list=option_list);opt_parser33,1024
+opt = parse_args(opt_parser);opt34,1076
+infile = opt$inputinfile43,1344
+df = read.csv(infile, stringsAsFactors = FALSE)df45,1364
+df_legend = select(filter(df, num_type=="legend"), value,comment)df_legend47,1413
+df = filter(df, num_type != "legend")df48,1479
+df_wide = pivot_wider(df,df_wide51,1550
+simpl_obj_cols = grep("^simpl.*_obj$",colnames(df_wide),value = TRUE)simpl_obj_cols57,1736
+time_cols = grep(".+time$",colnames(df_wide),value = TRUE)time_cols58,1806
+for (col in simpl_obj_cols){col62,1956
+df_rel = pivot_longer(df_wide,df_rel66,2072
+    SHOW_HEU = c(grep("^simpl.*_obj_rel$",colnames(df_wide),value = TRUE),SHOW_HEU73,2287
+df_rel = filter(df_rel, num_type %in% SHOW_HEU)df_rel77,2437
+df_rel = df_rel %>%df_rel81,2559
+df_time_o = merge(x=df_rel, y=df_legend, by.x = "heuristic", by.y = "value")df_time_o89,2915
+facet_names = unique(select(df_time_o, heuristic, comment))facet_names91,2993
+labels = as.list(facet_names$comment)labels92,3053
+facet_names <- c(labels, list(facet_names95,3131
+facet_names <- c(labels, list(anonListaffd9072040795,3131
+  "obj" = "Objective values, percent","obj"96,3162
+  "time" = "Wall-clock time / instance, msec""time"97,3201
+mylab = function(x){ return(facet_names[x]) }mylab101,3254
+my_ticks = annotation_logticks(sides = "b")my_ticks103,3301
+df_time_o = df_time_o %>%df_time_o106,3406
+  ggplot(df_time_o,aes(x=value, group=comment))+plt_zoomed112,3524
+
+post_processing/fig_cUFL_sizes_hist.R,2419
+X_QUANTILE=0.98 # quantile to filter for the histogram(Ox axis)X_QUANTILE17,397
+ORIG_BASE_COL = "orig_gsifts1p_obj" # col to divide byORIG_BASE_COL18,461
+SHOW_HEU = c("all")SHOW_HEU21,547
+option_list = list(option_list26,760
+    make_option(c("-i", "--input"), type="character", default=NULL,anonVec7781e499010627,780
+    make_option(c("-i", "--input"), type="character", default=NULL,type27,780
+    make_option(c("-i", "--input"), type="character", default=NULL,default27,780
+    make_option(c("-o", "--out"), type="character", default="./out.eps",anonVec7781e499020629,932
+    make_option(c("-o", "--out"), type="character", default="./out.eps",type29,932
+    make_option(c("-o", "--out"), type="character", default="./out.eps",default29,932
+opt_parser = OptionParser(option_list=option_list);opt_parser33,1091
+opt = parse_args(opt_parser);opt34,1143
+infile = opt$inputinfile43,1411
+df = read.csv(infile, stringsAsFactors = FALSE)df44,1430
+df_legend = select(filter(df, num_type=="legend"), value,comment)df_legend46,1479
+df = filter(df, num_type != "legend")df47,1545
+df_wide = pivot_wider(df,df_wide50,1616
+sum_sizes_cols = grep("^orig.*_AB_obj$", colnames(df_wide), value = TRUE)sum_sizes_cols56,1810
+all_relevant_cols = grep("^orig.*_obj$", colnames(df_wide), value = TRUE)all_relevant_cols57,1884
+for (col in sum_sizes_cols) {col59,1959
+for (col in setdiff(all_relevant_cols, sum_sizes_cols)) {col63,2085
+df_rel = pivot_longer(df_wide,df_rel68,2242
+SHOW_HEU = grep("^orig.*_obj_rel$", colnames(df_wide), value = TRUE)SHOW_HEU74,2430
+SHOW_HEU = SHOW_HEU[SHOW_HEU != "orig_gsifts1p_obj_rel"]SHOW_HEU75,2499
+SHOW_HEU = SHOW_HEU[SHOW_HEU != "orig_gsifts1p_AB_obj_rel"]SHOW_HEU76,2556
+df_rel = filter(df_rel, num_type %in% SHOW_HEU)df_rel78,2617
+df_rel = df_rel %>%df_rel82,2693
+df_time_o = pivot_wider(select(df_rel,-num_type),names_from = "entry_type",values_from = "value"df_time_o89,2949
+df_time_o = merge(x=df_time_o, y=df_legend, by.x = "heuristic", by.y = "value")df_time_o90,3047
+df_time_o = filter(df_time_o, obj > 0)df_time_o92,3128
+xmin = min(df_time_o$obj)xmin97,3278
+xmax = quantile(df_time_o$obj,X_QUANTILE)xmax98,3304
+latex_label = parse(text = TeX("try $S_A$, $S_B$, choose the best one"))latex_label99,3346
+    ggplot(df_time_o, aes(x=obj))+plt_dens102,3431
+        labels = scales::number_format(accuracy = 0.5),accuracy113,4082
+
+post_processing/tab_guessing.R,2169
+SIMPL_BASE_COL = "simpl_BB_obj" # exact solutionSIMPL_BASE_COL17,397
+SHOW_HEU = c("all")SHOW_HEU19,476
+option_list = list(option_list23,605
+    make_option(c("-i", "--input"), type="character", default=NULL,anonVec69874431010624,625
+    make_option(c("-i", "--input"), type="character", default=NULL,type24,625
+    make_option(c("-i", "--input"), type="character", default=NULL,default24,625
+    make_option(c("-o", "--out"), type="character", default="./out.eps",anonVec69874431020626,777
+    make_option(c("-o", "--out"), type="character", default="./out.eps",type26,777
+    make_option(c("-o", "--out"), type="character", default="./out.eps",default26,777
+    make_option(c("-a","--allowance"),type="numeric",anonVec69874431030628,933
+    make_option(c("-a","--allowance"),type="numeric",type28,933
+opt_parser = OptionParser(option_list=option_list);opt_parser32,1088
+opt = parse_args(opt_parser);opt33,1140
+df = read.csv(opt$input, stringsAsFactors = FALSE)df43,1409
+df_legend = select(filter(df, num_type=="legend"), value,comment)df_legend45,1461
+df = filter(df, num_type != "legend")df46,1527
+df_wide = pivot_wider(df,df_wide49,1598
+simpl_obj_cols = grep("^simpl.*_obj$",colnames(df_wide),value = TRUE)simpl_obj_cols55,1784
+time_cols = grep(".+time$",colnames(df_wide),value = TRUE)time_cols56,1854
+    SHOW_HEU = c(grep("^simpl.*_obj$",simpl_obj_cols,value = TRUE))SHOW_HEU59,1941
+guessing_power = data.frame(heuristic = grep(".*obj$",SHOW_HEU,value = TRUE),stringsAsFactors = guessing_power62,2012
+guessing_power = data.frame(heuristic = grep(".*obj$",SHOW_HEU,value = TRUE),stringsAsFactors = heuristic62,2012
+guessing_power = data.frame(heuristic = grep(".*obj$",SHOW_HEU,value = TRUE),stringsAsFactors = stringsAsFactors62,2012
+guessing_power$exact_guesses = sapply(guessing_power$heuristic, function(h){anonFunc69874431040064,2116
+guessing_power$good_guesses = sapply(guessing_power$heuristic, function(h){anonFunc69874431050068,2250
+guessing_power = guessing_power %>%guessing_power74,2538
+guessing_power = merge(x=guessing_power, y=df_legend, by.x = "heuristic", by.y = "value")guessing_power79,2669
+
+post_processing/fig_LBs.R,1789
+BINWIDTH = 0.01BINWIDTH18,446
+option_list = list(option_list22,571
+    make_option(c("-i", "--input"), type="character", default=NULL,anonVecc98e2bac010623,591
+    make_option(c("-i", "--input"), type="character", default=NULL,type23,591
+    make_option(c("-i", "--input"), type="character", default=NULL,default23,591
+    make_option(c("-o", "--out"), type="character", default="./out.eps",anonVecc98e2bac020625,743
+    make_option(c("-o", "--out"), type="character", default="./out.eps",type25,743
+    make_option(c("-o", "--out"), type="character", default="./out.eps",default25,743
+opt_parser = OptionParser(option_list=option_list);opt_parser29,902
+opt = parse_args(opt_parser);opt30,954
+infile = opt$inputinfile39,1222
+df = read.csv(infile, stringsAsFactors = FALSE)df41,1242
+df_legends = unique(select(df_legends42,1290
+df = merge(df45,1373
+df = df %>% mutate(df55,1678
+no_instances = nrow(filter(df, entry_type=="time")) / length(unique(df$LB))no_instances59,1814
+facets = list("LB_first" = "Min size\nfirst\nelement\naligned",facets63,2024
+facets = list("LB_first" = "Min size\nfirst\nelement\naligned","LB_first"63,2024
+  "LB_last" = "Min size\nlast\nelement\naligned","LB_last"64,2088
+  "LB_levels" = "Inversions-\ndriven LB","LB_levels"65,2138
+  "gap" = "LB tightness score, percent","gap"66,2180
+  "time" = "Wall-clock time per instance, msec")"time"67,2221
+   ggplot(filter(df, entry_type == "gap"),aes(x=value, group=caption))+plt_L70,2279
+  facet_wrap(~LB, labeller=as_labeller(function(x) return(facets[x])),anonFuncc98e2bac050090,3397
+   ggplot(filter(df, entry_type == "time"),aes(x=value, group=caption))+plt_R97,3695
+  facet_wrap(~LB, labeller=as_labeller(function(x) return(facets[x])),anonFuncc98e2bac0700118,4682
+
+post_processing/fig_scal_linear.R,1521
+option_list = list(option_list16,409
+    make_option(c("-i", "--input"), type="character", default=NULL,anonVecd3b5ae68010617,429
+    make_option(c("-i", "--input"), type="character", default=NULL,type17,429
+    make_option(c("-i", "--input"), type="character", default=NULL,default17,429
+    make_option(c("-o", "--out"), type="character", default="./out.eps",anonVecd3b5ae68020619,581
+    make_option(c("-o", "--out"), type="character", default="./out.eps",type19,581
+    make_option(c("-o", "--out"), type="character", default="./out.eps",default19,581
+opt_parser = OptionParser(option_list=option_list);opt_parser23,740
+opt = parse_args(opt_parser);opt24,792
+infile = opt$inputinfile33,1060
+df = read.csv(infile, stringsAsFactors = FALSE)df35,1080
+df = filter(df,N>0)df37,1146
+df = pivot_wider(df, id_cols = c("instance","N"), names_from = num_type, values_from = value)df40,1199
+df = pivot_wider(df, id_cols = c("instance","N"), names_from = num_type, values_from = value)anonVecd3b5ae68030640,1199
+df = pivot_wider(df, id_cols = c("instance","N"), names_from = num_type, values_from = value)names_from40,1199
+df = pivot_wider(df, id_cols = c("instance","N"), names_from = num_type, values_from = value)values_from40,1199
+df = df %>%df42,1294
+df_means = df %>%df_means48,1420
+df_outp = dfdf_outp56,1615
+df_outp = df_outp %>%df_outp61,1771
+ggplot(df)+p168,1884
+    geom_label(data=df_outp, aes(x=N, label=scales::percent(accuracy=1,simpl_outp)),y=1550, sizeaccuracy77,2458
+
+post_processing/fig_jUFL_simpl_eff.R,1099
+option_list = list(option_list18,515
+    make_option(c("-i", "--input"), type="character", default=NULL,anonVec8a099110010619,535
+    make_option(c("-i", "--input"), type="character", default=NULL,type19,535
+    make_option(c("-i", "--input"), type="character", default=NULL,default19,535
+    make_option(c("-p", "--problem"), type="character",anonVec8a099110020621,687
+    make_option(c("-p", "--problem"), type="character",type21,687
+    make_option(c("-o", "--out"), type="character", default="./out.eps",anonVec8a099110030623,823
+    make_option(c("-o", "--out"), type="character", default="./out.eps",type23,823
+    make_option(c("-o", "--out"), type="character", default="./out.eps",default23,823
+opt_parser = OptionParser(option_list=option_list);opt_parser27,982
+opt = parse_args(opt_parser);opt28,1034
+infile = opt$inputinfile37,1302
+df = read.csv(infile, stringsAsFactors = FALSE)df38,1321
+df_wide = pivot_wider(df,df_wide40,1370
+    ggplot(df_wide, aes(x=simpl_rel_obj))+plt_dens49,1663
+        labels = scales::number_format(accuracy = 1),accuracy60,2322
+
+post_processing/fig_BB_gaps.R,4184
+option_list = list(option_list15,394
+    make_option(c("-i", "--input"), type="character", default=NULL,anonVececafcdd9010616,414
+    make_option(c("-i", "--input"), type="character", default=NULL,type16,414
+    make_option(c("-i", "--input"), type="character", default=NULL,default16,414
+    make_option(c("-o", "--out"), type="character", default="./out.eps",anonVececafcdd9020618,566
+    make_option(c("-o", "--out"), type="character", default="./out.eps",type18,566
+    make_option(c("-o", "--out"), type="character", default="./out.eps",default18,566
+opt_parser = OptionParser(option_list=option_list);opt_parser22,725
+opt = parse_args(opt_parser);opt23,777
+infile = opt$inputinfile32,1045
+df = read.csv(infile,df33,1064
+steplog = filter(df, num_type == "steplog")steplog36,1127
+opts = filter(df, comment == "status:optimal")opts39,1190
+steplog = steplog %>%steplog43,1315
+step_vals = unique(filter(steplog,grepl("--none--",comment))$step)step_vals53,1618
+steps_df = steplog %>%steps_df55,1686
+full_steps_df = steps_df %>%full_steps_df61,1857
+                values_fill = list(LB_rel=1.0, UB_rel=1.0)anonListecafcdd9040765,2030
+                values_fill = list(LB_rel=1.0, UB_rel=1.0)LB_rel65,2030
+                values_fill = list(LB_rel=1.0, UB_rel=1.0)UB_rel65,2030
+full_steps_df = full_steps_df %>%full_steps_df68,2108
+df = pivot_wider(full_steps_df, names_from = c("bound_type"), values_from = "rel_value")df81,2448
+df = pivot_wider(full_steps_df, names_from = c("bound_type"), values_from = "rel_value")anonVececafcdd9070681,2448
+df = pivot_wider(full_steps_df, names_from = c("bound_type"), values_from = "rel_value")values_from81,2448
+N_inst = length(unique(df$instance))N_inst83,2538
+gaps_df = data.frame(step = step_vals,gaps_df85,2576
+gaps_df = data.frame(step = step_vals,step85,2576
+                     instshares_0.5 = sapply(step_vals, function(s){instshares_0.586,2615
+                     instshares_0.5 = sapply(step_vals, function(s){anonFuncecafcdd9080086,2615
+                     instshares_0.10 = sapply(step_vals, function(s){instshares_0.1091,2852
+                     instshares_0.10 = sapply(step_vals, function(s){anonFuncecafcdd9090091,2852
+                     instshares_0.05 = sapply(step_vals, function(s){instshares_0.0596,3104
+                     instshares_0.05 = sapply(step_vals, function(s){anonFuncecafcdd90a0096,3104
+                     instshares_0.0 = sapply(step_vals, function(s){instshares_0.0101,3356
+                     instshares_0.0 = sapply(step_vals, function(s){anonFuncecafcdd90b00101,3356
+gaps_df = pivot_longer(gaps_df,gaps_df108,3629
+    ggplot(gaps_df)+plt_convergence117,3868
+        labels = scales::number_format(accuracy = 1)accuracy140,5033
+    scale_linetype_manual(values = c(anonVececafcdd90e06148,5279
+                           "0.0" = "solid","0.0"149,5317
+                           "0.05" = "longdash","0.05"150,5361
+                           "0.10" = "dotted","0.10"151,5409
+                           "0.5" = "twodash""0.5"152,5455
+                       labels = c(anonVececafcdd90f06154,5526
+                           "0.0" = "0% (exact match)","0.0"155,5561
+                           "0.05" = "5% of optimum","0.05"156,5616
+                           "0.10" = "10% of optimum","0.10"157,5669
+                           "0.5" = "50% of optimum""0.5"158,5723
+    scale_color_manual(values = c(anonVececafcdd91006161,5827
+                              "0.0" = "blue","0.0"162,5862
+                              "0.05" = "red","0.05"163,5908
+                              "0.10" = "darkgreen","0.10"164,5954
+                              "0.5" = "black""0.5"165,6006
+                          labels = c(anonVececafcdd91106167,6081
+                              "0.0" = "0% (exact match)","0.0"168,6119
+                              "0.05" = "5% of optimum","0.05"169,6177
+                              "0.10" = "10% of optimum","0.10"170,6233
+                              "0.5" = "50% of optimum""0.5"171,6290
+                          ), guide="UB/LB gap size:"guide172,6345
+
+post_processing/fig_cUFL_sizes_rnd_hist.R,1830
+X_QUANTILE=0.98 # quantile to filter for the histogram(Ox axis)X_QUANTILE17,394
+option_list = list(option_list22,568
+    make_option(c("-i", "--input"), type="character", default=NULL,anonVec48465fbc010623,588
+    make_option(c("-i", "--input"), type="character", default=NULL,type23,588
+    make_option(c("-i", "--input"), type="character", default=NULL,default23,588
+    make_option(c("-o", "--out"), type="character", default="./out.eps",anonVec48465fbc020625,740
+    make_option(c("-o", "--out"), type="character", default="./out.eps",type25,740
+    make_option(c("-o", "--out"), type="character", default="./out.eps",default25,740
+opt_parser = OptionParser(option_list=option_list);opt_parser29,899
+opt = parse_args(opt_parser);opt30,951
+infile = opt$inputinfile39,1219
+df = read.csv(infile, stringsAsFactors = FALSE)df40,1238
+df_legend = select(filter(df, num_type=="legend"), value,comment)df_legend42,1287
+df = filter(df, num_type != "legend")df43,1353
+df_wide = pivot_wider(df,df_wide46,1424
+rnd_cols = grep("^orig.*_rnd_obj$", colnames(df_wide), value = TRUE)rnd_cols52,1618
+nat_cols = grep("^orig.*_nat_obj$", colnames(df_wide), value = TRUE)nat_cols53,1687
+ctl_cols = grep("^orig.*_ctl_obj$", colnames(df_wide), value = TRUE)ctl_cols54,1756
+for (col in rnd_cols) {col56,1826
+for (col in nat_cols) {col60,1947
+for (col in ctl_cols) {col64,2066
+df_rel = pivot_longer(df_wide,df_rel72,2309
+df_rel = df_rel %>%df_rel78,2497
+df_rel = merge(x=df_rel, y=df_legend, by.x="heuristic", by.y="value")df_rel87,2940
+df_rel = df_rel %>%df_rel89,3011
+xmin = min(df_rel$value)xmin100,3596
+xmax = quantile(df_rel$value,X_QUANTILE, na.rm=TRUE)xmax101,3621
+    ggplot(df_rel, aes(x=value))+plt_dens104,3686
+        labels = scales::number_format(accuracy = 0.5),accuracy115,4336
+
+post_processing/fig_scal.R,1785
+option_list = list(option_list18,473
+    make_option(c("-i", "--input"), type="character", default=NULL,anonVec58991eee010619,493
+    make_option(c("-i", "--input"), type="character", default=NULL,type19,493
+    make_option(c("-i", "--input"), type="character", default=NULL,default19,493
+    make_option(c("-o", "--out"), type="character", default="./out.eps",anonVec58991eee020621,645
+    make_option(c("-o", "--out"), type="character", default="./out.eps",type21,645
+    make_option(c("-o", "--out"), type="character", default="./out.eps",default21,645
+opt_parser = OptionParser(option_list=option_list);opt_parser25,804
+opt = parse_args(opt_parser);opt26,856
+infile = opt$inputinfile35,1124
+df = read.csv(infile, stringsAsFactors = FALSE)df37,1144
+df = filter(df,N>0)df39,1210
+df = pivot_wider(df, id_cols = c("instance","N"), names_from = num_type, values_from = value)df42,1263
+df = pivot_wider(df, id_cols = c("instance","N"), names_from = num_type, values_from = value)anonVec58991eee030642,1263
+df = pivot_wider(df, id_cols = c("instance","N"), names_from = num_type, values_from = value)names_from42,1263
+df = pivot_wider(df, id_cols = c("instance","N"), names_from = num_type, values_from = value)values_from42,1263
+df = filter(df, orig_gsifts1p_obj > 0) %>%df44,1358
+df_means = df %>%df_means50,1515
+df_outp = dfdf_outp58,1710
+df_outp = df_outp %>%df_outp63,1866
+ggplot(df)+p172,2091
+  geom_label(data=df_outp, aes(x=N, label=scales::percent(accuracy=1,simpl_outp)),accuracy84,2723
+Ns = c(5,10,12,15,17,20,22,25)Ns118,4263
+dfn = filter(df, N %in% Ns)dfn119,4294
+xmin = min(dfn$rel_obj)xmin121,4323
+xmax = quantile(dfn$rel_obj, 0.99)xmax122,4347
+ggplot(dfn, aes(x=rel_obj))+p2125,4388
+outfile = opt$outoutfile159,5814
+
+post_processing/fig_LB_ridges.R,1520
+option_list = list(option_list16,412
+    make_option(c("-i", "--input"), type="character", default=NULL,anonVec7f677636010617,432
+    make_option(c("-i", "--input"), type="character", default=NULL,type17,432
+    make_option(c("-i", "--input"), type="character", default=NULL,default17,432
+    make_option(c("-o", "--out"), type="character", default="./out.eps",anonVec7f677636020619,584
+    make_option(c("-o", "--out"), type="character", default="./out.eps",type19,584
+    make_option(c("-o", "--out"), type="character", default="./out.eps",default19,584
+opt_parser = OptionParser(option_list=option_list);opt_parser23,743
+opt = parse_args(opt_parser);opt24,795
+infile = opt$inputinfile33,1063
+df = read.csv(infile,df34,1082
+steplog = filter(df, num_type == "steplog")steplog37,1145
+opts = filter(df, comment == "status:optimal")opts40,1208
+steplog = steplog %>%steplog44,1333
+step_vals = unique(filter(steplog,grepl("--none--",comment))$step)step_vals54,1636
+steps_df = steplog %>%steps_df56,1704
+full_steps_df = steps_df %>%full_steps_df62,1875
+                values_fill = list(LB_rel=1.0, UB_rel=1.0)anonList7f677636040766,2048
+                values_fill = list(LB_rel=1.0, UB_rel=1.0)LB_rel66,2048
+                values_fill = list(LB_rel=1.0, UB_rel=1.0)UB_rel66,2048
+full_steps_df = full_steps_df %>%full_steps_df69,2126
+df = filter(full_steps_df, (bound_type %in% c("UB_rel")))df116,3957
+  ggplot(df, aes(x=as.factor(step), y=rel_value))+plt_convergence119,4034
+
+post_processing/figs_sol_struct.R,805
+df = read.csv("./run_logs/rnd_orders_nosifts.csv", stringsAsFactors = FALSE)df9,176
+legend_df = filter(df, num_type == "legend")legend_df14,421
+df = filter(df, num_type != "legend")df15,466
+df = df %>%df19,538
+sizes = filter(df, (n == 20) & num_type %in% c('color_size_nat',sizes24,612
+df_wide = pivot_wider(df, id_cols = c("instance","n"), names_from = num_type, values_from = valudf_wide40,1335
+df_wide = pivot_wider(df, id_cols = c("instance","n"), names_from = num_type, values_from = valuanonVec6a99ead0020640,1335
+df_wide = pivot_wider(df, id_cols = c("instance","n"), names_from = num_type, values_from = valunames_from40,1335
+df_wide = pivot_wider(df, id_cols = c("instance","n"), names_from = num_type, values_from = valuvalues_from40,1335
+df_wide = df_wide %>%df_wide43,1448
+
+post_processing/fig_simpl_vs_min.R,1485
+option_list = list(option_list20,584
+  make_option(c("-o", "--out"), type="character", default="./out.eps",anonVec44c9d99b010621,604
+  make_option(c("-o", "--out"), type="character", default="./out.eps",type21,604
+  make_option(c("-o", "--out"), type="character", default="./out.eps",default21,604
+  make_option(c("-i", "--indir"), type="character", default="./out.eps",anonVec44c9d99b020623,756
+  make_option(c("-i", "--indir"), type="character", default="./out.eps",type23,756
+  make_option(c("-i", "--indir"), type="character", default="./out.eps",default23,756
+opt_parser = OptionParser(option_list=option_list);opt_parser26,900
+opt = parse_args(opt_parser);opt27,952
+indir = opt$indirindir41,1294
+df = read.csv(paste0(indir,"/tUFLP_nat.csv"), stringsAsFactors = FALSE)df42,1312
+df_rnd <- read.csv(paste0(indir, "/tUFLP_rnd.csv"), stringsAsFactors = FALSE)df_rnd46,1487
+dfjUFL <- read.csv(paste0(indir, "/jUFLP.csv"), stringsAsFactors = FALSE)dfjUFL50,1675
+df_rnd_dia <- read.csv(paste0(indir, "/rnd_dia.csv"), stringsAsFactors = FALSE)df_rnd_dia54,1839
+df = rbind(df, df_rnd, df_rnd_dia)df58,2027
+df_wide = pivot_wider(df,df_wide60,2063
+no_insts = nrow(filter(df_wide, inst_type=="(a) t-UFLP (natural order)"))no_insts66,2273
+problems = c("(a) t-UFLP (natural order)", "(b) t-UFLP (random order)",problems71,2470
+    ggplot(df_wide, aes(x=simpl_rel_obj))+plt_dens77,2652
+        labels = scales::number_format(accuracy = 1),accuracy83,2927
+
+GPATH,0
+
+varseq.py,885
+import numpy as npnp8,177
+import itertools as itersiters10,208
+class VarSeq:VarSeq13,247
+    def __init__(self, layer_vars, layer_sizes):__init__16,326
+    def generate_weights(cls, N):generate_weights32,924
+    def random(cls, vars = None, N = 7):random43,1251
+    def size(self):size56,1795
+    def var_size(self, var):var_size60,1918
+    def S(self, a,j):S65,2054
+    def slide(self, a, j, inplace=False):slide78,2603
+    def __str__(self):__str__115,3742
+    def __len__(self):__len__119,3949
+    def count_inversions_to(self, to_what):count_inversions_to123,4069
+    def greedy_sort(self, to_what = None):greedy_sort138,4592
+    def align_to(self, to_what = None):align_to156,5214
+    def OA_bruteforce(self, with_what):OA_bruteforce207,6869
+    def is_aligned(self, to_what):is_aligned246,8177
+def non_dominated(e, A, B):non_dominated253,8480
+
+jUFL.py,393
+import BDD as DDDD9,136
+import numpy as npnp10,153
+import varseq as vsvs11,172
+import BB_search as bbbb12,192
+import gurobipy as gpgp13,215
+def solve_with_DD_MIP(inst):solve_with_DD_MIP16,263
+def solve_with_naive_MIP(instance):solve_with_naive_MIP34,721
+def generate_instance(n, p=0.25):generate_instance60,1304
+def solve_with_align_BDD(instance):solve_with_align_BDD73,1695
+
+GTAGS,0
+
+BB_search.py,1603
+import varseq as vsvs7,179
+import matplotlib.pyplot as pltplt8,199
+import pandas as pdpd9,231
+import numpy as npnp10,251
+import copy as copycopy11,270
+import anytree as atat12,290
+import heapq as heapheap14,352
+import heuristics as heuheu16,406
+TIMEOUT_ITERATIONS = 1000TIMEOUT_ITERATIONS19,464
+UB_UPDATE_FREQ = 5000 # in iterationsUB_UPDATE_FREQ20,490
+ALWAYS_FAST = TrueALWAYS_FAST21,528
+def LB_current(A,B):LB_current25,647
+def LB_first_aligned(A,B):LB_first_aligned29,749
+def LB_last_aligned(A,B):LB_last_aligned33,948
+def LB_by_level(A,B):LB_by_level38,1176
+def LB_by_level_complicated(A,B):LB_by_level_complicated58,1681
+def LB_lvl_compl_symm(A,B):LB_lvl_compl_symm75,2276
+def LB_lvl_symm(A,B):LB_lvl_symm79,2433
+LOWER_BOUNDS = [LOWER_BOUNDS86,2624
+def nodenamefunc(node):nodenamefunc101,3281
+def nodeattrfunc(node):nodeattrfunc108,3795
+class SearchNode(at.NodeMixin):SearchNode126,4407
+    def __init__(self, name, parent, Aresid, Bresid, A_tail_start, B_tail_start,A,B):__init__146,5208
+    def size(self):size164,5776
+    def calculate_UB(self, t='fast'):calculate_UB169,5951
+    def calculate_LB(self):calculate_LB183,6426
+    def __lt__(self, other):__lt__196,6813
+class BBSearch:BBSearch201,7035
+    def __init__(self, A,B):__init__220,7961
+    def current_best(self):current_best251,8762
+    def dump(self, filename=None):dump256,8912
+    def make_graph_gap(self, ax=None, trueOpt=None):make_graph_gap261,9161
+    def set_logging(self, logfile, prefix, steps_list):set_logging280,10057
+    def search(self):search288,10323
+
+update_R_packages_list.sh,0
+
+.pytest_cache/CACHEDIR.TAG,0
+
+.pytest_cache/README.md,54
+# pytest cache directory #pytest cache directory1,0
+
+.pytest_cache/v/cache/nodeids,0
+
+.pytest_cache/v/cache/lastfailed,0
+
+.pytest_cache/v/cache/stepwise,0
+
+.ctagsignore,0

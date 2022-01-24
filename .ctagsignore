@@ -1,0 +1,10 @@
+*.html
+*.js
+*.css
+*.png
+*.svg
+*.eps
+*.pdf
+reports/*
+*.json
+*.txt
