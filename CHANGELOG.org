@@ -1,4 +1,8 @@
-* Current version
+* Running changelog
+** [2022-01-24 Mon 12:14]: generated 'long' problems 
+See [[mu4e:msgid:871r127c2f.fsf@g.clemson.edu][Re: Two ideas]] for details
+
+* Rev1 as submitted
 ** [2021-04-05 Mon 16:57]: generated degree-2, -3, and -4 instances.  
    Interestingly, still width-4 cover DD.
 ** [2021-04-02 Fri 16:45]: found a subtle bug in =ColorSorter= 
@@ -17,7 +21,7 @@
 ** [2021-02-22 Mon 17:42]: implemented =swap_up= for weighted DDs 
    (simple tests passsing)
 ** [2021-02-22 Mon 12:30]: drafted =swap_up= for a weighted BDD
-** [2021-02-22 Mon 12:29]:  drafted =truth_table= for a weighted BDD
+** [2021-02-22 Mon 12:29]: drafted =truth_table= for a weighted BDD
 ** [2021-02-19 Fri 16:21]: drafted the implementation of =intersect= 
 ** [2021-02-19 Fri 13:16]: implemented availability, covering BDDs + naive MIPs (tests passing)
 ** [2021-02-18 Thu 14:40]: implemented MIP generation (for arbitrary g, dict) 

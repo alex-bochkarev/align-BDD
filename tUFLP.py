@@ -30,13 +30,18 @@ def make_label(state):
 
 
 class DegreeKeeper:
-    """Keeps a heap of node degrees."""
+    """Keeps a heap of node degrees.
+
+    Note: it works correctly iff nodes are
+    numbered starting with one.
+    """
     def __init__(self, S=None, next_node_type="min"):
         """Initializes the heap and index.
 
         EXPERIMENT BRACH version:
         Allows for different approaches to `get_next` node,
         parameterized by `next_node_type`:
+
         - `min`: minimum residual degree,
         - `max`: resp., maximum,
         - `rnd`: getting random node.

@@ -1,6 +1,10 @@
+#+TITLE: Align-BDD project
+#+CATEGORY: a-BDD
+#+STARTUP: show2levels
+
 * Immediate TODOs
-  - [ ] 1: soft cover constraints (general type) -- see the revision notes
-  - [ ] idea 2a (cross-terms, x1x2, etc.)
+  - [X] 1: soft cover constraints (general type) -- see the revision notes
+  - [X] idea 2a (cross-terms, x1x2, etc.)
   - [ ] idea 2b (function of cross-terms) -- ?
   - [X] =build_cover_DD=: make single overlap version
   - [X] =build_color_DD=: fix the procedure (linear DD growth is doable!)
@@ -25,28 +29,49 @@
     distribute the first facility into every bin, and then sort them randomly?
 
 * Current project TODOs
-** DONE Soft overlap: generate long instances
-CLOSED: [2022-01-20 Thu 13:48]
-- State "DONE"       from "TODO"       [2022-01-20 Thu 13:48]
+** Softcover: design instances with types
 :LOGBOOK:
-CLOCK: [2022-01-20 Thu 12:30]--[2022-01-20 Thu 13:45] =>  1:15
-CLOCK: [2022-01-19 Wed 15:29]--[2022-01-19 Wed 15:56] =>  0:27
-CLOCK: [2022-01-19 Wed 14:59]--[2022-01-19 Wed 15:17] =>  0:18
-CLOCK: [2022-01-19 Wed 14:05]--[2022-01-19 Wed 14:30] =>  0:25
-CLOCK: [2022-01-19 Wed 13:54]--[2022-01-19 Wed 14:01] =>  0:07
-CLOCK: [2022-01-19 Wed 13:28]--[2022-01-19 Wed 13:53] =>  0:25
-CLOCK: [2022-01-19 Wed 13:05]--[2022-01-19 Wed 13:14] =>  0:09
+CLOCK: [2022-01-24 Mon 12:16]--[2022-01-24 Mon 12:40] =>  0:24
 :END:
-It seems getting slow for already N=42 points...
-
-** TODO sum of subset products
+*** TODO Design cover DDs (Bool -> Int)
 :LOGBOOK:
-CLOCK: [2022-01-20 Thu 11:14]--[2022-01-20 Thu 12:04] =>  0:50
-CLOCK: [2022-01-19 Wed 15:56]--[2022-01-19 Wed 16:55] =>  0:59
+CLOCK: [2022-01-27 Thu 14:31]--[2022-01-27 Thu 14:58] =>  0:27
+CLOCK: [2022-01-27 Thu 13:36]--[2022-01-27 Thu 14:18] =>  0:42
+CLOCK: [2022-01-26 Wed 19:46]--[2022-01-26 Wed 19:47] =>  0:01
+CLOCK: [2022-01-26 Wed 17:42]--[2022-01-26 Wed 18:11] =>  0:29
+CLOCK: [2022-01-26 Wed 17:20]--[2022-01-26 Wed 17:41] =>  0:21
+CLOCK: [2022-01-26 Wed 17:12]--[2022-01-26 Wed 17:20] =>  0:08
+CLOCK: [2022-01-26 Wed 16:21]--[2022-01-26 Wed 16:33] =>  0:12
+CLOCK: [2022-01-26 Wed 14:40]--[2022-01-26 Wed 16:21] =>  1:41
+CLOCK: [2022-01-26 Wed 14:04]--[2022-01-26 Wed 14:18] =>  0:14
+CLOCK: [2022-01-26 Wed 13:45]--[2022-01-26 Wed 13:57] =>  0:12
+CLOCK: [2022-01-26 Wed 13:08]--[2022-01-26 Wed 13:43] =>  0:35
+CLOCK: [2022-01-24 Mon 15:13]--[2022-01-24 Mon 15:32] =>  0:19
+CLOCK: [2022-01-24 Mon 13:16]--[2022-01-24 Mon 14:23] =>  1:07
+CLOCK: [2022-01-24 Mon 12:59]--[2022-01-24 Mon 13:10] =>  0:11
+CLOCK: [2022-01-24 Mon 12:55]--[2022-01-24 Mon 12:56] =>  0:01
 :END:
-  OK, seems slow for N=500 vars, M=500 terms and Jmax = 25 vars per term max
-  (my single experiment took )
-
+Check it is correct, technically.
+*** TODO Check dia sizes scaling (with and w/o reduction) vs. no of vars in MIP
+*** TODO Repeat the experiment for a more narrow graph type (cavemen?)
+*** TODO Compare runtimes w/o types: BDDs vs naive MIP
+*** TODO Add types -- generate CPP instances 
+*** TODO Compare runtime: naive MIP vs CPP MIP vs Align-BDD CPP
+*** TODO Add reduction step -- check time
+** DONE Checking the reviewers' comments
+CLOSED: [2022-01-26 Wed 13:08]
+- State "DONE"       from              [2022-01-26 Wed 13:08]
+:LOGBOOK:
+CLOCK: [2022-01-25 Tue 12:52]--[2022-01-25 Tue 13:13] =>  0:21
+:END:
+** DONE Consider alternative applications
+CLOSED: [2022-01-26 Wed 13:08]
+- State "DONE"       from              [2022-01-26 Wed 13:08]
+:LOGBOOK:
+CLOCK: [2022-01-26 Wed 12:44]--[2022-01-26 Wed 13:08] =>  0:24
+CLOCK: [2022-01-26 Wed 11:47]--[2022-01-26 Wed 12:42] =>  0:55
+CLOCK: [2022-01-25 Tue 13:13]--[2022-01-25 Tue 13:25] =>  0:12
+:END:
 ** TODO Kill already merged branches
  [2020-07-11 Sat 09:49]
 
