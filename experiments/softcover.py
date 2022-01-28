@@ -86,15 +86,128 @@ def generate_overlaps(S):
     return f
 
 
-def make_instance(n, p=0.25):
+def dump_instance(S, filename="tmp/S.dot"):
+    """Dumps a graph implied by S into a `.dot` file. """
+    added = set([])
+    with open(filename, "w") as fout:
+        fout.write("graph G {\n")
+        for i in range(len(S)):
+            for j in S[i]:
+                if ((i+1) != j) and not (((j, (i+1)) in added)
+                                         or ((i+1, j) in added)):
+                    fout.write(f"n{i+1} -- n{j};\n")
+                    added.add(((i+1), j))
+
+        fout.write("}")
+
+def make_instance(n, p=0.25, verbose=True):
     """Generates an instance of `n` points and connectivity `p`."""
     S = generate_S(n, p)
     f = generate_overlaps(S)
     Cmax = 5.0
     c = [Cmax*np.random.uniform() for _ in range(len(S))]
-    print(f"S={S}, f={f}, c={c}")
+    if verbose:
+        print(f"S={S}, f={f}, c={c}")
     return S, f, c
 
+
+def make_string_inst(n, verbose=True):
+    """Generates a special-type instance ('string')."""
+    S = [[j+1] for j in range(n)]
+    for j in range(1, n-1):
+        S[j].append(j)
+        S[j].append(j+2)
+
+    S[-1].append(len(S)-1)
+    S[0].append(2)
+
+    f = generate_overlaps(S)
+    Cmax = 5.0
+    c = [Cmax*np.random.uniform() for _ in range(len(S))]
+    if verbose:
+        print(f"S={S}, f={f}, c={c}")
+    return S, f, c
+
+
+def make_organic_inst(n, verbose=True):
+    """Generates a special-type instance ('organic molecule').
+
+    Note: `n` here is length of the "main" line.
+    """
+    good_inst = False
+    while not good_inst:
+        groups = [np.random.randint(5) for _ in range(n-2)]
+        N = 1
+        while (N+1) + sum(groups[:(N+1)]) < n:
+            N += 1
+
+        if N>2:
+            good_inst = True
+
+    S = [[j+1] for j in range(N)]
+    for j in range(1, N-1):
+        S[j].append(j)
+        S[j].append(j+2)
+
+    S[-1].append(len(S)-1)
+    S[0].append(2)
+
+    newnode = N+1
+    for j in range(1, N-1):
+        for _ in range(groups[j-1]):
+            S.append([newnode])
+            S[j].append(newnode)
+            S[-1].append(j+1)
+            newnode += 1
+
+    f = generate_overlaps(S)
+    Cmax = 5.0
+    c = [Cmax*np.random.uniform() for _ in range(len(S))]
+    if verbose:
+        print(f"S={S}, f={f}, c={c}")
+    return S, f, c
+
+
+def make_caveman_inst(n=10, M=5, pcave=0.8, verbose=True):
+    """Generates a special type instance ('cavemen')."""
+    S = [[j+1] for j in range(n)]
+    for j in range(1, len(S)-1):
+        S[j].append(j)
+        S[j].append(j+2)
+
+    S[-1].append(len(S)-1)
+    S[0].append(2)
+
+    ncaves = n // M
+    for k in range(1, ncaves+1):
+        for i in range((k-1)*M, min(k*M, n)):
+            for j in range(i, min(k*M, n)):
+                if np.random.uniform() <= pcave:
+                    S[i].append(j+1)
+                    S[j].append(i+1)
+
+    f = generate_overlaps(S)
+    Cmax = 5.0
+    c = [Cmax*np.random.uniform() for _ in range(len(S))]
+    if verbose:
+        print(f"S={S}, f={f}, c={c}")
+    return S, f, c
+
+
+def assert_instance(S, f, c):
+    """Check that the instance is technically correct."""
+    assert min(sum(S,[])) == 1
+    assert max(sum(S,[])) == len(S)
+
+    assert len(S) == len(f)
+    assert len(S) == len(c)
+    for j in range(len(S)):
+        assert (j+1) in S[j]
+
+        for k in S[j]:
+            assert (j+1) in S[k-1]
+
+        assert len(f[j]) == len(S[j])+1
 
 # generating a Cover BDD for the problem ######################################
 
@@ -211,7 +324,45 @@ def build_soft_cover_DD(S, f, c, next_node_type='min'):
     return B, node_labels
 
 
+# experiments code ############################################################
+def dia_sizes(n1=5, n2=10, K=5, igen=make_instance):
+    """Prints random diagram sizes for different instance size."""
+    print("experiment, N, Bsize_nonred, Bsize_reduced, naive_MIP_vars, t_MIP, t_BDD")
+    expn = 1
+    for n in range (n1, n2+1):
+        for _ in range(K):
+            S, f, c = igen(n, verbose=False)
+            assert_instance(S, f, c)
+            # naive MIP approach
+            t0 = time()
+            m, x, y = make_MIP(S, c, f)
+            m.optimize()
+            t1 = time()
+            t_MIP = t1-t0
+            assert m.status == GRB.OPTIMAL
+            aobj = m.objVal + sum(fs[0] for fs in f)
+            nvars = len(x.keys())+len(y.keys())
+
+            # BDD approach
+            t0 = time()
+            B, _ = build_soft_cover_DD(S, f, c, next_node_type='min')
+            B_as_is = B.size()
+            B.make_reduced()
+            B_red = B.size()
+            m, _, _, x = add_BDD_to_MIP(B)
+            m.update()
+            m.optimize()
+            t1 = time()
+            t_BDD = t1-t0
+            assert m.status == GRB.OPTIMAL
+            assert (abs(aobj - m.objVal) < 1e-2)
+            print(
+                f"{expn}, {n}, {B_as_is}, {B_red}, {nvars}, {t_MIP:.2f}, {t_BDD:.2f}",
+                flush=True)
+            expn += 1
+
 # testing the code ############################################################
+
 def try_softcover_inst(S, c, f):
     """Solves a softcover inst with naive MIP and BDD MIP (both w/Gurobi)."""
     m, x, y = make_MIP(S, c, f)
@@ -225,6 +376,7 @@ def try_softcover_inst(S, c, f):
     x1 = [x[j].x for j in range(1, len(S)+1)]
     print("Alternative approach: building a BDD...")
     B, _ = build_soft_cover_DD(S, f, c)
+    B.make_reduced()
     print(f"BDD built, {B.size()} nodes.")
     m, _, _, x = add_BDD_to_MIP(B)
     print("Added to the model.")
@@ -236,7 +388,7 @@ def try_softcover_inst(S, c, f):
     print(f"Decisions are: {[x[xvar].x for xvar in x]}")
     x2 = [x[xvar].x for xvar in x]
 
-    return (abs(aobj - m.objVal)<1e-5)
+    return (abs(aobj - m.objVal) < 1e-2)
 
 
 def test_build_soft_cover_DD_simple1():
@@ -270,9 +422,12 @@ def test_build_soft_cover_DD_simple2():
 
     assert try_softcover_inst(S, c, f)
 
-@pytest.mark.parametrize("test_inst", [make_instance(np.random.randint(5, 10))
+
+@pytest.mark.parametrize("test_inst", [make_instance(np.random.randint(5, 10),
+                                                     verbose=False)
                                        for _ in range(100)])
 def test_build_soft_cover_DD(test_inst):
+    """Asserts naive MIP ~ BDD MIP."""
     S, f, c = test_inst
     print(f"S={S}; c={c}; f={f}")
     assert try_softcover_inst(S, c, f)
@@ -355,22 +510,53 @@ def test_MIP_example():
     print(f"(Adjusted) Objective is: {aobj}")
     print(f"Decisions are: {[x[j].x for j in range(1, len(S)+1)]}")
 
+
 # main run (if module is started by itself) ###################################
 if __name__ == '__main__':
-    parser = ap.ArgumentParser(description="''Soft overlap'' instance generator. (c) A. Bochkarev, 2022",
+    parser = ap.ArgumentParser(description="''Soft overlap'' experiments. (c) A. Bochkarev, 2022",
                                formatter_class=ap.ArgumentDefaultsHelpFormatter)
 
-    parser.add_argument("N", action="store",
+    parser.add_argument("EXPERIMENT", action="store",
+                        help="experiment name (rnd_inst, dia_sizes)")
+    parser.add_argument('-N', dest="N", action="store", default="-1",
                         help="number of points in the network")
     args = parser.parse_args()
 
-    S, f, c = make_instance(int(args.N))
-    m, x, y = make_MIP(S, c, f)
-    t0 = time()
-    m.optimize()
-    t1 = time()
-    assert m.status == GRB.OPTIMAL
-    aobj = m.objVal + sum(fs[0] for fs in f)
-    print(f"(Adjusted) Objective is: {aobj}")
-    print(f"Decisions are: {[x[j].x for j in range(len(S))]}")
-    print(f"Finished in {t1 - t0:.2f} sec.")
+    if args.EXPERIMENT == "rnd_inst":
+        if args.N == "-1":
+            print("N is required!")
+            exit(1)
+
+        S, f, c = make_instance(int(args.N))
+        m, x, y = make_MIP(S, c, f)
+        t0 = time()
+        m.optimize()
+        t1 = time()
+        assert m.status == GRB.OPTIMAL
+        aobj = m.objVal + sum(fs[0] for fs in f)
+        print(f"(Adjusted) Objective is: {aobj}")
+        print(f"Decisions are: {[x[j].x for j in range(len(S))]}")
+        print(f"Finished in {t1 - t0:.2f} sec.")
+    elif args.EXPERIMENT == "dia_sizes":
+        dia_sizes(5, 20, K=5)
+    elif args.EXPERIMENT == "dia_sizes_string":
+        dia_sizes(5, 15, K=1, igen=make_string_inst)
+    elif args.EXPERIMENT == "dia_sizes_organic":
+        dia_sizes(5, 25, K=1, igen=make_organic_inst)
+    elif args.EXPERIMENT == "dia_sizes_caves":
+        dia_sizes(15, 25, K=1, igen=make_caveman_inst)
+    elif args.EXPERIMENT == "MIP_time_cavemen":
+        if args.N == "-1":
+            print("N is required!")
+            exit(1)
+
+        S, f, c = make_caveman_inst(int(args.N))
+        m, x, y = make_MIP(S, c, f)
+        t0 = time()
+        m.optimize()
+        t1 = time()
+        assert m.status == GRB.OPTIMAL
+        aobj = m.objVal + sum(fs[0] for fs in f)
+        print(f"(Adjusted) Objective is: {aobj}")
+        print(f"Decisions are: {[x[j].x for j in range(1, len(S)+1)]}")
+        print(f"Finished in {t1 - t0:.2f} sec.")

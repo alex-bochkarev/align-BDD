@@ -33,7 +33,9 @@
 :LOGBOOK:
 CLOCK: [2022-01-24 Mon 12:16]--[2022-01-24 Mon 12:40] =>  0:24
 :END:
-*** TODO Design cover DDs (Bool -> Int)
+*** DONE Design cover DDs (Bool -> Int)
+CLOSED: [2022-01-27 Thu 15:11]
+- State "DONE"       from "TODO"       [2022-01-27 Thu 15:11]
 :LOGBOOK:
 CLOCK: [2022-01-27 Thu 14:31]--[2022-01-27 Thu 14:58] =>  0:27
 CLOCK: [2022-01-27 Thu 13:36]--[2022-01-27 Thu 14:18] =>  0:42
@@ -52,8 +54,32 @@ CLOCK: [2022-01-24 Mon 12:59]--[2022-01-24 Mon 13:10] =>  0:11
 CLOCK: [2022-01-24 Mon 12:55]--[2022-01-24 Mon 12:56] =>  0:01
 :END:
 Check it is correct, technically.
-*** TODO Check dia sizes scaling (with and w/o reduction) vs. no of vars in MIP
-*** TODO Repeat the experiment for a more narrow graph type (cavemen?)
+*** DONE Check dia sizes scaling (with and w/o reduction) vs. no of vars in MIP
+CLOSED: [2022-01-28 Fri 17:21]
+- State "DONE"       from "TODO"       [2022-01-28 Fri 17:21]
+:LOGBOOK:
+CLOCK: [2022-01-28 Fri 15:30]--[2022-01-28 Fri 16:24] =>  0:54
+CLOCK: [2022-01-28 Fri 14:05]--[2022-01-28 Fri 14:42] =>  0:37
+CLOCK: [2022-01-28 Fri 13:59]--[2022-01-28 Fri 14:03] =>  0:04
+CLOCK: [2022-01-27 Thu 18:57]--[2022-01-27 Thu 19:17] =>  0:20
+CLOCK: [2022-01-27 Thu 15:16]--[2022-01-27 Thu 15:26] =>  0:10
+CLOCK: [2022-01-27 Thu 15:11]--[2022-01-27 Thu 15:14] =>  0:03
+:END:
+So, without reduction, I basically create an exponentially sized diagrams. This
+makes sense, if I am not smart with this ``forgetting'' nodes (after they have zero
+``degrees of freedom'').
+
+However, it is not really bright even in theoretical case of writing down a
+reduced dia as well...
+
+*** DONE Repeat the experiment for a more narrow graph type (cavemen?)
+CLOSED: [2022-01-28 Fri 20:12]
+- State "DONE"       from "TODO"       [2022-01-28 Fri 20:12]
+:LOGBOOK:
+CLOCK: [2022-01-28 Fri 19:17]--[2022-01-28 Fri 20:12] =>  0:55
+CLOCK: [2022-01-28 Fri 18:34]--[2022-01-28 Fri 18:55] =>  0:21
+CLOCK: [2022-01-28 Fri 17:21]--[2022-01-28 Fri 17:59] =>  0:38
+:END:
 *** TODO Compare runtimes w/o types: BDDs vs naive MIP
 *** TODO Add types -- generate CPP instances 
 *** TODO Compare runtime: naive MIP vs CPP MIP vs Align-BDD CPP

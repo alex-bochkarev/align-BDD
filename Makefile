@@ -275,6 +275,9 @@ $(LOGS)/tUFLP_runtimes.csv: experiments/tUFLP_runtimes.py
 					cp $(INST)/tUFLP_steps_breakdown.json ./instances/ ; \
 				fi
 
+$(LOGS)/dia_sizes/*.csv: experiments/softcover.py
+	parallel -j4 python -m experiments.softcover {} ">" run_logs/dia_sizes/{}.csv ::: {dia_sizes,dia_sizes_string,dia_sizes_organic,dia_sizes_caves}
+
 ## clean-up
 # ######################################################################
 # # auxiliary recipes
