@@ -1,4 +1,5 @@
 * Running changelog
+** [2022-01-31 Mon 15:28]: fixed instance generation bug (cavemen) 
 ** [2022-01-24 Mon 12:14]: generated 'long' problems 
 See [[mu4e:msgid:871r127c2f.fsf@g.clemson.edu][Re: Two ideas]] for details
 

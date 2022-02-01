@@ -181,7 +181,7 @@ def make_caveman_inst(n=10, M=5, pcave=0.8, verbose=True):
     ncaves = n // M
     for k in range(1, ncaves+1):
         for i in range((k-1)*M, min(k*M, n)):
-            for j in range(i, min(k*M, n)):
+            for j in range(i+2, min(k*M, n)):
                 if np.random.uniform() <= pcave:
                     S[i].append(j+1)
                     S[j].append(i+1)
@@ -190,17 +190,19 @@ def make_caveman_inst(n=10, M=5, pcave=0.8, verbose=True):
     Cmax = 5.0
     c = [Cmax*np.random.uniform() for _ in range(len(S))]
     if verbose:
-        print(f"S={S}, f={f}, c={c}")
+        print(f"S={S};\nf={f}\n;c={c}")
     return S, f, c
 
 
 def assert_instance(S, f, c):
     """Check that the instance is technically correct."""
-    assert min(sum(S,[])) == 1
-    assert max(sum(S,[])) == len(S)
+    assert min(sum(S, [])) == 1
+    assert max(sum(S, [])) == len(S)
 
     assert len(S) == len(f)
     assert len(S) == len(c)
+    for Sj in S:
+        assert len(Sj) == len(set(Sj))  # no repeats within each adj list
     for j in range(len(S)):
         assert (j+1) in S[j]
 
@@ -213,8 +215,8 @@ def assert_instance(S, f, c):
 
 def make_label(state):
     """Helper: formats a node label out of the state."""
-    return "["+",".join(["j:"+str(state[j]) for j in range(len(state))
-                         if state[j] > 0])+"]"
+    return "\n".join([f"{j+1}:{state[j]}" for j in range(len(state))
+                      if state[j] > 0])
 
 
 def build_soft_cover_DD(S, f, c, next_node_type='min'):
@@ -251,6 +253,7 @@ def build_soft_cover_DD(S, f, c, next_node_type='min'):
     while k < N-1:
         # we take node `i` and try to add it and all its neighbors
         # to the diagram (unless they are already added)
+        print(f"Degrees: {freedoms.dh}")
         i = freedoms.get_next()  # current 'central' node to process
         for j in S[i-1]:
             if f"x{j}" in B.vars or k == N-1:
