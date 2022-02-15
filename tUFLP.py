@@ -38,7 +38,7 @@ class DegreeKeeper:
     def __init__(self, S=None, next_node_type="min"):
         """Initializes the heap and index.
 
-        EXPERIMENT BRACH version:
+        EXPERIMENT BRANCH version:
         Allows for different approaches to `get_next` node,
         parameterized by `next_node_type`:
 

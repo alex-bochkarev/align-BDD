@@ -213,10 +213,24 @@ def assert_instance(S, f, c):
 
 # generating a Cover BDD for the problem ######################################
 
-def make_label(state):
+
+def make_label(state, pts):
     """Helper: formats a node label out of the state."""
-    return "\n".join([f"{j+1}:{state[j]}" for j in range(len(state))
-                      if state[j] > 0])
+    return "\n".join([f"{pts[j]}:{state[j]}" for j in range(len(state))])
+
+
+def mknode(state, freedoms):
+    """Makes a node key.
+
+    Args:
+        state (list): no. of overlaps per point,
+        freedoms (DegreeKeeper): no. of point (residual) degrees.
+
+    Returns:
+        String label.
+    """
+    return ";".join([f"{j+1}:{freedoms[j+1]}" for j in range(len(state))
+                     if state[j] > 0])
 
 
 def build_soft_cover_DD(S, f, c, next_node_type='min'):
@@ -224,7 +238,7 @@ def build_soft_cover_DD(S, f, c, next_node_type='min'):
 
     Args:
         S (list): neighborhood list,
-        f (list): overlap costs, f[j][a], a=0,..,|S_j|
+        f (list): overlap costs, `f[j][a]`, a=0,..,|S_j|
         c (list): location costs.
             next_node_type (str): `min`, `max`, or `rnd` -- see `DegreeKeeper`
             docstring for details.
@@ -243,8 +257,10 @@ def build_soft_cover_DD(S, f, c, next_node_type='min'):
 
     freedoms = DegreeKeeper(S, next_node_type)  # node degrees
 
-    root_state = np.array([0 for _ in range(len(S))], dtype=int)
-    node_labels = dict({DD.NROOT: make_label(root_state)})
+    root_state = tuple(0 for _ in range(len(S)))
+    pts = [j for j in range(1, len(S)+1) if freedoms.has_freedom(j)]
+    assert len(pts) == len(root_state)
+    node_labels = dict({DD.NROOT: make_label(root_state, pts)})
 
     next_layer = {tuple(root_state): B.addnode(None)}
 
@@ -253,7 +269,6 @@ def build_soft_cover_DD(S, f, c, next_node_type='min'):
     while k < N-1:
         # we take node `i` and try to add it and all its neighbors
         # to the diagram (unless they are already added)
-        print(f"Degrees: {freedoms.dh}")
         i = freedoms.get_next()  # current 'central' node to process
         for j in S[i-1]:
             if f"x{j}" in B.vars or k == N-1:
@@ -268,33 +283,41 @@ def build_soft_cover_DD(S, f, c, next_node_type='min'):
                     freedoms.decrement(q)
 
             for state in current_layer:
-                node = current_layer[tuple(state)]
+                node = current_layer[state]
 
-                if state in next_layer:
-                    B.llink(node, next_layer[state], "lo")
-                else:
-                    newnode = B.addnode(node, "lo")
-                    next_layer.update({state: newnode})
-                    node_labels.update({newnode.id: make_label(state)})
-
-                next_state = list(state)
-
-                overlap_cost = 0
-                for q in S[j-1]:
-                    next_state[q-1] += 1
-                    overlap_cost += f[q - 1][next_state[q - 1]] - f[q - 1][
-                        next_state[q - 1] - 1]
-
-                next_state = tuple(next_state)
+                next_state = tuple([state[k] for k in range(len(state))
+                                    if freedoms.has_freedom(pts[k])])
 
                 if next_state in next_layer:
-                    B.llink(node, next_layer[next_state], "hi",
-                            edge_weight=c[j-1] + overlap_cost)
+                    B.llink(node, next_layer[next_state], "lo")
+                else:
+                    newnode = B.addnode(node, "lo")
+                    next_layer.update({next_state: newnode})
+                    node_labels.update({newnode.id: make_label(next_state,
+                                                               pts)})
+
+                next_state = tuple(state[k] + (pts[k] in S[j-1])
+                                   for k in range(len(state))
+                                   if freedoms.has_freedom(pts[k]))
+
+                a = {pts[j]: state[j] for j in range(len(pts))}
+                overlap_cost = 0
+
+                for q in S[j-1]:
+                    overlap_cost += f[q - 1][a[q]+1] - f[q - 1][a[q]]
+
+                if next_state in next_layer:
+                    B.llink(node, next_layer[next_state],
+                            "hi", edge_weight=c[j-1] + overlap_cost)
                 else:
                     newnode = B.addnode(node, "hi",
                                         edge_weight=c[j-1]+overlap_cost)
                     next_layer.update({next_state: newnode})
-                    node_labels.update({newnode.id: make_label(next_state)})
+                    node_labels.update({newnode.id: make_label(next_state,
+                                                               pts)})
+
+            ptsp = [j for j in pts if freedoms.has_freedom(j)]
+            pts = ptsp
 
             B.rename_vars({f"stub{k+1}": f"x{j}"})
             k += 1
@@ -305,19 +328,20 @@ def build_soft_cover_DD(S, f, c, next_node_type='min'):
     while ((f"x{i}" in B.vars) or (i == -1)):
         i, _ = freedoms.pop()
 
+
     current_layer = copy(next_layer)
 
     const_cost = sum(fj[0] for fj in f)
+
     for state in current_layer:
-        node = current_layer[tuple(state)]
+        node = current_layer[state]
         B.link(node.id, DD.NTRUE, "lo", const_cost)
 
-        next_state = list(state)
+        a = {pts[j]: state[j] for j in range(len(pts))}
         overlap_cost = 0
 
         for q in S[i-1]:
-            next_state[q-1] += 1
-            overlap_cost += f[q-1][next_state[q-1]] - f[q-1][next_state[q-1]-1]
+            overlap_cost += f[q - 1][a[q]+1] - f[q - 1][a[q]]
 
         B.link(node.id, DD.NTRUE, "hi", c[i-1] +
                overlap_cost + const_cost)
@@ -368,6 +392,7 @@ def dia_sizes(n1=5, n2=10, K=5, igen=make_instance):
 
 def try_softcover_inst(S, c, f):
     """Solves a softcover inst with naive MIP and BDD MIP (both w/Gurobi)."""
+    assert_instance(S, f, c)
     m, x, y = make_MIP(S, c, f)
     m.optimize()
 
@@ -405,7 +430,7 @@ def test_build_soft_cover_DD_simple1():
 
 def test_build_soft_cover_DD_simple2():
     """Tests the softcover DD construction procedure."""
-    S = [[1, 4, 5, 6],
+    S = [[1, 2, 4, 5, 6],
          [2, 1, 3],
          [3, 2, 7, 8, 9],
          [4, 1], [5, 1], [6, 1],
@@ -428,7 +453,7 @@ def test_build_soft_cover_DD_simple2():
 
 @pytest.mark.parametrize("test_inst", [make_instance(np.random.randint(5, 10),
                                                      verbose=False)
-                                       for _ in range(100)])
+                                       for _ in range(500)])
 def test_build_soft_cover_DD(test_inst):
     """Asserts naive MIP ~ BDD MIP."""
     S, f, c = test_inst
@@ -547,7 +572,7 @@ if __name__ == '__main__':
     elif args.EXPERIMENT == "dia_sizes_organic":
         dia_sizes(5, 25, K=1, igen=make_organic_inst)
     elif args.EXPERIMENT == "dia_sizes_caves":
-        dia_sizes(15, 25, K=1, igen=make_caveman_inst)
+        dia_sizes(15, 40, K=1, igen=make_caveman_inst)
     elif args.EXPERIMENT == "MIP_time_cavemen":
         if args.N == "-1":
             print("N is required!")
