@@ -90,8 +90,8 @@ class node(object):
 
     Note:
         There are special node IDs:
-        ``0``   for the root, 
-        ``-1``  for True sink, 
+        ``0``   for the root,
+        ``-1``  for True sink,
         ``-2``  for the False sink.
     """
 
@@ -263,7 +263,18 @@ class BDD(object):
         return g
 
     def addnode(self, parent_node, arc="hi", node_id=None, edge_weight=0.0):
-        """Adds a node and updates aux info as necessary."""
+        """Adds a node and updates aux info as necessary.
+
+        Args:
+            parent_node (node): parent node pointer,
+            arc (str): arc type, `hi` or `lo`,
+            node_id: node name. If `None` is provided, the value is derived
+                from :py:func:`BDD.BDD.new_node_name`,
+            edge_weight(float): edge weight
+
+        Returns:
+            The created node as a :py:class:`BDD.node` object.
+        """
         if node_id is None:
             node_id = self.new_node_name()
 

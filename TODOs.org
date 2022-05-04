@@ -7,28 +7,103 @@
   - [X] idea 2a (cross-terms, x1x2, etc.)
   - [ ] idea 2b (function of cross-terms) -- ?
   - [X] =build_cover_DD=: make single overlap version
-  - [X] =build_color_DD=: fix the procedure (linear DD growth is doable!)
+  - [X] =build_type_DD=: fix the procedure (linear DD growth is doable!)
   - [X] =build_tUFLP_MIP=: revise to single overlap version
   - [X] cross-check DDs with the MIP (simple)
   - [X] fix the bug in cover DD generation (infinite loop?..)
   - [X] cross-check DDs with the MIP (random set)
   - [X] test the align-BDD version.
-  - [X] implement color ordering / fix the color-DD order
+  - [X] implement type ordering / fix the type-DD order
   - [X] test the new problem (against Gurobi) -- runtimes.
   - [X] special case instance (string): diagram sizes
   - [X] special case (organic thing): dia sizes. Is it max degree?
   - [X] example of 'arbitrarily poor' heuristic.
   - [X] randomized cover-DD builder (random order of nodes)
-  - [X] randomized color-DD builder
+  - [X] randomized type-DD builder
   - [X] num test
-  - [X] Look into =gen_test_p.csv= (dia sizes for various instance gen parameters =p=)
-  - [X] check out =gen_test_colors.csv= (different no. of colors for given =n = 15=
-  - [ ] check out if the costs are correct for =build_color_DD=.
+  - [ ] check out if the costs are correct for =build_type_DD=.
     I thought it was not assume to include costs at all. How does it pass the tests?..
   - [ ] maybe generate t-UFLP differently?
     distribute the first facility into every bin, and then sort them randomly?
 
 * Current project TODOs
+** TODO Add assertion to the instance type
+[2022-05-03 Tue 14:10]
+[[file:~/projects/align-BDD/darkcloud.py]]
+
+'string' shape only.
+** TODO Check if the case of shared single endpoint works! 
+[2022-05-03 Tue 10:13]
+[[file:~/projects/align-BDD/darkcloud.py::drop_points.append(x)]]
+** TODO Implement =calc_cave= 
+[2022-05-02 Mon 19:37]
+[[file:~/projects/align-BDD/darkcloud.py::def _calc_cave(self, S, fixed_nodes):]]
+** TODO Add caves metadata generation
+[2022-04-27 Wed 16:27]
+[[file:~/projects/align-BDD/darkcloud.py::ncaves = n // M]]
+** TODO Design dark-cloud algo for relaxed cavemen graph / UFLP
+SCHEDULED: <2022-05-02 Mon>
+:LOGBOOK:
+CLOCK: [2022-05-04 Wed 13:56]--[2022-05-04 Wed 14:02] =>  0:06
+CLOCK: [2022-05-03 Tue 20:13]--[2022-05-03 Tue 20:23] =>  0:10
+CLOCK: [2022-05-03 Tue 14:25]--[2022-05-03 Tue 14:44] =>  0:19
+CLOCK: [2022-05-03 Tue 13:59]--[2022-05-03 Tue 14:14] =>  0:15
+CLOCK: [2022-05-03 Tue 13:20]--[2022-05-03 Tue 13:52] =>  0:32
+CLOCK: [2022-05-03 Tue 12:40]--[2022-05-03 Tue 13:12] =>  0:32
+CLOCK: [2022-05-03 Tue 12:12]--[2022-05-03 Tue 12:20] =>  0:08
+CLOCK: [2022-05-03 Tue 12:01]--[2022-05-03 Tue 12:07] =>  0:06
+CLOCK: [2022-05-03 Tue 10:24]--[2022-05-03 Tue 10:37] =>  0:13
+CLOCK: [2022-05-03 Tue 09:55]--[2022-05-03 Tue 10:05] =>  0:10
+CLOCK: [2022-05-03 Tue 09:02]--[2022-05-03 Tue 09:44] =>  0:42
+CLOCK: [2022-05-02 Mon 19:32]--[2022-05-02 Mon 19:48] =>  0:16
+CLOCK: [2022-05-02 Mon 19:05]--[2022-05-02 Mon 19:15] =>  0:10
+CLOCK: [2022-05-02 Mon 19:03]--[2022-05-02 Mon 19:04] =>  0:01
+CLOCK: [2022-05-02 Mon 15:43]--[2022-05-02 Mon 15:53] =>  0:10
+CLOCK: [2022-05-02 Mon 15:05]--[2022-05-02 Mon 15:20] =>  0:15
+CLOCK: [2022-05-02 Mon 14:29]--[2022-05-02 Mon 15:01] =>  0:32
+CLOCK: [2022-05-02 Mon 14:25]--[2022-05-02 Mon 14:26] =>  0:01
+CLOCK: [2022-05-02 Mon 13:14]--[2022-05-02 Mon 14:24] =>  1:10
+CLOCK: [2022-04-29 Fri 15:50]--[2022-04-29 Fri 15:58] =>  0:08
+CLOCK: [2022-04-29 Fri 15:11]--[2022-04-29 Fri 15:33] =>  0:22
+CLOCK: [2022-04-29 Fri 14:34]--[2022-04-29 Fri 14:57] =>  0:23
+CLOCK: [2022-04-29 Fri 14:19]--[2022-04-29 Fri 14:31] =>  0:12
+CLOCK: [2022-04-29 Fri 14:04]--[2022-04-29 Fri 14:14] =>  0:10
+CLOCK: [2022-04-29 Fri 13:16]--[2022-04-29 Fri 13:43] =>  0:27
+CLOCK: [2022-04-29 Fri 12:41]--[2022-04-29 Fri 12:50] =>  0:09
+CLOCK: [2022-04-27 Wed 15:05]--[2022-04-27 Wed 15:29] =>  0:24
+CLOCK: [2022-03-23 Wed 15:56]--[2022-03-23 Wed 16:02] =>  0:06
+CLOCK: [2022-03-23 Wed 15:48]--[2022-03-23 Wed 15:55] =>  0:07
+CLOCK: [2022-03-23 Wed 15:30]--[2022-03-23 Wed 15:38] =>  0:08
+CLOCK: [2022-03-23 Wed 15:16]--[2022-03-23 Wed 15:28] =>  0:12
+CLOCK: [2022-03-23 Wed 14:54]--[2022-03-23 Wed 15:11] =>  0:17
+CLOCK: [2022-03-23 Wed 09:45]--[2022-03-23 Wed 09:49] =>  0:04
+CLOCK: [2022-03-22 Tue 16:24]--[2022-03-22 Tue 16:26] =>  0:02
+CLOCK: [2022-03-22 Tue 14:50]--[2022-03-22 Tue 14:51] =>  0:01
+CLOCK: [2022-03-22 Tue 14:25]--[2022-03-22 Tue 14:30] =>  0:05
+CLOCK: [2022-03-22 Tue 13:35]--[2022-03-22 Tue 13:46] =>  0:11
+CLOCK: [2022-03-22 Tue 13:29]--[2022-03-22 Tue 13:30] =>  0:01
+CLOCK: [2022-03-22 Tue 13:09]--[2022-03-22 Tue 13:14] =>  0:05
+CLOCK: [2022-03-22 Tue 12:59]--[2022-03-22 Tue 13:01] =>  0:02
+CLOCK: [2022-03-22 Tue 12:42]--[2022-03-22 Tue 12:54] =>  0:12
+CLOCK: [2022-03-22 Tue 12:19]--[2022-03-22 Tue 12:22] =>  0:03
+CLOCK: [2022-03-17 Thu 18:21]--[2022-03-17 Thu 18:26] =>  0:05
+CLOCK: [2022-03-16 Wed 17:10]--[2022-03-16 Wed 17:14] =>  0:04
+CLOCK: [2022-03-16 Wed 16:45]--[2022-03-16 Wed 17:05] =>  0:20
+CLOCK: [2022-03-16 Wed 16:20]--[2022-03-16 Wed 16:25] =>  0:05
+CLOCK: [2022-03-16 Wed 15:47]--[2022-03-16 Wed 16:19] =>  0:32
+CLOCK: [2022-03-16 Wed 15:22]--[2022-03-16 Wed 15:44] =>  0:22
+CLOCK: [2022-03-16 Wed 14:55]--[2022-03-16 Wed 15:19] =>  0:24
+CLOCK: [2022-03-16 Wed 14:45]--[2022-03-16 Wed 14:53] =>  0:08
+CLOCK: [2022-03-14 Mon 14:49]--[2022-03-14 Mon 14:52] =>  0:03
+CLOCK: [2022-03-14 Mon 14:30]--[2022-03-14 Mon 14:44] =>  0:14
+CLOCK: [2022-03-14 Mon 14:17]--[2022-03-14 Mon 14:27] =>  0:10
+CLOCK: [2022-03-11 Fri 15:52]--[2022-03-11 Fri 16:12] =>  0:20
+CLOCK: [2022-03-11 Fri 15:39]--[2022-03-11 Fri 15:52] =>  0:13
+CLOCK: [2022-03-11 Fri 15:30]--[2022-03-11 Fri 15:35] =>  0:05
+CLOCK: [2022-03-11 Fri 15:01]--[2022-03-11 Fri 15:20] =>  0:19
+CLOCK: [2022-03-11 Fri 14:36]--[2022-03-11 Fri 14:55] =>  0:19
+CLOCK: [2022-03-11 Fri 13:53]--[2022-03-11 Fri 13:58] =>  0:05
+:END:
 ** Softcover: design instances with types
 :LOGBOOK:
 CLOCK: [2022-01-24 Mon 12:16]--[2022-01-24 Mon 12:40] =>  0:24
@@ -81,7 +156,9 @@ CLOCK: [2022-01-28 Fri 18:34]--[2022-01-28 Fri 18:55] =>  0:21
 CLOCK: [2022-01-28 Fri 17:21]--[2022-01-28 Fri 17:59] =>  0:38
 :END:
 
-*** TODO make improved cover-building algo
+*** DONE make improved cover-building algo
+CLOSED: [2022-03-11 Fri 13:21]
+- State "DONE"       from "TODO"       [2022-03-11 Fri 13:21]
 :LOGBOOK:
 CLOCK: [2022-02-15 Tue 15:09]--[2022-02-15 Tue 15:28] =>  0:19
 CLOCK: [2022-02-15 Tue 14:14]--[2022-02-15 Tue 15:05] =>  0:51
@@ -95,10 +172,16 @@ CLOCK: [2022-01-31 Mon 14:40]--[2022-01-31 Mon 15:11] =>  0:31
 CLOCK: [2022-01-31 Mon 14:12]--[2022-01-31 Mon 14:16] =>  0:04
 CLOCK: [2022-01-31 Mon 13:16]--[2022-01-31 Mon 13:35] =>  0:19
 :END:
-*** TODO Compare runtimes w/o types: BDDs vs naive MIP
-*** TODO Add types -- generate CPP instances 
-*** TODO Compare runtime: naive MIP vs CPP MIP vs Align-BDD CPP
-*** TODO Add reduction step -- check time
+*** DONE Compare runtimes w/o types: BDDs vs naive MIP
+CLOSED: [2022-03-11 Fri 13:21]
+- State "DONE"       from "TODO"       [2022-03-11 Fri 13:21]
+:LOGBOOK:
+CLOCK: [2022-02-23 Wed 15:41]--[2022-02-23 Wed 16:08] =>  0:27
+CLOCK: [2022-02-23 Wed 15:31]--[2022-02-23 Wed 15:37] =>  0:06
+:END:
+*** LATER Add types -- generate CPP instances 
+*** LATER Compare runtime: naive MIP vs CPP MIP vs Align-BDD CPP
+*** LATER Add reduction step -- check time
 ** DONE Checking the reviewers' comments
 CLOSED: [2022-01-26 Wed 13:08]
 - State "DONE"       from              [2022-01-26 Wed 13:08]
@@ -136,10 +219,10 @@ As of beginning of the day <2020-07-11> all of these are merged into =master=
  Like, maybe rename to =test_equivalence=. And then =is_equivalent <- test_equivalence()[0]=
 ** TODO rename =VarSeq.layer_var= into =vars=, I suppose...
  [2021-02-22 Mon 17:52]
-** TODO rename =cUFL= (streamlining names)
-** TODO let S NOT contain the node itself -- amended later :cUFL:
+** TODO rename =?UFL= (streamlining names)
+** TODO let S NOT contain the node itself -- amended later :tUFL:
  [2021-03-22 Mon 18:34]
-** TODO figure (1) the order of colors and (2) order of nodes within a color
+** TODO figure (1) the order of types and (2) order of nodes within a type
  [2021-03-30 Tue 13:32]
 ** TODO Technical description :doc:
    - makefile
@@ -162,3 +245,4 @@ CLOSED: [2022-01-19 Wed 14:15]
 * Notes
   - revision notes:  [[mu4e:msgid:CO1PR01MB658375A8FEDC337330803037DE609@CO1PR01MB6583.prod.exchangelabs.com][Two ideas]] from JCS.
   - first submission corresponds to =master= commit =04a5b38=
+    

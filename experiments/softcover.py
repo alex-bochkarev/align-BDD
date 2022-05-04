@@ -69,7 +69,7 @@ def generate_S(n, p=0.25):
 
 
 def generate_overlaps(S):
-    """Generates overlaps values `f`.
+    """Generates overlaps values (costs) `f` given adjacencies `S`.
 
     Args:
         S (list): list of lists (adjacencies)
@@ -453,7 +453,7 @@ def test_build_soft_cover_DD_simple2():
 
 @pytest.mark.parametrize("test_inst", [make_instance(np.random.randint(5, 10),
                                                      verbose=False)
-                                       for _ in range(500)])
+                                       for _ in range(1000)])
 def test_build_soft_cover_DD(test_inst):
     """Asserts naive MIP ~ BDD MIP."""
     S, f, c = test_inst
@@ -572,7 +572,7 @@ if __name__ == '__main__':
     elif args.EXPERIMENT == "dia_sizes_organic":
         dia_sizes(5, 25, K=1, igen=make_organic_inst)
     elif args.EXPERIMENT == "dia_sizes_caves":
-        dia_sizes(15, 40, K=1, igen=make_caveman_inst)
+        dia_sizes(25, 175, K=5, igen=make_caveman_inst)
     elif args.EXPERIMENT == "MIP_time_cavemen":
         if args.N == "-1":
             print("N is required!")

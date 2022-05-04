@@ -9,7 +9,7 @@ research and testing.
 # TODO: review the legacy code / consider moving
 
 import sys
-import requests # needed for Telegram
+# import requests # needed for Telegram
 import numpy as np
 
 import opt_parser as als
