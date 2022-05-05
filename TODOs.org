@@ -35,15 +35,13 @@
 ** TODO Check if the case of shared single endpoint works! 
 [2022-05-03 Tue 10:13]
 [[file:~/projects/align-BDD/darkcloud.py::drop_points.append(x)]]
-** TODO Implement =calc_cave= 
-[2022-05-02 Mon 19:37]
-[[file:~/projects/align-BDD/darkcloud.py::def _calc_cave(self, S, fixed_nodes):]]
 ** TODO Add caves metadata generation
 [2022-04-27 Wed 16:27]
 [[file:~/projects/align-BDD/darkcloud.py::ncaves = n // M]]
 ** TODO Design dark-cloud algo for relaxed cavemen graph / UFLP
-SCHEDULED: <2022-05-02 Mon>
+SCHEDULED: <2022-05-05 Thu>
 :LOGBOOK:
+CLOCK: [2022-05-04 Wed 14:13]--[2022-05-04 Wed 14:16] =>  0:03
 CLOCK: [2022-05-04 Wed 13:56]--[2022-05-04 Wed 14:02] =>  0:06
 CLOCK: [2022-05-03 Tue 20:13]--[2022-05-03 Tue 20:23] =>  0:10
 CLOCK: [2022-05-03 Tue 14:25]--[2022-05-03 Tue 14:44] =>  0:19
@@ -104,6 +102,20 @@ CLOCK: [2022-03-11 Fri 15:01]--[2022-03-11 Fri 15:20] =>  0:19
 CLOCK: [2022-03-11 Fri 14:36]--[2022-03-11 Fri 14:55] =>  0:19
 CLOCK: [2022-03-11 Fri 13:53]--[2022-03-11 Fri 13:58] =>  0:05
 :END:
+*** DONE Implement =calc= cloud calculation
+CLOSED: [2022-05-05 Thu 19:48]
+- State "DONE"       from "TODO"       [2022-05-05 Thu 19:48]
+:LOGBOOK:
+CLOCK: [2022-05-05 Thu 19:28]--[2022-05-05 Thu 19:48] =>  0:20
+CLOCK: [2022-05-05 Thu 19:10]--[2022-05-05 Thu 19:20] =>  0:10
+CLOCK: [2022-05-05 Thu 18:52]--[2022-05-05 Thu 18:54] =>  0:02
+CLOCK: [2022-05-05 Thu 15:25]--[2022-05-05 Thu 15:48] =>  0:23
+CLOCK: [2022-05-05 Thu 15:05]--[2022-05-05 Thu 15:17] =>  0:12
+CLOCK: [2022-05-05 Thu 14:33]--[2022-05-05 Thu 14:42] =>  0:09
+CLOCK: [2022-05-05 Thu 13:30]--[2022-05-05 Thu 13:33] =>  0:03
+CLOCK: [2022-05-05 Thu 12:58]--[2022-05-05 Thu 13:07] =>  0:09
+:END:
+*** TODO add more testing for the BDD-approach
 ** Softcover: design instances with types
 :LOGBOOK:
 CLOCK: [2022-01-24 Mon 12:16]--[2022-01-24 Mon 12:40] =>  0:24

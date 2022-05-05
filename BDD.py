@@ -1089,14 +1089,17 @@ class BDD(object):
             for node in self.layers[L]:
                 node_label = None
                 if node.hi.id in node_labels.keys():
-                    node_label = node_labels[node.hi.id] + self.weights[(node.id, node.hi.id, "hi")]
+                    node_label = node_labels[node.hi.id] + self.weights[
+                        (node.id, node.hi.id, "hi")]
 
                 if node.lo.id in node_labels.keys():
                     if node_label is not None:
-                        node_label = min(node_label,
-                                         node_labels[node.lo.id] + self.weights[(node.id, node.lo.id, "lo")])
+                        node_label = min(
+                            node_label, node_labels[node.lo.id] +
+                            self.weights[(node.id, node.lo.id, "lo")])
                     else:
-                        node_label = node_labels[node.lo.id] + self.weights[(node.id, node.lo.id, "lo")]
+                        node_label = node_labels[node.lo.id] + self.weights[
+                            (node.id, node.lo.id, "lo")]
 
                 if node_label is not None:
                     node_labels.update({node.id: node_label})

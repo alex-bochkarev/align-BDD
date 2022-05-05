@@ -8,9 +8,10 @@ a@bochkarev.io
 """
 import numpy as np
 from dataclasses import dataclass
+import gurobipy as gp
 from experiments.softcover import generate_overlaps
 from BDD import BDD, NTRUE
-
+import pytest
 
 @dataclass
 class ptscloud:
@@ -168,11 +169,11 @@ class DDSolver:
                 if add_costs is None:
                     cost = 0.0
                 else:
-                    cost = self._calc_cave(add_costs,
-                                           fixed_nodes={
-                                               new_state[i]: newstate[i]
-                                               for i in range(len(newstate))
-                                           })
+                    fnodes = {current_state[i]: astate[i]
+                              for i in range(len(current_state))}
+                    fnodes.update({x: astate[-1]})
+                    cost = self._calc_cave(add_costs, fixed_nodes=fnodes)
+
                 if newstate in next_layer:
                     self.B.llink(current_layer[state], next_layer[newstate],
                                  arc, cost)
@@ -181,22 +182,69 @@ class DDSolver:
                                              edge_weight=cost)
                     next_layer.update({newstate: newnode})
 
-        print(f"Added: point {x}.")
         return next_layer
 
     def _calc_cave(self, cave, fixed_nodes):
         """Calculates part of the objective due to the given cave."""
-        print(f"Calc: {cave} with the decisions fixed:\n{fixed_nodes}")
-        return -1.0
+        m = gp.Model()
+        m.modelSense = gp.GRB.MINIMIZE
+
+        x = dict()
+        y = dict()
+
+        endpoints = [x for x in cave.e1] + [x for x in cave.e2]
+        endpoints = [x for x in endpoints if x is not None]
+
+        V = list(np.unique([j for j in cave.S] + endpoints))
+
+        # variables
+        for i in V:
+            # decision (location) variables
+            if i in cave.S:
+                x[i] = m.addVar(vtype=gp.GRB.BINARY, name=f"x{i}",
+                                obj=self.c[i-1])
+                # overlap (aux) variables
+                for a in range(1, len(self.S[i-1])+1):
+                    y[(i, a)] = m.addVar(vtype=gp.GRB.BINARY,
+                                         name=f"y_{i}_{a}",
+                                         obj=(self.f[i-1][a] -
+                                              self.f[i-1][a-1]))
+            else:
+                x[i] = m.addVar(vtype=gp.GRB.BINARY, name=f"x{i}",
+                                obj=0.0)
+
+        # constraints
+        for j in V:
+            if j not in cave.S:
+                continue
+
+            m.addConstr(gp.quicksum(x[k] for k in self.S[j-1]) ==
+                        gp.quicksum(y[(j, a)]
+                                    for a in range(1, len(self.S[j-1])+1)))
+
+            for a in range(1, len(self.S[j-1])):
+                m.addConstr(y[(j, a)] >= y[(j, a+1)])
+
+        # fixing variables
+        print(f"Calc: S={cave.S}, fixed={fixed_nodes}")
+        for var in fixed_nodes:
+            m.addConstr(x[var] == fixed_nodes[var]*1)
+
+        m.display()
+        m.update()
+        m.optimize()
+        assert m.status == gp.GRB.OPTIMAL
+
+        fterm = sum(self.f[j-1][0] for j in cave.S)
+        return m.objVal + fterm
 
     def build_cover_DD(self):
         """Builds a cover/overlap DD for the instance."""
-        assert len(caves) > 1
+        assert len(self.caves) > 1
 
         vars_to_add = sum([[c.e1[0], c.e1[1], c.e2[0], c.e2[1]]
                           for c in self.caves], [])
         vars_to_add = np.unique([v for v in vars_to_add if v is not None])
-        print(f"vars = {vars_to_add}")
         self.B = BDD(N=len(vars_to_add), weighted=True)
         varnames = []
 
@@ -205,7 +253,6 @@ class DDSolver:
         self.curr_state = []
 
         for cavenum, cave in enumerate(self.caves[:-1]):
-            print(f"=== Adding cave {cave}===")
             new_points = []
             drop_points = []
             for x in (cave.e1 + cave.e2):
@@ -218,7 +265,6 @@ class DDSolver:
                 else:
                     drop_points.append(x)
 
-            print(f"new: {new_points}, drop: {drop_points}")
             for x in new_points[:-1]:
                 current_layer = self._add_interim_point(x, self.curr_state,
                                                         self.curr_state + [x],
@@ -227,7 +273,7 @@ class DDSolver:
                 self.curr_state += [x]
 
             x = new_points[-1]
-            if cavenum < len(caves)-2:
+            if cavenum < len(self.caves)-2:
                 # processing the last point
                 newstate = [y for y in (self.curr_state + [x])
                             if y not in drop_points]
@@ -239,7 +285,6 @@ class DDSolver:
                 # that's the last point of the pre-last cloud
                 # connecting everything to T and F nodes
                 # (no new nodes needed, just calculate costs)
-                print("Linking the last layer")
                 for state in current_layer:
                     for (xval, arc) in [(True, "hi"), (False, "lo")]:
                         fixed_vals = {
@@ -247,15 +292,74 @@ class DDSolver:
                             for i, pt in enumerate(self.curr_state)}
 
                         fixed_vals.update({new_points[-1]: xval})
+
+                        fvals2 = {var: fixed_vals[var] for var in fixed_vals
+                                  if var in (self.caves[-1].S +
+                                             list(self.caves[-1].e1) +
+                                             list(self.caves[-1].e2))}
                         cost = self._calc_cave(cave,
                                                fixed_vals) + self._calc_cave(
-                                                   caves[-1], fixed_vals)
+                                                   self.caves[-1], fvals2)
 
                         self.B.link(current_layer[state].id, NTRUE, arc, cost)
 
             varnames.append(x)
             self.curr_state = newstate
 
-        print(f"Renaming varnames from {self.B.vars} to {varnames}")
         self.B.rename_vars({i: varnames[i-1] for i in self.B.vars})
         return self.B
+
+
+## Testing code ######################################################
+def solve_with_MIP(S, f, c):
+    """Creates a MIP model (for gurobi) from an instance specs.
+
+    Args:
+        S (list): list of adjacency lists,
+        f (list): overlap cost function, f[j][a],
+        c (list): location costs per point.
+
+    Returns:
+        objective value, x, and y
+    """
+    m = gp.Model()
+    m.modelSense = gp.GRB.MINIMIZE
+    m.setParam("OutputFlag", 0)
+    x = dict()
+    y = dict()
+
+    # create variables
+    for j in range(1, len(S)+1):
+        x[j] = m.addVar(vtype=gp.GRB.BINARY, name=f"x_{j}",
+                        obj=c[j-1])
+
+        for a in range(1, len(S[j-1])+1):
+            y[(j, a)] = m.addVar(vtype=gp.GRB.BINARY, name=f"y_{j}_{a}",
+                                 obj=f[j-1][a]-f[j-1][a-1])
+
+    # create constraints
+    for j in range(1, len(S)+1):
+        m.addConstr(gp.quicksum(x[k] for k in S[j-1]) ==
+                    gp.quicksum(y[(j, a)] for a in range(1, len(S[j-1])+1)))
+
+        for a in range(1, len(S[j-1])):
+            m.addConstr(y[(j, a)] >= y[(j, a+1)])
+
+    m.update()
+    m.optimize()
+    assert m.status == gp.GRB.OPTIMAL
+    return m, (m.objVal + sum(fs[0] for fs in f)), x, y
+
+
+@pytest.mark.parametrize("_", [None for _ in range(100)])
+def test_BDD_vs_MIP_simple(_):
+    """Tests BDD vs MIP over a single topology (random costs)."""
+    S,f,c,caves = gen_simple_cavemen_inst1()
+    sol = DDSolver(S,f,c,caves)
+    B = sol.build_cover_DD()
+    sp = B.shortest_path()
+
+    _, obj, x, y = solve_with_MIP(S,f,c)
+
+    print(f"obj={obj}, SP={sp[0]}")
+    assert abs(obj - sp[0]) < 1e-3
