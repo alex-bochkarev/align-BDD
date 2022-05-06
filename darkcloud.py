@@ -9,9 +9,10 @@ a@bochkarev.io
 import numpy as np
 from dataclasses import dataclass
 import gurobipy as gp
-from experiments.softcover import generate_overlaps
+from experiments.softcover import generate_overlaps, assert_instance
 from BDD import BDD, NTRUE
 import pytest
+
 
 @dataclass
 class ptscloud:
@@ -26,43 +27,87 @@ class ptscloud:
     S: list[int]
 
 
-# def gen_caveman_inst(n=10, M=5, pcave=0.8, verbose=True):
-#     """Generates an instance with the related metadata (info on caves).
+def gen_caveman_inst(n=10, M=5, L=0.5, verbose=False):
+    """Generates an instance with the related metadata (info on caves).
 
-#     Args:
-#       n (int): number of caves,
-#       M (int): number of points in a cave0,
-#       pcave (float): probability of connection within the cave0,
-#       verbose (Bool): print debug info
+    Args:
+      n (int): number of caves,
+      M (int): number of points in a cave,
+      L (float): edge sparsity parameter (share of missing edges)
+      verbose (Bool): print debug info
 
-#     Returns:
-#       S, f, c, caves: instance (S,f,c) and cave0 description.
-#     """
-#     # Create a connected 'string' first
-#     S = [[j+1] for j in range(n)]
-#     for j in range(1, len(S)-1):
-#         S[j].append(j)
-#         S[j].append(j+2)
+    Returns:
+      S, f, c, caves: instance (S,f,c) and caves description.
 
-#     S[-1].append(len(S)-1)
-#     S[0].append(2)
+    Note:
+      The parameter ``L`` is calculated as follows.
 
-#     ncaves = n // M
-#     for k in range(1, ncaves+1):
-#         for i in range((k-1)*M, min(k*M, n)):
-#             for j in range(i+2, min(k*M, n)):
-#                 if np.random.uniform() <= pcave:
-#                     S[i].append(j+1)
-#                     S[j].append(i+1)
+      .. math::
+          \\Lambda = 1 - 2\\frac{#\\textrm{existing arcs}}{N(N-1)}
 
-#     f = generate_overlaps(S)
-#     Cmax = 5.0
-#     c = [Cmax*np.random.uniform() for _ in range(len(S))]
-#     if verbose:
-#         print(f"S={S};\nf={f}\n;c={c}")
-#     return S, f, c
+      (See, e.g., Sefair and Smith 2016 on DSPI for a similar approach.)
+    """
+    # creating the graph topology first
+    S = [[j+1] for j in range(n * M)]  # creating the nodes first
+    entry_point = (None, None)
+    caves = []
+    for k in range(n):
+        lastcave = [k*M + 1]
+        if len(caves) > 0:
+            caves[-1].e2 = entry_point
+            S[entry_point[0]-1].append(entry_point[1])
+            S[entry_point[1]-1].append(entry_point[0])
 
-def gen_simple_cavemen_inst1():
+        n_edges = 0
+        # create the necessary number of connected nodes
+        while len(lastcave) < M:
+            connect_to = np.random.choice(lastcave)
+            lastcave.append(lastcave[-1]+1)
+            S[lastcave[-1]-1].append(connect_to)
+            S[connect_to-1].append(lastcave[-1])
+            n_edges += 1
+
+        # add edges to ensure the required sparsity
+        while (1- 2*n_edges / (M*(M-1))) > L:
+            n1 = np.random.choice(lastcave)
+            n2 = np.random.choice(lastcave)
+
+            if n1 not in S[n2-1]:
+                S[n2-1].append(n1)
+                S[n1-1].append(n2)
+                n_edges += 1
+
+        caves.append(ptscloud(entry_point,
+                              (None, None),
+                              [j for j in range(k*M+1, (k+1)*M+1)]))
+
+        entry_point = (np.random.choice(lastcave), (k+1)*M+1)
+
+    # creating costs info (location and overlap costs)
+    f = generate_overlaps(S)
+    Cmax = 5.0
+    c = [Cmax*np.random.uniform() for _ in range(len(S))]
+    if verbose:
+        print(f"S={S};\nf={f}\n;c={c}")
+    return S, f, c, caves
+
+
+def dump_instance(S, filename="tmp/S.dot"):
+    """Dumps a graph implied by S into a `.dot` file. """
+    added = set([])
+    with open(filename, "w") as fout:
+        fout.write("graph G {\n")
+        for i in range(len(S)):
+            for j in S[i]:
+                if ((i+1) != j) and not (((j, (i+1)) in added)
+                                         or ((i+1, j) in added)):
+                    fout.write(f"n{i+1} -- n{j};\n")
+                    added.add(((i+1), j))
+
+        fout.write("}")
+
+
+def gen_simple_cavemen_inst0():
     """Generates a simple instance with metadata.
 
     Returns:
@@ -226,7 +271,7 @@ class DDSolver:
                 m.addConstr(y[(j, a)] >= y[(j, a+1)])
 
         # fixing variables
-        print(f"Calc: S={cave.S}, fixed={fixed_nodes}")
+        print(f"Calc: S={cave.S}, fixed={fixed_nodes}, e1={cave.e1}, e2={cave.e2}")
         for var in fixed_nodes:
             m.addConstr(x[var] == fixed_nodes[var]*1)
 
@@ -255,16 +300,26 @@ class DDSolver:
         for cavenum, cave in enumerate(self.caves[:-1]):
             new_points = []
             drop_points = []
-            for x in (cave.e1 + cave.e2):
-                if x is None:
-                    continue
 
-                if x not in self.curr_state:
-                    if x not in new_points:  # corner case: e1=(a,b), e2=(b,c)
-                        new_points.append(x)
-                else:
-                    drop_points.append(x)
+            new_points = list(np.unique([j for j in (cave.e1 + cave.e2)
+                                         if (j not in self.curr_state) and (
+                                                 j is not None)]))
+            drop_points = [j for j in cave.e1 if (j not in cave.e2) and (
+                j is not None)]
 
+            # for x in (cave.e1 + cave.e2):
+            #     if x is None:
+            #         continue
+
+            #     if x not in self.curr_state:
+            #         if x not in new_points:  # corner case: e1=(a,b), e2=(b,c)
+            #             new_points.append(x)
+
+            #     if (x in cave.e1) and (
+            #             x not in drop_points) and (x not in cave.e2):
+            #         drop_points.append(x)
+
+            print(f"new={new_points}, drop={drop_points}")
             for x in new_points[:-1]:
                 current_layer = self._add_interim_point(x, self.curr_state,
                                                         self.curr_state + [x],
@@ -311,6 +366,23 @@ class DDSolver:
 
 
 ## Testing code ######################################################
+
+# First: test that instances are correct
+
+@pytest.mark.parametrize("_", [None for _ in range(30)])
+def test_inst_gen(_):
+    """Tests that instance generator works correctly."""
+    S, f, c, caves = gen_simple_cavemen_inst0()
+    assert_instance(S, f, c)
+    S, f, c, caves = gen_simple_cavemen_inst1()
+    assert_instance(S, f, c)
+    n = np.random.randint(5, 10)
+    M = np.random.randint(3, 10)
+    L = np.random.uniform(0.1, 0.9)
+    S, f, c, caves = gen_caveman_inst(n, M, L)
+    assert_instance(S, f, c)
+
+
 def solve_with_MIP(S, f, c):
     """Creates a MIP model (for gurobi) from an instance specs.
 
@@ -351,15 +423,26 @@ def solve_with_MIP(S, f, c):
     return m, (m.objVal + sum(fs[0] for fs in f)), x, y
 
 
-@pytest.mark.parametrize("_", [None for _ in range(100)])
+@pytest.mark.parametrize("_", [None for _ in range(10)])
 def test_BDD_vs_MIP_simple(_):
     """Tests BDD vs MIP over a single topology (random costs)."""
-    S,f,c,caves = gen_simple_cavemen_inst1()
-    sol = DDSolver(S,f,c,caves)
+    S, f, c, caves = gen_simple_cavemen_inst1()
+    assert compare_BDD_vs_MIP(S, f, c, caves)
+
+
+@pytest.mark.parametrize("_", [None for _ in range(100)])
+def test_BDD_vs_MIP_random(_):
+    n = np.random.randint(5, 10)
+    M = np.random.randint(3, 10)
+    L = np.random.uniform(0.1, 0.9)
+    S, f, c, caves = gen_caveman_inst(n, M, L)
+    assert compare_BDD_vs_MIP(S, f, c, caves)
+
+def compare_BDD_vs_MIP(S,f,c,caves):
+    sol = DDSolver(S, f, c, caves)
     B = sol.build_cover_DD()
     sp = B.shortest_path()
 
-    _, obj, x, y = solve_with_MIP(S,f,c)
-
-    print(f"obj={obj}, SP={sp[0]}")
-    assert abs(obj - sp[0]) < 1e-3
+    _, obj, x, y = solve_with_MIP(S, f, c)
+    print(f"obj={obj}, sp={sp[0]}")
+    return abs(obj - sp[0]) < 1e-3

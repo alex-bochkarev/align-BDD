@@ -32,7 +32,9 @@
 [[file:~/projects/align-BDD/darkcloud.py]]
 
 'string' shape only.
-** TODO Check if the case of shared single endpoint works! 
+** DONE Check if the case of shared single endpoint works! 
+CLOSED: [2022-05-06 Fri 17:51]
+- State "DONE"       from "TODO"       [2022-05-06 Fri 17:51]
 [2022-05-03 Tue 10:13]
 [[file:~/projects/align-BDD/darkcloud.py::drop_points.append(x)]]
 ** TODO Add caves metadata generation
@@ -115,7 +117,26 @@ CLOCK: [2022-05-05 Thu 14:33]--[2022-05-05 Thu 14:42] =>  0:09
 CLOCK: [2022-05-05 Thu 13:30]--[2022-05-05 Thu 13:33] =>  0:03
 CLOCK: [2022-05-05 Thu 12:58]--[2022-05-05 Thu 13:07] =>  0:09
 :END:
-*** TODO add more testing for the BDD-approach
+*** DONE Instances generation (w/metadata)
+CLOSED: [2022-05-06 Fri 17:50]
+- State "DONE"       from "TODO"       [2022-05-06 Fri 17:50]
+:LOGBOOK:
+CLOCK: [2022-05-06 Fri 17:24]--[2022-05-06 Fri 17:49] =>  0:25
+CLOCK: [2022-05-06 Fri 17:13]--[2022-05-06 Fri 17:17] =>  0:04
+CLOCK: [2022-05-06 Fri 16:28]--[2022-05-06 Fri 16:59] =>  0:31
+CLOCK: [2022-05-06 Fri 15:40]--[2022-05-06 Fri 15:46] =>  0:06
+CLOCK: [2022-05-06 Fri 15:01]--[2022-05-06 Fri 15:34] =>  0:33
+CLOCK: [2022-05-06 Fri 14:26]--[2022-05-06 Fri 14:42] =>  0:16
+CLOCK: [2022-05-06 Fri 14:17]--[2022-05-06 Fri 14:18] =>  0:01
+CLOCK: [2022-05-06 Fri 13:43]--[2022-05-06 Fri 13:46] =>  0:03
+CLOCK: [2022-05-06 Fri 12:17]--[2022-05-06 Fri 12:29] =>  0:12
+CLOCK: [2022-05-06 Fri 11:51]--[2022-05-06 Fri 12:12] =>  0:21
+CLOCK: [2022-05-06 Fri 11:39]--[2022-05-06 Fri 11:42] =>  0:03
+:END:
+*** DONE More testing (algo)
+CLOSED: [2022-05-06 Fri 17:50]
+- State "DONE"       from "TODO"       [2022-05-06 Fri 17:50]
+*** TODO Check runtimes MIP vs BDD
 ** Softcover: design instances with types
 :LOGBOOK:
 CLOCK: [2022-01-24 Mon 12:16]--[2022-01-24 Mon 12:40] =>  0:24
