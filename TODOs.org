@@ -137,6 +137,10 @@ CLOCK: [2022-05-06 Fri 11:39]--[2022-05-06 Fri 11:42] =>  0:03
 CLOSED: [2022-05-06 Fri 17:50]
 - State "DONE"       from "TODO"       [2022-05-06 Fri 17:50]
 *** TODO Check runtimes MIP vs BDD
+:LOGBOOK:
+CLOCK: [2022-05-06 Fri 18:10]--[2022-05-06 Fri 18:18] =>  0:08
+CLOCK: [2022-05-06 Fri 18:05]--[2022-05-06 Fri 18:06] =>  0:01
+:END:
 ** Softcover: design instances with types
 :LOGBOOK:
 CLOCK: [2022-01-24 Mon 12:16]--[2022-01-24 Mon 12:40] =>  0:24

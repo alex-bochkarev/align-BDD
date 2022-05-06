@@ -12,6 +12,7 @@ import gurobipy as gp
 from experiments.softcover import generate_overlaps, assert_instance
 from BDD import BDD, NTRUE
 import pytest
+from time import time
 
 
 @dataclass
@@ -229,7 +230,7 @@ class DDSolver:
 
         return next_layer
 
-    def _calc_cave(self, cave, fixed_nodes):
+    def _calc_cave(self, cave, fixed_nodes, verbose=False):
         """Calculates part of the objective due to the given cave."""
         m = gp.Model()
         m.modelSense = gp.GRB.MINIMIZE
@@ -271,7 +272,9 @@ class DDSolver:
                 m.addConstr(y[(j, a)] >= y[(j, a+1)])
 
         # fixing variables
-        print(f"Calc: S={cave.S}, fixed={fixed_nodes}, e1={cave.e1}, e2={cave.e2}")
+        if verbose:
+            print(f"Calc: S={cave.S}, fixed={fixed_nodes}, e1={cave.e1}, e2={cave.e2}")
+
         for var in fixed_nodes:
             m.addConstr(x[var] == fixed_nodes[var]*1)
 
@@ -319,7 +322,7 @@ class DDSolver:
             #             x not in drop_points) and (x not in cave.e2):
             #         drop_points.append(x)
 
-            print(f"new={new_points}, drop={drop_points}")
+            # print(f"new={new_points}, drop={drop_points}")
             for x in new_points[:-1]:
                 current_layer = self._add_interim_point(x, self.curr_state,
                                                         self.curr_state + [x],
@@ -446,3 +449,34 @@ def compare_BDD_vs_MIP(S,f,c,caves):
     _, obj, x, y = solve_with_MIP(S, f, c)
     print(f"obj={obj}, sp={sp[0]}")
     return abs(obj - sp[0]) < 1e-3
+
+
+def main():
+    """Main experiment: runtimes DD vs MIP."""
+    print("Experiment, total_nodes, n, M, L, t_gen, t_BDD_, t_MIP")
+    for k in range(250):
+        t0 = time()
+        n = np.random.randint(5, 12)
+        M = np.random.randint(5, 12)
+        L = np.random.uniform(0.1, 0.9)
+        S, f, c, caves = gen_caveman_inst(n, M, L)
+        t_gen = time() - t0
+
+        t0 = time()
+        sol = DDSolver(S, f, c, caves)
+        B = sol.build_cover_DD()
+        sp = B.shortest_path()
+        obj_BDD = sp[0]
+        t_BDD = time() - t0
+
+        t0 = time()
+        _, obj_MIP, x, y = solve_with_MIP(S, f, c)
+        t_MIP = time() - t0
+
+        print(f"{k}, {n*M}, {n}, {M}, {L:.2f}, {t_gen:.3f}, {t_BDD:.3f}, {t_MIP:.3f}",
+              flush=True)
+        assert abs(obj_MIP - obj_BDD)<1e-2
+
+
+if __name__ == '__main__':
+    main()
