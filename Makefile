@@ -278,6 +278,9 @@ $(LOGS)/tUFLP_runtimes.csv: experiments/tUFLP_runtimes.py
 $(LOGS)/dia_sizes/*.csv: experiments/softcover.py
 	parallel -j4 python -m experiments.softcover {} ">" run_logs/dia_sizes/{}.csv ::: {dia_sizes,dia_sizes_string,dia_sizes_organic,dia_sizes_caves}
 
+$(LOGS)/darkcloud_BDD_vs_MIP_longMIP.csv: darkcloud.py
+				python -m darkcloud | tee $@
+
 ## clean-up
 # ######################################################################
 # # auxiliary recipes

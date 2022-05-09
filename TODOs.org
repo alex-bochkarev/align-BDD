@@ -32,14 +32,6 @@
 [[file:~/projects/align-BDD/darkcloud.py]]
 
 'string' shape only.
-** DONE Check if the case of shared single endpoint works! 
-CLOSED: [2022-05-06 Fri 17:51]
-- State "DONE"       from "TODO"       [2022-05-06 Fri 17:51]
-[2022-05-03 Tue 10:13]
-[[file:~/projects/align-BDD/darkcloud.py::drop_points.append(x)]]
-** TODO Add caves metadata generation
-[2022-04-27 Wed 16:27]
-[[file:~/projects/align-BDD/darkcloud.py::ncaves = n // M]]
 ** TODO Design dark-cloud algo for relaxed cavemen graph / UFLP
 SCHEDULED: <2022-05-05 Thu>
 :LOGBOOK:
@@ -136,10 +128,30 @@ CLOCK: [2022-05-06 Fri 11:39]--[2022-05-06 Fri 11:42] =>  0:03
 *** DONE More testing (algo)
 CLOSED: [2022-05-06 Fri 17:50]
 - State "DONE"       from "TODO"       [2022-05-06 Fri 17:50]
-*** TODO Check runtimes MIP vs BDD
+*** DONE Check runtimes MIP vs BDD
+CLOSED: [2022-05-09 Mon 14:59]
+- State "DONE"       from "TODO"       [2022-05-09 Mon 14:59]
 :LOGBOOK:
+CLOCK: [2022-05-09 Mon 12:25]--[2022-05-09 Mon 12:48] =>  0:23
+CLOCK: [2022-05-07 Sat 10:36]--[2022-05-07 Sat 10:54] =>  0:18
 CLOCK: [2022-05-06 Fri 18:10]--[2022-05-06 Fri 18:18] =>  0:08
 CLOCK: [2022-05-06 Fri 18:05]--[2022-05-06 Fri 18:06] =>  0:01
+:END:
+See [[./run_logs/darkcloud_BDD_vs_MIP_longMIP.csv]]
+
+*** TODO Recover caves data from an instance
+:LOGBOOK:
+CLOCK: [2022-05-09 Mon 14:04]--[2022-05-09 Mon 14:23] =>  0:19
+CLOCK: [2022-05-09 Mon 13:59]--[2022-05-09 Mon 14:00] =>  0:01
+CLOCK: [2022-05-09 Mon 13:00]--[2022-05-09 Mon 13:08] =>  0:08
+:END:
+  An algorithm sketch:
+  - start with 1 cloud = 1 point (so, $N$ clouds),
+  - run a BFS, and
+  - join two clouds every time I encounter an already-visited point?
+** TODO Darkcloud: add types
+:LOGBOOK:
+CLOCK: [2022-05-09 Mon 14:34]--[2022-05-09 Mon 14:59] =>  0:25
 :END:
 ** Softcover: design instances with types
 :LOGBOOK:

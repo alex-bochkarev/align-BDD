@@ -93,6 +93,23 @@ def gen_caveman_inst(n=10, M=5, L=0.5, verbose=False):
     return S, f, c, caves
 
 
+def gen_typed_cavemen_inst(n, M, L, K, kb_max):
+    """Generates an instance with types.
+
+    First parameters are that of :py:func:`gen_caveman_inst`. The other ones
+    are ``K``, number of types, and ``kb_max`` -- max type budget.
+
+    Returns:
+        S (adjacencies), f (overlap costs), c (location costs),
+        caves (list of ptscloud), k (point types), kbar (type budgets)
+    """
+    S, f, c, caves = gen_caveman_inst(n, M, L)
+    join_pts = np.unique(sum([list(c.e1 + c.e2) for c in caves], []))
+    k = {pt: np.random.randint(1, K+1) for pt in join_pts}  # point types
+    kbar = [np.random.randint(1, kb_max+1) for _ in range(K)]
+    return S, f, c, caves, k, kbar
+
+
 def dump_instance(S, filename="tmp/S.dot"):
     """Dumps a graph implied by S into a `.dot` file. """
     added = set([])
@@ -310,19 +327,6 @@ class DDSolver:
             drop_points = [j for j in cave.e1 if (j not in cave.e2) and (
                 j is not None)]
 
-            # for x in (cave.e1 + cave.e2):
-            #     if x is None:
-            #         continue
-
-            #     if x not in self.curr_state:
-            #         if x not in new_points:  # corner case: e1=(a,b), e2=(b,c)
-            #             new_points.append(x)
-
-            #     if (x in cave.e1) and (
-            #             x not in drop_points) and (x not in cave.e2):
-            #         drop_points.append(x)
-
-            # print(f"new={new_points}, drop={drop_points}")
             for x in new_points[:-1]:
                 current_layer = self._add_interim_point(x, self.curr_state,
                                                         self.curr_state + [x],
@@ -426,6 +430,55 @@ def solve_with_MIP(S, f, c):
     return m, (m.objVal + sum(fs[0] for fs in f)), x, y
 
 
+def solve_typed_with_MIP(S, f, c, k, kbar):
+    """Creates a MIP model (for gurobi) from an instance specs.
+
+    (Typed version.)
+
+    Args:
+        S (list): list of adjacency lists,
+        f (list): overlap cost function, f[j][a],
+        c (list): location costs per point.
+        k (dict): point types,
+        kbar (list): budget types.
+
+    Returns:
+        objective value, x, and y
+    """
+    m = gp.Model()
+    m.modelSense = gp.GRB.MINIMIZE
+    m.setParam("OutputFlag", 0)
+    x = dict()
+    y = dict()
+
+    # create variables
+    for j in range(1, len(S)+1):
+        x[j] = m.addVar(vtype=gp.GRB.BINARY, name=f"x_{j}",
+                        obj=c[j-1])
+
+        for a in range(1, len(S[j-1])+1):
+            y[(j, a)] = m.addVar(vtype=gp.GRB.BINARY, name=f"y_{j}_{a}",
+                                 obj=f[j-1][a]-f[j-1][a-1])
+
+    # create constraints
+    for j in range(1, len(S)+1):
+        m.addConstr(gp.quicksum(x[k] for k in S[j-1]) ==
+                    gp.quicksum(y[(j, a)] for a in range(1, len(S[j-1])+1)))
+
+        for a in range(1, len(S[j-1])):
+            m.addConstr(y[(j, a)] >= y[(j, a+1)])
+
+    # add type constraints
+    for t in range(len(kbar)):
+        m.addConstr(gp.quicksum(x[j] for j in k
+                                if k[j] == t) <= kbar[t])
+
+    m.update()
+    m.optimize()
+    assert m.status == gp.GRB.OPTIMAL
+    return m, (m.objVal + sum(fs[0] for fs in f)), x, y
+
+
 @pytest.mark.parametrize("_", [None for _ in range(10)])
 def test_BDD_vs_MIP_simple(_):
     """Tests BDD vs MIP over a single topology (random costs)."""
@@ -441,6 +494,7 @@ def test_BDD_vs_MIP_random(_):
     S, f, c, caves = gen_caveman_inst(n, M, L)
     assert compare_BDD_vs_MIP(S, f, c, caves)
 
+
 def compare_BDD_vs_MIP(S,f,c,caves):
     sol = DDSolver(S, f, c, caves)
     B = sol.build_cover_DD()
@@ -453,12 +507,12 @@ def compare_BDD_vs_MIP(S,f,c,caves):
 
 def main():
     """Main experiment: runtimes DD vs MIP."""
-    print("Experiment, total_nodes, n, M, L, t_gen, t_BDD_, t_MIP")
+    print("Experiment, total_nodes, n, M, L, t_gen, t_BDD_, t_MIP, t_MIPvsDD")
     for k in range(250):
         t0 = time()
-        n = np.random.randint(5, 12)
-        M = np.random.randint(5, 12)
-        L = np.random.uniform(0.1, 0.9)
+        n = 10
+        M = np.random.randint(8, 11)
+        L = 0.25
         S, f, c, caves = gen_caveman_inst(n, M, L)
         t_gen = time() - t0
 
@@ -473,7 +527,7 @@ def main():
         _, obj_MIP, x, y = solve_with_MIP(S, f, c)
         t_MIP = time() - t0
 
-        print(f"{k}, {n*M}, {n}, {M}, {L:.2f}, {t_gen:.3f}, {t_BDD:.3f}, {t_MIP:.3f}",
+        print(f"{k}, {n*M}, {n}, {M}, {L:.2f}, {t_gen:.3f}, {t_BDD:.3f}, {t_MIP:.3f}, {t_MIP/t_BDD:.1f}",
               flush=True)
         assert abs(obj_MIP - obj_BDD)<1e-2
 
