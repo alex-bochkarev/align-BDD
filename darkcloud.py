@@ -210,7 +210,7 @@ def prepare_inst(filename="tmp/instance.gv"):
 
 def prepare_inst_gallery():
     for t in range(10):
-        prepare_inst(f"tmp/inst{t+1}.gv")
+        prepare_inst(f"reports/2022-05-10_Darkcloud/instances/inst{t+1}.gv")
         print(".", end="", flush=True)
 
 def gen_simple_cavemen_inst0():
@@ -622,6 +622,20 @@ class DDTypedSolver (DDSolver):
         Tp = T.align_to(b.Ap_cand.layer_var, inplace=False)
 
         int_DD = intersect(Cp, Tp)
+        sp = int_DD.shortest_path()
+        return sp[0]
+
+    def solve_with_DDs_noVS(self, TtoC = True):
+        """Solves the problem using the DD-based approach."""
+        C = self.build_cover_DD()
+        T, _ = self.build_type_DD()
+
+        if TtoC:
+            T.align_to(C.vars, inplace=True)
+        else:
+            C.align_to(T.vars, inplace=True)
+
+        int_DD = intersect(C, T)
         sp = int_DD.shortest_path()
         return sp[0]
 
