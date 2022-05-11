@@ -109,8 +109,17 @@ def gen_typed_cavemen_inst(n, M, L, K, kb_max):
     """
     S, f, c, caves = gen_caveman_inst(n, M, L)
     join_pts = sum([list(c.e1 + c.e2) for c in caves], [])
-    join_pts = np.unique([j for j in join_pts if j is not None])
-    k = {pt: np.random.randint(1, K+1) for pt in join_pts}  # point types
+    join_pts = list(np.unique([j for j in join_pts if j is not None]))
+    assert K <= len(join_pts), "More classes than cave joining points!" +f" ({K}>{len(join_pts)})"
+    k = dict()
+    for t in range(K):
+        pt = np.random.choice(join_pts)
+        k.update({pt: t+1})
+        join_pts.remove(pt)
+
+    for pt in join_pts:
+        k.update({pt: np.random.randint(1, K+1)})
+
     kbar = [np.random.randint(1, kb_max+1) for _ in range(K)]
     return S, f, c, caves, k, kbar
 
