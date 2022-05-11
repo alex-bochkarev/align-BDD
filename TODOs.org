@@ -27,6 +27,9 @@
     distribute the first facility into every bin, and then sort them randomly?
 
 * Current project TODOs
+** TODO Move instance gallery and other experiments to a separate file from darkcloud
+[2022-05-10 Tue 18:24]
+[[file:~/projects/align-BDD/darkcloud.py::M = 10]]
 ** TODO Rewrite comments
 [2022-05-09 Mon 15:46]
 [[file:~/projects/align-BDD/darkcloud.py::def build_type_DD(self)]]
@@ -35,7 +38,7 @@
 [[file:~/projects/align-BDD/darkcloud.py]]
 
 'string' shape only.
-** TODO Design dark-cloud algo for relaxed cavemen graph / UFLP
+** WIP Design dark-cloud algo for relaxed cavemen graph / UFLP
 SCHEDULED: <2022-05-05 Thu>
 :LOGBOOK:
 CLOCK: [2022-05-04 Wed 14:13]--[2022-05-04 Wed 14:16] =>  0:03
@@ -142,7 +145,7 @@ CLOCK: [2022-05-06 Fri 18:05]--[2022-05-06 Fri 18:06] =>  0:01
 :END:
 See [[./run_logs/darkcloud_BDD_vs_MIP_longMIP.csv]]
 
-*** TODO Recover caves data from an instance
+*** LATER Recover caves data from an instance
 :LOGBOOK:
 CLOCK: [2022-05-09 Mon 14:04]--[2022-05-09 Mon 14:23] =>  0:19
 CLOCK: [2022-05-09 Mon 13:59]--[2022-05-09 Mon 14:00] =>  0:01
@@ -152,6 +155,32 @@ CLOCK: [2022-05-09 Mon 13:00]--[2022-05-09 Mon 13:08] =>  0:08
   - start with 1 cloud = 1 point (so, $N$ clouds),
   - run a BFS, and
   - join two clouds every time I encounter an already-visited point?
+** Typed-UFLP / cavemen
+*** TODO Instances gallery
+:LOGBOOK:
+CLOCK: [2022-05-10 Tue 18:15]--[2022-05-10 Tue 18:26] =>  0:11
+CLOCK: [2022-05-10 Tue 17:49]--[2022-05-10 Tue 17:52] =>  0:03
+CLOCK: [2022-05-10 Tue 17:20]--[2022-05-10 Tue 17:32] =>  0:12
+CLOCK: [2022-05-10 Tue 16:40]--[2022-05-10 Tue 17:02] =>  0:22
+CLOCK: [2022-05-10 Tue 16:21]--[2022-05-10 Tue 16:29] =>  0:08
+:END:
+*** TODO Dataset: runtimes MIP vs BDD
+:LOGBOOK:
+CLOCK: [2022-05-11 Wed 18:41]--[2022-05-11 Wed 18:45] =>  0:04
+CLOCK: [2022-05-11 Wed 17:00]--[2022-05-11 Wed 17:10] =>  0:10
+CLOCK: [2022-05-11 Wed 15:29]--[2022-05-11 Wed 15:30] =>  0:01
+CLOCK: [2022-05-11 Wed 12:41]--[2022-05-11 Wed 12:45] =>  0:04
+CLOCK: [2022-05-11 Wed 12:27]--[2022-05-11 Wed 12:35] =>  0:08
+CLOCK: [2022-05-10 Tue 18:26]--[2022-05-10 Tue 18:31] =>  0:05
+:END:
+*** TODO Draft: letter to reviewers
+*** TODO Descriptions
+- [ ] Problem
+- [ ] Solution approaches
+- [ ] cover DD construction
+- [ ] type DD construction
+*** TODO Discussion: weak points
+*** TODO Summary: necessary edits for the paper
 ** DONE Darkcloud: add types
 CLOSED: [2022-05-09 Mon 20:38]
 - State "DONE"       from "TODO"       [2022-05-09 Mon 20:38]
@@ -164,6 +193,20 @@ CLOCK: [2022-05-09 Mon 16:07]--[2022-05-09 Mon 16:30] =>  0:23
 CLOCK: [2022-05-09 Mon 15:25]--[2022-05-09 Mon 15:48] =>  0:23
 CLOCK: [2022-05-09 Mon 15:02]--[2022-05-09 Mon 15:08] =>  0:06
 CLOCK: [2022-05-09 Mon 14:34]--[2022-05-09 Mon 14:59] =>  0:25
+:END:
+** DONE Checking the reviewers' comments
+CLOSED: [2022-01-26 Wed 13:08]
+- State "DONE"       from              [2022-01-26 Wed 13:08]
+:LOGBOOK:
+CLOCK: [2022-01-25 Tue 12:52]--[2022-01-25 Tue 13:13] =>  0:21
+:END:
+** DONE Consider alternative applications
+CLOSED: [2022-01-26 Wed 13:08]
+- State "DONE"       from              [2022-01-26 Wed 13:08]
+:LOGBOOK:
+CLOCK: [2022-01-26 Wed 12:44]--[2022-01-26 Wed 13:08] =>  0:24
+CLOCK: [2022-01-26 Wed 11:47]--[2022-01-26 Wed 12:42] =>  0:55
+CLOCK: [2022-01-25 Tue 13:13]--[2022-01-25 Tue 13:25] =>  0:12
 :END:
 ** Softcover: design instances with types
 :LOGBOOK:
@@ -243,20 +286,6 @@ CLOCK: [2022-02-23 Wed 15:31]--[2022-02-23 Wed 15:37] =>  0:06
 *** LATER Add types -- generate CPP instances 
 *** LATER Compare runtime: naive MIP vs CPP MIP vs Align-BDD CPP
 *** LATER Add reduction step -- check time
-** DONE Checking the reviewers' comments
-CLOSED: [2022-01-26 Wed 13:08]
-- State "DONE"       from              [2022-01-26 Wed 13:08]
-:LOGBOOK:
-CLOCK: [2022-01-25 Tue 12:52]--[2022-01-25 Tue 13:13] =>  0:21
-:END:
-** DONE Consider alternative applications
-CLOSED: [2022-01-26 Wed 13:08]
-- State "DONE"       from              [2022-01-26 Wed 13:08]
-:LOGBOOK:
-CLOCK: [2022-01-26 Wed 12:44]--[2022-01-26 Wed 13:08] =>  0:24
-CLOCK: [2022-01-26 Wed 11:47]--[2022-01-26 Wed 12:42] =>  0:55
-CLOCK: [2022-01-25 Tue 13:13]--[2022-01-25 Tue 13:25] =>  0:12
-:END:
 ** TODO Kill already merged branches
  [2020-07-11 Sat 09:49]
 

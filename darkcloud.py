@@ -139,6 +139,80 @@ def dump_instance(S, filename="tmp/S.dot"):
         fout.write("}")
 
 
+def save_typed_instance(S, caves, k, kbar, more_info="",
+                        filename="tmp/inst.dot"):
+    """Draws a ``dot`` for the given instance."""
+    cnum=0
+    with open(filename, "w") as fout:
+        fout.write("graph G {\n")
+        fout.write(f"    label=\"{len(kbar)} types," +
+                   f" budget={kbar} {more_info}\";\n")
+        fout.write("    labelloc=top; labeljust=center;fontsize=100;\n")
+        edges = set([])
+        for c in caves:
+            cnum += 1
+            fout.write(f"    subgraph cluster_{cnum}" "{\n")
+            for j in c.S:
+                if j in k:
+                    fout.write(f"        n{j}[label={k[j]} fontsize=50];\n")
+                else:
+                    fout.write(f"        n{j}" +
+                               "[shape=point height=0.2 width=0.2 color=red];\n")
+            fout.write("    }\n")
+
+        for Si in S:
+            for j in Si[1:]:
+                if ((Si[0], j) not in edges) and ((j, Si[0]) not in edges):
+                    edges.add((Si[0], j))
+                    fout.write(f"    n{Si[0]} -- n{j};\n")
+
+        fout.write("}")
+
+
+def prepare_inst(filename="tmp/instance.gv"):
+    n = 7
+    M = 10
+    L = 0.45
+    K = 3
+    kb_max = 3
+
+    S, f, c, caves, k, kbar = gen_typed_cavemen_inst(n, M, L, K, kb_max)
+
+    # solve the unconstrained (untyped) version
+    sol = DDSolver(S, f, c, caves)
+    t0 = time()
+    B = sol.build_cover_DD()
+    sp = B.shortest_path()
+    objU = sp[0]
+    tUDD = time() - t0
+
+    t0 = time()
+    _, _, _, _ = solve_with_MIP(S, f, c)
+    tUMIP = time() - t0
+
+    # solve the constrained (typed) version
+    t0 = time()
+    sol = DDTypedSolver(S, f, c, caves, k, kbar)
+    objC = sol.solve_with_DDs()
+    tCDD = time() - t0
+
+    t0 = time()
+    _, _, _, _ = solve_typed_with_MIP(S, f, c, k, kbar)
+    tCMIP = time() - t0
+
+    save_typed_instance(S, caves, k, kbar,
+                        more_info=f"\nn={n}, M={M}, L={L}\n"+
+                        f"objective: typed {objC:.1f}, untyped {objU:.1f}\n" +
+                        f"MIP time: typed {tCMIP:.1f}, untyped {tUMIP:.1f} sec.\n"+
+                        f"DD  time: typed {tCDD:.1f}, untyped {tUDD:.1f} sec.",
+                        filename=filename)
+
+
+def prepare_inst_gallery():
+    for t in range(10):
+        prepare_inst(f"tmp/inst{t+1}.gv")
+        print(".", end="", flush=True)
+
 def gen_simple_cavemen_inst0():
     """Generates a simple instance with metadata.
 
@@ -410,6 +484,8 @@ class DDTypedSolver (DDSolver):
             nl (dict): string node labels ("states"), `id` -> `label` (string).
 
             Implementation based on :py:func:`tUFLP.build_type_DD`.
+
+            FIXME: revise this doc
         """
         self.D = BDD(N=len(self.k),
                      vars=[f"stub{i}" for i in range(1, len(self.k)+1)],
@@ -504,6 +580,7 @@ class DDTypedSolver (DDSolver):
                     else:
                         self.D.llink(node, next_layer[new_state], "hi")
 
+                assert len(customers[c])>0, f"Empty customers[{c}]"
                 self.D.rename_vars({f"stub{n}": customers[c][-1]})
                 n += 1
             else:
@@ -619,7 +696,7 @@ def solve_typed_with_MIP(S, f, c, k, kbar):
         kbar (list): budget types.
 
     Returns:
-        objective value, x, and y
+        model, objective value, x, and y
     """
     m = gp.Model()
     m.modelSense = gp.GRB.MINIMIZE
