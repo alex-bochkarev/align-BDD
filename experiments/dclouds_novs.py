@@ -12,11 +12,11 @@ def main():
         gen_iters = 0
         while not generated:
             gen_iters += 1
-            n = 25
-            M = 5
+            n = 30
+            M = 3
             L = 0.45
             K = 10
-            kbmax = 3
+            kbmax = 15
             S, f, c, caves, k, kbar = gen_typed_cavemen_inst(n, M, L, K, kbmax)
 
             # first: solve the untyped version

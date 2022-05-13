@@ -1,0 +1,3 @@
+exp_num, n, M, L, K_types, kmax, gen_iters, objU, objT, t_novsA, tTDD
+Set parameter Username
+1, 30, 3, 0.45, 10, 15, 3, 21.98, 26.28, 0.77, 48.58

@@ -103,6 +103,8 @@ def gen_typed_cavemen_inst(n, M, L, K, kb_max):
     First parameters are that of :py:func:`gen_caveman_inst`. The other ones
     are ``K``, number of types, and ``kb_max`` -- max type budget.
 
+    Relies on :py:func:`darkcloud.gen_caveman_inst` for graph generation.
+
     Returns:
         S (adjacencies), f (overlap costs), c (location costs),
         caves (list of ptscloud), k (point types), kbar (type budgets)

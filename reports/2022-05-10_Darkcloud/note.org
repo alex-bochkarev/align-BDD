@@ -1,0 +1,95 @@
+#+TITLE: [align-BDD] Revision: A note on the DP-ish algorithm.
+#+AUTHOR: A. Bochkarev
+#+DATE: 2022-05-13
+
+It's been a long time, so first, here's the bigger picture:
+
+- the reviewers asked us to illustrate our 'variable sequences' (VS) idea to
+  align BDDs with a specific optimization problem application. 
+
+- we proposed the Typed Uncapacitated Facility Location Problem (t-UFLP), and
+  demonstrated that our BDD/VS scales as fine as the CPP MIP, while providing
+  some computational benefits -- see Fig. 12 for total runtimes and Fig. 25 for
+  the runtimes breakdown. (I'm also attaching the latest paper: see
+  =submitted.pdf=.)
+
+- now, both reviewers are not convinced with the example, and that's their main
+  concern. They would like to see an example problem where our heuristic would
+  be consistently
+  a. better than the naive MIP, and
+  b. better than alternative BDD-based methods (such as CPP-MIP or CPP-align-to-any-order).
+
+  So, now I am working with the second part. As a sidenote: Let me create a
+  shared doc with all the reviewers' comments (so that it could evolve into a
+  response letter soon):
+  https://docs.google.com/document/d/1ArI6yFf6EnCjfm0r3Qogb1VRAa4eLkKdVQ-NB9QtuZQ/edit?usp=sharing
+
+  (The revision deadline is 06/15 --- in a month.)
+
+- during the last call we discussed the following possible approach:
+  + Consider UFLP with a special underlying graph structure, so that we could
+    generate a smaller BDD, while MIP approach would require working with /all/
+    the variables. That, along with non-convex/non-concave "overlap costs",
+    would make the solver struggle.
+  + Assume the following structure: clusters of nodes that are interconnected
+    within each cluster, but each cluster is connected with at most two other
+    ones. Moreover, each such connection implies exactly one edge. See an
+    example instance in =instance_ex.pdf=. So, here we see n=7 clusters with
+    M=10 points within each one. Parameter L regulates the edge density within
+    each cluster (L=0.0 would imply M isolated points, while L=1.0 would give a
+    fully connected subgraph.)
+  + I followed your sketch to design the BDD where each layer would correspond
+    to an endpoint of an edge between the clusters. Then, first, I could
+    calculate the cost attributable to the "cave" every time I fix the values of
+    at most four endpoints by solving a smaller MIP. Second, if the clusters are
+    connected in a line (each one being connected to exactly two other clusters,
+    except the first and the last cave) -- I can process them in that linear
+    order and discard the information concerning an edge every time I add
+    another edge. This means that my BDD will never be wider than 2^3=8 nodes.
+  + As a side note, my costs are still complicated: first, I assign a cost to
+    locating a facility at any point. On top of it, I assign cost or benefit
+    depending on how many times each point of the graph was covered. As before,
+    a point is "covered" if a facility is located at any of its neighbors (or
+    itself).
+  + Then, obviously, I'd need to introduce a second type of diagram to make my
+    align-BDD machinery work. So, I returned our 'type' constraints on the
+    connection points (since only the connection points are present in the cover
+    DD). So, every connection point belongs to a 'type', and there is a budget
+    constraint on each type -- e.g., we are allowed to locate a facility in one
+    type-2 point at most in =instance_ex.pdf=. Endpoint types are depicted with
+    numbers in the circles. The "type" diagram is constructed as before (as we
+    described in the paper).
+
+- brief numerical experiments show that:
+
+  a. our align-BDD + shortest-path approach is indeed faster than a naive MiP. I
+     provide computation times for MIP and DD based approaches in
+     =instance_ex.pdf=. So, typed version of the problem is harder than untyped
+     one (for both solvers), and DDs are faster than naive MIPs. I think that's
+     not just a lucky example, the picture remains the same in many
+     random-generated instances. Here's 250 random experiments with untyped
+     versions (=BDDvsMIP_untyped.png=, runtimes in seconds, the red is just
+     "y=x" line). These are 10-cluster instances, M=8 to 10 points in each
+     cluster. If I add types, I obtain a similar picture: see
+     =BDDvsMIP_wtyped.png=. In the second picture the cloud of points is more
+     homogenious since I did not vary the number of points within a cluster.
+     Anyways: nothing unexpected, MIPs are generally slower than CPPs. These are
+     good news.
+  b. Now, the bad news. On my dataset, I think this is mostly due to processing
+     additional information regarding the clusters. I'd need to demonstrate that
+     my align-BDD heuristic does bring something to the table. At least for
+     instances of this size and structure, aligning type DD to the order of the
+     cover DD works just as well if not better than aligning the two BDDs with
+     our cool variable-sequence powered heuristic. For large instances, it seems
+     my simplified-problem branch-and-bound takes a lot of time, while the
+     diagrams do not really blow up if I just apply a simple aligning heuristic
+     (as opposed to our variable-sequence based approach).
+     
+So, that's my current problem. I think, maybe I can find a better illustration
+with another size of instances, or maybe even just applying an arbitrary
+(random) constraint on connection points.
+
+* Relevant code                                                    :noexport:
+post-processing: [[../../post_processing/MIPvsDD_darkcloud.R]]
+data: [[../../run_logs/darkcloud_BDD_vs_MIP.csv]] (untyped) and [[../../run_logs/dclouds_typed.csv]] (typed).
+code: [[../../darkcloud.py]] for the general algo implementation and [[../../experiments/dclouds.py]] for experiments.

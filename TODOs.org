@@ -173,8 +173,18 @@ CLOCK: [2022-05-11 Wed 12:41]--[2022-05-11 Wed 12:45] =>  0:04
 CLOCK: [2022-05-11 Wed 12:27]--[2022-05-11 Wed 12:35] =>  0:08
 CLOCK: [2022-05-10 Tue 18:26]--[2022-05-10 Tue 18:31] =>  0:05
 :END:
-*** TODO Draft: letter to reviewers
-*** TODO Descriptions
+*** TODO Draft: letter to reviewers / design experiments
+:LOGBOOK:
+CLOCK: [2022-05-12 Thu 15:35]--[2022-05-12 Thu 15:47] =>  0:12
+CLOCK: [2022-05-12 Thu 15:15]--[2022-05-12 Thu 15:17] =>  0:02
+CLOCK: [2022-05-12 Thu 14:42]--[2022-05-12 Thu 14:59] =>  0:17
+CLOCK: [2022-05-12 Thu 11:47]--[2022-05-12 Thu 12:18] =>  0:31
+:END:
+*** WIP Descriptions
+:LOGBOOK:
+CLOCK: [2022-05-13 Fri 13:30]--[2022-05-13 Fri 14:37] =>  1:07
+CLOCK: [2022-05-13 Fri 12:32]--[2022-05-13 Fri 13:12] =>  0:40
+:END:
 - [ ] Problem
 - [ ] Solution approaches
 - [ ] cover DD construction

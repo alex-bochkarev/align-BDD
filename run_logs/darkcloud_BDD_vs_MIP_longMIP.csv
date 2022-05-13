@@ -1,5 +1,4 @@
 Experiment, total_nodes, n, M, L, t_gen, t_BDD_, t_MIP, t_MIPvsDD
-Set parameter Username
 0, 90, 10, 9, 0.25, 0.016, 4.081, 34.175, 8.4
 1, 80, 10, 8, 0.25, 0.013, 1.948, 3.010, 1.5
 2, 80, 10, 8, 0.25, 0.013, 2.109, 2.565, 1.2

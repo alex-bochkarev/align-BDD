@@ -5,6 +5,10 @@
 *.svg
 *.eps
 *.pdf
+*.csv
 reports/*
 *.json
 *.txt
+.venv/*
+.pytest_cache/*
+docs/build/*

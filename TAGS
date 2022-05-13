@@ -1,50 +1,50 @@
 
 heuristics.py,2057
-import numpy as npnp13,259
-import opt_parser as alsals15,279
-import varseq as vsvs16,304
-import BB_search as BBBB17,324
-import BDD as BDDBDD18,347
-def toA(A,B):toA28,482
-def toB(A,B):toB33,608
-def minAB(A,B):minAB38,705
-def simpl_greedy_swaps(A,B):simpl_greedy_swaps48,890
-def simpl_greedy_sifts(A,B,passes=-1):simpl_greedy_sifts76,1707
-def simpl_gsifts_1p(A,B):simpl_gsifts_1p110,2740
-def simpl_gsifts_2p(A,B):simpl_gsifts_2p114,2845
-def simpl_gsifts_inf(A,B):simpl_gsifts_inf118,2952
-def simpl_gsifts_3p(A,B):simpl_gsifts_3p122,3061
-def simpl_5random(A,B):simpl_5random126,3170
-def simpl_greedy_2sifts(A,B, passes=-1):simpl_greedy_2sifts138,3568
-def simpl_g2sifts_1p(A,B):simpl_g2sifts_1p175,4839
-def simpl_g2sifts_2p(A,B):simpl_g2sifts_2p179,4983
-def fastslide(X,a,p):fastslide186,5239
-def fast_greedy_sifts(A,B):fast_greedy_sifts224,6047
-def fast_greedy_2sifts(A,B):fast_greedy_2sifts257,6997
-def orig_simpl(A,B,simpl):orig_simpl294,8264
-def orig_gsifts1p(A,B,simpl):orig_gsifts1p303,8620
-def orig_bestAB(A,B,simpl):orig_bestAB325,9192
-def orig_5random(A,B,simpl):orig_5random335,9539
-def orig_interleaved(A,B,simpl):orig_interleaved349,9996
-def orig_meta(A,B,simpl):orig_meta381,10923
-def orig_interleave_when_diverge(A,B,simpl):orig_interleave_when_diverge395,11351
-def orig_rnd_starts(A,B,simpl):orig_rnd_starts428,12513
-SIMPL_HEU = [SIMPL_HEU458,13496
-ORIG_HEU = [ORIG_HEU472,14083
-    inst_dir = sys.argv[1]inst_dir489,14745
-    pr = cProfile.Profile()pr493,14887
-    n = 0n495,15007
-        inst_no = file.split('.')[-2]inst_no499,15075
-        inst_no = inst_no.split('/vs')[-1]inst_no500,15113
-        inst = als.alignments(file)inst502,15157
-        A = inst.As[0]A505,15227
-        B = inst.Bs[0]B506,15250
-        objs = []objs508,15274
-        steps = []steps509,15292
-            T, obj,st = h(A,B)T512,15341
-            T, obj,st = h(A,B)obj512,15341
-            T, obj,st = h(A,B)st512,15341
-    ps = pstats.Stats(pr).sort_stats('time')ps522,15630
+import numpy as npnp13,261
+import opt_parser as alsals15,281
+import varseq as vsvs16,306
+import BB_search as BBBB17,326
+import BDD as BDDBDD18,349
+def toA(A,B):toA28,484
+def toB(A,B):toB33,610
+def minAB(A,B):minAB38,707
+def simpl_greedy_swaps(A,B):simpl_greedy_swaps48,892
+def simpl_greedy_sifts(A,B,passes=-1):simpl_greedy_sifts76,1709
+def simpl_gsifts_1p(A,B):simpl_gsifts_1p110,2742
+def simpl_gsifts_2p(A,B):simpl_gsifts_2p114,2847
+def simpl_gsifts_inf(A,B):simpl_gsifts_inf118,2954
+def simpl_gsifts_3p(A,B):simpl_gsifts_3p122,3063
+def simpl_5random(A,B):simpl_5random126,3172
+def simpl_greedy_2sifts(A,B, passes=-1):simpl_greedy_2sifts138,3570
+def simpl_g2sifts_1p(A,B):simpl_g2sifts_1p175,4841
+def simpl_g2sifts_2p(A,B):simpl_g2sifts_2p179,4985
+def fastslide(X,a,p):fastslide186,5241
+def fast_greedy_sifts(A,B):fast_greedy_sifts224,6049
+def fast_greedy_2sifts(A,B):fast_greedy_2sifts257,6999
+def orig_simpl(A,B,simpl):orig_simpl294,8266
+def orig_gsifts1p(A,B,simpl):orig_gsifts1p303,8622
+def orig_bestAB(A,B,simpl):orig_bestAB325,9194
+def orig_5random(A,B,simpl):orig_5random335,9541
+def orig_interleaved(A,B,simpl):orig_interleaved349,9998
+def orig_meta(A,B,simpl):orig_meta381,10925
+def orig_interleave_when_diverge(A,B,simpl):orig_interleave_when_diverge395,11353
+def orig_rnd_starts(A,B,simpl):orig_rnd_starts428,12515
+SIMPL_HEU = [SIMPL_HEU458,13498
+ORIG_HEU = [ORIG_HEU472,14085
+    inst_dir = sys.argv[1]inst_dir489,14747
+    pr = cProfile.Profile()pr493,14889
+    n = 0n495,15009
+        inst_no = file.split('.')[-2]inst_no499,15077
+        inst_no = inst_no.split('/vs')[-1]inst_no500,15115
+        inst = als.alignments(file)inst502,15159
+        A = inst.As[0]A505,15229
+        B = inst.Bs[0]B506,15252
+        objs = []objs508,15276
+        steps = []steps509,15294
+            T, obj,st = h(A,B)T512,15343
+            T, obj,st = h(A,B)obj512,15343
+            T, obj,st = h(A,B)st512,15343
+    ps = pstats.Stats(pr).sort_stats('time')ps522,15632
 
 BDD.py,2558
 import numpy as npnp14,486
@@ -60,40 +60,40 @@ NTRUE = -1NTRUE35,1080
 NFALSE = -2NFALSE36,1091
 def simscore(seq_A, seq_B, p_B = None):simscore39,1175
 class node(object):node82,2349
-    def __init__(self, id, hi=None, lo=None, layer=-1):__init__98,2748
-    def link(self, to_whom, arc="hi"):link105,2937
-class BDD(object):BDD116,3348
-    def __init__(self, N=2, vars=None, weighted=False):__init__130,3976
-    def link(self, parent, child, etype="hi", edge_weight=0.0):link157,4922
-    def llink(self, parent, child, etype="hi", edge_weight=0.0):llink174,5555
-    def __len__(self):__len__186,5944
-    def n(self, i):n190,6067
-    def p(self, a):p194,6169
-    def size(self):size198,6293
-    def new_node_name(self):new_node_name202,6411
-    def dump_gv(self, layerCapt=True, x_prefix="x", node_labels=None):dump_gv214,6836
-    def addnode(self, parent_node, arc="hi", node_id=None, edge_weight=0.0):addnode265,8847
-    def swap_up(self, layer_idx):swap_up299,10009
-    def sift(self, var, pos):sift439,15922
-    def gsifts(self, with_whom, start_order=None):gsifts460,16557
-    def save(self, filename):save531,18806
-    def load(self, filename, weighted=False):load588,20757
-    def random(cls, N=5, p=0.5, weighted=False):random703,24797
-    def profile(self):profile751,26683
-    def show(self,show797,28026
-    def align_to(self, vars_order, inplace=False):align_to820,28961
-    def OA_bruteforce(self, with_what, LR=False):OA_bruteforce835,29328
-    def is_reduced(self):is_reduced878,30725
-    def make_reduced(self):make_reduced891,31143
-    def rename_vars(self, ren_dict):rename_vars903,31511
-    def shuffle_vars(self):shuffle_vars918,32067
-    def is_aligned(self, to_what):is_aligned923,32259
-    def get_value(self, x):get_value928,32483
-    def truth_table(self):truth_table980,34209
-    def is_equivalent(self, B):is_equivalent1008,35307
-    def shortest_path(self):shortest_path1058,37247
-    def simscore(self, B):simscore1099,38769
-def intersect(A, B):intersect1103,38938
+    def __init__(self, id, hi=None, lo=None, layer=-1):__init__98,2746
+    def link(self, to_whom, arc="hi"):link105,2935
+class BDD(object):BDD116,3346
+    def __init__(self, N=2, vars=None, weighted=False):__init__130,3974
+    def link(self, parent, child, etype="hi", edge_weight=0.0):link157,4920
+    def llink(self, parent, child, etype="hi", edge_weight=0.0):llink174,5553
+    def __len__(self):__len__186,5942
+    def n(self, i):n190,6065
+    def p(self, a):p194,6167
+    def size(self):size198,6291
+    def new_node_name(self):new_node_name202,6409
+    def dump_gv(self, layerCapt=True, x_prefix="x", node_labels=None):dump_gv214,6834
+    def addnode(self, parent_node, arc="hi", node_id=None, edge_weight=0.0):addnode265,8845
+    def swap_up(self, layer_idx):swap_up310,10387
+    def sift(self, var, pos):sift450,16300
+    def gsifts(self, with_whom, start_order=None):gsifts471,16935
+    def save(self, filename):save542,19184
+    def load(self, filename, weighted=False):load599,21135
+    def random(cls, N=5, p=0.5, weighted=False):random714,25175
+    def profile(self):profile762,27061
+    def show(self,show808,28404
+    def align_to(self, vars_order, inplace=False):align_to831,29339
+    def OA_bruteforce(self, with_what, LR=False):OA_bruteforce846,29706
+    def is_reduced(self):is_reduced889,31103
+    def make_reduced(self):make_reduced902,31521
+    def rename_vars(self, ren_dict):rename_vars914,31889
+    def shuffle_vars(self):shuffle_vars929,32445
+    def is_aligned(self, to_what):is_aligned934,32637
+    def get_value(self, x):get_value939,32861
+    def truth_table(self):truth_table991,34587
+    def is_equivalent(self, B):is_equivalent1019,35685
+    def shortest_path(self):shortest_path1069,37625
+    def simscore(self, B):simscore1113,39217
+def intersect(A, B):intersect1117,39386
 
 shell_scripts/gen_cUFL_runtimes_overview.sh,0
 
@@ -186,6 +186,39 @@ class alignments:alignments13,321
     def check_conditions(self, conditions, names, instances=-1):check_conditions159,7449
     def save_case(self, A,B,i_no = -1):save_case200,9088
 
+darkcloud.py,1812
+import numpy as npnp9,162
+import gurobipy as gpgp11,215
+import varseq as vsvs17,417
+import BB_search as bbbb18,437
+class ptscloud:ptscloud23,499
+def gen_caveman_inst(n=10, M=5, L=0.5, verbose=False):gen_caveman_inst35,771
+def gen_typed_cavemen_inst(n, M, L, K, kb_max):gen_typed_cavemen_inst100,2888
+def dump_instance(S, filename="tmp/S.dot"):dump_instance129,3939
+def save_typed_instance(S, caves, k, kbar, more_info="",save_typed_instance144,4443
+def prepare_inst(filename="tmp/instance.gv"):prepare_inst174,5569
+def prepare_inst_gallery():prepare_inst_gallery213,6682
+def gen_simple_cavemen_inst0():gen_simple_cavemen_inst0218,6851
+def gen_simple_cavemen_inst1():gen_simple_cavemen_inst1251,7614
+class DDSolver:DDSolver299,8810
+    def __init__(self, S, f, c, caves):__init__301,8827
+    def _add_interim_point(self, x, current_state, new_state,  current_layer,_add_interim_point308,8974
+    def _calc_cave(self, cave, fixed_nodes, verbose=False):_calc_cave340,10369
+    def build_cover_DD(self):build_cover_DD396,12294
+class DDTypedSolver (DDSolver):DDTypedSolver465,15240
+    def __init__(self, S, f, c, caves, k, kbar):__init__466,15272
+    def build_type_DD(self):build_type_DD472,15436
+    def solve_with_DDs(self):solve_with_DDs607,21031
+    def solve_with_DDs_noVS(self, TtoC = True):solve_with_DDs_noVS630,21817
+def test_inst_gen(_):test_inst_gen649,22381
+def solve_with_MIP(S, f, c):solve_with_MIP662,22794
+def solve_typed_with_MIP(S, f, c, k, kbar):solve_typed_with_MIP702,23946
+def test_BDD_vs_MIP_simple(_):test_BDD_vs_MIP_simple752,25440
+def test_BDD_vs_MIP_random(_):test_BDD_vs_MIP_random759,25690
+def compare_BDD_vs_MIP(S, f, c, caves):compare_BDD_vs_MIP767,25918
+def test_DD_full(_):test_DD_full778,26223
+def main():main799,27036
+
 gurobi.env,0
 
 paper_build.o2892699,0
@@ -196,14 +229,14 @@ data_archive/2020-08-12_17-57-44_lwidths_logs.tar.gz,0
 
 data_archive/2020-08-12_14-51-52_scal_logs.tar.gz,0
 
-GRTAGS,0
+.flake8rc,0
 
 README.md,323
 # Accompanying code for the paper: Aligning BDDsAccompanying code for the paper: Aligning BDDs1,0
 ## Contact infoContact info2,49
 ## General information and software requirementsGeneral information and software requirements5,137
-## Repo structureRepo structure11,396
-## Steps to reproduceSteps to reproduce14,464
+## Repo structureRepo structure17,527
+## Steps to reproduceSteps to reproduce20,595
 
 experiments/gen_lsizes_stats.py,390
 import BDD as exactexact6,153
@@ -236,25 +269,56 @@ import argparse as apap10,311
                 t0 = time()t049,1928
                 t1 = time()t151,2050
 
-experiments/softcover.py,849
-import numpy as npnp4,89
-import gurobipy as gpgp5,108
-import argparse as apap8,177
-def make_MIP(S, c, f):make_MIP10,200
-def generate_S(n, p=0.25):generate_S45,1226
-def generate_overlaps(S):generate_overlaps65,1634
-def make_instance(n, p=0.25):make_instance82,2032
-def test_make_MIP():test_make_MIP92,2390
-    parser = ap.ArgumentParser(description="''Soft overlap'' instance generator. (c) A. Bochkareparser119,3281
-    args = parser.parse_args()args124,3578
-    S, f, c = make_instance(int(args.N))S126,3610
-    S, f, c = make_instance(int(args.N))f126,3610
-    S, f, c = make_instance(int(args.N))c126,3610
-    m, x, y = make_MIP(S, c, f)m127,3651
-    m, x, y = make_MIP(S, c, f)x127,3651
-    m, x, y = make_MIP(S, c, f)y127,3651
-    t = time()t128,3683
-    aobj = m.objVal + sum(fs[0] for fs in f)aobj132,3751
+experiments/dclouds.py,23
+def main():main6,153
+
+experiments/dclouds_novs.py,23
+def main():main6,153
+
+experiments/softcover.py,2370
+import numpy as npnp2,64
+import gurobipy as gpgp3,83
+import argparse as apap6,152
+import BDD as DDDD8,205
+def make_MIP(S, c, f):make_MIP13,292
+def generate_S(n, p=0.25):generate_S51,1345
+def generate_overlaps(S):generate_overlaps71,1759
+def dump_instance(S, filename="tmp/S.dot"):dump_instance89,2188
+def make_instance(n, p=0.25, verbose=True):make_instance103,2691
+def make_string_inst(n, verbose=True):make_string_inst114,3005
+def make_organic_inst(n, verbose=True):make_organic_inst132,3435
+def make_caveman_inst(n=10, M=5, pcave=0.8, verbose=True):make_caveman_inst171,4369
+def assert_instance(S, f, c):assert_instance197,5096
+def make_label(state, pts):make_label217,5641
+def mknode(state, freedoms):mknode222,5802
+def build_soft_cover_DD(S, f, c, next_node_type='min'):build_soft_cover_DD236,6140
+def dia_sizes(n1=5, n2=10, K=5, igen=make_instance):dia_sizes355,10165
+def try_softcover_inst(S, c, f):try_softcover_inst393,11522
+def test_build_soft_cover_DD_simple1():test_build_soft_cover_DD_simple1422,12450
+def test_build_soft_cover_DD_simple2():test_build_soft_cover_DD_simple2431,12691
+def test_build_soft_cover_DD(test_inst):test_build_soft_cover_DD457,13425
+def test_make_MIP():test_make_MIP464,13604
+def test_MIP_example():test_MIP_example490,14399
+    parser = ap.ArgumentParser(description="''Soft overlap'' experiments. (c) A. Bochkarev, 2022parser544,15959
+    args = parser.parse_args()args551,16398
+        S, f, c = make_instance(int(args.N))S558,16552
+        S, f, c = make_instance(int(args.N))f558,16552
+        S, f, c = make_instance(int(args.N))c558,16552
+        m, x, y = make_MIP(S, c, f)m559,16597
+        m, x, y = make_MIP(S, c, f)x559,16597
+        m, x, y = make_MIP(S, c, f)y559,16597
+        t0 = time()t0560,16633
+        t1 = time()t1562,16674
+        aobj = m.objVal + sum(fs[0] for fs in f)aobj564,16733
+        S, f, c = make_caveman_inst(int(args.N))S581,17458
+        S, f, c = make_caveman_inst(int(args.N))f581,17458
+        S, f, c = make_caveman_inst(int(args.N))c581,17458
+        m, x, y = make_MIP(S, c, f)m582,17507
+        m, x, y = make_MIP(S, c, f)x582,17507
+        m, x, y = make_MIP(S, c, f)y582,17507
+        t0 = time()t0583,17543
+        t1 = time()t1585,17584
+        aobj = m.objVal + sum(fs[0] for fs in f)aobj587,17643
 
 experiments/exp_BDD_example.py,23
 def main():main6,156
@@ -519,11 +583,20 @@ import BB_search as BBBB7,146
 import argparse as apap8,169
 def main():main10,192
 
-experiments/sumofproducts.py,159
+experiments/sumofproducts.py,635
 import numpy as npnp3,62
-import gurobipy as gpgp5,103
-def gen_instance(n, M=3, jmax=3, Cmax=10.0):gen_instance8,151
-def make_MIP(I, c):make_MIP44,1171
+import gurobipy as gpgp6,125
+import argparse as apap8,172
+def gen_instance(n, M=3, jmax=3, Cmax=10.0):gen_instance10,195
+def make_MIP(I, c):make_MIP46,1215
+    parser = ap.ArgumentParser(description="''Sum-of-products'' instance generator. (c) A. Bochkparser82,2271
+    args = parser.parse_args()args91,2754
+    I, c = gen_instance(int(args.N), int(args.M), int(args.J))I93,2786
+    I, c = gen_instance(int(args.N), int(args.M), int(args.J))c93,2786
+    m, x, y = make_MIP(I, c)m94,2849
+    m, x, y = make_MIP(I, c)x94,2849
+    m, x, y = make_MIP(I, c)y94,2849
+    t = time()t95,2878
 
 experiments/BDD_size_illustration/BDD_size_illustration.py,434
 import numpy as npnp14,257
@@ -625,7 +698,7 @@ i = 0i17,305
 
 __init__.py,0
 
-tUFLP.py,2576
+tUFLP.py,2577
 from copy import copy as cpycpy10,313
 import numpy as npnp12,355
 import networkx as nxnx15,436
@@ -635,42 +708,42 @@ import BB_search as bbbb18,497
 import varseq as vsvs19,520
 def make_label(state):make_label27,709
 class DegreeKeeper:DegreeKeeper32,870
-    def __init__(self, S=None, next_node_type="min"):__init__34,930
-    def __len__(self):__len__61,1898
-    def __getitem__(self, key):__getitem__65,2001
-    def get_next(self):get_next69,2104
-    def decrement(self, j):decrement79,2397
-    def push(self, i, d):push100,3127
-    def pop(self):pop105,3277
-    def has_freedom(self, key):has_freedom114,3593
-class TypeSorter:TypeSorter119,3727
-    def __init__(self, f_types, node_order):__init__121,3820
-    def rel_weight(self, elements_in_A, elements_in_B):rel_weight127,4052
-    def sort_types(self):sort_types150,4820
-def build_cover_DD(S, f, next_node_type='min'):build_cover_DD185,6014
-def build_randomized_cover_DD(S, f):build_randomized_cover_DD310,10514
-def build_type_DD(f, f_types, k_bar, preferred_order=None):  # pylint: disable=invalid-namebuild_type_DD427,14395
-def build_randomized_type_DD(f, f_types, k_bar):  # pylint: disable=invalid-namebuild_randomized_type_DD566,19738
-def build_tUFLP_MIP(S, f, f_types, k_bar):build_tUFLP_MIP589,20523
-def solve_with_MIP(S, f, fc, kb):solve_with_MIP625,21427
-def generate_test_instance(n, p=0.3):generate_test_instance633,21626
-def generate_test_instance_alt(n, p=0.3, nodes_per_type=5):generate_test_instance_alt690,23336
-def generate_string_instance(n):generate_string_instance746,24931
-def generate_organic_instance(n):generate_organic_instance796,26375
-def generate_d4_instance(n):generate_d4_instance869,28289
-def generate_simple_problem():generate_simple_problem944,30213
-def generate_5d_problem(n=None):generate_5d_problem956,30564
-def draw_problem_dia(S, f, f_types, k_bar,draw_problem_dia970,31007
-def check_simple_example():check_simple_example992,31900
-def solve_with_BDD_MIP(S, f, fc, kb):solve_with_BDD_MIP1004,32327
-def test_type_UFL():test_type_UFL1016,32754
-def solve_with_align_BDD(S, f, fc, kb):solve_with_align_BDD1027,33235
-def no_invs(order, blocks, target):no_invs1065,34374
-def bruteforce_correct_order(f_types, target_order):bruteforce_correct_order1100,35444
-def find_correct_order(f_types, target_order):find_correct_order1123,36154
-def make_instance(n):make_instance1131,36392
-def get_score(A, target):get_score1137,36628
-def show_cov(n, gen_func):show_cov1147,36936
+    def __init__(self, S=None, next_node_type="min"):__init__38,1011
+    def __len__(self):__len__66,1981
+    def __getitem__(self, key):__getitem__70,2084
+    def get_next(self):get_next74,2187
+    def decrement(self, j):decrement84,2480
+    def push(self, i, d):push105,3210
+    def pop(self):pop110,3360
+    def has_freedom(self, key):has_freedom119,3676
+class TypeSorter:TypeSorter124,3810
+    def __init__(self, f_types, node_order):__init__126,3903
+    def rel_weight(self, elements_in_A, elements_in_B):rel_weight132,4135
+    def sort_types(self):sort_types155,4903
+def build_cover_DD(S, f, next_node_type='min'):build_cover_DD190,6097
+def build_randomized_cover_DD(S, f):build_randomized_cover_DD315,10597
+def build_type_DD(f, f_types, k_bar, preferred_order=None):  # pylint: disable=invalid-namebuild_type_DD432,14478
+def build_randomized_type_DD(f, f_types, k_bar):  # pylint: disable=invalid-namebuild_randomized_type_DD571,19821
+def build_tUFLP_MIP(S, f, f_types, k_bar):build_tUFLP_MIP594,20606
+def solve_with_MIP(S, f, fc, kb):solve_with_MIP630,21510
+def generate_test_instance(n, p=0.3):generate_test_instance638,21709
+def generate_test_instance_alt(n, p=0.3, nodes_per_type=5):generate_test_instance_alt695,23419
+def generate_string_instance(n):generate_string_instance751,25014
+def generate_organic_instance(n):generate_organic_instance801,26458
+def generate_d4_instance(n):generate_d4_instance874,28372
+def generate_simple_problem():generate_simple_problem949,30296
+def generate_5d_problem(n=None):generate_5d_problem961,30647
+def draw_problem_dia(S, f, f_types, k_bar,draw_problem_dia975,31090
+def check_simple_example():check_simple_example997,31983
+def solve_with_BDD_MIP(S, f, fc, kb):solve_with_BDD_MIP1009,32410
+def test_type_UFL():test_type_UFL1021,32837
+def solve_with_align_BDD(S, f, fc, kb):solve_with_align_BDD1032,33318
+def no_invs(order, blocks, target):no_invs1070,34457
+def bruteforce_correct_order(f_types, target_order):bruteforce_correct_order1105,35527
+def find_correct_order(f_types, target_order):find_correct_order1128,36237
+def make_instance(n):make_instance1136,36475
+def get_score(A, target):get_score1142,36711
+def show_cov(n, gen_func):show_cov1152,37019
 
 solve_inst.py,223
 import BDD as exactexact11,564
@@ -713,6 +786,8 @@ instances/heu_sol_struct.tar.gz,0
 instances/orig_scal.tar.gz,0
 
 instances/orig_problem.tar.gz,0
+
+gurobi.log,0
 
 tests/int_A.wbdd,0
 
@@ -1201,9 +1276,17 @@ BUILDDIR      = buildBUILDDIR9,221
 help:help12,312
 %: Makefile%19,555
 
+tmp/inst.dot,0
+
 tmp/tUFLP_runtimes.csv,0
 
 tmp/test_save.bdd,0
+
+tmp/S_cave.dot,0
+
+tmp/S.dot,0
+
+tmp/S_string.dot,0
 
 tmp/bm_heu_inst/A2-1.bdd,0
 
@@ -1253,6 +1336,12 @@ tmp/bm_heu_inst/B2-2.bdd,0
 
 tmp/bm_heu_inst/B2-0.bdd,0
 
+tmp/S_org.dot,0
+
+tmp/cavemen.dot,0
+
+tmp/S_rnd.dot,0
+
 TODOs.org,0
 
 .Rhistory,0
@@ -1265,7 +1354,7 @@ aux/R_install_packages.R,0
 
 aux/packages.list,0
 
-Makefile,4070
+Makefile,4176
 PREF=./PREF10,280
 FIGS=./figuresFIGS11,288
 INST=$(PREF)/instancesINST12,303
@@ -1317,18 +1406,21 @@ $(FIGS)/orig_lwidth_stats.eps: $(LOGS)/lwidths.csv $(PP)/fig_summary.R$(FIGS)/o
 $(LOGS)/lwidths.csv: gen_BDD_pair.py$(LOGS)/lwidths.csv251,10110
 $(FIGS)/tUFLP_runtimes_breakdown.eps: $(LOGS)/tUFLP_runtimes.csv $(PP)/fig_tUFLP_runtimes_breakd$(FIGS)/tUFLP_runtimes_breakdown.eps267,10973
 $(LOGS)/tUFLP_runtimes.csv: experiments/tUFLP_runtimes.py$(LOGS)/tUFLP_runtimes.csv270,11137
-save-orig-instances:save-orig-instances282,11593
-prep_dirs:prep_dirs285,11696
-clean:clean289,11811
-fresh: cleanfresh294,11879
-check_src:check_src300,11982
-cross-checks:cross-checks306,12091
+$(LOGS)/darkcloud_BDD_vs_MIP_longMIP.csv: darkcloud.py$(LOGS)/darkcloud_BDD_vs_MIP_longMIP.csv281,11682
+save-orig-instances:save-orig-instances288,11879
+prep_dirs:prep_dirs291,11982
+clean:clean295,12097
+fresh: cleanfresh300,12165
+check_src:check_src306,12268
+cross-checks:cross-checks312,12377
 
 run_logs/sending.log,0
 
 run_logs/simpl_sol_struct.csv,0
 
 run_logs/tUFLP_runtimes.csv,0
+
+run_logs/softcover_dia_sizes_organic.csv,0
 
 run_logs/heu_bm/rnd_dia.csv,0
 
@@ -1338,13 +1430,45 @@ run_logs/heu_bm/tUFLP_nat.csv,0
 
 run_logs/heu_bm/tUFLP_rnd.csv,0
 
+run_logs/dclouds_typed.csv,0
+
+run_logs/darkcloud_BDD_vs_MIP.csv,0
+
+run_logs/darkcloud_BDD_vs_MIP_longMIP.csv,0
+
 run_logs/lwidths.csv,0
 
 run_logs/simpl_LB.csv,0
 
+run_logs/softcover_goldfish_large_M5.csv,0
+
+run_logs/softcover_goldfish_large2_M15.csv,0
+
+run_logs/softcover_dia_sizes.csv,0
+
 run_logs/orig_scal.csv,0
 
+run_logs/dia_sizes/dia_sizes_string.csv,0
+
+run_logs/dia_sizes/dia_sizes.csv,0
+
+run_logs/dia_sizes/dia_sizes_caves.csv,0
+
+run_logs/dia_sizes/dia_sizes_organic.csv,0
+
+run_logs/softcover_dia_sizes_organic_goldfish.csv,0
+
 run_logs/main_rnd_run.csv,0
+
+run_logs/softcover_tests.log,0
+
+run_logs/dclouds_typed_novs_compl.csv,0
+
+run_logs/softcover_goldfish_large.csv,0
+
+run_logs/dclouds_typed_novs.csv,0
+
+run_logs/softcover_goldfish.csv,0
 
 run_logs/tUFLP_runtimes_scal.csv,0
 
@@ -1394,6 +1518,11 @@ df = merge(df41,1291
   ggplot(filter(df, grepl("timelog",legend.tech)), aes(y=gap*1000,x=0))+plt_LBs_time98,3576
       labels = scales::number_format(accuracy = 0.1)accuracy107,3964
 
+post_processing/MIPvsBDD.R,290
+df5 = read.csv("./run_logs/softcover_goldfish_large_M5.csv", stringsAsFactors = FALSE)df53,18
+df15 = read.csv("./run_logs/softcover_goldfish_large2_M15.csv", stringsAsFactors = FALSE)df154,105
+df = read.csv("./run_logs/softcover_goldfish_large.csv", stringsAsFactors = FALSE)df20,500
+
 post_processing/fig_tUFL_sols_hist.R,1859
 X_QUANTILE=0.98 # quantile to filter for the histogram(Ox axis)X_QUANTILE17,418
 option_list = list(option_list22,592
@@ -1423,6 +1552,9 @@ xmin = min(df_rel$value)xmin91,3268
 xmax = 2.5 #quantile(df_rel$value,1.0, na.rm=TRUE)xmax92,3293
     ggplot(filter(df_rel, entry_type != "aux_number"), aes(x=value))+plt_dens95,3356
         labels = scales::number_format(accuracy = 1),accuracy106,4042
+
+post_processing/MIPvsDD_darkcloud.R,87
+df = read.csv("./run_logs/darkcloud_BDD_vs_MIP.csv", stringsAsFactors = FALSE)df4,33
 
 post_processing/fig_summary.R,1113
 option_list = list(option_list19,423
@@ -2073,8 +2205,6 @@ problems = c("(a) t-UFLP (natural order)", "(b) t-UFLP (random order)",problems
     ggplot(df_wide, aes(x=simpl_rel_obj))+plt_dens77,2652
         labels = scales::number_format(accuracy = 1),accuracy83,2927
 
-GPATH,0
-
 varseq.py,885
 import numpy as npnp8,177
 import itertools as itersiters10,208
@@ -2105,8 +2235,6 @@ def solve_with_DD_MIP(inst):solve_with_DD_MIP16,263
 def solve_with_naive_MIP(instance):solve_with_naive_MIP34,721
 def generate_instance(n, p=0.25):generate_instance60,1304
 def solve_with_align_BDD(instance):solve_with_align_BDD73,1695
-
-GTAGS,0
 
 BB_search.py,1603
 import varseq as vsvs7,179
@@ -2143,6 +2271,8 @@ class BBSearch:BBSearch201,7035
     def make_graph_gap(self, ax=None, trueOpt=None):make_graph_gap261,9161
     def set_logging(self, logfile, prefix, steps_list):set_logging280,10057
     def search(self):search288,10323
+
+TODOs.org_archive,0
 
 update_R_packages_list.sh,0
 
