@@ -281,6 +281,9 @@ $(LOGS)/dia_sizes/*.csv: experiments/softcover.py
 $(LOGS)/darkcloud_BDD_vs_MIP_longMIP.csv: darkcloud.py
 				python -m darkcloud | tee $@
 
+$(LOGS)/darkcloud_rnd_cover.csv: experiments/dclouds_rndcover.py
+				python -m experiments.dclouds_rndcover | tee $@
+
 ## clean-up
 # ######################################################################
 # # auxiliary recipes

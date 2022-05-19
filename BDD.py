@@ -152,6 +152,10 @@ class BDD(object):
         self.var_pos = dict(zip(vars, [i for i in range(len(self.layers))]))
         self.nodes.update({NTRUE: self.T, NFALSE: self.F})
 
+
+    def width(self):
+        """Returns BDD width (max no. nodes in a layer)."""
+        return max([len(L) for L in self.layers])
     # some helper functions
 
     def link(self, parent, child, etype="hi", edge_weight=0.0):

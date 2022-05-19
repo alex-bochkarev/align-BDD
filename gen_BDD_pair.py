@@ -19,6 +19,7 @@ import sys
 import os
 import argparse as ap
 
+
 def count_inversions(X, Y):
     """Count inversions between (label lists) X and Y."""
     invs = 0
@@ -26,13 +27,13 @@ def count_inversions(X, Y):
 
     # O(n): index all the vars of Y
     for i in range(len(Y)):
-        p.update({Y[i] : i})
+        p.update({Y[i]: i})
 
     # O(n^2): check all pairs
     # NOTE: O(n log n) is possible with MergeSort
 
     for i in range(len(X)-1):
-        for j in range(i+1,len(X)):
+        for j in range(i+1, len(X)):
             if p[X[i]] >= p[X[j]]:
                 invs += 1
 

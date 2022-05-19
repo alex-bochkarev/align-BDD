@@ -21,11 +21,11 @@ from UFL import create_NF
 
 @dataclass
 class ptscloud:
-    """Keeps current 'cloud' of points.
+    """Keeps current 'cloud' of points (modeling a 'cave').
 
     Attributes:
-        e1, e2 (tuple): the two external entry points of the cloud (edges),
-        S (list[int]): a list of points within the cloud.
+        e1, e2 (tuple): the 4 endpoints of the 2 edges emanating from the cave,
+        S (list[int]): a list of points within the cave.
     """
     e1: tuple[int]
     e2: tuple[int]
