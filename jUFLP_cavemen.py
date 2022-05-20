@@ -5,7 +5,7 @@ import numpy as np
 from darkcloud import ptscloud, generate_overlaps
 
 
-def gen_caveman_inst(n=10, M=5, L=0.5, verbose=False):
+def gen_caveman_inst(n=10, M=7, L=0.5, verbose=False):
     """Generates an instance with the related metadata (info on caves).
 
     Args:
@@ -43,6 +43,9 @@ def gen_caveman_inst(n=10, M=5, L=0.5, verbose=False):
             n_edges += 1
 
         # add edges to ensure the required sparsity
+
+    S2 = copy(S)
+
         while (1 - 2*n_edges / (M*(M-1))) > L:
             n1 = np.random.choice(lastcave)
             n2 = np.random.choice(lastcave)
@@ -60,7 +63,6 @@ def gen_caveman_inst(n=10, M=5, L=0.5, verbose=False):
 
     # creating the second graph
     caves2 = deepcopy(caves)
-    S2 = copy(S)
 
     n_edges = 0
     for cave in caves2:
@@ -73,6 +75,7 @@ def gen_caveman_inst(n=10, M=5, L=0.5, verbose=False):
             S2[cave.e2[1]-1].append(cave.e2[0])
 
         n_edges = 0
+        print(f"S2={S2}")
         while (1 - 2 * n_edges / (M * (M - 1))) > L:
             n1 = np.random.choice(cave.S)
             n2 = np.random.choice(cave.S)
@@ -90,3 +93,20 @@ def gen_caveman_inst(n=10, M=5, L=0.5, verbose=False):
     if verbose:
         print(f"S={S};\nf={f}\n;c={c}")
     return S, S2, f, f2, c, caves
+
+
+def dump_instance(S, caves, filename="tmp/S.dot"):
+    """Dumps a graph implied by S into a `.dot` file. """
+    added = set([])
+    with open(filename, "w") as fout:
+        fout.write("graph G {\n")
+        for i in range(len(S)):
+            for j in S[i]:
+                if ((i+1) != j) and not (((j, (i+1)) in added)
+                                         or ((i+1, j) in added)):
+                    fout.write(f"    n{i+1} -- n{j};\n")
+                    added.add(((i+1), j))
+
+        fout.write("}")
+
+

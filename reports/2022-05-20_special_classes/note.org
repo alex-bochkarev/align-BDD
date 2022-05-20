@@ -1,0 +1,11 @@
+#+TITLE: On special classes of instances for align-BDD
+
+* Re: randomized cover DD
+
+[[./int_sizes_points.png]]
+
+So, it seems we have VS-ed intersection DD size smaller than the simple one on
+about 60% of the cases. Two more percentage points for the same size. In terms of
+the histogram:
+
+[[./int_sizes_hist.png]]

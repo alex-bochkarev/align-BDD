@@ -20,7 +20,7 @@ def main():
         gen_iters = 0
         while not generated:
             gen_iters += 1
-            n = 10
+            n = 12
             M = 10
             L = 0.45
             K = 3

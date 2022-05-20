@@ -33,9 +33,23 @@
 CLOCK: [2022-05-19 Thu 20:21]--[2022-05-19 Thu 20:40] =>  0:19
 CLOCK: [2022-05-19 Thu 19:50]--[2022-05-19 Thu 20:21] =>  0:31
 :END:
-**** WIP Make a figure for randomized covers
+**** DONE Make a figure for randomized covers
+CLOSED: [2022-05-20 Fri 17:44]
+- State "DONE"       from "WIP"        [2022-05-20 Fri 17:44]
+:LOGBOOK:
+CLOCK: [2022-05-20 Fri 17:39]--[2022-05-20 Fri 17:44] =>  0:05
+CLOCK: [2022-05-20 Fri 14:41]--[2022-05-20 Fri 14:52] =>  0:11
+:END:
 So, randomizing cover DD seems to work in terms of the diagram size -- see [[file:run_logs/darkcloud_rnd_cover.csv::exp_num, n, M, L, K_types, kmax, gen_iters, objU, objT, t_novsA, tTDD, size_int_VS, sim_C_VS, size_int_toC, sim_C_toC][darkclouds_rnd_cover.csv]] for a log.
+
+Also, details are in a separate [[./reports/2022-05-20_special_classes/note.org][note]].
+
 **** TODO Add tests for j-UFLP-caves (with MIP)
+:LOGBOOK:
+CLOCK: [2022-05-20 Fri 15:25]--[2022-05-20 Fri 15:33] =>  0:08
+CLOCK: [2022-05-20 Fri 15:18]--[2022-05-20 Fri 15:23] =>  0:05
+CLOCK: [2022-05-20 Fri 14:52]--[2022-05-20 Fri 15:12] =>  0:20
+:END:
 **** TODO Experiment: jUFLP runtimes and sizes toA and VS
 *** DONE Check out dia sizes and orders
 CLOSED: [2022-05-19 Thu 13:26]
