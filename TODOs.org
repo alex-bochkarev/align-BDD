@@ -27,6 +27,9 @@
     distribute the first facility into every bin, and then sort them randomly?
 
 * Current project TODOs
+** TODO Rndcover: fix =inplace= parameter! 
+[2022-05-23 Mon 22:43]
+[[file:~/projects/align-BDD/experiments/dclouds_rndcover.py::Tpp = T.align_to(C.vars, inplace=True)]]
 ** TODO Check if =L= parameter works correctly
 [2022-05-23 Mon 11:18]
 [[file:~/projects/align-BDD/jUFLP_cavemen.py::while (1 - 2*n_edges / (M*(M-1))) > L:]]
@@ -82,9 +85,12 @@ CLOCK: [2022-05-19 Thu 11:40]--[2022-05-19 Thu 12:07] =>  0:27
 CLOCK: [2022-05-19 Thu 11:34]--[2022-05-19 Thu 11:35] =>  0:01
 :END:
 See [[mu4e:msgid:BL0PR01MB51238B80278092F3D0B96D32DED19@BL0PR01MB5123.prod.exchangelabs.com][Re: [align-BDD] Revision: A note on the DP algo / possible to discuss?]]
-*** TODO Draft a note
+*** DONE Draft a note
+CLOSED: [2022-05-23 Mon 23:12]
+- State "DONE"       from "TODO"       [2022-05-23 Mon 23:12]
 :LOGBOOK:
-CLOCK: [2022-05-23 Mon 19:18]
+CLOCK: [2022-05-23 Mon 22:17]--[2022-05-23 Mon 23:12] =>  0:55
+CLOCK: [2022-05-23 Mon 19:18]--[2022-05-23 Mon 19:27] =>  0:09
 CLOCK: [2022-05-23 Mon 18:54]--[2022-05-23 Mon 19:12] =>  0:18
 CLOCK: [2022-05-23 Mon 18:20]--[2022-05-23 Mon 18:38] =>  0:18
 CLOCK: [2022-05-23 Mon 17:20]--[2022-05-23 Mon 18:00] =>  0:40

@@ -1,4 +1,4 @@
-% Created 2022-05-23 Mon 19:10
+% Created 2022-05-23 Mon 23:09
 % Intended LaTeX compiler: pdflatex
 \documentclass[11pt]{article}
 \usepackage[utf8]{inputenc}
@@ -33,38 +33,44 @@
 \begin{document}
 
 \maketitle
-In order to find a special class of instances, where \texttt{align-BDD} heuristic would
-give us a clear advantage, I tried two things.
+In a nutshell:
 \begin{itemize}
 \item First, I looked into \emph{typed UFLP} on 'cavemen' graph structure and checked if
-anything would change if the order of the type diagram would be randomized.
-It seems the situation changes slightly: indeed, I am able to find smaller
-diagrams more often than not. But for some reason this does not really yields
-benefit in runtimes, as compared to a simple \texttt{align-to-A} heuristic.
-\item Second, I tried to invent a \emph{joint-UFLP}, and it seems this is where the
-heuristic does make sense. However, we'd need to discuss if this type of
-problem is natural enough.
-
-More details on everything is below.
+anything would change if the order of variables in the type diagram would be
+randomized before alignment. It seems our heuristic does find smaller diagrams
+more often than not. But for some reason this does not really yields benefit
+in runtimes, as compared to a simple \texttt{align-to-A} heuristic.
+\item Second, I tried to invent another problem, \emph{joint-UFLP}, and it seems this is where the
+heuristic does make sense.
 \end{itemize}
 
+\textbf{My key question to you:} do you think the \emph{j-UFLP} would work / is it too
+artificial?
+
+\textbf{My next steps:} I'd need to double-check the experiment. Maybe there is a
+cleaner way to generate a j-UFLP instance + add cross-checks here and there.
+After that, if you think it is worth trying, I could set up a larger experiment
+(increase the number of instances) and write everything up carefully + edit the
+responses to the reviewers (in the \href{https://docs.google.com/document/d/1ArI6yFf6EnCjfm0r3Qogb1VRAa4eLkKdVQ-NB9QtuZQ/edit?usp=sharing}{google-doc} I sent before).
+
+
 \section{UFLP with overlaps: general info}
-\label{sec:org449f21f}
+\label{sec:org912bfcd}
 We have been discussing variations of uncapacitated facility location problem
-(UFLP). In a nutshell (and this is no different, conceptually, from what we have
-in the paper):
+(UFLP). Let me try to lay out everything briefly, this way it seems easier to
+spot problems in the logic. First, what we already had in the paper:
 \begin{itemize}
-\item We have \(M\) points of an undirected graph.
-\item I can \emph{locate a facility} at each one, at cost \(c_i\) for the i-th point.
+\item We have an undirected graph, and I can \emph{locate a facility} at each point
+(vertex), at cost \(c_i\) for the i-th point.
 \item If a facility is located at point \(i\), it 'covers' all the points from its
-neighborhood, \(S_i\).
+neighborhood, \(S_i\) (which by convention includes \(i\)).
 \end{itemize}
 
 New things:
 \begin{itemize}
-\item \textbf{Overlap costs}. That is, if a point \(j\) is covered \(a\) times,
-we bear cost (or profit) \(f_{ja}\), with no particular assumptions on the structure
-of \(f_{ja}\) depending on \(a\) (i.e., no monotonicity / convexity / concavity).
+\item \textbf{Overlap costs}. If a point \(j\) is covered \(a\) times, we bear cost (or profit)
+\(f_{ja}\), with no particular assumptions on the structure of \(f_{ja}\)
+depending on \(a\) (i.e., no monotonicity / convexity / concavity).
 \item \textbf{Objective:} We do not demand all points to be covered, but we assume certain cost \(f_{j0}\)
 for not covering a point at all. The objective is to minimize the sum of
 costs, including location costs and overlap costs.
@@ -72,8 +78,8 @@ costs, including location costs and overlap costs.
 of instances, where points are split into clusters, with many edges within a
 cluster, but only a single edge between two clusters (and each cluster being
 connected to at most two other ones). An example of such instance is provided
-in Fig. \ref{fig:ex-inst}. I call head and tail of an edge connecting two
-clusters a \emph{connection point}.
+in Fig. \ref{fig:ex-inst}. Note that I further refer to the endpoints of an edge
+connecting two clusters as \emph{connection points}.
 \end{itemize}
 
 \begin{figure}[htbp]
@@ -88,30 +94,32 @@ facility at four connection points adjacent to a cluster, the subproblem
 corresponding to this cluster becomes independent of the rest of the problem.
 This way I can process clusters one by one and build a BDD encoding the
 objective value depending on the choices regarding endpoints only, having width
-of at most eight nodes.
+of at most eight nodes. Such algorithm beats a naive MIP formulation (solved by
+Gurobi solver), since it exploits the special structure.
 
-Such algorithm beats a naive MIP formulation (solved by Gurobi solver), since it
-exploits the special structure. Now, I'd need to introduce another sort of
-conditions, to illustrate our BDD-alignment heuristic.
+Now, I'd need to add another sort of conditions, to introduce another BDD and
+illustrate our BDD-alignment heuristic. First thing I tried was the introduction
+of \emph{types} for connection points. That is, I assumed that each one has a type,
+and there is a (budget) constraint on the maximum number of points of each type
+I can locate a facility at. While the BDD-based approach was indeed faster than
+a naive MiP, it was not clear why use our heuristic, since aligning 'type'
+diagram to 'cover' diagram to build an intersection later would work just as
+well, and in many cases even faster than our simplified-problem-based heuristic.
 
-First thing I tried was the introduction of \emph{types} for connection points. That
-is, I assumed that each one has a type, and there is a (budget) constraint on
-the maximum number of points of each type I can locate a facility at. While the
-BDD-based approach was indeed faster than a naive MiP, it was not clear why use
-our heuristic, since aligning 'type' diagram to 'cover' diagram to build an
-intersection later would work just as well, and in many cases even faster than
-our simplified-problem-based heuristic. We wanted to find a situation where it
-would not be the case.
+This is what we had by the previous call. So, we wanted to construct a situation
+that would illustrate the practicality of the BDD-alignment heuristic we propose.
 
 \section{t-UFLP + randomized type diagram.}
-\label{sec:org167a6ba}
-Our hypothesis was that we just happened to supply a fortunate initial
-ordering by building the type diagram. (So that revising this order to a more
-complex cover DD was relatively simple.) Therefore, I tried to destroy this
-simple structure to see if it was indeed the case. Viz, before aligning, I
-randomized the order of variables in the type diagram. The results in terms of
-the resulting intersection diagram sizes are presented in Fig.
-\ref{fig:intrndpts} and \ref{fig:intrndhist}.
+\label{sec:orgc5dc98a}
+Our hypothesis was that we just happened to supply a fortunate initial ordering
+by building the type diagram. (So that revising this order to a more complex
+cover DD was relatively simple.) Therefore, I tried to destroy this simple
+structure to see if it was indeed the case. Viz., before aligning, I randomized
+the order of variables in the type diagram. The results in terms of the
+resulting intersection diagram sizes are presented in Fig. \ref{fig:intrndpts}.
+Here, the red line is just \(y=x\), so a point above the line implies that the
+variable-sequence (VS) based heuristic resulted in an intersection diagram with
+more nodes than that of the diagram obtained using the simple baseline.
 
 \begin{figure}[htbp]
 \centering
@@ -119,11 +127,10 @@ the resulting intersection diagram sizes are presented in Fig.
 \caption{\label{fig:intrndpts}Intersection diagram sizes (nominal values), depending on the alignment heuristic used: \texttt{VS} for variable-sequence based, and \texttt{toC} for a simple alternative, "align-to-cover-DD" heuristic.}
 \end{figure}
 
-So, it seems the intersection DD size is smaller with our heuristic than it is
-for the simple \texttt{align-to-cover} approach more often than not. That is, on about
-60\% of my random instances (about 62\% if I count the cases when the size is the
-same). In terms the histogram of relative intersection diagram sizes, see Fig.
-\ref{fig:intrndhist}.
+On about 60\% of my random instances (about 62\% if I count the cases when the
+size is the same) application of VS-based heuristic yielded smaller intersection
+diagrams. This is perhaps more obvious on the histogram of relative intersection
+diagram sizes, see Fig. \ref{fig:intrndhist}.
 
 \begin{figure}[htbp]
 \centering
@@ -131,18 +138,17 @@ same). In terms the histogram of relative intersection diagram sizes, see Fig.
 \caption{\label{fig:intrndhist}Intersection diagram sizes, VS-based heuristic relative to 'align-to'cover' alternative.}
 \end{figure}
 
-Interestingly, though, runtimes still suggest that a simple alignment heuristic
-is by far faster.
-
-However, I think I was able to invent a class of problems where using the
-heuristic does make sense.
+Interestingly, runtimes still suggest that the simple baseline heuristic is
+comparable, if not faster than the VS-based one; at least with these instances I
+have here.
 
 \section{Another variation of `joint-UFLP.'}
-\label{sec:org6612cc6}
-Again, consider UFLP (without types) over this ‘cavemen’ type of graph with
-general overlap cost. Let me forget types altogether, but assume we have not
-one, but \textbf{two} such graphs, stitched together via the connection points in the
-following sense.
+\label{sec:org40b5f8e}
+Since it seemed that the `type' diagram resulted in some artifacts we'd like to
+avoid, I tried to redesign the problem. Again, consider UFLP over this ‘cavemen’
+graph with general overlap cost. Let me forget about types altogether, but
+assume we have not one, but \textbf{two} such graphs, stitched together via the
+connection points in the following sense.
 
 Both graphs possess the special ‘cavemen’ structure, and connection points
 coincide. That is, there is a one-to-one mapping between the connection points
@@ -168,22 +174,23 @@ I generated random instances as follows:
 
 The procedure gives me \(G_1\) and \(G_2\), but there is no point in aligning them,
 because the sequence of connection points coincide. Therefore, I just rename the
-connection points in \(G_2\) (by randomizing their order -- I am actually doing
-this renaming already for a BDD, before the alignment.)
+connection points in \(G_2\), by randomizing their order. (I am actually doing
+this renaming already after the BDD construction, before the alignment).
 
 In this fashion, I generated 250 random instances and solved them using the
 BDD-based approach (naive MIP seems slower anyways), aligning the diagrams using
 the variable-sequence-based heuristic (VS) and a simple align-to-A heuristic
 (toA). The results are presented in Fig. \ref{fig:jUFLP-hist} --- that's a
 histogram of relative intersection diagram sizes, our heuristic relative to the
-simple baseline (`align-to-A'). Here, on 92\% of the cases our heuristic performs
+simple baseline (`align-to-A'). Here, on ca. 90\% of the cases our heuristic performs
 better in terms of the sizes. Nominal/absolute runtimes and sizes are depicted
-in Fig.\textasciitilde{}\ref{fig:jUFLP-abs}.
+in Fig. \ref{fig:jUFLP-abs}.
 
-\begin{center}
-\includegraphics[width=\textwidth]{./jUFLP_hist.png}
-\label{fig:jUFLP-hist}
-\end{center}
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.9\textwidth]{./jUFLP_hist.png}
+\caption{\label{fig:jUFLP-hist}Runtimes for j-UFLP, relative to the simple baseline.}
+\end{figure}
 
   \begin{figure}%
     \centering
@@ -201,7 +208,7 @@ one both in terms of runtime and the diagram sizes.
 
 It seems to me this problem would work as an illustration, if we think that it
  is not too theoretical/artificial. Speaking about interpretations, I do not
- have a quite good case here. But I would say it is like thinking about
+ have a quite good proposition here. But I would say it is like thinking about
  propagation of information through social graphs of people with respect to
  different interests. For example, my social graph as a researcher is very
  different from my social graph as a hobby Go player. However, I can carry some

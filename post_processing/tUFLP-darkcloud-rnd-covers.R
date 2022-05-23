@@ -28,6 +28,23 @@ nrow(df)
 ggsave("./reports/2022-05-20_special_classes/int_sizes_hist.png",
        width = 16, height = 10)
 
+
+ggplot(df)+
+  geom_point(aes(x=t_novsA, y=tTDD))+
+  theme(
+    axis.text.x = element_text(vjust = 0.5, hjust = 1, size=18),
+    axis.text.y = element_text(size=13),
+    axis.title.x = element_text(size = 26),
+    axis.title.y = element_text(size = 26, margin = margin(t=50)),
+    panel.background = element_rect(fill = NA, color = "black"),
+    panel.grid.major = element_line(size = 0.5, linetype = 'solid',
+                                    color = "lightgrey"),
+    strip.text.x = element_text(size = 22),
+    strip.text.y = element_text(size=22),
+    strip.background = element_blank())+
+  xlab("Solution times: VS / 'to-A' alignment.")+
+  geom_abline(intercept = 0.0, slope=1.0, color='red')
+
 ggplot(df)+
   geom_point(aes(x=log(size_int_toC), y=log(size_int_VS)))+
   geom_abline(intercept = 0.0, slope=1.0, color='red')+

@@ -249,12 +249,12 @@ def compare_runtimes():
     B2 = sol.build_cover_DD()
     B2.shuffle_vars()  # renames the variables, without reordering
 
-    # B1.make_reduced()
-    # B2.make_reduced()
+    B1.make_reduced()
+    B2.make_reduced()
 
     t0 = time()
-    B1p = B1.align_to(B2.vars, inplace=False)
-    int_toA = intersect(B1p, B2)
+    B2p = B2.align_to(B1.vars, inplace=False)
+    int_toA = intersect(B1, B2p)
     obj_toA = int_toA.shortest_path()[0]
     t_toA = time() - t0
 
@@ -279,6 +279,7 @@ def compare_runtimes():
     t_VS = time() - t0
     print(f"{t_VS:.2f}, {int_VS.size()}")
     assert (abs(obj_VS - obj_toA) < 0.01), f"{obj_VS:.2f} vs {obj_toA:.2f}"
+
 
 def main():
     print("t_toA, intsize_toA, t_VS, intsize_VS")
