@@ -284,6 +284,9 @@ $(LOGS)/darkcloud_BDD_vs_MIP_longMIP.csv: darkcloud.py
 $(LOGS)/darkcloud_rnd_cover.csv: experiments/dclouds_rndcover.py
 				python -m experiments.dclouds_rndcover | tee $@
 
+$(LOGS)/dcloud_jUFLP_cavemen.csv: jUFLP_cavemen.py
+				python -m jUFLP_cavemen | tee $@
+
 ## clean-up
 # ######################################################################
 # # auxiliary recipes

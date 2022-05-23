@@ -1,11 +1,184 @@
 #+TITLE: On special classes of instances for align-BDD
+#+OPTIONS: toc:nil
+#+EXPORT_FILE_NAME: ./export/align-BDD-note.pdf
+#+LATEX_HEADER: \usepackage{cleveref}
+#+LATEX_HEADER: \usepackage{subfig}
+#+LATEX_HEADER: \usepackage[letterpaper, margin=1in]{geometry}
+#+LATEX_HEADER: \usepackage{fancyhdr}
+#+LATEX_HEADER: \pagestyle{fancy}
+#+LATEX_HEADER: \fancyhead[CO,CE]{\textbf{[Align-BDD]}}
+#+LATEX_HEADER: \fancyhead[LO,LE]{A.B.}
+#+LATEX_HEADER: \fancyhead[RO,RE]{The Applications question.}
 
-* Re: randomized cover DD
+In a nutshell:
+- First, I looked into /typed UFLP/ on 'cavemen' graph structure and checked if
+  anything would change if the order of variables in the type diagram would be
+  randomized before alignment. It seems our heuristic does find smaller diagrams
+  more often than not. But for some reason this does not really yields benefit
+  in runtimes, as compared to a simple =align-to-A= heuristic.
+- Second, I tried to invent a /joint-UFLP/, and it seems this is where the
+  heuristic does make sense.
 
+*My key question to you:* do you think /t-UFLP/ would work / is it too
+artificial? Or can we provide some interpretation / motivation behind it?
+
+*My next steps:*
+- carefully set up the numerical experiments (add a couple of cross-checks here
+  and there, increase no. of instances, etc.)
+
+
+* UFLP with overlaps: general info
+We have been discussing variations of uncapacitated facility location problem
+(UFLP). In a nutshell (and this is no different, conceptually, from what we have
+in the paper):
+- We have $M$ points of an undirected graph.
+- I can /locate a facility/ at each one, at cost $c_i$ for the i-th point.
+- If a facility is located at point $i$, it 'covers' all the points from its
+  neighborhood, $S_i$.
+
+New things:
+- *Overlap costs*. That is, if a point $j$ is covered $a$ times,
+  we bear cost (or profit) $f_{ja}$, with no particular assumptions on the structure
+  of $f_{ja}$ depending on $a$ (i.e., no monotonicity / convexity / concavity).
+- *Objective:* We do not demand all points to be covered, but we assume certain cost $f_{j0}$
+  for not covering a point at all. The objective is to minimize the sum of
+  costs, including location costs and overlap costs.
+- *Special structure / 'cavemen':* We restricted our attention to a special type
+  of instances, where points are split into clusters, with many edges within a
+  cluster, but only a single edge between two clusters (and each cluster being
+  connected to at most two other ones). An example of such instance is provided
+  in Fig. ref:fig:ex-inst. I call head and tail of an edge connecting two
+  clusters a /connection point/.
+
+#+NAME: fig:ex-inst
+#+CAPTION: Instance example: special graph structure.
+#+ATTR_LATEX: :width \textwidth
+#+ATTR_ORG: :width 500
+[[./ex-inst.png]]
+  
+This special structure allowed us to design a tailored algorithm exploiting
+these 'caves.' The key idea is that as soon as I decide whether I locate a
+facility at four connection points adjacent to a cluster, the subproblem
+corresponding to this cluster becomes independent of the rest of the problem.
+This way I can process clusters one by one and build a BDD encoding the
+objective value depending on the choices regarding endpoints only, having width
+of at most eight nodes.
+
+Such algorithm beats a naive MIP formulation (solved by Gurobi solver), since it
+exploits the special structure. Now, I'd need to introduce another sort of
+conditions, to illustrate our BDD-alignment heuristic.
+
+First thing I tried was the introduction of /types/ for connection points. That
+is, I assumed that each one has a type, and there is a (budget) constraint on
+the maximum number of points of each type I can locate a facility at. While the
+BDD-based approach was indeed faster than a naive MiP, it was not clear why use
+our heuristic, since aligning 'type' diagram to 'cover' diagram to build an
+intersection later would work just as well, and in many cases even faster than
+our simplified-problem-based heuristic. We wanted to find a situation where it
+would not be the case.
+
+* t-UFLP + randomized type diagram.
+Our hypothesis was that we just happened to supply a fortunate initial
+ordering by building the type diagram. (So that revising this order to a more
+complex cover DD was relatively simple.) Therefore, I tried to destroy this
+simple structure to see if it was indeed the case. Viz, before aligning, I
+randomized the order of variables in the type diagram. The results in terms of
+the resulting intersection diagram sizes are presented in Fig.
+ref:fig:intrndpts and ref:fig:intrndhist.
+
+#+NAME: fig:intrndpts
+#+CAPTION: Intersection diagram sizes (nominal values), depending on the alignment heuristic used: =VS= for variable-sequence based, and =toC= for a simple alternative, "align-to-cover-DD" heuristic.
+#+ATTR_LATEX: :width 0.8\linewidth
+#+ATTR_ORG: :width 700
 [[./int_sizes_points.png]]
 
-So, it seems we have VS-ed intersection DD size smaller than the simple one on
-about 60% of the cases. Two more percentage points for the same size. In terms of
-the histogram:
+So, it seems the intersection DD size is smaller with our heuristic than it is
+for the simple =align-to-cover= approach more often than not. That is, on about
+60% of my random instances (about 62% if I count the cases when the size is the
+same). In terms the histogram of relative intersection diagram sizes, see Fig.
+ref:fig:intrndhist.
 
+#+NAME: fig:intrndhist
+#+CAPTION: Intersection diagram sizes, VS-based heuristic relative to 'align-to'cover' alternative.
+#+ATTR_LATEX: :width 0.8\linewidth
+#+ATTR_ORG: :width 700
 [[./int_sizes_hist.png]]
+
+Interestingly, though, runtimes still suggest that a simple alignment heuristic
+is by far faster.
+
+However, I think I was able to invent a class of problems where using the
+heuristic does make sense.
+
+* Another variation of `joint-UFLP.'
+Again, consider UFLP (without types) over this ‘cavemen’ type of graph with
+general overlap cost. Let me forget types altogether, but assume we have not
+one, but *two* such graphs, stitched together via the connection points in the
+following sense.
+
+Both graphs possess the special ‘cavemen’ structure, and connection points
+coincide. That is, there is a one-to-one mapping between the connection points
+in $G_1$ and the ones in $G_2$. Moreover, locating a facility at a connection
+point in $G_1$ automatically implies locating the corresponding one in $G_2$ at
+no additional location cost. Otherwise, the two UFLP instances are independent.
+I think even the total number of nodes per cluster and for the graph in total
+can be different. Overlaps are also calculated for the two graphs independently,
+aside from the dependent location decisions.
+
+My primary objective when designing this type of instances was to have a pair of
+*comparable* diagrams to align. I will further try to provide some intuition on
+what this problem might actually mean / how to interpret it. However, let’s see
+first if it would work for the purposes of the illustration for our heuristic.
+
+I generated random instances as follows:
+A. Create the necessary number of nodes split into the given number of clusters ($n$ clusters, some fixed number of points each)
+B. Make sure that each cluster is connected, and that the clusters are connected to each other as necessary.
+C. Create two copies of this graph — these will give me $G_1$ and $G_2$.
+D. Within each graph, add random edges within each cluster to reach the necessary ‘density’ (parameterized as the number of edges)
+
+The procedure gives me $G_1$ and $G_2$, but there is no point in aligning them,
+because the sequence of connection points coincide. Therefore, I just rename the
+connection points in $G_2$ (by randomizing their order -- I am actually doing
+this renaming already for a BDD, before the alignment.)
+
+In this fashion, I generated 250 random instances and solved them using the
+BDD-based approach (naive MIP seems slower anyways), aligning the diagrams using
+the variable-sequence-based heuristic (VS) and a simple align-to-A heuristic
+(toA). The results are presented in Fig. ref:fig:jUFLP-hist --- that's a
+histogram of relative intersection diagram sizes, our heuristic relative to the
+simple baseline (`align-to-A'). Here, on 92% of the cases our heuristic performs
+better in terms of the sizes. Nominal/absolute runtimes and sizes are depicted
+in Fig.~\ref{fig:jUFLP-abs}.
+
+#+NAME: fig:jUFLP-hist
+#+ATTR_LATEX: :width \textwidth
+#+ATTR_ORG: 500
+[[./jUFLP_hist.png]]
+
+#+begin_export latex
+  \begin{figure}%
+    \centering
+    \subfloat[\centering Runtimes, sec.]{{\includegraphics[width=\textwidth]{./jUFLP_runtimes.png} }}%
+    \qquad
+    \subfloat[\centering Intersection dia sizes, nodes]{{\includegraphics[width=\textwidth]{./jUFLP_sizes.png} }}%
+    \caption{Nominal parameters for the two BDD alignment heuristics.}%
+    \label{fig:jUFLP-abs}%
+\end{figure}
+#+end_export
+
+Basically, in this setting it is not obvious how to align the diagrams, and
+despite the simple diagram structure, I think the diagrams might explode if we
+try to change the variables order carelessly. So, our heuristic beats a naive
+one both in terms of runtime and the diagram sizes.
+
+It seems to me this problem would work as an illustration, if we think that it
+ is not too theoretical/artificial. Speaking about interpretations, I do not
+ have a quite good case here. But I would say it is like thinking about
+ propagation of information through social graphs of people with respect to
+ different interests. For example, my social graph as a researcher is very
+ different from my social graph as a hobby Go player. However, I can carry some
+ idea or information through both graphs (at least one hop forward), so it makes
+ sense that ‘locating’ me just once is enough for both graphs. I do not quite
+ see a good intuition why *connection points* should coincide in the two graphs,
+ though. Anyways, I am not sure if it looks solid enough to you, but I would be
+ grateful for any hints in this regard!

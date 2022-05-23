@@ -27,6 +27,11 @@
     distribute the first facility into every bin, and then sort them randomly?
 
 * Current project TODOs
+** TODO Check if =L= parameter works correctly
+[2022-05-23 Mon 11:18]
+[[file:~/projects/align-BDD/jUFLP_cavemen.py::while (1 - 2*n_edges / (M*(M-1))) > L:]]
+
+i.e., produces the necessary number of edges.
 ** WIP Implement Typed-UFLP / cavemen specialized algo
 *** WIP Try j-UFLP-caves + randomized covers
 :LOGBOOK:
@@ -44,11 +49,26 @@ So, randomizing cover DD seems to work in terms of the diagram size -- see [[fil
 
 Also, details are in a separate [[./reports/2022-05-20_special_classes/note.org][note]].
 
-**** TODO Add tests for j-UFLP-caves (with MIP)
+**** WIP Add tests for j-UFLP-caves (with MIP)
 :LOGBOOK:
+CLOCK: [2022-05-23 Mon 13:29]--[2022-05-23 Mon 13:40] =>  0:11
+CLOCK: [2022-05-23 Mon 12:50]--[2022-05-23 Mon 13:20] =>  0:30
+CLOCK: [2022-05-23 Mon 12:28]--[2022-05-23 Mon 12:46] =>  0:18
+CLOCK: [2022-05-23 Mon 11:55]--[2022-05-23 Mon 12:11] =>  0:16
+CLOCK: [2022-05-23 Mon 10:48]--[2022-05-23 Mon 11:51] =>  1:03
+CLOCK: [2022-05-20 Fri 18:28]--[2022-05-20 Fri 18:50] =>  0:22
+CLOCK: [2022-05-20 Fri 18:08]--[2022-05-20 Fri 18:12] =>  0:04
+CLOCK: [2022-05-20 Fri 17:55]--[2022-05-20 Fri 17:57] =>  0:02
+CLOCK: [2022-05-20 Fri 17:51]--[2022-05-20 Fri 17:52] =>  0:01
 CLOCK: [2022-05-20 Fri 15:25]--[2022-05-20 Fri 15:33] =>  0:08
 CLOCK: [2022-05-20 Fri 15:18]--[2022-05-20 Fri 15:23] =>  0:05
 CLOCK: [2022-05-20 Fri 14:52]--[2022-05-20 Fri 15:12] =>  0:20
+:END:
+
+**** WIP revise jUFLP-caves concept
+:LOGBOOK:
+CLOCK: [2022-05-23 Mon 14:35]--[2022-05-23 Mon 14:41] =>  0:06
+CLOCK: [2022-05-23 Mon 13:40]--[2022-05-23 Mon 14:31] =>  0:51
 :END:
 **** TODO Experiment: jUFLP runtimes and sizes toA and VS
 *** DONE Check out dia sizes and orders
@@ -62,6 +82,16 @@ CLOCK: [2022-05-19 Thu 11:40]--[2022-05-19 Thu 12:07] =>  0:27
 CLOCK: [2022-05-19 Thu 11:34]--[2022-05-19 Thu 11:35] =>  0:01
 :END:
 See [[mu4e:msgid:BL0PR01MB51238B80278092F3D0B96D32DED19@BL0PR01MB5123.prod.exchangelabs.com][Re: [align-BDD] Revision: A note on the DP algo / possible to discuss?]]
+*** TODO Draft a note
+:LOGBOOK:
+CLOCK: [2022-05-23 Mon 19:18]
+CLOCK: [2022-05-23 Mon 18:54]--[2022-05-23 Mon 19:12] =>  0:18
+CLOCK: [2022-05-23 Mon 18:20]--[2022-05-23 Mon 18:38] =>  0:18
+CLOCK: [2022-05-23 Mon 17:20]--[2022-05-23 Mon 18:00] =>  0:40
+CLOCK: [2022-05-23 Mon 16:05]--[2022-05-23 Mon 16:49] =>  0:44
+CLOCK: [2022-05-23 Mon 15:45]--[2022-05-23 Mon 15:46] =>  0:01
+CLOCK: [2022-05-23 Mon 14:42]--[2022-05-23 Mon 15:03] =>  0:21
+:END:
 
 *** DONE Instances gallery
 CLOSED: [2022-05-19 Thu 11:33]
