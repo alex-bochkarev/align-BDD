@@ -36,7 +36,10 @@ Need to fine-tune the files to check (ignore =.venv=, etc.)
 :PROPERTIES:
 :CATEGORY: a-BDD/jUFLP
 :END:
-*** TODO numerical experiment: MIP vs a2A vs VS.
+*** WIP numerical experiment: MIP vs a2A vs VS.
+:LOGBOOK:
+CLOCK: [2022-06-01 Wed 23:21]--[2022-06-01 Wed 23:46] =>  0:25
+:END:
 *** TODO description
 *** TODO edit the draft
 *** DONE instance load/save

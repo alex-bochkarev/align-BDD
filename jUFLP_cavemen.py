@@ -223,7 +223,8 @@ def solve_cm_jUFLP_MIP(i1, i2, jmap):
 
 
 def solve_cm_jUFLP_DDs(i1, i2, jmap,
-                       intmode="toA"):
+                       intmode="toA",
+                       ret_int=False):
     """Solves the jUFLP cavemen instance with DDs.
 
     Args:
@@ -234,18 +235,14 @@ def solve_cm_jUFLP_DDs(i1, i2, jmap,
       Instance is parameterized as per :py:func:`gen_caveman_inst`,
       The diagrams are built with :py:class:`darkcloud.DDSolver`.
     """
-    print("Building the first DD...", end="", flush=True)
     S, f, c, caves = i1
     S2, f2, c2, caves2 = i2
 
     sol = DDSolver(S, f, c, caves)
     B1 = sol.build_cover_DD()
-    print("done.")
 
-    print("Building the second DD...", end="", flush=True)
     sol = DDSolver(S2, f2, c2, caves2)
     B2 = sol.build_cover_DD()
-    print("done.")
 
     B1.make_reduced()
     B2.make_reduced()
@@ -274,7 +271,10 @@ def solve_cm_jUFLP_DDs(i1, i2, jmap,
 
     int_DD = intersect(B1, B2)
     sp = int_DD.shortest_path()
-    return sp[0]
+    if ret_int:
+        return sp[0], int_DD.size()
+    else:
+        return sp[0]
 
 
 ###
