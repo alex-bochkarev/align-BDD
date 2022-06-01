@@ -1,10 +1,11 @@
-"""A specialized code for typed UFLP over cavemen instances."""
+"""Proof-of-concept experiment: joint UFLP over special class of instances."""
 import pytest
 from copy import deepcopy
 import numpy as np
 import gurobipy as gp
+import subprocess
 
-from darkcloud import ptscloud, generate_overlaps, DDSolver
+from darkcloud import ptscloud, generate_overlaps, DDSolver, gen_caveman_inst
 from BDD import intersect
 from varseq import VarSeq
 from BB_search import BBSearch
@@ -12,7 +13,7 @@ from BB_search import BBSearch
 from time import time
 
 
-def gen_caveman_inst(n=10, M=7, L=0.25, verbose=False):
+def gen_cavemen_jUFLP_inst(n=10, M=7, L=0.25, verbose=False):
     """Generates an instance with the related metadata (info on caves).
 
     Args:
@@ -22,94 +23,209 @@ def gen_caveman_inst(n=10, M=7, L=0.25, verbose=False):
       verbose (Bool): print debug info
 
     Returns:
-      S, S2, f, f2, c, caves: instance and caves description.
+      inst1, inst2, join_map: sub-instances and caves description.
 
     Note:
-      The implementation is based on :py:func:`darkcloud.gen_caveman_inst`,
-      but with the 'types' condition replaced with another cover-like
-      condition. Note that caves are the same for the two networks:
-      sets of nodes coincide, but the connection within each cave
-      may be different.
+      Each sub-instance is parameterized by [S,f,c,caves].
+      (See :py:func:`darkcloud.gen_caveman_inst` for details.)
     """
-    # creating the first graph topology
-    S = [[j+1] for j in range(n * M)]  # creating the nodes first
-    entry_point = (None, None)
-    caves = []
-    for k in range(n):
-        lastcave = [k*M + 1]
-        if len(caves) > 0:
-            caves[-1].e2 = entry_point
-            S[entry_point[0]-1].append(entry_point[1])
-            S[entry_point[1]-1].append(entry_point[0])
+    success = False
+    while not success:
+        S, f, c, caves = gen_caveman_inst(n, M, L)
+        S2, f2, c2, caves2 = gen_caveman_inst(n, M, L)
 
-        # create the necessary number of connected nodes
-        while len(lastcave) < M:
-            connect_to = np.random.choice(lastcave)
-            lastcave.append(lastcave[-1]+1)
-            S[lastcave[-1]-1].append(connect_to)
-            S[connect_to-1].append(lastcave[-1])
+        join_pts = sum([list(c.e1 + c.e2) for c in caves], [])
+        join_pts = list(np.unique([j for j in join_pts if j is not None]))
 
-        caves.append(ptscloud(entry_point,
-                              (None, None),
-                              [j for j in range(k*M+1, (k+1)*M+1)]))
+        join_pts2 = sum([list(c.e1 + c.e2) for c in caves2], [])
+        join_pts2 = list(np.unique([j for j in join_pts2 if j is not None]))
 
-        entry_point = (np.random.choice(lastcave), (k+1)*M+1)
+        success = (len(join_pts) == len(join_pts2))
 
-    S2 = deepcopy(S)
+    join_map = dict(zip(join_pts, np.random.permutation(join_pts2)))
 
-    # add edges to the first graph
-    for cave in caves:
-        n_edges = 0
-        for i in cave.S:
-            for j in S[i - 1]:
-                if (i != j) and ((i, j) not in [cave.e1, cave.e2]) and (
-                        (j, i) not in [cave.e1, cave.e2]):
-                    n_edges += 1
-
-        n_edges /= 2
-
-        while (1 - 2*n_edges / (M*(M-1))) > L:
-            n1 = np.random.choice(cave.S)
-            n2 = np.random.choice(cave.S)
-
-            if n1 not in S[n2-1]:
-                S[n2-1].append(n1)
-                S[n1-1].append(n2)
-                n_edges += 1
-
-    # add edges to the second graph
-    caves2 = deepcopy(caves)
-
-    for cave in caves2:
-        n_edges = 0
-        for i in cave.S:
-            for j in S2[i - 1]:
-                if (i != j) and ((i, j) not in [cave.e1, cave.e2]) and (
-                        (j, i) not in [cave.e1, cave.e2]):
-                    n_edges += 1
-
-        n_edges /= 2
-
-        while (1 - 2*n_edges / (M*(M-1))) > L:
-            n1 = np.random.choice(cave.S)
-            n2 = np.random.choice(cave.S)
-
-            if n1 not in S2[n2-1]:
-                S2[n2-1].append(n1)
-                S2[n1-1].append(n2)
-                n_edges += 1
-
-    # creating costs info (location and overlap costs)
-    f = generate_overlaps(S)
-    f2 = generate_overlaps(S2)
-
-    Cmax = 5.0
-    c = [Cmax*np.random.uniform() for _ in range(len(S))]
     if verbose:
         print(f"S={S};\nf={f}\n;c={c}")
-    return S, S2, f, f2, c, caves
+    return [[S, f, c, caves], [S2, f2, c2, caves2], join_map]
 
 
+def show_inst(inst1, inst2, join_map, filename="./tmp/jUFLP.dot"):
+    """Shows the supplied j-UFLP instance / saves it to a .dot file.
+
+    Args:
+        inst1, inst2 (list): instances description, [S,f,c,caves]
+        filename (str): filename to save to (default "./tmp/jUFLP.dot")
+    """
+    added = set([])
+    with open(filename, "w") as fout:
+        fout.write("graph G {\n")
+        fout.write("""    rankdir="LR";\n""")
+        S, f, c, caves = inst2
+        join_pts = sum([list(c.e1 + c.e2) for c in caves], [])
+        join_pts = list(np.unique([j for j in join_pts if j is not None]))
+        for i in range(len(S)):
+            for j in S[i]:
+                if ((i+1) != j) and not (((j, (i+1)) in added)
+                                         or ((i+1, j) in added)):
+
+                    if (i+1) in join_pts:
+                        pref_i = "j"
+                    else:
+                        pref_i = "f"
+
+                    if j in join_pts:
+                        pref_j = "j"
+                    else:
+                        pref_j = "f"
+
+                    fout.write(f"    {pref_i}{i+1}--{pref_j}{j}[penwidth=3];\n")
+                    added.add(((i+1), j))
+
+            if (i+1) not in join_pts:
+                fout.write(f"    f{i+1}[penwidth=3];\n")
+        S, f, c, caves = inst1
+        join_pts = sum([list(c.e1 + c.e2) for c in caves], [])
+        join_pts = list(np.unique([j for j in join_pts if j is not None]))
+        added = set([])
+        for i in range(len(S)):
+            for j in S[i]:
+                if ((i+1) != j) and not (((j, (i+1)) in added)
+                                         or ((i+1, j) in added)):
+
+                    if (i+1) in join_pts:
+                        a = f"j{join_map[i+1]}"
+                    else:
+                        a = f"s{i+1}"
+
+                    if j in join_pts:
+                        b = f"j{join_map[j]}"
+                    else:
+                        b = f"s{j}"
+
+                    fout.write(f"    {a}--{b}[color=red];\n")
+                    added.add(((i+1), j))
+            if (i+1) not in join_pts:
+                fout.write(f"    s{i+1}[color=red, textcolor=red];\n")
+
+        for j in join_pts:
+            fout.write(f"    j{join_map[j]}[style=filled, fillcolor=yellow, penwidth=5];\n")
+        fout.write("}")
+
+
+def solve_cm_jUFLP_MIP(i1, i2, jmap):
+    """Solves the special jUFLP instance with MIP."""
+    m = gp.Model()
+    m.modelSense = gp.GRB.MINIMIZE
+    m.setParam("OutputFlag", 0)
+    x = dict()
+    y = dict()
+
+    # add the first instance
+    S, f, c, caves = i1
+    # create variables
+    for j in range(1, len(S)+1):
+        x[(1, j)] = m.addVar(vtype=gp.GRB.BINARY, name=f"x1_{j}",
+                            obj=c[j-1])
+
+        for a in range(1, len(S[j-1])+1):
+            y[(1, j, a)] = m.addVar(vtype=gp.GRB.BINARY, name=f"y1_{j}_{a}",
+                                    obj=f[j-1][a]-f[j-1][a-1])
+
+    # create constraints
+    for j in range(1, len(S)+1):
+        m.addConstr(gp.quicksum(x[(1, k)] for k in S[j-1]) ==
+                    gp.quicksum(y[(1, j, a)] for a in range(1, len(S[j-1])+1)))
+
+        for a in range(1, len(S[j-1])):
+            m.addConstr(y[(1, j, a)] >= y[(1, j, a+1)])
+
+    # add the second instance
+    S, f, c, caves = i2
+    # create variables
+    for j in range(1, len(S)+1):
+        x[(2, j)] = m.addVar(vtype=gp.GRB.BINARY, name=f"x2_{j}",
+                             obj=c[j-1])
+
+        for a in range(1, len(S[j-1])+1):
+            y[(2, j, a)] = m.addVar(vtype=gp.GRB.BINARY, name=f"y2_{j}_{a}",
+                                    obj=f[j-1][a]-f[j-1][a-1])
+
+    # create constraints
+    for j in range(1, len(S)+1):
+        m.addConstr(gp.quicksum(x[(2, k)] for k in S[j-1]) ==
+                    gp.quicksum(y[(2, j, a)] for a in range(1, len(S[j-1])+1)))
+
+        for a in range(1, len(S[j-1])):
+            m.addConstr(y[(2, j, a)] >= y[(2, j, a+1)])
+
+    # link the two instances
+    for j in jmap:
+        m.addConstr(x[(1, j)] == x[(2, jmap[j])])
+
+    m.update()
+    m.optimize()
+    assert m.status == gp.GRB.OPTIMAL
+    return m.objVal + sum([fs[0]
+                           for fs in i1[1]]) + sum([fs[0] for fs in i2[1]])
+
+
+
+def solve_cm_jUFLP_DDs(i1, i2, jmap,
+                       intmode="toA"):
+    """Solves the jUFLP cavemen instance with DDs.
+
+    Args:
+      i1, i2 (list): instances
+      intmode (str): alignment mode, 'toA', 'toB', or 'VS'
+
+    Notes:
+      Instance is parameterized as per :py:func:`gen_caveman_inst`,
+      The diagrams are built with :py:class:`darkcloud.DDSolver`.
+    """
+    print("Building the first DD...", end="", flush=True)
+    S, f, c, caves = i1
+    S2, f2, c2, caves2 = i2
+
+    sol = DDSolver(S, f, c, caves)
+    B1 = sol.build_cover_DD()
+    print("done.")
+
+    print("Building the second DD...", end="", flush=True)
+    sol = DDSolver(S2, f2, c2, caves2)
+    B2 = sol.build_cover_DD()
+    print("done.")
+
+    B1.make_reduced()
+    B2.make_reduced()
+    B1.rename_vars(jmap)
+
+    if intmode == "toA":
+        target = B1.vars
+    elif intmode == "toB":
+        target = B2.vars
+    elif intmode == 'VS':
+        vs1 = VarSeq(B1.vars, [len(L) for L in B1.layers[:-1]])
+        vs2 = VarSeq(B2.vars, [len(L) for L in B2.layers[:-1]])
+
+        assert set(vs1.layer_var) == set(
+            vs2.layer_var), f"1:{vs1.layer_var}, 2:{vs2.layer_var}"
+
+        b = BBSearch(vs1, vs2)
+        status = b.search()
+        assert status == "optimal" or status == "timeout"
+        target = b.Ap_cand.layer_var
+    else:
+        print(f"Wrong mode: '{intmode}'. Expected: 'toA', 'toB', or 'VS'.")
+
+    B1.align_to(target, inplace=True)
+    B2.align_to(target, inplace=True)
+
+    int_DD = intersect(B1, B2)
+    sp = int_DD.shortest_path()
+    return sp[0]
+
+
+###
 def dump_instance(S, caves, filename="tmp/S.dot"):
     """Dumps a graph implied by S into a `.dot` file. """
     added = set([])
@@ -222,22 +338,25 @@ def solve_with_DDs(S, S2, f, f2, c, caves,
     return sp[0]
 
 # Testing code ######################################################
-@pytest.mark.parametrize("test_inst", [gen_caveman_inst()
+@pytest.mark.parametrize("test_inst", [gen_cavemen_jUFLP_inst(7, 7)
                                        for _ in range(5)])
 def test_jUFL_DDs(test_inst):
-    S, S2, f, f2, c, caves = test_inst
-    obj1 = solve_with_DDs(S,S2,f,f2,c,caves, intmode='toA')
-    obj2 = solve_with_DDs(S,S2,f,f2,c,caves, intmode='VS')
+    i1, i2, jmap = test_inst
+    obj1 = solve_cm_jUFLP_DDs(i1, i2, jmap, 'toA')
+    obj2 = solve_cm_jUFLP_DDs(i1, i2, jmap, 'toB')
+    obj3 = solve_cm_jUFLP_DDs(i1, i2, jmap, 'VS')
+    assert abs(obj1 - obj2) < 0.001
+    assert abs(obj1 - obj3) < 0.001
+
+
+@pytest.mark.parametrize("test_inst", [gen_cavemen_jUFLP_inst(7, 7)
+                                       for _ in range(5)])
+def test_cm_jUFL_DDvsMIP(test_inst):
+    i1, i2, jmap = test_inst
+    obj1 = solve_cm_jUFLP_MIP(i1, i2, jmap)
+    obj2 = solve_cm_jUFLP_DDs(i1, i2, jmap)
     assert abs(obj1 - obj2) < 0.001
 
-@pytest.mark.parametrize("test_inst", [gen_caveman_inst()
-                                       for _ in range(5)])
-def test_jUFL_DDvsMIP(test_inst):
-    S, S2, f, f2, c, caves = test_inst
-    obj1 = solve_with_DDs(S,S2,f,f2,c,caves, intmode='VS')
-    m, obj2, _, _, _ = solve_with_MIP(S, S2, f, f2, c, caves)
-    assert m.status == gp.GRB.OPTIMAL
-    assert abs(obj1 - obj2) < 0.001
 
 def compare_runtimes():
     """Performs a quick runtimes comparison (toA vs VS)."""
@@ -287,4 +406,4 @@ def main():
         compare_runtimes()
 
 if __name__ == '__main__':
-   main()
+    main()

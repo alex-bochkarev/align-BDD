@@ -87,7 +87,7 @@ def main():
         # T.make_reduced()
         # C.make_reduced()
 
-        Tpp = T.align_to(C.vars, inplace=True)
+        Tpp = T.align_to(C.vars, inplace=True)  # FIXME: double-check the code.
 
         int_DD = intersect(C, Tpp)
         objT_novsA = int_DD.shortest_path()[0]

@@ -27,6 +27,30 @@
     distribute the first facility into every bin, and then sort them randomly?
 
 * Current project TODOs
+** TODO fix =check_src= makefile target
+[2022-06-01 Wed 13:06]
+[[file:~/projects/align-BDD/Makefile::egrep -nr --color 'TODO|FIXME|BUG|NOTE']]
+
+Need to fine-tune the files to check (ignore =.venv=, etc.)
+** j-UFLP implementation
+:PROPERTIES:
+:CATEGORY: a-BDD/jUFLP
+:END:
+*** DONE instance generation + cross-check
+CLOSED: [2022-06-01 Wed 15:53]
+- State "DONE"       from "TODO"       [2022-06-01 Wed 15:53]
+:LOGBOOK:
+CLOCK: [2022-06-01 Wed 15:27]--[2022-06-01 Wed 15:53] =>  0:26
+CLOCK: [2022-06-01 Wed 14:43]--[2022-06-01 Wed 14:48] =>  0:05
+CLOCK: [2022-06-01 Wed 14:12]--[2022-06-01 Wed 14:23] =>  0:11
+CLOCK: [2022-06-01 Wed 13:55]--[2022-06-01 Wed 14:02] =>  0:07
+CLOCK: [2022-06-01 Wed 13:09]--[2022-06-01 Wed 13:52] =>  0:43
+:END:
+*** TODO instance load/save
+*** TODO numerical experiment: MIP vs a2A vs VS.
+*** TODO description
+*** TODO edit the draft
+
 ** TODO Rndcover: fix =inplace= parameter! 
 [2022-05-23 Mon 22:43]
 [[file:~/projects/align-BDD/experiments/dclouds_rndcover.py::Tpp = T.align_to(C.vars, inplace=True)]]
@@ -35,8 +59,139 @@
 [[file:~/projects/align-BDD/jUFLP_cavemen.py::while (1 - 2*n_edges / (M*(M-1))) > L:]]
 
 i.e., produces the necessary number of edges.
-** WIP Implement Typed-UFLP / cavemen specialized algo
-*** WIP Try j-UFLP-caves + randomized covers
+** TODO Move instance gallery and other experiments to a separate file from darkcloud
+[2022-05-10 Tue 18:24]
+[[file:~/projects/align-BDD/darkcloud.py::M = 10]]
+** TODO Rewrite comments
+[2022-05-09 Mon 15:46]
+[[file:~/projects/align-BDD/darkcloud.py::def build_type_DD(self)]]
+** TODO Add assertion to the instance type
+[2022-05-03 Tue 14:10]
+[[file:~/projects/align-BDD/darkcloud.py]]
+
+'string' shape only.
+** Softcover: design instances with types
+:LOGBOOK:
+CLOCK: [2022-01-24 Mon 12:16]--[2022-01-24 Mon 12:40] =>  0:24
+:END:
+*** DONE Design cover DDs (Bool -> Int)
+CLOSED: [2022-01-27 Thu 15:11]
+- State "DONE"       from "TODO"       [2022-01-27 Thu 15:11]
+:LOGBOOK:
+CLOCK: [2022-01-27 Thu 14:31]--[2022-01-27 Thu 14:58] =>  0:27
+CLOCK: [2022-01-27 Thu 13:36]--[2022-01-27 Thu 14:18] =>  0:42
+CLOCK: [2022-01-26 Wed 19:46]--[2022-01-26 Wed 19:47] =>  0:01
+CLOCK: [2022-01-26 Wed 17:42]--[2022-01-26 Wed 18:11] =>  0:29
+CLOCK: [2022-01-26 Wed 17:20]--[2022-01-26 Wed 17:41] =>  0:21
+CLOCK: [2022-01-26 Wed 17:12]--[2022-01-26 Wed 17:20] =>  0:08
+CLOCK: [2022-01-26 Wed 16:21]--[2022-01-26 Wed 16:33] =>  0:12
+CLOCK: [2022-01-26 Wed 14:40]--[2022-01-26 Wed 16:21] =>  1:41
+CLOCK: [2022-01-26 Wed 14:04]--[2022-01-26 Wed 14:18] =>  0:14
+CLOCK: [2022-01-26 Wed 13:45]--[2022-01-26 Wed 13:57] =>  0:12
+CLOCK: [2022-01-26 Wed 13:08]--[2022-01-26 Wed 13:43] =>  0:35
+CLOCK: [2022-01-24 Mon 15:13]--[2022-01-24 Mon 15:32] =>  0:19
+CLOCK: [2022-01-24 Mon 13:16]--[2022-01-24 Mon 14:23] =>  1:07
+CLOCK: [2022-01-24 Mon 12:59]--[2022-01-24 Mon 13:10] =>  0:11
+CLOCK: [2022-01-24 Mon 12:55]--[2022-01-24 Mon 12:56] =>  0:01
+:END:
+Check it is correct, technically.
+*** DONE Check dia sizes scaling (with and w/o reduction) vs. no of vars in MIP
+CLOSED: [2022-01-28 Fri 17:21]
+- State "DONE"       from "TODO"       [2022-01-28 Fri 17:21]
+:LOGBOOK:
+CLOCK: [2022-01-28 Fri 15:30]--[2022-01-28 Fri 16:24] =>  0:54
+CLOCK: [2022-01-28 Fri 14:05]--[2022-01-28 Fri 14:42] =>  0:37
+CLOCK: [2022-01-28 Fri 13:59]--[2022-01-28 Fri 14:03] =>  0:04
+CLOCK: [2022-01-27 Thu 18:57]--[2022-01-27 Thu 19:17] =>  0:20
+CLOCK: [2022-01-27 Thu 15:16]--[2022-01-27 Thu 15:26] =>  0:10
+CLOCK: [2022-01-27 Thu 15:11]--[2022-01-27 Thu 15:14] =>  0:03
+:END:
+So, without reduction, I basically create an exponentially sized diagrams. This
+makes sense, if I am not smart with this ``forgetting'' nodes (after they have zero
+``degrees of freedom'').
+
+However, it is not really bright even in theoretical case of writing down a
+reduced dia as well...
+
+*** DONE Repeat the experiment for a more narrow graph type (cavemen?)
+CLOSED: [2022-01-28 Fri 20:12]
+- State "DONE"       from "TODO"       [2022-01-28 Fri 20:12]
+:LOGBOOK:
+CLOCK: [2022-01-28 Fri 19:17]--[2022-01-28 Fri 20:12] =>  0:55
+CLOCK: [2022-01-28 Fri 18:34]--[2022-01-28 Fri 18:55] =>  0:21
+CLOCK: [2022-01-28 Fri 17:21]--[2022-01-28 Fri 17:59] =>  0:38
+:END:
+
+*** DONE make improved cover-building algo
+CLOSED: [2022-03-11 Fri 13:21]
+- State "DONE"       from "TODO"       [2022-03-11 Fri 13:21]
+:LOGBOOK:
+CLOCK: [2022-02-15 Tue 15:09]--[2022-02-15 Tue 15:28] =>  0:19
+CLOCK: [2022-02-15 Tue 14:14]--[2022-02-15 Tue 15:05] =>  0:51
+CLOCK: [2022-02-15 Tue 13:20]--[2022-02-15 Tue 13:28] =>  0:08
+CLOCK: [2022-02-15 Tue 12:09]--[2022-02-15 Tue 12:17] =>  0:08
+CLOCK: [2022-02-15 Tue 10:51]--[2022-02-15 Tue 11:54] =>  1:03
+CLOCK: [2022-02-14 Mon 18:49]--[2022-02-14 Mon 18:55] =>  0:06
+CLOCK: [2022-02-01 Tue 13:36]--[2022-02-01 Tue 13:58] =>  0:22
+CLOCK: [2022-01-31 Mon 15:18]--[2022-01-31 Mon 15:29] =>  0:11
+CLOCK: [2022-01-31 Mon 14:40]--[2022-01-31 Mon 15:11] =>  0:31
+CLOCK: [2022-01-31 Mon 14:12]--[2022-01-31 Mon 14:16] =>  0:04
+CLOCK: [2022-01-31 Mon 13:16]--[2022-01-31 Mon 13:35] =>  0:19
+:END:
+*** DONE Compare runtimes w/o types: BDDs vs naive MIP
+CLOSED: [2022-03-11 Fri 13:21]
+- State "DONE"       from "TODO"       [2022-03-11 Fri 13:21]
+:LOGBOOK:
+CLOCK: [2022-02-23 Wed 15:41]--[2022-02-23 Wed 16:08] =>  0:27
+CLOCK: [2022-02-23 Wed 15:31]--[2022-02-23 Wed 15:37] =>  0:06
+:END:
+*** LATER Add types -- generate CPP instances 
+*** LATER Compare runtime: naive MIP vs CPP MIP vs Align-BDD CPP
+*** LATER Add reduction step -- check time
+** TODO Kill already merged branches
+ [2020-07-11 Sat 09:49]
+
+- minor_fixes (figures, labels, etc.)
+- scal_update (major scal update)
+
+As of beginning of the day <2020-07-11> all of these are merged into =master=
+** TODO Clean-up testing code (remove unnecessary, add separate testing)
+ [2021-02-19 Fri 12:47]
+** TODO add diagram generation tests :UFL:
+** TODO Revise tests for key functions
+** TODO Requires =gurobi= to run examples :doc:
+ [2021-02-06 Sat 17:40]
+ [[file:~/projects/align-BDD/UFL.py][file:~/projects/align-BDD/UFL.py]]
+** TODO implement =BDD.save()= for a weighted BDD
+ [2021-02-22 Mon 12:29]
+** TODO Perhaps, =is_equivalent= is a bad name?
+ [2021-02-22 Mon 13:48]
+ [[file:~/projects/align-BDD/BDD.py]]
+
+ Like, maybe rename to =test_equivalence=. And then =is_equivalent <- test_equivalence()[0]=
+** TODO rename =VarSeq.layer_var= into =vars=, I suppose...
+ [2021-02-22 Mon 17:52]
+** TODO rename =?UFL= (streamlining names)
+** TODO let S NOT contain the node itself -- amended later :tUFL:
+ [2021-03-22 Mon 18:34]
+** TODO figure (1) the order of types and (2) order of nodes within a type
+ [2021-03-30 Tue 13:32]
+** TODO Technical description :doc:
+   - makefile
+   - pytest and testing framework
+
+** Organization
+:LOGBOOK:
+CLOCK: [2022-06-01 Wed 13:00]--[2022-06-01 Wed 13:09] =>  0:09
+:END:
+
+* Closed points
+** DONE Implement Typed-UFLP / cavemen specialized algo
+CLOSED: [2022-06-01 Wed 12:54]
+- State "DONE"       from "WIP"        [2022-06-01 Wed 12:54]
+*** DONE Try j-UFLP-caves + randomized covers
+CLOSED: [2022-06-01 Wed 12:54]
+- State "DONE"       from "WIP"        [2022-06-01 Wed 12:54]
 :LOGBOOK:
 CLOCK: [2022-05-19 Thu 20:21]--[2022-05-19 Thu 20:40] =>  0:19
 CLOCK: [2022-05-19 Thu 19:50]--[2022-05-19 Thu 20:21] =>  0:31
@@ -139,19 +294,12 @@ CLOCK: [2022-05-13 Fri 12:32]--[2022-05-13 Fri 13:12] =>  0:40
 - [ ] Solution approaches
 - [ ] cover DD construction
 - [ ] type DD construction
-*** TODO Discussion: weak points
-*** TODO Summary: necessary edits for the paper
-** TODO Move instance gallery and other experiments to a separate file from darkcloud
-[2022-05-10 Tue 18:24]
-[[file:~/projects/align-BDD/darkcloud.py::M = 10]]
-** TODO Rewrite comments
-[2022-05-09 Mon 15:46]
-[[file:~/projects/align-BDD/darkcloud.py::def build_type_DD(self)]]
-** TODO Add assertion to the instance type
-[2022-05-03 Tue 14:10]
-[[file:~/projects/align-BDD/darkcloud.py]]
-
-'string' shape only.
+*** DONE Discussion: weak points
+CLOSED: [2022-06-01 Wed 12:54]
+- State "DONE"       from "TODO"       [2022-06-01 Wed 12:54]
+*** DONE Summary: necessary edits for the paper
+CLOSED: [2022-06-01 Wed 12:54]
+- State "DONE"       from "TODO"       [2022-06-01 Wed 12:54]
 ** DONE Design dark-cloud algo for relaxed cavemen graph / UFLP
 CLOSED: [2022-05-19 Thu 20:44] SCHEDULED: <2022-05-05 Thu>
 - State "DONE"       from "WIP"        [2022-05-19 Thu 20:44]
@@ -297,116 +445,10 @@ CLOCK: [2022-01-26 Wed 12:44]--[2022-01-26 Wed 13:08] =>  0:24
 CLOCK: [2022-01-26 Wed 11:47]--[2022-01-26 Wed 12:42] =>  0:55
 CLOCK: [2022-01-25 Tue 13:13]--[2022-01-25 Tue 13:25] =>  0:12
 :END:
-** Softcover: design instances with types
-:LOGBOOK:
-CLOCK: [2022-01-24 Mon 12:16]--[2022-01-24 Mon 12:40] =>  0:24
-:END:
-*** DONE Design cover DDs (Bool -> Int)
-CLOSED: [2022-01-27 Thu 15:11]
-- State "DONE"       from "TODO"       [2022-01-27 Thu 15:11]
-:LOGBOOK:
-CLOCK: [2022-01-27 Thu 14:31]--[2022-01-27 Thu 14:58] =>  0:27
-CLOCK: [2022-01-27 Thu 13:36]--[2022-01-27 Thu 14:18] =>  0:42
-CLOCK: [2022-01-26 Wed 19:46]--[2022-01-26 Wed 19:47] =>  0:01
-CLOCK: [2022-01-26 Wed 17:42]--[2022-01-26 Wed 18:11] =>  0:29
-CLOCK: [2022-01-26 Wed 17:20]--[2022-01-26 Wed 17:41] =>  0:21
-CLOCK: [2022-01-26 Wed 17:12]--[2022-01-26 Wed 17:20] =>  0:08
-CLOCK: [2022-01-26 Wed 16:21]--[2022-01-26 Wed 16:33] =>  0:12
-CLOCK: [2022-01-26 Wed 14:40]--[2022-01-26 Wed 16:21] =>  1:41
-CLOCK: [2022-01-26 Wed 14:04]--[2022-01-26 Wed 14:18] =>  0:14
-CLOCK: [2022-01-26 Wed 13:45]--[2022-01-26 Wed 13:57] =>  0:12
-CLOCK: [2022-01-26 Wed 13:08]--[2022-01-26 Wed 13:43] =>  0:35
-CLOCK: [2022-01-24 Mon 15:13]--[2022-01-24 Mon 15:32] =>  0:19
-CLOCK: [2022-01-24 Mon 13:16]--[2022-01-24 Mon 14:23] =>  1:07
-CLOCK: [2022-01-24 Mon 12:59]--[2022-01-24 Mon 13:10] =>  0:11
-CLOCK: [2022-01-24 Mon 12:55]--[2022-01-24 Mon 12:56] =>  0:01
-:END:
-Check it is correct, technically.
-*** DONE Check dia sizes scaling (with and w/o reduction) vs. no of vars in MIP
-CLOSED: [2022-01-28 Fri 17:21]
-- State "DONE"       from "TODO"       [2022-01-28 Fri 17:21]
-:LOGBOOK:
-CLOCK: [2022-01-28 Fri 15:30]--[2022-01-28 Fri 16:24] =>  0:54
-CLOCK: [2022-01-28 Fri 14:05]--[2022-01-28 Fri 14:42] =>  0:37
-CLOCK: [2022-01-28 Fri 13:59]--[2022-01-28 Fri 14:03] =>  0:04
-CLOCK: [2022-01-27 Thu 18:57]--[2022-01-27 Thu 19:17] =>  0:20
-CLOCK: [2022-01-27 Thu 15:16]--[2022-01-27 Thu 15:26] =>  0:10
-CLOCK: [2022-01-27 Thu 15:11]--[2022-01-27 Thu 15:14] =>  0:03
-:END:
-So, without reduction, I basically create an exponentially sized diagrams. This
-makes sense, if I am not smart with this ``forgetting'' nodes (after they have zero
-``degrees of freedom'').
-
-However, it is not really bright even in theoretical case of writing down a
-reduced dia as well...
-
-*** DONE Repeat the experiment for a more narrow graph type (cavemen?)
-CLOSED: [2022-01-28 Fri 20:12]
-- State "DONE"       from "TODO"       [2022-01-28 Fri 20:12]
-:LOGBOOK:
-CLOCK: [2022-01-28 Fri 19:17]--[2022-01-28 Fri 20:12] =>  0:55
-CLOCK: [2022-01-28 Fri 18:34]--[2022-01-28 Fri 18:55] =>  0:21
-CLOCK: [2022-01-28 Fri 17:21]--[2022-01-28 Fri 17:59] =>  0:38
-:END:
-
-*** DONE make improved cover-building algo
-CLOSED: [2022-03-11 Fri 13:21]
-- State "DONE"       from "TODO"       [2022-03-11 Fri 13:21]
-:LOGBOOK:
-CLOCK: [2022-02-15 Tue 15:09]--[2022-02-15 Tue 15:28] =>  0:19
-CLOCK: [2022-02-15 Tue 14:14]--[2022-02-15 Tue 15:05] =>  0:51
-CLOCK: [2022-02-15 Tue 13:20]--[2022-02-15 Tue 13:28] =>  0:08
-CLOCK: [2022-02-15 Tue 12:09]--[2022-02-15 Tue 12:17] =>  0:08
-CLOCK: [2022-02-15 Tue 10:51]--[2022-02-15 Tue 11:54] =>  1:03
-CLOCK: [2022-02-14 Mon 18:49]--[2022-02-14 Mon 18:55] =>  0:06
-CLOCK: [2022-02-01 Tue 13:36]--[2022-02-01 Tue 13:58] =>  0:22
-CLOCK: [2022-01-31 Mon 15:18]--[2022-01-31 Mon 15:29] =>  0:11
-CLOCK: [2022-01-31 Mon 14:40]--[2022-01-31 Mon 15:11] =>  0:31
-CLOCK: [2022-01-31 Mon 14:12]--[2022-01-31 Mon 14:16] =>  0:04
-CLOCK: [2022-01-31 Mon 13:16]--[2022-01-31 Mon 13:35] =>  0:19
-:END:
-*** DONE Compare runtimes w/o types: BDDs vs naive MIP
-CLOSED: [2022-03-11 Fri 13:21]
-- State "DONE"       from "TODO"       [2022-03-11 Fri 13:21]
-:LOGBOOK:
-CLOCK: [2022-02-23 Wed 15:41]--[2022-02-23 Wed 16:08] =>  0:27
-CLOCK: [2022-02-23 Wed 15:31]--[2022-02-23 Wed 15:37] =>  0:06
-:END:
-*** LATER Add types -- generate CPP instances 
-*** LATER Compare runtime: naive MIP vs CPP MIP vs Align-BDD CPP
-*** LATER Add reduction step -- check time
-** TODO Kill already merged branches
- [2020-07-11 Sat 09:49]
-
-- minor_fixes (figures, labels, etc.)
-- scal_update (major scal update)
-
-As of beginning of the day <2020-07-11> all of these are merged into =master=
-** TODO Clean-up testing code (remove unnecessary, add separate testing)
- [2021-02-19 Fri 12:47]
-** TODO add diagram generation tests :UFL:
-** TODO Revise tests for key functions
-** TODO Requires =gurobi= to run examples :doc:
- [2021-02-06 Sat 17:40]
- [[file:~/projects/align-BDD/UFL.py][file:~/projects/align-BDD/UFL.py]]
-** TODO implement =BDD.save()= for a weighted BDD
- [2021-02-22 Mon 12:29]
-** TODO Perhaps, =is_equivalent= is a bad name?
- [2021-02-22 Mon 13:48]
- [[file:~/projects/align-BDD/BDD.py]]
-
- Like, maybe rename to =test_equivalence=. And then =is_equivalent <- test_equivalence()[0]=
-** TODO rename =VarSeq.layer_var= into =vars=, I suppose...
- [2021-02-22 Mon 17:52]
-** TODO rename =?UFL= (streamlining names)
-** TODO let S NOT contain the node itself -- amended later :tUFL:
- [2021-03-22 Mon 18:34]
-** TODO figure (1) the order of types and (2) order of nodes within a type
- [2021-03-30 Tue 13:32]
-** TODO Technical description :doc:
-   - makefile
-   - pytest and testing framework
-** TODO maybe instances gallery for tUFL?
+** DONE maybe instances gallery for tUFL?
+CLOSED: [2022-06-01 Wed 12:59]
+- State "DONE"       from "TODO"       [2022-06-01 Wed 12:59]
+See [[file:darkcloud.py::def prepare_inst_gallery():][prepare_inst_gallery()]] and [[file:reports/2022-05-10_Darkcloud/instances/][instances dir]].
 
 ** DONE Introduce a proper testing framework
 CLOSED: [2022-01-19 Wed 14:16]
@@ -424,4 +466,8 @@ CLOSED: [2022-01-19 Wed 14:15]
 * Notes
   - revision notes:  [[mu4e:msgid:CO1PR01MB658375A8FEDC337330803037DE609@CO1PR01MB6583.prod.exchangelabs.com][Two ideas]] from JCS.
   - first submission corresponds to =master= commit =04a5b38=
-    
+** Discuss: caves info transfer. Is it a fair comparison?
+[2022-06-01 Wed 13:11]
+[[file:~/projects/align-BDD/jUFLP_cavemen.py::"""Generates an instance with the related metadata (info on caves).]]
+
+Perhaps it is, since we are designing a tailor-made algorithm for the problem.
