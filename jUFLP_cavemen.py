@@ -3,7 +3,7 @@ import pytest
 from copy import deepcopy
 import numpy as np
 import gurobipy as gp
-import subprocess
+import json
 
 from darkcloud import ptscloud, generate_overlaps, DDSolver, gen_caveman_inst
 from BDD import intersect
@@ -47,6 +47,58 @@ def gen_cavemen_jUFLP_inst(n=10, M=7, L=0.25, verbose=False):
     if verbose:
         print(f"S={S};\nf={f}\n;c={c}")
     return [[S, f, c, caves], [S2, f2, c2, caves2], join_map]
+
+# encoding numpy numbers
+
+# save and load instances
+class jUFLPEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, np.int64):
+            return int(obj)
+        elif isinstance(obj, dict):
+            return {int(k): int(obj[k]) for k in obj}
+
+        return json.JSONEncoder.default(self, obj)
+
+
+def save_inst(i1, i2, join_map, filename):
+    """Saves the jUFLP instance to ``.json`` file."""
+    with open(filename, "w") as fout:
+        fout.write(json.dumps({
+            'inst1':{
+                'S':i1[0],
+                'f':i1[1],
+                'c':i1[2],
+                'ptsclouds': [i1[3][j].__dict__
+                              for j in range(len(i1[3]))]},
+            'inst2':{
+                'S':i2[0],
+                'f':i2[1],
+                'c':i2[2],
+                'ptsclouds': [i2[3][j].__dict__
+                              for j in range(len(i2[3]))]},
+            'jmap':{int(j): join_map[j] for j in join_map}},
+                              cls=jUFLPEncoder))
+
+
+def load_inst(filename):
+    """Loads a jUFLP instance from ``.json`` file.
+
+    Returns:
+      [[S,f,c,ptsclouds], [S2,f2,c2,pltsclouds2], jmap]
+    """
+    with open(filename, "r") as fin:
+        json_inst = fin.read()
+
+    json_dct = json.loads(json_inst)
+    return [[json_dct[f'inst{i}']['S'],
+            json_dct[f'inst{i}']['f'],
+            json_dct[f'inst{i}']['c'],
+            [ptscloud(ptc['e1'],
+                      ptc['e2'],
+                      ptc['S']) for ptc in json_dct[f'inst{i}']['ptsclouds']]]
+            for i in [1, 2]] + [{int(j1): json_dct['jmap'][j1]
+                                 for j1 in json_dct['jmap']}]
 
 
 def show_inst(inst1, inst2, join_map, filename="./tmp/jUFLP.dot"):
@@ -356,6 +408,19 @@ def test_cm_jUFL_DDvsMIP(test_inst):
     obj1 = solve_cm_jUFLP_MIP(i1, i2, jmap)
     obj2 = solve_cm_jUFLP_DDs(i1, i2, jmap)
     assert abs(obj1 - obj2) < 0.001
+
+
+@pytest.mark.parametrize("test_inst", [gen_cavemen_jUFLP_inst(5, 5)
+                                       for _ in range(10)])
+def test_load_save(test_inst):
+    i1, i2, jmap = test_inst
+    save_inst(i1, i2, jmap, "./tmp/jUFLP-loadsave-test.json")
+
+    [inst1, inst2, jm] = load_inst("./tmp/jUFLP-loadsave-test.json")
+    obj1 = solve_cm_jUFLP_DDs(i1, i2, jmap)
+    obj2 = solve_cm_jUFLP_DDs(inst1, inst2, jm)
+
+    assert abs(obj1-obj2) < 0.001
 
 
 def compare_runtimes():
