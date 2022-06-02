@@ -38,6 +38,8 @@ Need to fine-tune the files to check (ignore =.venv=, etc.)
 :END:
 *** WIP numerical experiment: MIP vs a2A vs VS.
 :LOGBOOK:
+CLOCK: [2022-06-02 Thu 14:28]--[2022-06-02 Thu 14:47] =>  0:19
+CLOCK: [2022-06-02 Thu 13:20]--[2022-06-02 Thu 14:24] =>  1:04
 CLOCK: [2022-06-01 Wed 23:21]--[2022-06-01 Wed 23:46] =>  0:25
 :END:
 *** TODO description

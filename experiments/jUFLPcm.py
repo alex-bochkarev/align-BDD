@@ -3,6 +3,7 @@ from jUFLP_cavemen import gen_cavemen_jUFLP_inst, solve_cm_jUFLP_MIP
 from jUFLP_cavemen import solve_cm_jUFLP_DDs, save_inst
 from time import time
 
+
 def main():
     print("experiment, n, M, L, tMIP, tDD_toA, tDD_toB, tDD_VS, int_toA, int_toB, int_VS")
     M = 5
@@ -11,7 +12,7 @@ def main():
     i = 1
 
     while True:
-        for n in range(5, 15):
+        for n in range(15, 18):
             i1, i2, jm = gen_cavemen_jUFLP_inst(n, M, L)
             t0 = time()
             objMIP = solve_cm_jUFLP_MIP(i1, i2, jm)
