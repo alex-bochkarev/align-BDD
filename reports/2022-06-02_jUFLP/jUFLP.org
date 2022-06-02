@@ -1,0 +1,119 @@
+#+TITLE: Align-BDD application: on joint UFLP.
+#+OPTIONS: toc:nil
+#+EXPORT_FILE_NAME: ./export/jUFLP.pdf
+#+LATEX_HEADER: \usepackage{cleveref}
+#+LATEX_HEADER: \usepackage{subfig}
+#+LATEX_HEADER: \usepackage[letterpaper, margin=1in]{geometry}
+#+LATEX_HEADER: \usepackage{fancyhdr}
+#+LATEX_HEADER: \pagestyle{fancy}
+#+LATEX_HEADER: \usepackage{amssymb}
+#+latex_header: \usepackage[citestyle=authoryear,bibstyle=authoryear, hyperref=true,backref=true,maxcitenames=3,url=true,backend=biber,natbib=true] {biblatex}
+#+latex_header: \addbibresource{export/bibs.bib}
+#+LATEX_HEADER: \fancyhead[CO,CE]{\textbf{[Align-BDD]}}
+#+LATEX_HEADER: \fancyhead[LO,LE]{A.B.}
+#+LATEX_HEADER: \fancyhead[RO,RE]{Application: j-UFLP.}
+* Summary and questions TBD
+- weak point: CPP MIP
+- weak point: feeding more info to the DD-based methods.
+- weak point: not that much variety in graph topologies.
+- question: not equivalent to another UFLP? I guess not (consider j10 and j16).
+
+* Joint-UFLP formulation
+:PROPERTIES:
+:CUSTOM_ID: sec:jUFLP
+:END:
+We next illustrate the performance of our algorithms in the context of a
+specific application. We will consider the following variant of the
+uncapacitated facility location problem, UFLP citep:owen1998,revelle2008, which
+we call the ``joint uncapacitated facility location problem,'' j-UFLP. We have
+designed this problem specifically to highlight a possible application of our
+heuristic. Therefore, it comprises two interconnected, but comparable
+subproblems, which can be represented as BDDs.
+
+To introduce j-UFLP, let us first consider a simple UFLP formulation. This
+problem considers a set of $N$ points. At each point $i$, we can locate a
+facility at a cost given by $c_i$, covering all points in a set given by $S_i$,
+where $i \in S_i$. (Set $S_i$ might refer to customers that are sufficiently
+close to location $i$ according to some specified metric, like distance or
+travel time.) We also define a cost function $f_i:
+\mathbb{N}_0\rightarrow\mathbb{R}$, so that $f_i(a)$ would indicate a cost of
+covering point $i$ exactly $a_i$ times. Note that we do not imply any properties
+of $f_i$, such as convexity or concavity. This UFLP variant minimizes the total
+cost and can be formulated as follows:
+
+#+begin_export latex
+\begin{subequations}\label{eq:UFLP}
+\begin{align}
+  \min & \sum_{i=1}^N \Big(c_i x_i + f_i(a_i)\Big)&\\
+    \textrm{s.t. } & a_i = \sum_{j\in S_i} x_i& \textrm{ for all } i=1,\ldots, N,\\
+    & x_i\in\{0,1\} & \textrm{ for all } i=1,\ldots,N.
+\end{align}
+\end{subequations}
+#+end_export
+
+In our numerical experiments, we consider j-UFLP, which comprises two such
+problems, interconnected by having certain common variables. For a set of common
+variables  $J\subseteq\{1,\ldots,N\}$, the j-UFLP is formulated as follows:
+
+#+begin_export latex
+\begin{subequations}\label{eq:j-UFLP}
+\begin{align}\tag{j-UFLP}
+  \min & \sum_{i=1, t=1,2}^N \Big(c^t_i x^t_i + f^t_i(a^t_i)\Big)&\\
+    \textrm{s.t. } & a^t_i = \sum_{j\in S^t_i} x^t_i& \textrm{ for all } i=1,\ldots, N, t=1,2,\\
+    & x^t_i\in\{0,1\} & \textrm{ for all } i=1,\ldots,N, t=1,2,\\
+    & x^1_j = x^2_j & \textrm{ for all } j\in J.\label{eq:link}
+\end{align}
+\end{subequations}
+#+end_export
+
+Further, to make this problem hard for an MIP solver, we induce the following
+special structure for the underlying graph. We assume that each sub-problem
+graph consists of $n$ subgraphs, $M$ nodes each, and that there is at most one
+arc between every two subgraphs. Moreover, we assume $J$ to be the set of
+endpoints of such arcs between the subgraphs. An example of such instance is
+presented in Figure ref:fig:sample-jUFLP. A subgraph corresponding to the first
+subproblem is depicted with thick black lines, while the one corresponding to
+the second subproblem has thin red lines. Nodes that are common for the two
+subgraphs (corresponding to conditions eqref:eq:link) are marked with background
+color (nodes =j1=, =j6=, =j10=--=j12=, =j16=, =j19=, and =j21=). Note that
+overlaps are calculated independently: e.g., locating a facility at =j10= does
+contribute to $a_{16}^2$, but not $a_{16}^1$.
+
+#+begin_export latex
+  \begin{figure}%
+    \centering
+    \includegraphics[width=\textwidth]{./sample_jUFLP.pdf}%
+    \caption{Sample j-UFLP instance graph.}%
+    \label{fig:sample-jUFLP}%
+\end{figure}
+#+end_export
+
+A naive MIP reformulation for eqref:eq:j-UFLP implies introducing new binary
+variables $y_{i,a}^t$ indicating whether point $i$ in subproblem $t$ was covered
+at least $a$ times. Therefore, the equivalent problem is:
+
+#+begin_export latex
+\begin{subequations}\label{eq:j-UFLP-MIP}
+\begin{align}\tag{j-UFLP-MIP}
+  \min & \sum_{i=1, t=1,2}^N \Big(c^t_i x^t_i + \sum_{a=0}^{|S_i^t}q_{i,a}^t y^t_{i,a}\Big)+C&\\
+    \textrm{s.t. } & \sum_{a=1}^{|S_i|} y_{i,a}^t = \sum_{j\in S^t_i} x^t_i& \textrm{ for all } i=1,\ldots, N, t=1,2,\\
+    & y^t_{i,a} \geq y^t_{i, a+1} & \textrm{ for all }i=1, \ldots, N, t=1,2, a=0,\ldots,|S_i|,\\
+    & x^t_i\in\{0,1\} & \textrm{ for all } i=1,\ldots,N, t=1,2,\\
+    & x^1_j = x^2_j & \textrm{ for all } j\in J,\label{eq:link}
+\end{align}
+\end{subequations}
+#+end_export
+where $q_{i,a}=f_i^t(a)-f_i^t(a-1)$ and $C=\sum_{i,t} f_i^t(0)$ are constants.
+
+* Numerical performance
+
+#+begin_export latex
+  \begin{figure}%
+    \centering
+    \includegraphics[width=\textwidth]{./jUFLP.eps}%
+    \caption{Numerical performance of various heuristics for j-UFLP.}%
+    \label{fig:jUFLP-nums}%
+\end{figure}
+#+end_export
+* References
+[[printbibliography:]]

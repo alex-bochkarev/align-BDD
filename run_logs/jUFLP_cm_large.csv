@@ -1,0 +1,4 @@
+experiment, n, M, L, tMIP, tDD_toA, tDD_toB, tDD_VS, int_toA, int_toB, int_VS
+Set parameter Username
+1, 15, 5, 0.25, 6.28, 16.74, 58.68, 9.53, 122951, 173010, 462943
+2, 16, 5, 0.25, 6.16, 39.31, 48.02, 4.46, 292937, 335553, 158854
