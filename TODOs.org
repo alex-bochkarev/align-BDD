@@ -36,13 +36,26 @@ Need to fine-tune the files to check (ignore =.venv=, etc.)
 :PROPERTIES:
 :CATEGORY: a-BDD/jUFLP
 :END:
-*** WIP numerical experiment: MIP vs a2A vs VS.
+*** DONE numerical experiment: MIP vs a2A vs VS.
+CLOSED: [2022-06-02 Thu 17:45]
+- State "DONE"       from "WIP"        [2022-06-02 Thu 17:45]
 :LOGBOOK:
+CLOCK: [2022-06-02 Thu 16:36]--[2022-06-02 Thu 17:32] =>  0:56
+CLOCK: [2022-06-02 Thu 15:00]--[2022-06-02 Thu 15:53] =>  0:53
 CLOCK: [2022-06-02 Thu 14:28]--[2022-06-02 Thu 14:47] =>  0:19
 CLOCK: [2022-06-02 Thu 13:20]--[2022-06-02 Thu 14:24] =>  1:04
 CLOCK: [2022-06-01 Wed 23:21]--[2022-06-01 Wed 23:46] =>  0:25
 :END:
+*** TODO What's with CPP/MIP?
+:LOGBOOK:
+CLOCK: [2022-06-02 Thu 18:10]--[2022-06-02 Thu 18:22] =>  0:12
+CLOCK: [2022-06-02 Thu 17:57]--[2022-06-02 Thu 18:04] =>  0:07
+:END:
 *** TODO description
+:LOGBOOK:
+CLOCK: [2022-06-02 Thu 17:54]--[2022-06-02 Thu 17:57] =>  0:03
+CLOCK: [2022-06-02 Thu 17:46]--[2022-06-02 Thu 17:52] =>  0:06
+:END:
 *** TODO edit the draft
 *** DONE instance load/save
 CLOSED: [2022-06-01 Wed 22:59]
