@@ -17,7 +17,7 @@ suppressPackageStartupMessages({
 infile = "./run_logs/jUFLP_cm.csv"
 
 df = read.csv(infile, stringsAsFactors = FALSE)
-
+df = filter(df, n<15)
 ## calculate means for each instance size
 df_medians = df %>%
   group_by(n) %>%
@@ -91,7 +91,8 @@ dfn = filter(df, n %in% Ns)
 xmin = min(dfn$tDD_VS)
 xmax = quantile(dfn$tMIP, 0.95)
 
-dfn$nlabel = paste0("n = ", dfn$n)
+dfn$nlabel = factor(paste0("n = ", dfn$n),
+                    levels = c("n = 7", "n = 10", "n = 14"))
 
 p2 =
 ggplot(dfn)+

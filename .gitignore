@@ -19,3 +19,4 @@ testing/showfunc.dot.*
 .ipynb_checkpoints/
 gurobi.log
 TODOs.org_archive
+*.drawio.bkp

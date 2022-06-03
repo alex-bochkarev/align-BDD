@@ -5,7 +5,7 @@ import numpy as np
 import gurobipy as gp
 import json
 
-from darkcloud import ptscloud, generate_overlaps, DDSolver, gen_caveman_inst
+from darkcloud import ptscloud, DDSolver, gen_caveman_inst
 from BDD import intersect
 from varseq import VarSeq
 from BB_search import BBSearch
