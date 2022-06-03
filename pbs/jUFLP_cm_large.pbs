@@ -1,0 +1,17 @@
+#PBS -N jUFLP
+#PBS -l select=1:ncpus=1:mem=15gb:interconnect=any,walltime=06:00:00
+#PBS -j oe
+#PBS -M abochka@g.clemson.edu
+#PBS -m abe
+
+cd /home/abochka/BDD/align-BDD
+source .venv/bin/activate
+module add gurobi
+
+tgs -m "Starting: large jUFLP-cm-s"
+# run-command
+fname="run_logs/jUFLP_cm_15_17"
+python -m experiments.jUFLPcm | tee $fname.csv
+tgs -m "Experiment done (large jUFLP-cm instances)."
+tgs -f $fname.csv
+tgs -s happycat
