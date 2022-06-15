@@ -8,7 +8,7 @@ import numpy as np
 
 def make_label(state):
     """Helper: formats a node label according to the ``state``."""
-    return "\n".join([f"{j+1}:{state[j]}" for j in range(len(state))
+    return "\n"+"\n".join([f"{j+1}:{state[j]}" for j in range(len(state))
                       if (state[j])])
 
 
@@ -79,7 +79,7 @@ def create_cover_DD(S, f, c, node_order):
     nodes = copy(node_order)
 
     while k < N:
-        i = nodes.pop()
+        i = nodes.pop(0)
         add_costs = []  # list of points to calc costs for during the step
 
         for j in S[i-1]:
@@ -100,8 +100,10 @@ def create_cover_DD(S, f, c, node_order):
         for state in current_layer:
             # a no-arc
             node = current_layer[state]
-            next_state = tuple([state[k] * (node_value[k] > 0)
-                                for k in range(len(state))])
+            next_state = tuple([
+                (state[k] - 1 * ((k + 1) == i)) * (node_value[k] > 0)
+                for k in range(len(state))
+            ])
 
             arc_cost = calc_cost(add_costs, next_state, state, (i, -1),
                                  S, f, c)
