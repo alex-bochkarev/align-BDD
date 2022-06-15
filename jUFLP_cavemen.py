@@ -309,7 +309,8 @@ def solve_cm_jUFLP_CPPMIP(i1, i2, jmap):
     m.setParam("OutputFlag", 0)
     m.optimize()
     return m.objVal
-    
+
+
 ###
 def dump_instance(S, caves, filename="tmp/S.dot"):
     """Dumps a graph implied by S into a `.dot` file. """

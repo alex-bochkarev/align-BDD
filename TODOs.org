@@ -36,6 +36,43 @@ Need to fine-tune the files to check (ignore =.venv=, etc.)
 :PROPERTIES:
 :CATEGORY: a-BDD/jUFLP
 :END:
+*** WIP Implement the full-BDD approach for the problem.
+:LOGBOOK:
+CLOCK: [2022-06-13 Mon 14:54]--[2022-06-13 Mon 15:07] =>  0:13
+:END:
+**** TODO Design a good order to encode full-BDD j-UFLP?
+:LOGBOOK:
+CLOCK: [2022-06-13 Mon 18:27]--[2022-06-13 Mon 18:28] =>  0:01
+CLOCK: [2022-06-13 Mon 18:21]--[2022-06-13 Mon 18:22] =>  0:01
+CLOCK: [2022-06-13 Mon 18:18]--[2022-06-13 Mon 18:20] =>  0:02
+CLOCK: [2022-06-13 Mon 17:57]--[2022-06-13 Mon 17:58] =>  0:01
+CLOCK: [2022-06-13 Mon 17:17]--[2022-06-13 Mon 17:26] =>  0:09
+CLOCK: [2022-06-13 Mon 16:49]--[2022-06-13 Mon 17:11] =>  0:22
+CLOCK: [2022-06-13 Mon 16:34]--[2022-06-13 Mon 16:44] =>  0:10
+CLOCK: [2022-06-13 Mon 16:29]--[2022-06-13 Mon 16:30] =>  0:01
+CLOCK: [2022-06-13 Mon 15:53]--[2022-06-13 Mon 16:19] =>  0:26
+CLOCK: [2022-06-13 Mon 15:07]--[2022-06-13 Mon 15:45] =>  0:38
+:END:
+**** DONE Full-DD algo
+CLOSED: [2022-06-15 Wed 13:10]
+- State "DONE"       from "TODO"       [2022-06-15 Wed 13:10]
+:LOGBOOK:
+CLOCK: [2022-06-15 Wed 12:43]--[2022-06-15 Wed 13:09] =>  0:26
+CLOCK: [2022-06-15 Wed 11:57]--[2022-06-15 Wed 12:13] =>  0:16
+CLOCK: [2022-06-15 Wed 11:25]--[2022-06-15 Wed 11:44] =>  0:19
+CLOCK: [2022-06-14 Tue 15:46]--[2022-06-14 Tue 16:22] =>  0:36
+CLOCK: [2022-06-14 Tue 15:18]--[2022-06-14 Tue 15:31] =>  0:13
+CLOCK: [2022-06-14 Tue 14:21]--[2022-06-14 Tue 14:43] =>  0:22
+CLOCK: [2022-06-14 Tue 13:52]--[2022-06-14 Tue 14:05] =>  0:13
+CLOCK: [2022-06-14 Tue 13:43]--[2022-06-14 Tue 13:48] =>  0:05
+CLOCK: [2022-06-14 Tue 12:56]--[2022-06-14 Tue 13:14] =>  0:18
+CLOCK: [2022-06-14 Tue 12:41]--[2022-06-14 Tue 12:42] =>  0:01
+CLOCK: [2022-06-14 Tue 12:35]--[2022-06-14 Tue 12:40] =>  0:05
+CLOCK: [2022-06-14 Tue 10:56]--[2022-06-14 Tue 12:10] =>  1:14
+:END:
+  [[file:UFLP_fullDD.py][UFLP_fullDD]] file
+
+*** TODO Derive the sensitivity info from the SP.
 *** DONE numerical experiment: MIP vs a2A vs VS.
 CLOSED: [2022-06-02 Thu 17:45]
 - State "DONE"       from "WIP"        [2022-06-02 Thu 17:45]
@@ -45,12 +82,6 @@ CLOCK: [2022-06-02 Thu 15:00]--[2022-06-02 Thu 15:53] =>  0:53
 CLOCK: [2022-06-02 Thu 14:28]--[2022-06-02 Thu 14:47] =>  0:19
 CLOCK: [2022-06-02 Thu 13:20]--[2022-06-02 Thu 14:24] =>  1:04
 CLOCK: [2022-06-01 Wed 23:21]--[2022-06-01 Wed 23:46] =>  0:25
-:END:
-*** WIP What's with CPP/MIP?
-:LOGBOOK:
-CLOCK: [2022-06-02 Thu 19:58]--[2022-06-02 Thu 20:02] =>  0:04
-CLOCK: [2022-06-02 Thu 18:10]--[2022-06-02 Thu 18:22] =>  0:12
-CLOCK: [2022-06-02 Thu 17:57]--[2022-06-02 Thu 18:04] =>  0:07
 :END:
 *** DONE description
 CLOSED: [2022-06-04 Sat 10:14]
@@ -74,7 +105,6 @@ CLOCK: [2022-06-02 Thu 20:03]--[2022-06-02 Thu 20:06] =>  0:03
 CLOCK: [2022-06-02 Thu 17:54]--[2022-06-02 Thu 17:57] =>  0:03
 CLOCK: [2022-06-02 Thu 17:46]--[2022-06-02 Thu 17:52] =>  0:06
 :END:
-*** TODO edit the draft
 *** DONE instance load/save
 CLOSED: [2022-06-01 Wed 22:59]
 - State "DONE"       from "TODO"       [2022-06-01 Wed 22:59]
@@ -94,6 +124,14 @@ CLOCK: [2022-06-01 Wed 14:12]--[2022-06-01 Wed 14:23] =>  0:11
 CLOCK: [2022-06-01 Wed 13:55]--[2022-06-01 Wed 14:02] =>  0:07
 CLOCK: [2022-06-01 Wed 13:09]--[2022-06-01 Wed 13:52] =>  0:43
 :END:
+*** LATER What's with CPP/MIP?
+:LOGBOOK:
+CLOCK: [2022-06-02 Thu 19:58]--[2022-06-02 Thu 20:02] =>  0:04
+CLOCK: [2022-06-02 Thu 18:10]--[2022-06-02 Thu 18:22] =>  0:12
+CLOCK: [2022-06-02 Thu 17:57]--[2022-06-02 Thu 18:04] =>  0:07
+:END:
+So, it seems still faster than the VS-SP. We'd need to look into another problem
+formulation, I assume.
 ** TODO Rndcover: fix =inplace= parameter! 
 [2022-05-23 Mon 22:43]
 [[file:~/projects/align-BDD/experiments/dclouds_rndcover.py::Tpp = T.align_to(C.vars, inplace=True)]]

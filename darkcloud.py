@@ -297,7 +297,7 @@ def gen_simple_cavemen_inst1():
 
 
 class DDSolver:
-
+    """Implements a DD-based solver for the j-UFLP over 'cavemen'-instances."""
     def __init__(self, S, f, c, caves):
         self.S = S
         self.f = f

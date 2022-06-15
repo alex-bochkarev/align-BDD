@@ -252,14 +252,14 @@ class BDD(object):
             for n in layer:
                 if not n.hi is None:
                     if self.weighted:
-                        elabel = f"{self.weights[(n.id, n.hi.id, 'hi')]}"
+                        elabel = f"{self.weights[(n.id, n.hi.id, 'hi')]:.2f}"
                     else:
                         elabel = ""
                     g.edge(str(n.id), str(n.hi.id), label=elabel)
 
                 if not n.lo is None:
                     if self.weighted:
-                        elabel = f"{self.weights[(n.id, n.lo.id, 'lo')]}"
+                        elabel = f"{self.weights[(n.id, n.lo.id, 'lo')]:.2f}"
                     else:
                         elabel = ""
                     g.edge(str(n.id), str(n.lo.id), style="dashed", label=elabel)

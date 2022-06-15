@@ -20,3 +20,5 @@ testing/showfunc.dot.*
 gurobi.log
 TODOs.org_archive
 *.drawio.bkp
+*.bkp
+reports/2022-05-10_Darkcloud/submitted.pdf
