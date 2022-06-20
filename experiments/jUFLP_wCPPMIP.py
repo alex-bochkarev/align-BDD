@@ -16,7 +16,7 @@ def main():
     i = 1
 
     while True:
-        for n in range(3, 8):
+        for n in range(5, 10):
             i1, i2, jm = gen_cavemen_jUFLP_inst(n, M, L)
             # save_inst(i1, i2, jm, f"instances/jUFLP_cm/inst_wCPPMIP_{i}.json")
 

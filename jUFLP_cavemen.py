@@ -35,7 +35,10 @@ def gen_cavemen_jUFLP_inst(n=10, M=7, L=0.25, verbose=False):
     S2, f2, c2, caves2 = gen_caveman_inst(n, M, L)
 
     order = [j for j in range(1, len(S)+1)]
-    join_map = dict(zip(order, np.random.permutation(order)))
+    # join_map = dict(zip(order, np.random.permutation(order)))
+    join_map = dict()
+    for cave in caves:
+        join_map.update(dict(zip(cave.S, np.random.permutation(cave.S))))
 
     if verbose:
         print(f"S={S};\nf={f}\n;c={c}")
