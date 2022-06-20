@@ -823,14 +823,14 @@ class BDD(object):
         Args:
             dir (str): directory to place files (default: ``tmp``)
             filename (str): `.dot` filename (default: ``showfunc.dot``)
-            layerCapt (bool): whether to show layer captions (default: ``True``)
+            layerCapt (bool): whether to show layer caption (default: ``True``)
             x_prefix(str): a prefix for variable captions (default: ``x``)
             node_labels(dict): node labels to display (optional).
 
         """
         self.dump_gv(layerCapt, x_prefix, node_labels).view(filename,
-                                               directory=dir,
-                                               cleanup=True)
+                                                            directory=dir,
+                                                            cleanup=True)
 
     def align_to(self, vars_order, inplace=False):
         """Revises the BDD to a given order.

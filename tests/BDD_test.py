@@ -36,7 +36,7 @@ def test_shortest_path(test_inst):
     nl = A.shortest_path()
     if m.status == 2:
         # optimal
-        assert nl[BDD.NROOT] == m.objVal, "SP={nl[NROOT], while Gurobi gave {m.objVal}}"
+        assert abs(nl[BDD.NROOT] - m.objVal) < 0.001, "SP={nl[NROOT], while Gurobi gave {m.objVal}}"
     else:
         assert nl[BDD.NROOT] == "∞", "with Gurobi status {m.status}, root node label is {nl[NROOT]}"
 
@@ -180,6 +180,23 @@ def test_swaps_weighted(i):
         eq, msg = A.is_equivalent(B)
         assert eq, f"{i}: for swap at {pos}: {msg}"
 
+
+@pytest.mark.parametrize("i", [i for i in range(100)])
+def test_alignto(i):
+    """Tests align_to operation (random instances)."""
+    A = BDD.BDD.random(N=5, weighted=True)
+    B = copy.deepcopy(A)
+
+    B.align_to(A.vars, inplace=True)
+    eq, msg = A.is_equivalent(B)
+    assert eq, msg
+    assert A.vars == B.vars
+
+    B = copy.deepcopy(A)
+    B = B.align_to(A.vars, inplace=False)
+    eq, msg = A.is_equivalent(B)
+    assert eq, msg
+    assert A.vars == B.vars
 
 @pytest.mark.parametrize("i", [i for i in range(100)])
 def test_swaps_uweighted(i):

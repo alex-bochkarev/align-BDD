@@ -31,20 +31,11 @@ def gen_cavemen_jUFLP_inst(n=10, M=7, L=0.25, verbose=False):
       Each sub-instance is parameterized by [S,f,c,caves].
       (See :py:func:`darkcloud.gen_caveman_inst` for details.)
     """
-    success = False
-    while not success:
-        S, f, c, caves = gen_caveman_inst(n, M, L)
-        S2, f2, c2, caves2 = gen_caveman_inst(n, M, L)
+    S, f, c, caves = gen_caveman_inst(n, M, L)
+    S2, f2, c2, caves2 = gen_caveman_inst(n, M, L)
 
-        join_pts = sum([list(c.e1 + c.e2) for c in caves], [])
-        join_pts = list(np.unique([j for j in join_pts if j is not None]))
-
-        join_pts2 = sum([list(c.e1 + c.e2) for c in caves2], [])
-        join_pts2 = list(np.unique([j for j in join_pts2 if j is not None]))
-
-        success = (len(join_pts) == len(join_pts2))
-
-    join_map = dict(zip(join_pts, np.random.permutation(join_pts2)))
+    order = [j for j in range(1, len(S)+1)]
+    join_map = dict(zip(order, np.random.permutation(order)))
 
     if verbose:
         print(f"S={S};\nf={f}\n;c={c}")
@@ -179,7 +170,7 @@ def solve_cm_jUFLP_MIP(i1, i2, jmap):
     # create variables
     for j in range(1, len(S)+1):
         x[(1, j)] = m.addVar(vtype=gp.GRB.BINARY, name=f"x1_{j}",
-                            obj=c[j-1])
+                             obj=c[j-1])
 
         for a in range(1, len(S[j-1])+1):
             y[(1, j, a)] = m.addVar(vtype=gp.GRB.BINARY, name=f"y1_{j}_{a}",
@@ -314,14 +305,14 @@ def solve_cm_jUFLP_CPPMIP(i1, i2, jmap):
 
 def solve_cm_jUFLP_CPPMIP_fullDDs(i1, i2, jmap):
     """Solves a jUFLP on cavemen (full-DDs) with CPPMIP.
-    
+
     Args:
       i1, i2 (list): instances
       jmap (dict): joining dict.
 
     Notes:
       Instance is parameterized as per :py:func:`gen_caveman_inst`,
-      The diagrams are built with :py:class:`darkcloud.DDSolver`.
+      The diagrams are built with :py:func:`UFLP_fullDD.create_cover_DD`.
     Returns:
         objective (float)
     """
@@ -333,6 +324,7 @@ def solve_cm_jUFLP_CPPMIP_fullDDs(i1, i2, jmap):
 
     B1.make_reduced()
     B2.make_reduced()
+
     B1.rename_vars(jmap)
 
     m, c, v, x = add_BDD_to_MIP(B1, prefix="B1_")
