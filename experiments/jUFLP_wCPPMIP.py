@@ -3,11 +3,9 @@
 A version with CPP MIP.
 """
 from jUFLP_cavemen import gen_cavemen_jUFLP_inst, solve_cm_jUFLP_MIP
-from jUFLP_cavemen import solve_cm_jUFLP_CPPMIP, solve_cm_jUFLP_DDs
-from jUFLP_cavemen import save_inst
-from UFL import add_BDD_to_MIP
+from jUFLP_cavemen import solve_cm_jUFLP_CPPMIP_fullDDs
+from jUFLP_cavemen import save_inst, solve_cm_jUFLP_fullDDs
 from time import time
-import gurobipy as gp
 
 
 def main():
@@ -20,28 +18,34 @@ def main():
     while True:
         for n in range(5, 16):
             i1, i2, jm = gen_cavemen_jUFLP_inst(n, M, L)
-            save_inst(i1, i2, jm, f"instances/jUFLP_cm/inst_wCPPMIP_{i}.json")
+            # save_inst(i1, i2, jm, f"instances/jUFLP_cm/inst_wCPPMIP_{i}.json")
 
+            print("start")
             t0 = time()
             objMIP = solve_cm_jUFLP_MIP(i1, i2, jm)
             tMIP = time() - t0
+            print("MIP ✅")
 
             # solve with CPP MIP
             t0 = time()
-            objMIP_CPP = solve_cm_jUFLP_CPPMIP(i1, i2, jm)
+            objMIP_CPP = solve_cm_jUFLP_CPPMIP_fullDDs(i1, i2, jm)
             tMIP_CPP = time() - t0
+            print("CPP MIP ✅")
 
             t0 = time()
-            objDD, int_toA = solve_cm_jUFLP_DDs(i1, i2, jm, "toA", True)
+            objDD, int_toA = solve_cm_jUFLP_fullDDs(i1, i2, jm, "toA", True)
             tDD_toA = time() - t0
+            print("Full DDs toA ✅")
 
             t0 = time()
-            objDD2, int_toB = solve_cm_jUFLP_DDs(i1, i2, jm, "toB", True)
+            objDD2, int_toB = solve_cm_jUFLP_fullDDs(i1, i2, jm, "toB", True)
             tDD_toB = time() - t0
 
+            print("Full DDs toB ✅")
             t0 = time()
-            objDD3, int_VS = solve_cm_jUFLP_DDs(i1, i2, jm, "VS", True)
+            objDD3, int_VS = solve_cm_jUFLP_fullDDs(i1, i2, jm, "VS", True)
             tDD_VS = time() - t0
+            print("Full DDs VS ✅")
 
             assert abs(objMIP - objDD)< 0.01
             assert abs(objMIP - objDD2)< 0.01

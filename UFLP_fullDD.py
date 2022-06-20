@@ -4,7 +4,7 @@ from darkcloud import solve_with_MIP, gen_caveman_inst
 from copy import copy
 import pytest
 import numpy as np
-
+from UFLPOrder import UFLP_greedy_order
 
 def make_label(state):
     """Helper: formats a node label according to the ``state``."""
@@ -138,14 +138,16 @@ def create_cover_DD(S, f, c, node_order):
 
 # Testing code ######################################################
 @pytest.mark.parametrize("inst", [
-    gen_caveman_inst(n=np.random.randint(10, 20),
-                     M=np.random.randint(5, 10),
+    gen_caveman_inst(n=np.random.randint(5, 8),
+                     M=np.random.randint(5, 8),
                      L=max(0.1 + np.random.rand(), 0.9)) for _ in range(100)])
 def test_full_DD(inst):
     """Tests the full-DD-based approach against a MiP."""
     S, f, c, _ = inst
     _, objMIP, _, _ = solve_with_MIP(S, f, c)
-    B, nl = create_cover_DD(S, f, c, [j for j in range(1, len(S)+1)])
+    order = UFLP_greedy_order(S)
+    print(f"order = {order}")
+    B, nl = create_cover_DD(S, f, c, order)
     objDD = B.shortest_path()[0]
     assert abs(objMIP - objDD) < 0.01
 
@@ -196,4 +198,4 @@ def test_fullDD_simple():
 
     c = [1, 2, 3, 4, 5, 6]
 
-    return create_cover_DD(S, f, c, [j for j in range(1, len(S)+1)])
+    return create_cover_DD(S, f, c, UFLP_greedy_order(S))

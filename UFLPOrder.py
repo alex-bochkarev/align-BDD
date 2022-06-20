@@ -77,7 +77,7 @@ class N2RList:
         return len(self.pq)
 
 
-def UFLP_greedy_order(S, f, c):
+def UFLP_greedy_order(S):
     """Finds a good order for BDD representing UFLP.
 
     Args:
@@ -120,4 +120,32 @@ def test_greedy_order_simple():
                                                     [1, 2, 3, 4, 5, 6, 7],
                                                     [3, 5, 6, 7]]
 
-    assert UFLP_greedy_order(S, None, None) == [3, 5, 6, 7, 2, 4, 1]
+    assert UFLP_greedy_order(S) == [3, 5, 6, 7, 2, 4, 1]
+
+
+def test_greedy_order_toy2():
+    """Another toy-instance test."""
+    S = [[1, 2], [1,2,3,4], [2,3], [2,4,5,6],
+         [4,5,10], [4,6,7], [6,7,8], [7,8,9,10],
+         [8,9], [5,8,10], [11]]
+
+    t = N2RList(S)
+    assert t.S == S
+    assert [list(np.sort(row)) for row in t.N2] == [[1,2,3,4],
+                                                    [1,2,3,4,5,6],
+                                                    [1,2,3,4],
+                                                    [1,2,3,4,5,6,7,10],
+                                                    [2,4,5,6,8,10],
+                                                    [2,4,5,6,7,8],
+                                                    [4,6,7,8,9,10],
+                                                    [5,6,7,8,9,10],
+                                                    [7,8,9,10],
+                                                    [4,5,7,8,9,10],
+                                                    [11]]
+    order = UFLP_greedy_order(S)
+    assert [list(np.sort(order[a[0]:a[1]])) for a in [(0,1), (1, 5),
+                                                       (5, 7), (7,9),
+                                                       (9,10), (10,11)]] == [
+                                                           [11], [1,2,3,4],
+                                                           [5,6], [7,10], [8],
+                                                           [9]]

@@ -36,12 +36,18 @@ Need to fine-tune the files to check (ignore =.venv=, etc.)
 :PROPERTIES:
 :CATEGORY: a-BDD/jUFLP
 :END:
-*** WIP Implement the full-BDD approach for the problem.
+*** DONE Implement the full-BDD approach for the problem.
+CLOSED: [2022-06-20 Mon 12:57]
+- State "DONE"       from "WIP"        [2022-06-20 Mon 12:57]
 :LOGBOOK:
 CLOCK: [2022-06-13 Mon 14:54]--[2022-06-13 Mon 15:07] =>  0:13
 :END:
-**** WIP Design a good order to encode full-BDD j-UFLP?
+**** DONE Design a good order to encode full-BDD j-UFLP?
+CLOSED: [2022-06-20 Mon 12:57]
+- State "DONE"       from "WIP"        [2022-06-20 Mon 12:57]
 :LOGBOOK:
+CLOCK: [2022-06-19 Sun 15:00]--[2022-06-19 Sun 15:42] =>  0:42
+CLOCK: [2022-06-19 Sun 14:49]--[2022-06-19 Sun 14:56] =>  0:07
 CLOCK: [2022-06-19 Sun 01:00]--[2022-06-19 Sun 01:07] =>  0:07
 CLOCK: [2022-06-18 Sat 23:20]--[2022-06-19 Sun 00:54] =>  1:34
 CLOCK: [2022-06-18 Sat 14:45]--[2022-06-18 Sat 14:47] =>  0:02
@@ -85,6 +91,7 @@ CLOCK: [2022-06-14 Tue 12:35]--[2022-06-14 Tue 12:40] =>  0:05
 CLOCK: [2022-06-14 Tue 10:56]--[2022-06-14 Tue 12:10] =>  1:14
 :END:
   [[file:UFLP_fullDD.py][UFLP_fullDD]] file
+*** Figure a good instance type?
 *** TODO Derive the sensitivity info from the SP.
 *** DONE numerical experiment: MIP vs a2A vs VS.
 CLOSED: [2022-06-02 Thu 17:45]

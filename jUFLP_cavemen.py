@@ -4,14 +4,15 @@ from copy import deepcopy
 import numpy as np
 import gurobipy as gp
 import json
+from time import time
 
 from darkcloud import ptscloud, DDSolver, gen_caveman_inst
 from BDD import intersect
 from varseq import VarSeq
 from BB_search import BBSearch
 from UFL import add_BDD_to_MIP
-
-from time import time
+from UFLP_fullDD import create_cover_DD
+from UFLPOrder import UFLP_greedy_order
 
 
 def gen_cavemen_jUFLP_inst(n=10, M=7, L=0.25, verbose=False):
@@ -309,6 +310,90 @@ def solve_cm_jUFLP_CPPMIP(i1, i2, jmap):
     m.setParam("OutputFlag", 0)
     m.optimize()
     return m.objVal
+
+
+def solve_cm_jUFLP_CPPMIP_fullDDs(i1, i2, jmap):
+    """Solves a jUFLP on cavemen (full-DDs) with CPPMIP.
+    
+    Args:
+      i1, i2 (list): instances
+      jmap (dict): joining dict.
+
+    Notes:
+      Instance is parameterized as per :py:func:`gen_caveman_inst`,
+      The diagrams are built with :py:class:`darkcloud.DDSolver`.
+    Returns:
+        objective (float)
+    """
+    S, f, c, caves = i1
+    S2, f2, c2, caves2 = i2
+
+    B1, _ = create_cover_DD(S, f, c, UFLP_greedy_order(S))
+    B2, _ = create_cover_DD(S2, f2, c2, UFLP_greedy_order(S2))
+
+    B1.make_reduced()
+    B2.make_reduced()
+    B1.rename_vars(jmap)
+
+    m, c, v, x = add_BDD_to_MIP(B1, prefix="B1_")
+    m, c, v, x = add_BDD_to_MIP(B2, model=m, x=x, prefix="B2_")
+    m.update()
+    m.setParam("OutputFlag", 0)
+    m.optimize()
+    return m.objVal
+
+
+def solve_cm_jUFLP_fullDDs(i1, i2, jmap, intmode,
+                           ret_int=False):
+    """Solves the jUFLP cavemen instance with DDs.
+
+    Args:
+      i1, i2 (list): instances
+
+    Notes:
+      Instance is parameterized as per :py:func:`gen_caveman_inst`.
+    """
+    S, f, c, caves = i1
+    S2, f2, c2, caves2 = i2
+
+    o1 = UFLP_greedy_order(S)
+    o2 = UFLP_greedy_order(S2)
+
+    B1, _ = create_cover_DD(S, f, c, o1)
+    B2, _ = create_cover_DD(S2, f2, c2, o2)
+
+    B1.make_reduced()
+    B2.make_reduced()
+
+    B1.rename_vars(jmap)
+
+    if intmode == "toA":
+        target = B1.vars
+    elif intmode == "toB":
+        target = B2.vars
+    elif intmode == 'VS':
+        vs1 = VarSeq(B1.vars, [len(L) for L in B1.layers[:-1]])
+        vs2 = VarSeq(B2.vars, [len(L) for L in B2.layers[:-1]])
+
+        assert set(vs1.layer_var) == set(
+            vs2.layer_var), f"1:{vs1.layer_var}, 2:{vs2.layer_var}"
+
+        b = BBSearch(vs1, vs2)
+        status = b.search()
+        assert status == "optimal" or status == "timeout"
+        target = b.Ap_cand.layer_var
+    else:
+        print(f"Wrong mode: '{intmode}'. Expected: 'toA', 'toB', or 'VS'.")
+
+    B1.align_to(target, inplace=True)
+    B2.align_to(target, inplace=True)
+
+    int_DD = intersect(B1, B2)
+    sp = int_DD.shortest_path()
+    if ret_int:
+        return sp[0], int_DD.size()
+    else:
+        return sp[0]
 
 
 ###
