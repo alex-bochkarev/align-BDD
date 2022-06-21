@@ -1,4 +1,4 @@
-% Created 2022-06-21 Tue 23:00
+% Created 2022-06-22 Wed 00:02
 % Intended LaTeX compiler: pdflatex
 \documentclass[11pt]{article}
 \usepackage[utf8]{inputenc}
@@ -42,36 +42,30 @@
 
 \maketitle
 
-\section{Summary}
-\label{sec:orgc3a554e}
+\section{TBD: Summary}
+\label{sec:orgcf53b13}
 \marginnote{
 \textbf{Context:} We have been constructing BDDs for the CPP using auxiliary, smaller MIPs. It is faster
-than a naive MIP, but seems to allow very limited sensitivity analsysis. Moreover, it turned out
+than a naive MIP, but seems to allow very limited sensitivity analsysis. Also, it turned out
 it is quite often slower than CPP MIP. Therefore, we decided to revert to full BDDs (where one layer
 = one decision variable, $x_i$) that would not require solving any auxiliary MIPs. This required a better way
 to construct BDDs for UFLP, so I think I have found one.}[-6ex]
 In this note I discuss a new way to create BDDs for the uncapacitated facility
-location poroblem (UFLP) that yields more compact diagrams, and another
-numerical experiment with joint-UFLP (j-UFLP) comparing the three approaches:
-\begin{itemize}
-\item a naive MIP,
-\item a CPP MIP,
-\item a shortest-path CPP.
-\end{itemize}
+location poroblem (UFLP) that yields more compact diagrams. Moreover, it sort of
+gives understanding where does the BDD size for UFLPs come from. I would propose
+to use this as a starting point to design a special class of instances.
 
-The results are perhaps more promising than the ones we had before, but I would
-  like to discuss and invent yet another special class of j-UFLP instances that
-  would allow to highlight the numerical benefits of the computational pipeline
-  we propose. Let us see if we can achieve this using this new understanding of
-  how the diagrams are actually built for UFLP.
+I tried some numerical experiments with the type of instances we had (a brief
+  note on that in the very end), but I think we could at least try to do better
+  than that. 
 
 \section{Encoding UFLP with BDDs}
-\label{sec:org0eb0cfa}
+\label{sec:org1ef59f4}
 \subsection{Creating a BDD for a given order of variables}
-\label{sec:org8e50c41}
-Let us start with a BDD construction for a single UFLP instance, which is
+\label{sec:orge69b2ab}
+Consider a single UFLP instance, which is
 equivalent to the following MIP: \marginnote{This is the same
-formulation as before, for a single UFLP.}
+formulation as before, for a single UFLP.}[3em]
 \begin{subequations}\label{eq:UFLP}
 \begin{align}
   \min & \sum_{i=1}^N \Big(c_i x_i + f_i(a_i)\Big)&\\
@@ -82,17 +76,18 @@ formulation as before, for a single UFLP.}
 where \(S_i\) is a list of points adjacent to \textcircled{$i$} (including itself,
 by assumption). We seek to build a BDD where every layer would represent a
 single facility location decision, \(x_i\). Technically, each node of the BDD will
-be associated with a \emph{state} \(\sigma = (s_1, \ldots, s_N)\), where
-\(s_i\in\{1,0,*\}\) represents whether a facility has been located (\(s_i=1\)) at
-\textcircled{$i$} or not (\(s_i=0\)). The third value, \(s_i=*\), indicates that the
-decision on point \textcircled{$i$} does not affect costs, and hence, does not
-matter at this moment of the BDD construction, or simply not yet known.
-\marginnote{We do not impose any hard constraints, so, nothing can
-affect \textit{feasibility}, only costs are relevant.}[-2em] Each node state
-is unique within the respective layer. As we incorporate more decisions and the
-corresponding costs to the diagram, some previous decisions become irrelevant
-and the layer width can both increase or decrease. Let us try to find a good
-order of decisions to keep the BDD size small.
+be associated with a \emph{state} \(\sigma = (\sigma_1, \ldots, \sigma_N)\), where
+\(\sigma_i\in\{1,0,*\}\) represents whether a facility has been located
+(\(\sigma_i=1\)) at \textcircled{$i$} or not (\(\sigma_i=0\)). The third value,
+\(\sigma_i=*\), indicates that the decision on point \textcircled{$i$} does not
+affect costs, and hence, does not matter at this moment of the BDD construction,
+or simply not yet known. \marginnote{We do not impose any hard
+constraints, so, nothing can affect \textit{feasibility}, only costs are
+relevant.}[-2em] Each node state is unique within the respective layer. As we
+incorporate more decisions and the corresponding costs to the diagram, some
+previous decisions become irrelevant and the layer width can both increase or
+decrease. Let us try to find a good order of decisions to keep the BDD size
+small.
 
 There are two key observations relevant to the BDD construction. First, we can
 \textbf{incorporate costs} associated with point \(i\), \(c_i x_i + f_i(a_i)\), as soon as
@@ -100,7 +95,7 @@ we incorporate all decisions \(x_j\in S_i\). For the situation depicted in Figur
 \ref{fig:Ns}, we can calculate costs associated with \textcircled{$i$} only when
 we incorporate all decisions regarding the gray points and \textcircled{$i$}
 itself. After that we can derive \(x_i\) and \(a_i\) (to compute \(f_i(a_i)\) from
-each BDD node state as discussed above. However, incorporating all points from
+each BDD node state. However, incorporating all points from
 \(S_i\) is not enough to discard the decision regarding point \textcircled{$i$}
 (marking it \(*\) in all further node states). For example, the cost associated
 with point \textcircled{$j$} in Figure \ref{fig:Ns} depends on the decisions
@@ -111,10 +106,10 @@ the figure (assuming no other points are present). This is the second key
 observation regarding the BDD construction:
 
 Any point \textcircled{$i$} can be marked \textbf{``irrelevant''} in the node state
-(\(s_i\) set to \(*\)) as soon as we have incorporated the decisions regarding all
+(\(\sigma_i\) set to \(*\)) as soon as we have incorporated the decisions regarding all
 points \(j\in S^*_i = \{j:~d(i,j)\leq 2\}\) into the diagram.
 
-These two observations both yield an algorithm to construct the diagram given an
+These two observations yield an algorithm to construct the diagram given an
 order of points to incorporate, and suggest a way to find a good order of
 decisions. Let us start with the former.
 
@@ -128,9 +123,9 @@ time we incorporate new point \textcircled{$i$} into the diagram, we decrement
 \(Q_j\) for all points from its neighborhood \(S_i\). After this step we can
 calculate costs associated with all points \(j\) such that \(Q_j=0\). Further, each
 time we calculate cost for some point \(j\) we can decrement \(V_k\) for all points
-\(k\) from its neighborhood \(S_i\). Every time node value for some node \(V_k\) drops
-to zero, we mark it as ``irrelevant'' by setting the corresponding state marker
-to \(*\).
+\(k\) from its neighborhood \(S_j\). Every time some node value \(V_k\) drops to zero,
+we mark this node, \textcircled{$k$}, as irrelevant by setting the
+corresponding state marker to \(*\).
 
 \begin{algorithm}
 \scriptsize
@@ -182,7 +177,7 @@ to \(*\).
     \caption{Several points of the original graph.}\label{fig:Ns}%
 \end{figure}
 
-I think we can claim that given the order, this algorithm gives us the smallest
+\hl{I think} We can claim that given the order, this algorithm gives us the smallest
 possible diagram:
 
 \begin{proposition}
@@ -194,16 +189,27 @@ Like, whatever I do, I'll have zero costs. That would not capture the
 graph structure and would seriously restrict my sensitivity analsysis.}[-4em]
 \label{prop:bestDD}
 \end{proposition}
+
+\hl{I am not providing a proof now, before we are sure we will need it.
+But I think the key idea would be that the algorithm gives a lower bound on the
+number of nodes. This is because we need to differentiate at least between the
+states at each BDD layer that we assign to different nodes in this algorithm.
+Otherwise there would be two states associated to the same BDD node, and we
+could construct a situation when the cost would be wrog.}
+
 \subsection{Finding a good order of variables.}
-\label{sec:orgd1ea1a1}
+\label{sec:org75483d8}
 The procedure we have just introduced provides some insight into the size of the
-resulting diagram. Assuming the size (width) of the current, $k$-th
+resulting diagram. Assume the size (width) of the current, $k$-th
 layer is \(W_k\). Then, width of the next layer will be:
-\[ W_{k+1} = W_k \times 2^{1 - F_k} = 2^{k - \sum_{j=1}^k F_j, \]
+\[ W_{k+1} = W_k \times 2^{1 - F_k} = 2^{k - \sum_{j=1}^k F_j}, \]
 where \(F_j\) is the number of points marked irrelevant after step \(j\) of
 Algorithm \ref{alg:UFLPDD}. Therefore, the logarithm of width will look like the
-one presented in Figure \ref{fig:LW}. The top (red) line represents steps \(y=k\),
-the bottom (blue) one represents cumulative number of nodes marked irrelevant.
+one presented in Figure \ref{fig:LW}. The top (red) line represents step numbers
+\(k\), the bottom (blue) one represents cumulative number of nodes marked
+irrelevant. Both lines start at \((0,0)\) and end at \((N, N)\), and certainly
+\(\sum_{j=1}^k F_j \leq k\), because at each step only one point is added, and
+hence no more than \(k\) points can be marked irrelevant after \(k\) steps.
 
 \begin{figure}[h!]
 \centering
@@ -215,6 +221,7 @@ the bottom (blue) one represents cumulative number of nodes marked irrelevant.
   \draw (6.5,6.1) node[anchor=south]{\color{red} \LARGE $k$};
   \draw[blue, very thick, <->] (8.2,4) -- (8.2, 7);
   \draw (8.25, 5) node[anchor=north west] {\color{blue} \LARGE $F_8$};
+  \draw[dashed] (8, 10) -- (8, -0.1) node[anchor=north] {$k=8$};
   \draw (10, 7) node[anchor=south west] {\color{blue} \LARGE $\sum_{j=2}^{k-1}F_j$};
   \draw[very thick, blue] (0,0) -- (4,0) -- (4,1) -- (6,1) -- (6,2) -- (7,2) -- (7, 4) -- (8,4) -- (8,7) -- (10,7) -- (10,10);
   \draw[dashed] (4, 10) -- (4, -0.1) node[anchor=north] {$k=4$};
@@ -224,22 +231,23 @@ the bottom (blue) one represents cumulative number of nodes marked irrelevant.
 \caption{An illustration for the layer width.}\label{fig:LW}
 \end{figure}
 
-This representation suggests a simple greedy algorithm, where at each
-step we would try to complete the smallest set \(S^*_j\) (given the already taken
-decisions). We illustrate it with Example \ref{ex:greedy}.
+This representation suggests a simple greedy algorithm, where we would be trying
+to mark the next node irrelevant as fast as possible. This means we would always
+add points from a smallest \(S^*_j\setminus X\), where \(X\) is the set of points
+already added to the BDD. We illustrate it with Example \ref{ex:greedy}.
 
 \begin{example}\label{ex:greedy}
 Consider a graph depicted in Figure \ref{fig:ex-greedy}. We summarize the steps we
-take in Table \ref{tab:greedy}. Rows represents distance-two-neighborhoods of
+take in Table \ref{tab:greedy}. Rows represent distance-two-neighborhoods of
 respective points. When we incorporate a point (add it to the BDD), we remove it
 from further consideration by crossing it out from all the rows of the third
 column (\(S^*_i\)) of the table. We keep track of the number of points left in
 each subset in the right-most five columns of the table. \marginnote{For
 example, when we incorporate points 1,2,3, and 4 into the BDD, we cross them out
 from all the rows of that column and update the sizes of the subsets that are
-left. For example, for subset \textcircled{3} (row 3) we had {1,2,3,4,5,6}.
-After crossing out {1,2,3,4} we are left with {5,6}, which gives size 2 in
-column $k=5$ (after step five).}[-3em]. The algorithm runs as follows:
+left. For subset \textcircled{3} (row 3) we had {1,2,3,4,5,6}. After crossing
+out {1,2,3,4} we are left with {5,6}, which gives size 2 in column $k=5$ (after
+step five). And so on for other rows.}[-3em]. The algorithm runs as follows:
 \begin{itemize}
 \item The smallest \(S^*_i\) corresponds to point 11 (with the single element, 11).
 Therefore, we add point 11 and mark it irrelevant immediately.
@@ -254,11 +262,11 @@ can be marked irrelevant as well (points 1,2,3, and 4 are already added).
 \item The next candidate subset corresponds to a smallest number in column \(k=8\).
 This would be the ones corresponding to \textcircled{4}, \textcircled{5}, or
 \textcircled{6}. The first one is \textcircled{4}, \marginnote{We always
-  pick the first subset, as we keep the them in a min-heap, keyed by the current
-  size and breaking ties with the subset number.}[-5em] so we proceed with incorporating
+  pick the first subset, as we keep them in a min-heap, keyed by the current
+  size and breaking ties with the subset number.}[-4em] so we proceed with incorporating
 points 7 and 10 into the diagram and marking \textcircled{4} as irrelevant.
 \item The next candidates correspond to smallest numbers in column \(k=11\), which are
-rows 5 or 6. Either way incorporate \textcircled{8} and mark both 5 and 6 as
+rows 5 or 6. Either way we incorporate \textcircled{8} and mark both 5 and 6 as
 irrelevant. Updated residual length-2 neighborhoods are presented in column
 \(k=12\).
 \item Finally, we add the last point, \textcircled{9} and mark 7, 8, 9, and 10 as
@@ -292,7 +300,7 @@ diagram (similar to Figure \ref{fig:LW}) is presented in Figure \ref{fig:LW-ex}.
   \draw (9.5,-0.25) node[anchor=north] {8};
   \draw (10.5,-0.25) node[anchor=north] {9};
   \draw[very thick, ->] (-1,-0.6) -- (-0.1, -0.6);
-  \draw (-1,-0.6) node[anchor=east] {points added:}
+  \draw (-1,-0.6) node[anchor=east] {points added:};
 \end{tikzpicture}
 \caption{Layer width diagram for the proposed solution.}\label{fig:LW-ex}
 \end{figure}
@@ -327,18 +335,30 @@ diagram (similar to Figure \ref{fig:LW}) is presented in Figure \ref{fig:LW-ex}.
 \end{example}
 
 In practice, the presented algorithm provides relatively compact BDD sizes.
-\marginnote{In fact, I am almost sure the algorihtm is optimal. Proof sketch: use
+\hl{TBD:} In fact, I am almost sure the algorihtm is optimal. Proof sketch: use
 Proposition \ref{prop:bestDD} to construct a better order. Note that an order
 is a sequence of subsets corresponding to distance-2-neighborhoods. Pick the first
 pair of adjacent subsets in the solution such that a greedy algorithm would invert their order,
 and swap them. I think that looking at a picture similar to Figures \ref{fig:LW-ex} one can show
 that such swap would never make the resulting BDD size worse. Hence, ``fixing'' all such
-discrepancies we arrive at a solution that can be obtained with the greedy algorithm.}[-15em]
-\section{Creating a j-UFLP instance.}
-\label{sec:org0a6dbae}
+discrepancies we arrive at a solution that can be obtained with the greedy algorithm. \hl{end of TBD}
 
-\section{A numerical experiment}
-\label{sec:orgaf624d5}
+\section{TBD: A numerical experiment}
+\label{sec:org8aafe77}
+I was able to generate a class of instances where the full-DD
+approach is \emph{somewhat} comparable to the naive MIP and even CPP MIP. In particular,
+out of 45 random instances, I had 18 where full-DD was faster than the naive MIP,
+and 24 -- where full-DD was faster than CPP MIP.
+
+This is the 'caveman' type of j-UFLP instances, with \(n=2\) clusters, \(M=11\)
+points within each one, with sparsity parameter \(L=0.35\). I generate two such
+UFLP instances and add linking constraints between them (so that all location
+decisions in one instance affect the decisions in the other one).
+
+But I have a feeling that this result is somewhat fragile and very much
+dependent on instance parameters. Do you think we could try to design a specific
+instance class, given our understanding of the algorithm, where our pipeline
+would be especially beneficial?..
 
 \printbibliography
 \end{document}
