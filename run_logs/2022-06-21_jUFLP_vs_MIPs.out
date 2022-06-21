@@ -1,0 +1,230 @@
+experiment, n, M, L, N, A, tMIP, tMIP_CPP, tDD_VS, int_VS
+---
+Set parameter TokenServer to value "license8.clemson.edu"
+✅ MIP in 21.05 sec
+✅ CPP MIP in 32.39 sec
+✅ Full DDs VS in 20.14 sec
+1, 2, 11, 0.35, 44, 146.0, 21.05, 32.39, 20.14, 7335
+---
+✅ MIP in 34.71 sec
+✅ CPP MIP in 43.29 sec
+✅ Full DDs VS in 17.73 sec
+2, 2, 11, 0.35, 44, 146.0, 34.71, 43.29, 17.73, 4599
+---
+✅ MIP in 20.82 sec
+✅ CPP MIP in 39.24 sec
+✅ Full DDs VS in 782.80 sec
+3, 2, 11, 0.35, 44, 146.0, 20.82, 39.24, 782.80, 22541
+---
+✅ MIP in 27.27 sec
+✅ CPP MIP in 42.52 sec
+✅ Full DDs VS in 1047.02 sec
+4, 2, 11, 0.35, 44, 146.0, 27.27, 42.52, 1047.02, 34863
+---
+✅ MIP in 17.52 sec
+✅ CPP MIP in 34.86 sec
+✅ Full DDs VS in 19.20 sec
+5, 2, 11, 0.35, 44, 146.0, 17.52, 34.86, 19.20, 8973
+---
+✅ MIP in 28.95 sec
+✅ CPP MIP in 31.65 sec
+✅ Full DDs VS in 17.16 sec
+6, 2, 11, 0.35, 44, 146.0, 28.95, 31.65, 17.16, 6807
+---
+✅ MIP in 19.92 sec
+✅ CPP MIP in 31.35 sec
+✅ Full DDs VS in 17.19 sec
+7, 2, 11, 0.35, 44, 146.0, 19.92, 31.35, 17.19, 4967
+---
+✅ MIP in 24.99 sec
+✅ CPP MIP in 32.92 sec
+✅ Full DDs VS in 904.14 sec
+8, 2, 11, 0.35, 44, 146.0, 24.99, 32.92, 904.14, 22609
+---
+✅ MIP in 19.77 sec
+✅ CPP MIP in 35.16 sec
+✅ Full DDs VS in 17.97 sec
+9, 2, 11, 0.35, 44, 146.0, 19.77, 35.16, 17.97, 5799
+---
+✅ MIP in 26.61 sec
+✅ CPP MIP in 47.78 sec
+✅ Full DDs VS in 965.47 sec
+10, 2, 11, 0.35, 44, 146.0, 26.61, 47.78, 965.47, 11816
+---
+✅ MIP in 32.94 sec
+✅ CPP MIP in 30.92 sec
+✅ Full DDs VS in 17.25 sec
+11, 2, 11, 0.35, 44, 146.0, 32.94, 30.92, 17.25, 5219
+---
+✅ MIP in 40.29 sec
+✅ CPP MIP in 38.59 sec
+✅ Full DDs VS in 16.00 sec
+12, 2, 11, 0.35, 44, 146.0, 40.29, 38.59, 16.00, 5783
+---
+✅ MIP in 25.55 sec
+✅ CPP MIP in 32.93 sec
+✅ Full DDs VS in 998.12 sec
+13, 2, 11, 0.35, 44, 146.0, 25.55, 32.93, 998.12, 38935
+---
+✅ MIP in 52.75 sec
+✅ CPP MIP in 64.30 sec
+✅ Full DDs VS in 874.38 sec
+14, 2, 11, 0.35, 44, 146.0, 52.75, 64.30, 874.38, 26686
+---
+✅ MIP in 29.44 sec
+✅ CPP MIP in 26.97 sec
+✅ Full DDs VS in 834.08 sec
+15, 2, 11, 0.35, 44, 146.0, 29.44, 26.97, 834.08, 66414
+---
+✅ MIP in 17.33 sec
+✅ CPP MIP in 33.64 sec
+✅ Full DDs VS in 16.75 sec
+16, 2, 11, 0.35, 44, 146.0, 17.33, 33.64, 16.75, 4807
+---
+✅ MIP in 13.66 sec
+✅ CPP MIP in 21.84 sec
+✅ Full DDs VS in 15.84 sec
+17, 2, 11, 0.35, 44, 146.0, 13.66, 21.84, 15.84, 5759
+---
+✅ MIP in 16.34 sec
+✅ CPP MIP in 20.17 sec
+✅ Full DDs VS in 18.61 sec
+18, 2, 11, 0.35, 44, 146.0, 16.34, 20.17, 18.61, 6779
+---
+✅ MIP in 25.83 sec
+✅ CPP MIP in 47.68 sec
+✅ Full DDs VS in 918.15 sec
+19, 2, 11, 0.35, 44, 146.0, 25.83, 47.68, 918.15, 57378
+---
+✅ MIP in 26.03 sec
+✅ CPP MIP in 32.26 sec
+✅ Full DDs VS in 1046.35 sec
+20, 2, 11, 0.35, 44, 146.0, 26.03, 32.26, 1046.35, 462590
+---
+✅ MIP in 30.32 sec
+✅ CPP MIP in 26.39 sec
+✅ Full DDs VS in 15.86 sec
+21, 2, 11, 0.35, 44, 146.0, 30.32, 26.39, 15.86, 5367
+---
+✅ MIP in 25.39 sec
+✅ CPP MIP in 29.89 sec
+✅ Full DDs VS in 15.90 sec
+22, 2, 11, 0.35, 44, 146.0, 25.39, 29.89, 15.90, 5519
+---
+✅ MIP in 11.24 sec
+✅ CPP MIP in 14.33 sec
+✅ Full DDs VS in 18.04 sec
+23, 2, 11, 0.35, 44, 146.0, 11.24, 14.33, 18.04, 5303
+---
+✅ MIP in 15.93 sec
+✅ CPP MIP in 25.40 sec
+✅ Full DDs VS in 19.69 sec
+24, 2, 11, 0.35, 44, 146.0, 15.93, 25.40, 19.69, 5815
+---
+✅ MIP in 26.51 sec
+✅ CPP MIP in 43.38 sec
+✅ Full DDs VS in 731.83 sec
+25, 2, 11, 0.35, 44, 146.0, 26.51, 43.38, 731.83, 6303
+---
+✅ MIP in 28.02 sec
+✅ CPP MIP in 38.09 sec
+✅ Full DDs VS in 911.50 sec
+26, 2, 11, 0.35, 44, 146.0, 28.02, 38.09, 911.50, 51229
+---
+✅ MIP in 22.02 sec
+✅ CPP MIP in 38.24 sec
+✅ Full DDs VS in 664.28 sec
+27, 2, 11, 0.35, 44, 146.0, 22.02, 38.24, 664.28, 55742
+---
+✅ MIP in 31.29 sec
+✅ CPP MIP in 51.87 sec
+✅ Full DDs VS in 762.04 sec
+28, 2, 11, 0.35, 44, 146.0, 31.29, 51.87, 762.04, 38761
+---
+✅ MIP in 19.91 sec
+✅ CPP MIP in 33.78 sec
+✅ Full DDs VS in 16.23 sec
+29, 2, 11, 0.35, 44, 146.0, 19.91, 33.78, 16.23, 5047
+---
+✅ MIP in 20.39 sec
+✅ CPP MIP in 35.81 sec
+✅ Full DDs VS in 1289.80 sec
+30, 2, 11, 0.35, 44, 146.0, 20.39, 35.81, 1289.80, 10717
+---
+✅ MIP in 23.80 sec
+✅ CPP MIP in 43.56 sec
+✅ Full DDs VS in 17.97 sec
+31, 2, 11, 0.35, 44, 146.0, 23.80, 43.56, 17.97, 5767
+---
+✅ MIP in 27.68 sec
+✅ CPP MIP in 53.07 sec
+✅ Full DDs VS in 864.06 sec
+32, 2, 11, 0.35, 44, 146.0, 27.68, 53.07, 864.06, 20235
+---
+✅ MIP in 11.64 sec
+✅ CPP MIP in 29.90 sec
+✅ Full DDs VS in 1201.86 sec
+33, 2, 11, 0.35, 44, 146.0, 11.64, 29.90, 1201.86, 6419
+---
+✅ MIP in 17.35 sec
+✅ CPP MIP in 32.96 sec
+✅ Full DDs VS in 15.16 sec
+34, 2, 11, 0.35, 44, 146.0, 17.35, 32.96, 15.16, 5543
+---
+✅ MIP in 18.79 sec
+✅ CPP MIP in 31.40 sec
+✅ Full DDs VS in 20.40 sec
+35, 2, 11, 0.35, 44, 146.0, 18.79, 31.40, 20.40, 6231
+---
+✅ MIP in 22.86 sec
+✅ CPP MIP in 27.51 sec
+✅ Full DDs VS in 16.08 sec
+36, 2, 11, 0.35, 44, 146.0, 22.86, 27.51, 16.08, 5471
+---
+✅ MIP in 31.10 sec
+✅ CPP MIP in 49.27 sec
+✅ Full DDs VS in 910.13 sec
+37, 2, 11, 0.35, 44, 146.0, 31.10, 49.27, 910.13, 42012
+---
+✅ MIP in 21.45 sec
+✅ CPP MIP in 39.10 sec
+✅ Full DDs VS in 16.87 sec
+38, 2, 11, 0.35, 44, 146.0, 21.45, 39.10, 16.87, 6492
+---
+✅ MIP in 23.62 sec
+✅ CPP MIP in 69.11 sec
+✅ Full DDs VS in 911.12 sec
+39, 2, 11, 0.35, 44, 146.0, 23.62, 69.11, 911.12, 38991
+---
+✅ MIP in 18.86 sec
+✅ CPP MIP in 24.51 sec
+✅ Full DDs VS in 16.12 sec
+40, 2, 11, 0.35, 44, 146.0, 18.86, 24.51, 16.12, 4983
+---
+✅ MIP in 26.10 sec
+✅ CPP MIP in 32.03 sec
+✅ Full DDs VS in 16.64 sec
+41, 2, 11, 0.35, 44, 146.0, 26.10, 32.03, 16.64, 5807
+---
+✅ MIP in 23.72 sec
+✅ CPP MIP in 42.64 sec
+✅ Full DDs VS in 762.86 sec
+42, 2, 11, 0.35, 44, 146.0, 23.72, 42.64, 762.86, 24599
+---
+✅ MIP in 15.02 sec
+✅ CPP MIP in 36.70 sec
+✅ Full DDs VS in 19.71 sec
+43, 2, 11, 0.35, 44, 146.0, 15.02, 36.70, 19.71, 7307
+---
+✅ MIP in 22.49 sec
+✅ CPP MIP in 34.08 sec
+✅ Full DDs VS in 917.36 sec
+44, 2, 11, 0.35, 44, 146.0, 22.49, 34.08, 917.36, 49134
+---
+✅ MIP in 30.29 sec
+✅ CPP MIP in 62.77 sec
+✅ Full DDs VS in 18.36 sec
+45, 2, 11, 0.35, 44, 146.0, 30.29, 62.77, 18.36, 6279
+---
+✅ MIP in 18.78 sec
+✅ CPP MIP in 43.33 sec
