@@ -3,10 +3,10 @@
 Assuming overlap costs and instance parameterization with S, f, c.
 """
 from heapq import heappop, heappush
-from itertools import count
 import numpy as np
+from sys import maxsize
 
-REMOVED = '<DEL>'
+REMOVED = maxsize
 
 
 class N2RList:
@@ -21,7 +21,6 @@ class N2RList:
         """Initializes the prio que structure."""
         self.S = S
         self.N2 = []
-        self.counter = count()
         self.pq = []
         self.set_index = {}
         self.removed = []
@@ -33,8 +32,7 @@ class N2RList:
 
             self.N2.append(N2)
 
-            curcount = next(self.counter)
-            entry = [len(N2), curcount, (j+1)]
+            entry = [len(N2), (j+1)]
             self.set_index[j+1] = entry
             heappush(self.pq, entry)
 
@@ -55,7 +53,7 @@ class N2RList:
             entry = self.set_index[j]
             newsize = entry[0] - tbu[j]
             if newsize > 0:
-                newentry = [newsize, next(self.counter), j]
+                newentry = [newsize, j]
                 entry[-1] = REMOVED
                 heappush(self.pq, newentry)
                 self.set_index[j] = newentry
@@ -65,7 +63,7 @@ class N2RList:
     def pop(self):
         """Pops a smallest-2-neighborhood point (adjusting the heap)."""
         while self.pq:
-            _, _, j = heappop(self.pq)
+            _, j = heappop(self.pq)
             if j is not REMOVED:
                 N2 = [s for s in self.N2[j-1] if s not in self.removed]
                 self._remove(N2)

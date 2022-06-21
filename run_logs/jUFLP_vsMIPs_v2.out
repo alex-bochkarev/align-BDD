@@ -1,0 +1,502 @@
+experiment, n, M, L, N, A, tMIP, tMIP_CPP, tDD_VS, int_VS
+---
+Set parameter Username
+✅ MIP in 1.97 sec
+✅ CPP MIP in 3.39 sec
+✅ Full DDs VS in 53.86 sec
+1, 2, 10, 0.25, 40, 138.0, 1.97, 3.39, 53.86, 3057
+---
+✅ MIP in 1.83 sec
+✅ CPP MIP in 3.42 sec
+✅ Full DDs VS in 2.61 sec
+2, 2, 10, 0.25, 40, 138.0, 1.83, 3.42, 2.61, 3247
+---
+✅ MIP in 1.40 sec
+✅ CPP MIP in 2.91 sec
+✅ Full DDs VS in 2.29 sec
+3, 2, 10, 0.25, 40, 138.0, 1.40, 2.91, 2.29, 2959
+---
+✅ MIP in 1.62 sec
+✅ CPP MIP in 3.57 sec
+✅ Full DDs VS in 30.82 sec
+4, 2, 10, 0.25, 40, 138.0, 1.62, 3.57, 30.82, 28341
+---
+✅ MIP in 1.50 sec
+✅ CPP MIP in 3.01 sec
+✅ Full DDs VS in 2.46 sec
+5, 2, 10, 0.25, 40, 138.0, 1.50, 3.01, 2.46, 2758
+---
+✅ MIP in 1.50 sec
+✅ CPP MIP in 2.77 sec
+✅ Full DDs VS in 2.30 sec
+6, 2, 10, 0.25, 40, 138.0, 1.50, 2.77, 2.30, 3471
+---
+✅ MIP in 2.12 sec
+✅ CPP MIP in 3.10 sec
+✅ Full DDs VS in 53.31 sec
+7, 2, 10, 0.25, 40, 138.0, 2.12, 3.10, 53.31, 23391
+---
+✅ MIP in 1.67 sec
+✅ CPP MIP in 3.10 sec
+✅ Full DDs VS in 2.69 sec
+8, 2, 10, 0.25, 40, 138.0, 1.67, 3.10, 2.69, 4615
+---
+✅ MIP in 1.66 sec
+✅ CPP MIP in 4.13 sec
+✅ Full DDs VS in 2.62 sec
+9, 2, 10, 0.25, 40, 138.0, 1.66, 4.13, 2.62, 3071
+---
+✅ MIP in 1.67 sec
+✅ CPP MIP in 4.05 sec
+✅ Full DDs VS in 2.82 sec
+10, 2, 10, 0.25, 40, 138.0, 1.67, 4.05, 2.82, 4319
+---
+✅ MIP in 2.00 sec
+✅ CPP MIP in 3.40 sec
+✅ Full DDs VS in 2.60 sec
+11, 2, 10, 0.25, 40, 138.0, 2.00, 3.40, 2.60, 4563
+---
+✅ MIP in 1.44 sec
+✅ CPP MIP in 3.72 sec
+✅ Full DDs VS in 46.41 sec
+12, 2, 10, 0.25, 40, 138.0, 1.44, 3.72, 46.41, 102755
+---
+✅ MIP in 1.70 sec
+✅ CPP MIP in 3.63 sec
+✅ Full DDs VS in 59.01 sec
+13, 2, 10, 0.25, 40, 138.0, 1.70, 3.63, 59.01, 33813
+---
+✅ MIP in 1.89 sec
+✅ CPP MIP in 3.44 sec
+✅ Full DDs VS in 51.55 sec
+14, 2, 10, 0.25, 40, 138.0, 1.89, 3.44, 51.55, 110422
+---
+✅ MIP in 1.91 sec
+✅ CPP MIP in 3.48 sec
+✅ Full DDs VS in 61.86 sec
+15, 2, 10, 0.25, 40, 138.0, 1.91, 3.48, 61.86, 17969
+---
+✅ MIP in 1.48 sec
+✅ CPP MIP in 3.15 sec
+✅ Full DDs VS in 41.86 sec
+16, 2, 10, 0.25, 40, 138.0, 1.48, 3.15, 41.86, 32892
+---
+✅ MIP in 2.08 sec
+✅ CPP MIP in 3.19 sec
+✅ Full DDs VS in 55.68 sec
+17, 2, 10, 0.25, 40, 138.0, 2.08, 3.19, 55.68, 7133
+---
+✅ MIP in 1.81 sec
+✅ CPP MIP in 2.83 sec
+✅ Full DDs VS in 2.23 sec
+18, 2, 10, 0.25, 40, 138.0, 1.81, 2.83, 2.23, 2951
+---
+✅ MIP in 1.66 sec
+✅ CPP MIP in 3.40 sec
+✅ Full DDs VS in 67.26 sec
+19, 2, 10, 0.25, 40, 138.0, 1.66, 3.40, 67.26, 3659
+---
+✅ MIP in 2.18 sec
+✅ CPP MIP in 3.82 sec
+✅ Full DDs VS in 46.74 sec
+20, 2, 10, 0.25, 40, 138.0, 2.18, 3.82, 46.74, 58754
+---
+✅ MIP in 2.12 sec
+✅ CPP MIP in 3.72 sec
+✅ Full DDs VS in 2.57 sec
+21, 2, 10, 0.25, 40, 138.0, 2.12, 3.72, 2.57, 3727
+---
+✅ MIP in 1.82 sec
+✅ CPP MIP in 3.98 sec
+✅ Full DDs VS in 64.06 sec
+22, 2, 10, 0.25, 40, 138.0, 1.82, 3.98, 64.06, 29742
+---
+✅ MIP in 1.59 sec
+✅ CPP MIP in 3.37 sec
+✅ Full DDs VS in 75.96 sec
+23, 2, 10, 0.25, 40, 138.0, 1.59, 3.37, 75.96, 60450
+---
+✅ MIP in 1.60 sec
+✅ CPP MIP in 3.31 sec
+✅ Full DDs VS in 2.25 sec
+24, 2, 10, 0.25, 40, 138.0, 1.60, 3.31, 2.25, 3667
+---
+✅ MIP in 1.53 sec
+✅ CPP MIP in 3.81 sec
+✅ Full DDs VS in 46.06 sec
+25, 2, 10, 0.25, 40, 138.0, 1.53, 3.81, 46.06, 17435
+---
+✅ MIP in 2.45 sec
+✅ CPP MIP in 4.93 sec
+✅ Full DDs VS in 2.28 sec
+26, 2, 10, 0.25, 40, 138.0, 2.45, 4.93, 2.28, 3413
+---
+✅ MIP in 2.46 sec
+✅ CPP MIP in 3.06 sec
+✅ Full DDs VS in 2.48 sec
+27, 2, 10, 0.25, 40, 138.0, 2.46, 3.06, 2.48, 3703
+---
+✅ MIP in 1.86 sec
+✅ CPP MIP in 3.22 sec
+✅ Full DDs VS in 2.20 sec
+28, 2, 10, 0.25, 40, 138.0, 1.86, 3.22, 2.20, 2764
+---
+✅ MIP in 2.08 sec
+✅ CPP MIP in 3.85 sec
+✅ Full DDs VS in 2.60 sec
+29, 2, 10, 0.25, 40, 138.0, 2.08, 3.85, 2.60, 3155
+---
+✅ MIP in 2.52 sec
+✅ CPP MIP in 3.15 sec
+✅ Full DDs VS in 53.22 sec
+30, 2, 10, 0.25, 40, 138.0, 2.52, 3.15, 53.22, 40750
+---
+✅ MIP in 1.56 sec
+✅ CPP MIP in 3.40 sec
+✅ Full DDs VS in 53.91 sec
+31, 2, 10, 0.25, 40, 138.0, 1.56, 3.40, 53.91, 17467
+---
+✅ MIP in 2.22 sec
+✅ CPP MIP in 2.99 sec
+✅ Full DDs VS in 2.57 sec
+32, 2, 10, 0.25, 40, 138.0, 2.22, 2.99, 2.57, 4547
+---
+✅ MIP in 1.55 sec
+✅ CPP MIP in 3.98 sec
+✅ Full DDs VS in 2.68 sec
+33, 2, 10, 0.25, 40, 138.0, 1.55, 3.98, 2.68, 3155
+---
+✅ MIP in 1.50 sec
+✅ CPP MIP in 2.75 sec
+✅ Full DDs VS in 1.96 sec
+34, 2, 10, 0.25, 40, 138.0, 1.50, 2.75, 1.96, 2943
+---
+✅ MIP in 2.20 sec
+✅ CPP MIP in 3.19 sec
+✅ Full DDs VS in 51.70 sec
+35, 2, 10, 0.25, 40, 138.0, 2.20, 3.19, 51.70, 2664
+---
+✅ MIP in 1.97 sec
+✅ CPP MIP in 3.05 sec
+✅ Full DDs VS in 2.46 sec
+36, 2, 10, 0.25, 40, 138.0, 1.97, 3.05, 2.46, 3046
+---
+✅ MIP in 1.36 sec
+✅ CPP MIP in 3.01 sec
+✅ Full DDs VS in 43.97 sec
+37, 2, 10, 0.25, 40, 138.0, 1.36, 3.01, 43.97, 11283
+---
+✅ MIP in 1.20 sec
+✅ CPP MIP in 2.92 sec
+✅ Full DDs VS in 2.68 sec
+38, 2, 10, 0.25, 40, 138.0, 1.20, 2.92, 2.68, 3323
+---
+✅ MIP in 1.33 sec
+✅ CPP MIP in 3.55 sec
+✅ Full DDs VS in 2.55 sec
+39, 2, 10, 0.25, 40, 138.0, 1.33, 3.55, 2.55, 3711
+---
+✅ MIP in 1.80 sec
+✅ CPP MIP in 2.65 sec
+✅ Full DDs VS in 44.41 sec
+40, 2, 10, 0.25, 40, 138.0, 1.80, 2.65, 44.41, 54458
+---
+✅ MIP in 1.87 sec
+✅ CPP MIP in 2.27 sec
+✅ Full DDs VS in 2.47 sec
+41, 2, 10, 0.25, 40, 138.0, 1.87, 2.27, 2.47, 2927
+---
+✅ MIP in 2.27 sec
+✅ CPP MIP in 3.92 sec
+✅ Full DDs VS in 63.93 sec
+42, 2, 10, 0.25, 40, 138.0, 2.27, 3.92, 63.93, 5271
+---
+✅ MIP in 1.92 sec
+✅ CPP MIP in 3.18 sec
+✅ Full DDs VS in 49.83 sec
+43, 2, 10, 0.25, 40, 138.0, 1.92, 3.18, 49.83, 29210
+---
+✅ MIP in 1.53 sec
+✅ CPP MIP in 3.19 sec
+✅ Full DDs VS in 40.89 sec
+44, 2, 10, 0.25, 40, 138.0, 1.53, 3.19, 40.89, 5319
+---
+✅ MIP in 1.64 sec
+✅ CPP MIP in 3.19 sec
+✅ Full DDs VS in 2.23 sec
+45, 2, 10, 0.25, 40, 138.0, 1.64, 3.19, 2.23, 3711
+---
+✅ MIP in 1.57 sec
+✅ CPP MIP in 2.49 sec
+✅ Full DDs VS in 54.65 sec
+46, 2, 10, 0.25, 40, 138.0, 1.57, 2.49, 54.65, 70543
+---
+✅ MIP in 2.15 sec
+✅ CPP MIP in 3.41 sec
+✅ Full DDs VS in 2.20 sec
+47, 2, 10, 0.25, 40, 138.0, 2.15, 3.41, 2.20, 2959
+---
+✅ MIP in 1.43 sec
+✅ CPP MIP in 2.97 sec
+✅ Full DDs VS in 2.84 sec
+48, 2, 10, 0.25, 40, 138.0, 1.43, 2.97, 2.84, 3431
+---
+✅ MIP in 1.78 sec
+✅ CPP MIP in 3.17 sec
+✅ Full DDs VS in 60.13 sec
+49, 2, 10, 0.25, 40, 138.0, 1.78, 3.17, 60.13, 17983
+---
+✅ MIP in 1.68 sec
+✅ CPP MIP in 3.11 sec
+✅ Full DDs VS in 39.92 sec
+50, 2, 10, 0.25, 40, 138.0, 1.68, 3.11, 39.92, 74635
+---
+✅ MIP in 1.97 sec
+✅ CPP MIP in 3.69 sec
+✅ Full DDs VS in 63.08 sec
+51, 2, 10, 0.25, 40, 138.0, 1.97, 3.69, 63.08, 11311
+---
+✅ MIP in 1.98 sec
+✅ CPP MIP in 3.18 sec
+✅ Full DDs VS in 2.37 sec
+52, 2, 10, 0.25, 40, 138.0, 1.98, 3.18, 2.37, 3373
+---
+✅ MIP in 2.69 sec
+✅ CPP MIP in 3.11 sec
+✅ Full DDs VS in 2.17 sec
+53, 2, 10, 0.25, 40, 138.0, 2.69, 3.11, 2.17, 3156
+---
+✅ MIP in 1.62 sec
+✅ CPP MIP in 3.63 sec
+✅ Full DDs VS in 2.79 sec
+54, 2, 10, 0.25, 40, 138.0, 1.62, 3.63, 2.79, 3663
+---
+✅ MIP in 2.00 sec
+✅ CPP MIP in 3.78 sec
+✅ Full DDs VS in 2.47 sec
+55, 2, 10, 0.25, 40, 138.0, 2.00, 3.78, 2.47, 3295
+---
+✅ MIP in 1.28 sec
+✅ CPP MIP in 3.41 sec
+✅ Full DDs VS in 54.04 sec
+56, 2, 10, 0.25, 40, 138.0, 1.28, 3.41, 54.04, 36480
+---
+✅ MIP in 1.93 sec
+✅ CPP MIP in 2.57 sec
+✅ Full DDs VS in 2.71 sec
+57, 2, 10, 0.25, 40, 138.0, 1.93, 2.57, 2.71, 4463
+---
+✅ MIP in 1.75 sec
+✅ CPP MIP in 3.06 sec
+✅ Full DDs VS in 2.44 sec
+58, 2, 10, 0.25, 40, 138.0, 1.75, 3.06, 2.44, 3319
+---
+✅ MIP in 1.83 sec
+✅ CPP MIP in 3.71 sec
+✅ Full DDs VS in 2.62 sec
+59, 2, 10, 0.25, 40, 138.0, 1.83, 3.71, 2.62, 3157
+---
+✅ MIP in 1.44 sec
+✅ CPP MIP in 3.63 sec
+✅ Full DDs VS in 52.74 sec
+60, 2, 10, 0.25, 40, 138.0, 1.44, 3.63, 52.74, 5624
+---
+✅ MIP in 2.30 sec
+✅ CPP MIP in 4.28 sec
+✅ Full DDs VS in 2.41 sec
+61, 2, 10, 0.25, 40, 138.0, 2.30, 4.28, 2.41, 3066
+---
+✅ MIP in 1.63 sec
+✅ CPP MIP in 2.73 sec
+✅ Full DDs VS in 2.21 sec
+62, 2, 10, 0.25, 40, 138.0, 1.63, 2.73, 2.21, 3207
+---
+✅ MIP in 2.57 sec
+✅ CPP MIP in 3.52 sec
+✅ Full DDs VS in 55.24 sec
+63, 2, 10, 0.25, 40, 138.0, 2.57, 3.52, 55.24, 35337
+---
+✅ MIP in 1.98 sec
+✅ CPP MIP in 3.57 sec
+✅ Full DDs VS in 3.01 sec
+64, 2, 10, 0.25, 40, 138.0, 1.98, 3.57, 3.01, 4443
+---
+✅ MIP in 1.99 sec
+✅ CPP MIP in 3.47 sec
+✅ Full DDs VS in 43.14 sec
+65, 2, 10, 0.25, 40, 138.0, 1.99, 3.47, 43.14, 7553
+---
+✅ MIP in 2.53 sec
+✅ CPP MIP in 2.77 sec
+✅ Full DDs VS in 57.07 sec
+66, 2, 10, 0.25, 40, 138.0, 2.53, 2.77, 57.07, 23569
+---
+✅ MIP in 1.97 sec
+✅ CPP MIP in 2.92 sec
+✅ Full DDs VS in 51.33 sec
+67, 2, 10, 0.25, 40, 138.0, 1.97, 2.92, 51.33, 12407
+---
+✅ MIP in 1.47 sec
+✅ CPP MIP in 2.90 sec
+✅ Full DDs VS in 56.02 sec
+68, 2, 10, 0.25, 40, 138.0, 1.47, 2.90, 56.02, 59421
+---
+✅ MIP in 1.45 sec
+✅ CPP MIP in 2.62 sec
+✅ Full DDs VS in 2.09 sec
+69, 2, 10, 0.25, 40, 138.0, 1.45, 2.62, 2.09, 2666
+---
+✅ MIP in 1.66 sec
+✅ CPP MIP in 2.67 sec
+✅ Full DDs VS in 44.15 sec
+70, 2, 10, 0.25, 40, 138.0, 1.66, 2.67, 44.15, 21574
+---
+✅ MIP in 1.64 sec
+✅ CPP MIP in 2.79 sec
+✅ Full DDs VS in 2.37 sec
+71, 2, 10, 0.25, 40, 138.0, 1.64, 2.79, 2.37, 3651
+---
+✅ MIP in 2.06 sec
+✅ CPP MIP in 3.53 sec
+✅ Full DDs VS in 2.63 sec
+72, 2, 10, 0.25, 40, 138.0, 2.06, 3.53, 2.63, 3155
+---
+✅ MIP in 2.11 sec
+✅ CPP MIP in 2.88 sec
+✅ Full DDs VS in 2.39 sec
+73, 2, 10, 0.25, 40, 138.0, 2.11, 2.88, 2.39, 3679
+---
+✅ MIP in 1.88 sec
+✅ CPP MIP in 4.19 sec
+✅ Full DDs VS in 40.45 sec
+74, 2, 10, 0.25, 40, 138.0, 1.88, 4.19, 40.45, 32233
+---
+✅ MIP in 1.61 sec
+✅ CPP MIP in 2.49 sec
+✅ Full DDs VS in 2.31 sec
+75, 2, 10, 0.25, 40, 138.0, 1.61, 2.49, 2.31, 3739
+---
+✅ MIP in 1.99 sec
+✅ CPP MIP in 2.53 sec
+✅ Full DDs VS in 2.72 sec
+76, 2, 10, 0.25, 40, 138.0, 1.99, 2.53, 2.72, 4239
+---
+✅ MIP in 1.83 sec
+✅ CPP MIP in 3.14 sec
+✅ Full DDs VS in 50.47 sec
+77, 2, 10, 0.25, 40, 138.0, 1.83, 3.14, 50.47, 4981
+---
+✅ MIP in 1.57 sec
+✅ CPP MIP in 2.46 sec
+✅ Full DDs VS in 2.12 sec
+78, 2, 10, 0.25, 40, 138.0, 1.57, 2.46, 2.12, 3407
+---
+✅ MIP in 1.95 sec
+✅ CPP MIP in 3.35 sec
+✅ Full DDs VS in 2.30 sec
+79, 2, 10, 0.25, 40, 138.0, 1.95, 3.35, 2.30, 3667
+---
+✅ MIP in 2.02 sec
+✅ CPP MIP in 3.45 sec
+✅ Full DDs VS in 2.27 sec
+80, 2, 10, 0.25, 40, 138.0, 2.02, 3.45, 2.27, 2613
+---
+✅ MIP in 1.32 sec
+✅ CPP MIP in 3.68 sec
+✅ Full DDs VS in 60.07 sec
+81, 2, 10, 0.25, 40, 138.0, 1.32, 3.68, 60.07, 3701
+---
+✅ MIP in 2.06 sec
+✅ CPP MIP in 3.44 sec
+✅ Full DDs VS in 58.51 sec
+82, 2, 10, 0.25, 40, 138.0, 2.06, 3.44, 58.51, 15407
+---
+✅ MIP in 1.93 sec
+✅ CPP MIP in 4.15 sec
+✅ Full DDs VS in 2.54 sec
+83, 2, 10, 0.25, 40, 138.0, 1.93, 4.15, 2.54, 3471
+---
+✅ MIP in 2.17 sec
+✅ CPP MIP in 2.99 sec
+✅ Full DDs VS in 2.60 sec
+84, 2, 10, 0.25, 40, 138.0, 2.17, 2.99, 2.60, 3471
+---
+✅ MIP in 1.81 sec
+✅ CPP MIP in 3.23 sec
+✅ Full DDs VS in 43.29 sec
+85, 2, 10, 0.25, 40, 138.0, 1.81, 3.23, 43.29, 28569
+---
+✅ MIP in 1.66 sec
+✅ CPP MIP in 3.69 sec
+✅ Full DDs VS in 54.71 sec
+86, 2, 10, 0.25, 40, 138.0, 1.66, 3.69, 54.71, 5221
+---
+✅ MIP in 1.94 sec
+✅ CPP MIP in 3.46 sec
+✅ Full DDs VS in 2.56 sec
+87, 2, 10, 0.25, 40, 138.0, 1.94, 3.46, 2.56, 4492
+---
+✅ MIP in 1.92 sec
+✅ CPP MIP in 4.04 sec
+✅ Full DDs VS in 58.23 sec
+88, 2, 10, 0.25, 40, 138.0, 1.92, 4.04, 58.23, 4555
+---
+✅ MIP in 1.66 sec
+✅ CPP MIP in 2.77 sec
+✅ Full DDs VS in 45.50 sec
+89, 2, 10, 0.25, 40, 138.0, 1.66, 2.77, 45.50, 23475
+---
+✅ MIP in 1.78 sec
+✅ CPP MIP in 3.88 sec
+✅ Full DDs VS in 3.13 sec
+90, 2, 10, 0.25, 40, 138.0, 1.78, 3.88, 3.13, 5263
+---
+✅ MIP in 1.54 sec
+✅ CPP MIP in 2.74 sec
+✅ Full DDs VS in 2.38 sec
+91, 2, 10, 0.25, 40, 138.0, 1.54, 2.74, 2.38, 2815
+---
+✅ MIP in 1.52 sec
+✅ CPP MIP in 2.80 sec
+✅ Full DDs VS in 2.45 sec
+92, 2, 10, 0.25, 40, 138.0, 1.52, 2.80, 2.45, 3471
+---
+✅ MIP in 1.62 sec
+✅ CPP MIP in 2.71 sec
+✅ Full DDs VS in 65.44 sec
+93, 2, 10, 0.25, 40, 138.0, 1.62, 2.71, 65.44, 25639
+---
+✅ MIP in 2.30 sec
+✅ CPP MIP in 3.37 sec
+✅ Full DDs VS in 38.61 sec
+94, 2, 10, 0.25, 40, 138.0, 2.30, 3.37, 38.61, 47978
+---
+✅ MIP in 2.48 sec
+✅ CPP MIP in 3.19 sec
+✅ Full DDs VS in 56.88 sec
+95, 2, 10, 0.25, 40, 138.0, 2.48, 3.19, 56.88, 19650
+---
+✅ MIP in 1.71 sec
+✅ CPP MIP in 3.35 sec
+✅ Full DDs VS in 54.30 sec
+96, 2, 10, 0.25, 40, 138.0, 1.71, 3.35, 54.30, 10821
+---
+✅ MIP in 1.81 sec
+✅ CPP MIP in 3.42 sec
+✅ Full DDs VS in 53.64 sec
+97, 2, 10, 0.25, 40, 138.0, 1.81, 3.42, 53.64, 14359
+---
+✅ MIP in 1.47 sec
+✅ CPP MIP in 2.80 sec
+✅ Full DDs VS in 66.23 sec
+98, 2, 10, 0.25, 40, 138.0, 1.47, 2.80, 66.23, 57399
+---
+✅ MIP in 1.71 sec
+✅ CPP MIP in 2.68 sec
+✅ Full DDs VS in 38.67 sec
+99, 2, 10, 0.25, 40, 138.0, 1.71, 2.68, 38.67, 9383
+---
+✅ MIP in 1.91 sec
+✅ CPP MIP in 3.34 sec
+✅ Full DDs VS in 49.99 sec
+100, 2, 10, 0.25, 40, 138.0, 1.91, 3.34, 49.99, 50505

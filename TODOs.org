@@ -98,6 +98,18 @@ CLOCK: [2022-06-20 Mon 15:19]--[2022-06-20 Mon 15:36] =>  0:17
 CLOCK: [2022-06-20 Mon 14:30]--[2022-06-20 Mon 15:04] =>  0:34
 CLOCK: [2022-06-20 Mon 12:58]--[2022-06-20 Mon 13:37] =>  0:39
 :END:
+Note: this gives CPP MIP slower than Full DDs, generally:
+#+begin_src python
+    M = 11
+    L = 0.35
+    n = 2
+
+    i = 1
+
+    for _ in range(100):
+        i1, i2, jm = gen_cavemen_jUFLP_inst(n, M, L)
+#+end_src
+
 *** DONE fixing: naive MIP vs DD-based for jUFLP
 CLOSED: [2022-06-20 Mon 15:55]
 - State "DONE"       from "TODO"       [2022-06-20 Mon 15:55]

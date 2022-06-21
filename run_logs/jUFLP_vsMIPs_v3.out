@@ -1,0 +1,10 @@
+experiment, n, M, L, N, A, tMIP, tMIP_CPP, tDD_VS, int_VS
+---
+Set parameter Username
+✅ MIP in 2.68 sec
+✅ CPP MIP in 5.87 sec
+✅ Full DDs VS in 4.52 sec
+1, 2, 11, 0.35, 44, 146.0, 2.68, 5.87, 4.52, 6775
+---
+✅ MIP in 3.01 sec
+✅ CPP MIP in 5.46 sec
