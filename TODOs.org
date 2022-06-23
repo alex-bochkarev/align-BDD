@@ -36,6 +36,28 @@ Need to fine-tune the files to check (ignore =.venv=, etc.)
 :PROPERTIES:
 :CATEGORY: a-BDD/jUFLP
 :END:
+*** TODO Figure a good instance type?
+:LOGBOOK:
+CLOCK: [2022-06-23 Thu 13:27]
+CLOCK: [2022-06-23 Thu 12:49]--[2022-06-23 Thu 13:24] =>  0:35
+CLOCK: [2022-06-21 Tue 12:41]--[2022-06-21 Tue 13:00] =>  0:19
+CLOCK: [2022-06-20 Mon 15:46]--[2022-06-20 Mon 15:48] =>  0:02
+CLOCK: [2022-06-20 Mon 15:19]--[2022-06-20 Mon 15:36] =>  0:17
+CLOCK: [2022-06-20 Mon 14:30]--[2022-06-20 Mon 15:04] =>  0:34
+CLOCK: [2022-06-20 Mon 12:58]--[2022-06-20 Mon 13:37] =>  0:39
+:END:
+Note: this gives CPP MIP (and sometimes naive MiP as well) slower than Full DDs,
+generally:
+#+begin_src python
+  M = 11
+  L = 0.35
+  n = 2
+  # ...
+  i1, i2, jm = gen_cavemen_jUFLP_inst(n, M, L)
+#+end_src
+see [[file:experiments/jUFLP_vsMIPs.py::L = 0.35][jUFLP_vsMIPs]].
+
+*** TODO Derive the sensitivity info from the SP.
 *** DONE Implement the full-BDD approach for the problem.
 CLOSED: [2022-06-20 Mon 12:57]
 - State "DONE"       from "WIP"        [2022-06-20 Mon 12:57]
@@ -91,26 +113,9 @@ CLOCK: [2022-06-14 Tue 12:35]--[2022-06-14 Tue 12:40] =>  0:05
 CLOCK: [2022-06-14 Tue 10:56]--[2022-06-14 Tue 12:10] =>  1:14
 :END:
   [[file:UFLP_fullDD.py][UFLP_fullDD]] file
-*** TODO Figure a good instance type?
-:LOGBOOK:
-CLOCK: [2022-06-21 Tue 12:41]--[2022-06-21 Tue 13:00] =>  0:19
-CLOCK: [2022-06-20 Mon 15:46]--[2022-06-20 Mon 15:48] =>  0:02
-CLOCK: [2022-06-20 Mon 15:19]--[2022-06-20 Mon 15:36] =>  0:17
-CLOCK: [2022-06-20 Mon 14:30]--[2022-06-20 Mon 15:04] =>  0:34
-CLOCK: [2022-06-20 Mon 12:58]--[2022-06-20 Mon 13:37] =>  0:39
-:END:
-Note: this gives CPP MIP slower than Full DDs, generally:
-#+begin_src python
-    M = 11
-    L = 0.35
-    n = 2
-
-    i = 1
-
-    for _ in range(100):
-        i1, i2, jm = gen_cavemen_jUFLP_inst(n, M, L)
-#+end_src
-*** TODO Write-up the UFLP-encoding procedure.
+*** DONE Write-up the UFLP-encoding procedure.
+CLOSED: [2022-06-23 Thu 12:47]
+- State "DONE"       from "TODO"       [2022-06-22 Wed 12:47]
 :LOGBOOK:
 CLOCK: [2022-06-21 Tue 22:15]--[2022-06-21 Tue 23:01] =>  0:46
 CLOCK: [2022-06-21 Tue 20:25]--[2022-06-21 Tue 20:47] =>  0:22
@@ -127,7 +132,6 @@ CLOSED: [2022-06-20 Mon 15:55]
 :LOGBOOK:
 CLOCK: [2022-06-20 Mon 15:48]--[2022-06-20 Mon 15:55] =>  0:07
 :END:
-*** TODO Derive the sensitivity info from the SP.
 *** DONE numerical experiment: MIP vs a2A vs VS.
 CLOSED: [2022-06-02 Thu 17:45]
 - State "DONE"       from "WIP"        [2022-06-02 Thu 17:45]

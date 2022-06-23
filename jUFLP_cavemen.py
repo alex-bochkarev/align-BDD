@@ -15,7 +15,8 @@ from UFLP_fullDD import create_cover_DD
 from UFLPOrder import UFLP_greedy_order
 
 
-def gen_cavemen_jUFLP_inst(n=10, M=7, L=0.25, verbose=False):
+def gen_cavemen_jUFLP_inst(n=10, M=7, L=0.25, verbose=False,
+                           linking="default"):
     """Generates an instance with the related metadata (info on caves).
 
     Args:
@@ -23,6 +24,7 @@ def gen_cavemen_jUFLP_inst(n=10, M=7, L=0.25, verbose=False):
       M (int): number of points in a cave,
       L (float): edge sparsity parameter (share of missing edges)
       verbose (Bool): print debug info
+      linking (str): linking constraints type
 
     Returns:
       inst1, inst2, join_map: sub-instances and caves description.
@@ -34,14 +36,24 @@ def gen_cavemen_jUFLP_inst(n=10, M=7, L=0.25, verbose=False):
     S, f, c, caves = gen_caveman_inst(n, M, L)
     S2, f2, c2, caves2 = gen_caveman_inst(n, M, L)
 
-    order = [j for j in range(1, len(S)+1)]
-    # join_map = dict(zip(order, np.random.permutation(order)))
     join_map = dict()
-    ca1 = [ca.S for ca in caves]
-    ca2 = np.random.permutation([ca.S for ca in caves2])
+    if linking == "uniform":
+        join_map = dict(
+            zip([j for j in range(1, len(S)+1)],
+                np.random.permutation([j for j in range(1, len(S)+1)])))
+    elif linking == "consecutive":
+        ca1 = [ca.S for ca in caves]
+        ca2 = [ca.S for ca in caves2]
 
-    for k in range(len(ca1)):
-        join_map.update(dict(zip(ca1[k], np.random.permutation(ca2[k]))))
+        for k in range(len(ca1)):
+            join_map.update(dict(zip(ca1[k], np.random.permutation(ca2[k]))))
+
+    else:
+        ca1 = [ca.S for ca in caves]
+        ca2 = np.random.permutation([ca.S for ca in caves2])
+
+        for k in range(len(ca1)):
+            join_map.update(dict(zip(ca1[k], np.random.permutation(ca2[k]))))
 
     if verbose:
         print(f"S={S};\nf={f}\n;c={c}")
