@@ -1,0 +1,47 @@
+experiment, n, M, L, N, A, tMIP, tMIP_CPP, tDD_VS, int_VS
+---
+Set parameter TokenServer to value "license8.clemson.edu"
+✅ MIP in 440.64 sec
+✅ CPP MIP in 124.12 sec
+✅ Full DDs VS in 3960.86 sec
+1, 11, 7, 0.35, 154, 328.0, 440.64, 124.12, 3960.86, 64411
+---
+✅ MIP in 84.69 sec
+✅ CPP MIP in 50.77 sec
+✅ Full DDs VS in 27.28 sec
+2, 11, 7, 0.35, 154, 328.0, 84.69, 50.77, 27.28, 7559
+---
+✅ MIP in 163.74 sec
+✅ CPP MIP in 62.44 sec
+✅ Full DDs VS in 25.17 sec
+3, 11, 7, 0.35, 154, 328.0, 163.74, 62.44, 25.17, 6597
+---
+✅ MIP in 284.15 sec
+✅ CPP MIP in 88.62 sec
+✅ Full DDs VS in 24.75 sec
+4, 11, 7, 0.35, 154, 328.0, 284.15, 88.62, 24.75, 5343
+---
+✅ MIP in 100.80 sec
+✅ CPP MIP in 228.79 sec
+✅ Full DDs VS in 378.07 sec
+5, 11, 7, 0.35, 154, 328.0, 100.80, 228.79, 378.07, 205405
+---
+✅ MIP in 192.05 sec
+✅ CPP MIP in 859.22 sec
+[2022-06-23T12:07:14-0400]: run_logs/2022-06-23_jUFLP_vs_MIPs_consec.out.csv -- file not found
+ 
+ 
++------------------------------------------+ 
+| PALMETTO CLUSTER PBS RESOURCES REQUESTED | 
++------------------------------------------+ 
+ 
+mem=15gb,walltime=06:00:00,ncpus=1
+ 
+ 
++-------------------------------------+ 
+| PALMETTO CLUSTER PBS RESOURCES USED | 
++-------------------------------------+ 
+ 
+cput=04:03:30,mem=15728640kb,walltime=04:05:26,ncpus=1,cpupercent=98,vmem=17155428kb
+ 
+ 
