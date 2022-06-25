@@ -36,9 +36,9 @@ Need to fine-tune the files to check (ignore =.venv=, etc.)
 :PROPERTIES:
 :CATEGORY: a-BDD/jUFLP
 :END:
-*** TODO Figure a good instance type?
+*** WIP Figure a good instance type?
 :LOGBOOK:
-CLOCK: [2022-06-23 Thu 13:27]
+CLOCK: [2022-06-23 Thu 13:27]--[2022-06-23 Thu 14:04] =>  0:37
 CLOCK: [2022-06-23 Thu 12:49]--[2022-06-23 Thu 13:24] =>  0:35
 CLOCK: [2022-06-21 Tue 12:41]--[2022-06-21 Tue 13:00] =>  0:19
 CLOCK: [2022-06-20 Mon 15:46]--[2022-06-20 Mon 15:48] =>  0:02
@@ -56,7 +56,32 @@ generally:
   i1, i2, jm = gen_cavemen_jUFLP_inst(n, M, L)
 #+end_src
 see [[file:experiments/jUFLP_vsMIPs.py::L = 0.35][jUFLP_vsMIPs]].
-
+**** DONE node-connected clouds
+CLOSED: [2022-06-24 Fri 13:09]
+- State "DONE"       from "TODO"       [2022-06-24 Fri 13:09]
+:LOGBOOK:
+CLOCK: [2022-06-24 Fri 12:16]--[2022-06-24 Fri 12:50] =>  0:34
+CLOCK: [2022-06-24 Fri 11:35]--[2022-06-24 Fri 12:16] =>  0:41
+CLOCK: [2022-06-24 Fri 11:00]--[2022-06-24 Fri 11:35] =>  0:35
+CLOCK: [2022-06-24 Fri 09:51]--[2022-06-24 Fri 10:32] =>  0:41
+:END:
+#+begin_src python
+    M = 15
+    L = 0.55
+    n = 5
+    linking = "consecutive"
+    inst_type = "1-link"
+#+end_src
+(gives tens of seconds for Gurobi.)
+**** TODO experiment with linking
+:LOGBOOK:
+CLOCK: [2022-06-24 Fri 13:53]--[2022-06-24 Fri 14:33] =>  0:40
+CLOCK: [2022-06-24 Fri 13:11]--[2022-06-24 Fri 13:41] =>  0:30
+:END:
+**** TODO double-check that a-to-A is still not better than VS
+**** DONE adjust costs (1--5 ➡ 100--105)
+CLOSED: [2022-06-24 Fri 13:10]
+- State "DONE"       from "TODO"       [2022-06-24 Fri 13:10]
 *** TODO Derive the sensitivity info from the SP.
 *** DONE Implement the full-BDD approach for the problem.
 CLOSED: [2022-06-20 Mon 12:57]

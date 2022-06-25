@@ -13,9 +13,9 @@ from time import time
 
 def main():
     print("experiment, n, M, L, N, A, tMIP, tMIP_CPP, tDD_VS, int_VS")
-    M = 7
+    M = 6
     L = 0.35
-    n = 11
+    n = 10
 
     for i in range(1, 100 + 1):
         i1, i2, jm = gen_cavemen_jUFLP_inst(n, M, L, linking="consecutive")

@@ -77,11 +77,13 @@ def generate_overlaps(S):
     Returns:
         f (list): list of lists, f[j][a], a=0,..,|S_j|
     """
-    Fmax = 10.0
-    f = [[Fmax, 0.0] for _ in range(len(S))]
+    F0 = 2.0
+    Fw = 5.0
+    f = [[] for _ in range(len(S))]
     for j in range(len(S)):
-        for a in range(1, len(S[j])):
-            f[j].append(Fmax * (np.random.uniform()-0.5))
+        f[j] = [F0 + Fw, 0.0]
+        for a in range(2, len(S[j])+1):
+            f[j].append(F0 + Fw * (np.random.uniform()-0.5))
 
     return f
 

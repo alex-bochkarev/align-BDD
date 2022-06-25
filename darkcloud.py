@@ -90,8 +90,9 @@ def gen_caveman_inst(n=10, M=5, L=0.5, verbose=False):
 
     # creating costs info (location and overlap costs)
     f = generate_overlaps(S)
-    Cmax = 5.0
-    c = [Cmax*np.random.uniform() for _ in range(len(S))]
+    C0 = 5.0
+    Cw = 1.0
+    c = [C0 + Cw*(np.random.uniform()-0.5) for _ in range(len(S))]
     if verbose:
         print(f"S={S};\nf={f}\n;c={c}")
     return S, f, c, caves
