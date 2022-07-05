@@ -1,0 +1,148 @@
+experiment, n, M, L, N, A, inst_type, linking, tMIP, tMIP_CPP, tDD_VS, int_VS
+---
+Set parameter TokenServer to value "license8.clemson.edu"
+✅ MIP in 241.31 sec
+✅ CPP MIP in 120.28 sec
+✅ Full DDs VS in 774.78 sec
+✅ Full DDs toA VS in 1168.48 sec
+1, 4, 11, 0.35, 94, 300.0, 1-link, consecutive, 241.31, 120.28, 1168.48, 53005
+---
+✅ MIP in 62.09 sec
+✅ CPP MIP in 69.06 sec
+✅ Full DDs VS in 58.61 sec
+✅ Full DDs toA VS in 53.64 sec
+2, 4, 11, 0.35, 94, 300.0, 1-link, consecutive, 62.09, 69.06, 53.64, 26911
+---
+✅ MIP in 490.12 sec
+✅ CPP MIP in 182.15 sec
+✅ Full DDs VS in 54.96 sec
+✅ Full DDs toA VS in 50.25 sec
+3, 4, 11, 0.35, 94, 300.0, 1-link, consecutive, 490.12, 182.15, 50.25, 14973
+---
+✅ MIP in 67.26 sec
+✅ CPP MIP in 65.98 sec
+✅ Full DDs VS in 51.49 sec
+✅ Full DDs toA VS in 44.39 sec
+4, 4, 11, 0.35, 94, 300.0, 1-link, consecutive, 67.26, 65.98, 44.39, 13238
+---
+✅ MIP in 157.72 sec
+✅ CPP MIP in 112.62 sec
+✅ Full DDs VS in 51.63 sec
+✅ Full DDs toA VS in 46.06 sec
+5, 4, 11, 0.35, 94, 300.0, 1-link, consecutive, 157.72, 112.62, 46.06, 15849
+---
+✅ MIP in 131.60 sec
+✅ CPP MIP in 73.92 sec
+✅ Full DDs VS in 51.68 sec
+✅ Full DDs toA VS in 45.77 sec
+6, 4, 11, 0.35, 94, 300.0, 1-link, consecutive, 131.60, 73.92, 45.77, 16271
+---
+✅ MIP in 68.87 sec
+✅ CPP MIP in 79.04 sec
+✅ Full DDs VS in 64.18 sec
+✅ Full DDs toA VS in 58.37 sec
+7, 4, 11, 0.35, 94, 300.0, 1-link, consecutive, 68.87, 79.04, 58.37, 22063
+---
+✅ MIP in 462.48 sec
+✅ CPP MIP in 97.71 sec
+✅ Full DDs VS in 51.72 sec
+✅ Full DDs toA VS in 45.68 sec
+8, 4, 11, 0.35, 94, 300.0, 1-link, consecutive, 462.48, 97.71, 45.68, 17616
+---
+✅ MIP in 57.20 sec
+✅ CPP MIP in 49.99 sec
+✅ Full DDs VS in 54.47 sec
+✅ Full DDs toA VS in 48.30 sec
+9, 4, 11, 0.35, 94, 300.0, 1-link, consecutive, 57.20, 49.99, 48.30, 17359
+---
+✅ MIP in 215.95 sec
+✅ CPP MIP in 120.03 sec
+✅ Full DDs VS in 59.80 sec
+✅ Full DDs toA VS in 58.38 sec
+10, 4, 11, 0.35, 94, 300.0, 1-link, consecutive, 215.95, 120.03, 58.38, 20767
+---
+✅ MIP in 200.89 sec
+✅ CPP MIP in 76.05 sec
+✅ Full DDs VS in 52.70 sec
+✅ Full DDs toA VS in 46.65 sec
+11, 4, 11, 0.35, 94, 300.0, 1-link, consecutive, 200.89, 76.05, 46.65, 14751
+---
+✅ MIP in 208.89 sec
+✅ CPP MIP in 82.78 sec
+✅ Full DDs VS in 50.89 sec
+✅ Full DDs toA VS in 44.95 sec
+12, 4, 11, 0.35, 94, 300.0, 1-link, consecutive, 208.89, 82.78, 44.95, 18791
+---
+✅ MIP in 107.96 sec
+✅ CPP MIP in 85.91 sec
+✅ Full DDs VS in 52.50 sec
+✅ Full DDs toA VS in 45.04 sec
+13, 4, 11, 0.35, 94, 300.0, 1-link, consecutive, 107.96, 85.91, 45.04, 13679
+---
+✅ MIP in 143.14 sec
+✅ CPP MIP in 66.85 sec
+✅ Full DDs VS in 53.15 sec
+✅ Full DDs toA VS in 46.39 sec
+14, 4, 11, 0.35, 94, 300.0, 1-link, consecutive, 143.14, 66.85, 46.39, 14779
+---
+✅ MIP in 126.51 sec
+✅ CPP MIP in 92.57 sec
+✅ Full DDs VS in 52.33 sec
+✅ Full DDs toA VS in 46.21 sec
+15, 4, 11, 0.35, 94, 300.0, 1-link, consecutive, 126.51, 92.57, 46.21, 16775
+---
+✅ MIP in 190.40 sec
+✅ CPP MIP in 116.57 sec
+✅ Full DDs VS in 54.96 sec
+✅ Full DDs toA VS in 47.84 sec
+16, 4, 11, 0.35, 94, 300.0, 1-link, consecutive, 190.40, 116.57, 47.84, 15383
+---
+✅ MIP in 228.00 sec
+✅ CPP MIP in 106.57 sec
+✅ Full DDs VS in 54.39 sec
+✅ Full DDs toA VS in 46.72 sec
+17, 4, 11, 0.35, 94, 300.0, 1-link, consecutive, 228.00, 106.57, 46.72, 17771
+---
+✅ MIP in 138.90 sec
+✅ CPP MIP in 72.94 sec
+✅ Full DDs VS in 50.44 sec
+✅ Full DDs toA VS in 45.37 sec
+18, 4, 11, 0.35, 94, 300.0, 1-link, consecutive, 138.90, 72.94, 45.37, 15783
+---
+✅ MIP in 77.81 sec
+✅ CPP MIP in 81.79 sec
+✅ Full DDs VS in 54.06 sec
+✅ Full DDs toA VS in 48.79 sec
+19, 4, 11, 0.35, 94, 300.0, 1-link, consecutive, 77.81, 81.79, 48.79, 18291
+---
+✅ MIP in 350.71 sec
+✅ CPP MIP in 116.21 sec
+✅ Full DDs VS in 54.58 sec
+✅ Full DDs toA VS in 47.03 sec
+20, 4, 11, 0.35, 94, 300.0, 1-link, consecutive, 350.71, 116.21, 47.03, 14883
+---
+✅ MIP in 98.66 sec
+✅ CPP MIP in 82.15 sec
+✅ Full DDs VS in 54.89 sec
+✅ Full DDs toA VS in 49.51 sec
+21, 4, 11, 0.35, 94, 300.0, 1-link, consecutive, 98.66, 82.15, 49.51, 18027
+---
+✅ MIP in 134.24 sec
+✅ CPP MIP in 80.25 sec
+=>> PBS: job killed: walltime 10801 exceeded limit 10800
+ 
+ 
++------------------------------------------+ 
+| PALMETTO CLUSTER PBS RESOURCES REQUESTED | 
++------------------------------------------+ 
+ 
+mem=15gb,walltime=03:00:00,ncpus=1
+ 
+ 
++-------------------------------------+ 
+| PALMETTO CLUSTER PBS RESOURCES USED | 
++-------------------------------------+ 
+ 
+cput=02:56:11,mem=4665668kb,walltime=03:00:12,ncpus=1,cpupercent=96,vmem=5821512kb
+ 
+ 
