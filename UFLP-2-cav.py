@@ -204,7 +204,7 @@ def draw_jUFLP_inst(i1, i2, link, filename="tmp/jUFLP.dot"):
 
 if __name__ == '__main__':
     print("experiment, n, M, L, N, A, inst_type, linking, tMIP, tMIP_CPP, tDD_VS, int_VS")
-    M = 13
+    M = 11
     L = 0.35
     n = 4
     linking = "consecutive"
@@ -227,14 +227,15 @@ if __name__ == '__main__':
         print(f"✅ CPP MIP in {tMIP_CPP:.2f} sec", flush=True)
 
         t0 = time()
+        objDD3, int_VS = solve_cm_jUFLP_fullDDs(i1, i2, jm, "VS", True)
+        tDD_VS = time() - t0
+        print(f"✅ Full DDs VS in {tDD_VS:.2f} sec", flush=True)
+
+        t0 = time()
         objDD3, int_VS = solve_cm_jUFLP_fullDDs(i1, i2, jm, "toA", True)
         tDD_VS = time() - t0
         print(f"✅ Full DDs toA VS in {tDD_VS:.2f} sec", flush=True)
 
-        t0 = time()
-        objDD3, int_VS = solve_cm_jUFLP_fullDDs(i1, i2, jm, "VS", True)
-        tDD_VS = time() - t0
-        print(f"✅ Full DDs VS in {tDD_VS:.2f} sec", flush=True)
 
         assert abs(objMIP - objMIP_CPP) < 0.01, f"objMIP = {objMIP:.2f}, objMIP_CPP={objMIP_CPP:.2f}"
         assert abs(objMIP - objDD3) < 0.01, f"objMIP = {objMIP:.2f}, objDD3={objDD3:.2f}"

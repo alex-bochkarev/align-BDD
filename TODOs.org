@@ -38,6 +38,7 @@ Need to fine-tune the files to check (ignore =.venv=, etc.)
 :END:
 *** WIP Figure a good instance type?
 :LOGBOOK:
+CLOCK: [2022-07-05 Tue 14:56]--[2022-07-05 Tue 15:17] =>  0:21
 CLOCK: [2022-06-23 Thu 13:27]--[2022-06-23 Thu 14:04] =>  0:37
 CLOCK: [2022-06-23 Thu 12:49]--[2022-06-23 Thu 13:24] =>  0:35
 CLOCK: [2022-06-21 Tue 12:41]--[2022-06-21 Tue 13:00] =>  0:19
@@ -82,6 +83,8 @@ CLOCK: [2022-06-24 Fri 13:11]--[2022-06-24 Fri 13:41] =>  0:30
 **** DONE adjust costs (1--5 ➡ 100--105)
 CLOSED: [2022-06-24 Fri 13:10]
 - State "DONE"       from "TODO"       [2022-06-24 Fri 13:10]
+**** TODO single-cloud instance -- would it work?
+**** TODO experiment with grids.
 *** TODO Derive the sensitivity info from the SP.
 *** DONE Implement the full-BDD approach for the problem.
 CLOSED: [2022-06-20 Mon 12:57]

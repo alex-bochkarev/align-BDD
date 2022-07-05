@@ -1,0 +1,16 @@
+#PBS -N FLP2c
+#PBS -l select=1:ncpus=1:mem=15gb:interconnect=any,walltime=03:00:00
+#PBS -j oe
+#PBS -M abochka@g.clemson.edu
+#PBS -m abe
+
+cd /home/abochka/BDD/align-BDD
+source .venv/bin/activate
+module add gurobi
+
+# run-command
+tgs -m "Experiment started: 2-cav-instances, n=4, M=11, L=0.35."
+fname="run_logs/2022-07-05_jUFLP_vs_MIPs_2cav.out"
+python -m UFLP-2-cav | tee $fname
+tgs -m "Experiment done."
+tgs -f $fname.csv
