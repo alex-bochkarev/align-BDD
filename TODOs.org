@@ -40,6 +40,8 @@ Need to fine-tune the files to check (ignore =.venv=, etc.)
 :END:
 *** WIP Figure a good instance type?
 :LOGBOOK:
+CLOCK: [2022-07-06 Wed 17:03]--[2022-07-06 Wed 17:04] =>  0:01
+CLOCK: [2022-07-06 Wed 16:39]--[2022-07-06 Wed 16:49] =>  0:10
 CLOCK: [2022-07-06 Wed 12:28]--[2022-07-06 Wed 15:56] =>  3:28
 CLOCK: [2022-07-05 Tue 20:02]--[2022-07-05 Tue 20:54] =>  0:52
 CLOCK: [2022-07-05 Tue 14:56]--[2022-07-05 Tue 15:17] =>  0:21

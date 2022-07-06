@@ -177,8 +177,10 @@ def gen_special_jUFLP(n, M, L, linking="consecutive", inst_type="cavemen"):
         # clusters = [k for k in reversed(range(len(ca2)))]
         clusters = [k for k in range(len(ca2))]
         for k in range(len(ca1)):
+            # link.update(dict(zip(ca1[k],
+            #                      np.random.permutation(ca2[clusters[k]]))))
             link.update(dict(zip(ca1[k],
-                                 np.random.permutation(ca2[clusters[k]]))))
+                                 reversed(ca2[clusters[k]]))))
 
         in_clusters1 = np.unique(sum([], ca1))
         in_clusters2 = np.unique(sum([], ca2))
@@ -243,7 +245,7 @@ if __name__ == '__main__':
     print("experiment, n, M, L, N, A, inst_type, linking, tMIP, tMIP_CPP, tDD_VS, tDD_toA, int_VS, int_VS_toA")
     M = 10
     L = 0.35
-    n = 3
+    n = 5
     linking = "cluster-reverse"
     inst_type = "cavemen"
 

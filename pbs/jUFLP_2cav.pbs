@@ -9,8 +9,8 @@ source .venv/bin/activate
 module add gurobi
 
 # run-command
-tgs -m "Experiment started: 2-cav-instances, n=4, M=11, L=0.35."
-fname="run_logs/2022-07-05_jUFLP_vs_MIPs_2cav.out"
+tgs -m "Experiment started: 2-cav-instances, n=5, M=10, L=0.35."
+fname="run_logs/2022-07-06_jUFLP_vs_MIPs_cavemen_normal.out"
 python -m UFLP-2-cav | tee $fname
 tgs -m "Experiment done."
 tgs -f $fname.csv
