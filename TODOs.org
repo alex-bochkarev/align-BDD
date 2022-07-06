@@ -74,6 +74,15 @@ Also, this one gives t VS << t toA:
     inst_type = "1-link"
 #+end_src
 
+This seems to work really well, except toA:
+#+begin_src python
+    M = 10
+    L = 0.35
+    n = 5
+    linking = "cluster-reverse"
+    inst_type = "cavemen"
+#+end_src
+
 **** DONE node-connected clouds
 CLOSED: [2022-06-24 Fri 13:09]
 - State "DONE"       from "TODO"       [2022-06-24 Fri 13:09]
