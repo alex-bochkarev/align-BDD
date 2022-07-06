@@ -347,6 +347,7 @@ def solve_cm_jUFLP_CPPMIP_fullDDs(i1, i2, jmap):
 
     m, c, v, x = add_BDD_to_MIP(B1, prefix="B1_")
     m, c, v, x = add_BDD_to_MIP(B2, model=m, x=x, prefix="B2_")
+    print(">", flush=True, end="")
     m.update()
     m.setParam("OutputFlag", 0)
     m.optimize()

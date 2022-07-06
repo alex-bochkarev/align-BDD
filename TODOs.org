@@ -27,6 +27,8 @@
     distribute the first facility into every bin, and then sort them randomly?
 
 * Current project TODOs
+** TODO Adjust =is_reduced= for weighted BDDs
+[2022-07-06 Wed 13:11]
 ** TODO fix =check_src= makefile target
 [2022-06-01 Wed 13:06]
 [[file:~/projects/align-BDD/Makefile::egrep -nr --color 'TODO|FIXME|BUG|NOTE']]
@@ -38,6 +40,8 @@ Need to fine-tune the files to check (ignore =.venv=, etc.)
 :END:
 *** WIP Figure a good instance type?
 :LOGBOOK:
+CLOCK: [2022-07-06 Wed 12:28]--[2022-07-06 Wed 15:56] =>  3:28
+CLOCK: [2022-07-05 Tue 20:02]--[2022-07-05 Tue 20:54] =>  0:52
 CLOCK: [2022-07-05 Tue 14:56]--[2022-07-05 Tue 15:17] =>  0:21
 CLOCK: [2022-06-23 Thu 13:27]--[2022-06-23 Thu 14:04] =>  0:37
 CLOCK: [2022-06-23 Thu 12:49]--[2022-06-23 Thu 13:24] =>  0:35
@@ -57,6 +61,17 @@ generally:
   i1, i2, jm = gen_cavemen_jUFLP_inst(n, M, L)
 #+end_src
 see [[file:experiments/jUFLP_vsMIPs.py::L = 0.35][jUFLP_vsMIPs]].
+
+
+Also, this one gives t VS << t toA:
+#+begin_src  python
+    M = 5
+    L = 0.15
+    n = 5
+    linking = "by-cluster"
+    inst_type = "1-link"
+#+end_src
+
 **** DONE node-connected clouds
 CLOSED: [2022-06-24 Fri 13:09]
 - State "DONE"       from "TODO"       [2022-06-24 Fri 13:09]

@@ -82,8 +82,8 @@ def gen_nlinks_cavemen_inst(n=10, M=5, L=0.5):
 
     # creating costs info (location and overlap costs)
     f = generate_overlaps(S)
-    C0 = 2.0
-    Cw = 5.0
+    C0 = 200.0
+    Cw = 10.0
     c = [C0 + Cw*(np.random.uniform() - 0.5) for _ in range(len(S))]
     return S, f, c, caves
 
@@ -99,6 +99,8 @@ def gen_special_jUFLP(n, M, L, linking="consecutive", inst_type="cavemen"):
             - "consecutive": link randomly within consecutive clusters
               ('ladder linking')
             - "by-cluster": link randomly, but cluster-to-cluster.
+            - "cluster-reverse": consecutive clusters, in reverse order
+              within each pair of clusters.
             - "literal": trivial linking, 1-to-1.
 
         inst_type (str): instance topology, one of:
@@ -166,6 +168,28 @@ def gen_special_jUFLP(n, M, L, linking="consecutive", inst_type="cavemen"):
                    if j not in in_clusters2]
 
         link.update(dict(zip(origins, targets)))
+    elif linking == "cluster-reverse":
+        ca1 = [S for S in i1[COL_caves]]
+        ca2 = [S for S in i2[COL_caves]]
+
+        link = dict()
+        # clusters = [k for k in np.random.permutation(range(len(ca2)))]
+        # clusters = [k for k in reversed(range(len(ca2)))]
+        clusters = [k for k in range(len(ca2))]
+        for k in range(len(ca1)):
+            link.update(dict(zip(ca1[k],
+                                 np.random.permutation(ca2[clusters[k]]))))
+
+        in_clusters1 = np.unique(sum([], ca1))
+        in_clusters2 = np.unique(sum([], ca2))
+
+        origins = [j for j in range(1, len(i1[0])+1)
+                   if j not in in_clusters1]
+
+        targets = [j for j in range(1, len(i2[0])+1)
+                   if j not in in_clusters2]
+
+        link.update(dict(zip(origins, targets)))
     elif linking == "literal":
         link = dict(zip([j for j in range(1, len(i1[0])+1)],
                         [j for j in range(1, len(i2[0])+1)]))
@@ -202,17 +226,31 @@ def draw_jUFLP_inst(i1, i2, link, filename="tmp/jUFLP.dot"):
         fout.write("}")
 
 
+def shuffle_inst(instance):
+    """Shuffles the graph nodes randomly."""
+    S, f, c, caves = instance
+    inew = [j for j in range(len(S))]
+    np.random.shuffle(inew)
+    Sp = [[inew[j-1]+1 for j in S[inew[i]]] for i in range(len(S))]
+    fp = [f[inew[i]] for i in range(len(S))]
+    cp = [c[inew[i]] for i in range(len(S))]
+    cavesp = [[inew[j-1] for j in cave] for cave in caves]
+
+    return (Sp, fp, cp, cavesp)
+
+
 if __name__ == '__main__':
-    print("experiment, n, M, L, N, A, inst_type, linking, tMIP, tMIP_CPP, tDD_VS, int_VS")
-    M = 11
+    print("experiment, n, M, L, N, A, inst_type, linking, tMIP, tMIP_CPP, tDD_VS, tDD_toA, int_VS, int_VS_toA")
+    M = 10
     L = 0.35
-    n = 4
-    linking = "consecutive"
-    inst_type = "1-link"
+    n = 3
+    linking = "cluster-reverse"
+    inst_type = "cavemen"
 
     for i in range(1, 100+1):
         i1, i2, jm = gen_special_jUFLP(n, M, L, linking, inst_type)
         # save_inst(i1, i2, jm, f"instances/jUFLP_cm/inst_wMIP_{i}.json")
+        # i2 = shuffle_inst(i2)
 
         print("---")
         t0 = time()
@@ -227,22 +265,23 @@ if __name__ == '__main__':
         print(f"✅ CPP MIP in {tMIP_CPP:.2f} sec", flush=True)
 
         t0 = time()
-        objDD3, int_VS = solve_cm_jUFLP_fullDDs(i1, i2, jm, "VS", True)
+        objDD_VS, int_VS = solve_cm_jUFLP_fullDDs(i1, i2, jm, "VS", True)
         tDD_VS = time() - t0
         print(f"✅ Full DDs VS in {tDD_VS:.2f} sec", flush=True)
 
         t0 = time()
-        objDD3, int_VS = solve_cm_jUFLP_fullDDs(i1, i2, jm, "toA", True)
-        tDD_VS = time() - t0
-        print(f"✅ Full DDs toA VS in {tDD_VS:.2f} sec", flush=True)
+        objDD_toA, int_VS_toA = solve_cm_jUFLP_fullDDs(i1, i2, jm, "toA", True)
+        tDD_toA = time() - t0
+        print(f"✅ Full DDs toA in {tDD_toA:.2f} sec", flush=True)
 
 
         assert abs(objMIP - objMIP_CPP) < 0.01, f"objMIP = {objMIP:.2f}, objMIP_CPP={objMIP_CPP:.2f}"
-        assert abs(objMIP - objDD3) < 0.01, f"objMIP = {objMIP:.2f}, objDD3={objDD3:.2f}"
+        assert abs(objMIP - objDD_VS) < 0.01, f"objMIP = {objMIP:.2f}, objDD_VS={objDD_VS:.2f}"
+        assert abs(objMIP - objDD_toA) < 0.01, f"objMIP = {objMIP:.2f}, objDD_toA={objDD_toA:.2f}"
 
 
         A = sum([len(s)-1 for s in i1[0]])/2+sum([len(s)-1 for s in i2[0]])/2
         print(f"{i}, {n}, {M}, {L}, {len(i1[0])+len(i2[0])}, {A}, " +
               f"{inst_type}, {linking}, " +
-              f"{tMIP:.2f}, {tMIP_CPP:.2f}, {tDD_VS:.2f}, {int_VS}",
+              f"{tMIP:.2f}, {tMIP_CPP:.2f}, {tDD_VS:.2f}, {tDD_toA:.2f}, {int_VS}, {int_VS_toA}",
               flush=True)

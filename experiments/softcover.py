@@ -77,8 +77,8 @@ def generate_overlaps(S):
     Returns:
         f (list): list of lists, f[j][a], a=0,..,|S_j|
     """
-    F0 = 2.0
-    Fw = 5.0
+    F0 = 0.0
+    Fw = 200.0
     f = [[] for _ in range(len(S))]
     for j in range(len(S)):
         f[j] = [F0 + Fw, 0.0]
