@@ -83,6 +83,56 @@ This seems to work really well, except toA:
     inst_type = "cavemen"
 #+end_src
 
+That's what works:
+#+begin_src python
+    M = 15
+    L = 0.35
+    n = 3
+    linking = "cluster-reverse"
+    inst_type = "cavemen"
+#+end_src
+
+where I have:
+#+begin_src python
+  # linking code:
+  elif linking == "cluster-reverse":
+      ca1 = [S for S in i1[COL_caves]]
+      ca2 = [S for S in i2[COL_caves]]
+
+      link = dict()
+      # clusters = [k for k in np.random.permutation(range(len(ca2)))]
+      # clusters = [k for k in reversed(range(len(ca2)))]
+      clusters = [k for k in range(len(ca2))]
+      for k in range(len(ca1)):
+          # link.update(dict(zip(ca1[k],
+          #                      np.random.permutation(ca2[clusters[k]]))))
+          link.update(dict(zip(ca1[k],
+                               reversed(ca2[clusters[k]]))))
+
+      in_clusters1 = np.unique(sum([], ca1))
+      in_clusters2 = np.unique(sum([], ca2))
+
+      origins = [j for j in range(1, len(i1[0])+1)
+                 if j not in in_clusters1]
+
+      targets = [j for j in range(1, len(i2[0])+1)
+                 if j not in in_clusters2]
+
+      link.update(dict(zip(origins, targets)))
+#+end_src
+
+
+and gives:
+#+begin_example
+experiment, n, M, L, N, A, inst_type, linking, tMIP, tMIP_CPP, tDD_VS, tDD_toA, int_VS, int_VS_toA
+1, 3, 15, 0.35, 90, 418.0, cavemen, cluster-reverse, 6835.82, 8703.79, 639.00, 655.28, 174199, 413959
+---
+✅ MIP in 6835.82 sec
+>✅ CPP MIP in 8703.79 sec
+✅ Full DDs VS in 639.00 sec
+✅ Full DDs toA in 655.28 sec
+---
+#+end_example
 **** DONE node-connected clouds
 CLOSED: [2022-06-24 Fri 13:09]
 - State "DONE"       from "TODO"       [2022-06-24 Fri 13:09]
