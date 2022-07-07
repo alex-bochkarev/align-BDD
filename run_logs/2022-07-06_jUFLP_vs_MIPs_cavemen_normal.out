@@ -1,0 +1,11 @@
+experiment, n, M, L, N, A, inst_type, linking, tMIP, tMIP_CPP, tDD_VS, tDD_toA, int_VS, int_VS_toA
+---
+Set parameter TokenServer to value "license8.clemson.edu"
+✅ MIP in 711.88 sec
+>✅ CPP MIP in 455.38 sec
+✅ Full DDs VS in 35.61 sec
+✅ Full DDs toA in 30.09 sec
+1, 5, 10, 0.35, 100, 308.0, cavemen, cluster-reverse, 711.88, 455.38, 35.61, 30.09, 11959, 14447
+---
+✅ MIP in 1144.19 sec
+>✅ CPP MIP in 1404.36 sec

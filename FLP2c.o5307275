@@ -1,0 +1,28 @@
+experiment, n, M, L, N, A, inst_type, linking, tMIP, tMIP_CPP, tDD_VS, tDD_toA, int_VS, int_VS_toA
+---
+Set parameter TokenServer to value "license8.clemson.edu"
+✅ MIP in 711.88 sec
+>✅ CPP MIP in 455.38 sec
+✅ Full DDs VS in 35.61 sec
+✅ Full DDs toA in 30.09 sec
+1, 5, 10, 0.35, 100, 308.0, cavemen, cluster-reverse, 711.88, 455.38, 35.61, 30.09, 11959, 14447
+---
+✅ MIP in 1144.19 sec
+>✅ CPP MIP in 1404.36 sec
+[2022-07-06T13:39:14-0400]: run_logs/2022-07-06_jUFLP_vs_MIPs_cavemen_normal.out.csv -- file not found
+ 
+ 
++------------------------------------------+ 
+| PALMETTO CLUSTER PBS RESOURCES REQUESTED | 
++------------------------------------------+ 
+ 
+mem=15gb,walltime=03:00:00,ncpus=1
+ 
+ 
++-------------------------------------+ 
+| PALMETTO CLUSTER PBS RESOURCES USED | 
++-------------------------------------+ 
+ 
+cput=02:30:30,mem=15733976kb,walltime=02:33:47,ncpus=1,cpupercent=97,vmem=17977220kb
+ 
+ 

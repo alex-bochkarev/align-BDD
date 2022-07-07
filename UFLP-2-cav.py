@@ -243,7 +243,7 @@ def shuffle_inst(instance):
 
 if __name__ == '__main__':
     print("experiment, n, M, L, N, A, inst_type, linking, tMIP, tMIP_CPP, tDD_VS, tDD_toA, int_VS, int_VS_toA")
-    M = 14
+    M = 15
     L = 0.35
     n = 3
     linking = "cluster-reverse"
