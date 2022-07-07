@@ -245,45 +245,46 @@ if __name__ == '__main__':
     print("experiment, n, M, L, N, A, inst_type, linking, tMIP, tMIP_CPP, tDD_VS, tDD_toA, int_VS, int_VS_toA")
     M = 15
     L = 0.35
-    n = 3
+    n = 2
     linking = "cluster-reverse"
     inst_type = "cavemen"
 
+    k = 0
     for i in range(1, 100+1):
-        i1, i2, jm = gen_special_jUFLP(n, M, L, linking, inst_type)
-        # save_inst(i1, i2, jm, f"instances/jUFLP_cm/inst_wMIP_{i}.json")
-        # i2 = shuffle_inst(i2)
+        for M in [10, 12, 14]:
+            k += 1
+            i1, i2, jm = gen_special_jUFLP(n, M, L, linking, inst_type)
+            # save_inst(i1, i2, jm, f"instances/jUFLP_cm/inst_wMIP_{i}.json")
+            # i2 = shuffle_inst(i2)
 
-        print("---")
-        t0 = time()
-        objMIP = solve_cm_jUFLP_MIP(i1, i2, jm)
-        tMIP = time() - t0
-        print(f"✅ MIP in {tMIP:.2f} sec", flush=True)
+            print("---")
+            t0 = time()
+            objMIP = solve_cm_jUFLP_MIP(i1, i2, jm)
+            tMIP = time() - t0
+            print(f"✅ MIP in {tMIP:.2f} sec", flush=True)
 
-        # solve with CPP MIP
-        t0 = time()
-        objMIP_CPP = solve_cm_jUFLP_CPPMIP_fullDDs(i1, i2, jm)
-        tMIP_CPP = time() - t0
-        print(f"✅ CPP MIP in {tMIP_CPP:.2f} sec", flush=True)
+            # solve with CPP MIP
+            t0 = time()
+            objMIP_CPP = solve_cm_jUFLP_CPPMIP_fullDDs(i1, i2, jm)
+            tMIP_CPP = time() - t0
+            print(f"✅ CPP MIP in {tMIP_CPP:.2f} sec", flush=True)
 
-        t0 = time()
-        objDD_VS, int_VS = solve_cm_jUFLP_fullDDs(i1, i2, jm, "VS", True)
-        tDD_VS = time() - t0
-        print(f"✅ Full DDs VS in {tDD_VS:.2f} sec", flush=True)
+            t0 = time()
+            objDD_VS, int_VS = solve_cm_jUFLP_fullDDs(i1, i2, jm, "VS", True)
+            tDD_VS = time() - t0
+            print(f"✅ Full DDs VS in {tDD_VS:.2f} sec", flush=True)
 
-        t0 = time()
-        objDD_toA, int_VS_toA = solve_cm_jUFLP_fullDDs(i1, i2, jm, "toA", True)
-        tDD_toA = time() - t0
-        print(f"✅ Full DDs toA in {tDD_toA:.2f} sec", flush=True)
+            t0 = time()
+            objDD_toA, int_VS_toA = solve_cm_jUFLP_fullDDs(i1, i2, jm, "toA", True)
+            tDD_toA = time() - t0
+            print(f"✅ Full DDs toA in {tDD_toA:.2f} sec", flush=True)
 
+            assert abs(objMIP - objMIP_CPP) < 0.01, f"objMIP = {objMIP:.2f}, objMIP_CPP={objMIP_CPP:.2f}"
+            assert abs(objMIP - objDD_VS) < 0.01, f"objMIP = {objMIP:.2f}, objDD_VS={objDD_VS:.2f}"
+            assert abs(objMIP - objDD_toA) < 0.01, f"objMIP = {objMIP:.2f}, objDD_toA={objDD_toA:.2f}"
 
-        # assert abs(objMIP - objMIP_CPP) < 0.01, f"objMIP = {objMIP:.2f}, objMIP_CPP={objMIP_CPP:.2f}"
-        # assert abs(objMIP - objDD_VS) < 0.01, f"objMIP = {objMIP:.2f}, objDD_VS={objDD_VS:.2f}"
-        # assert abs(objMIP - objDD_toA) < 0.01, f"objMIP = {objMIP:.2f}, objDD_toA={objDD_toA:.2f}"
-
-
-        A = sum([len(s)-1 for s in i1[0]])/2+sum([len(s)-1 for s in i2[0]])/2
-        print(f"{i}, {n}, {M}, {L}, {len(i1[0])+len(i2[0])}, {A}, " +
-              f"{inst_type}, {linking}, " +
-              f"{tMIP:.2f}, {tMIP_CPP:.2f}, {tDD_VS:.2f}, {tDD_toA:.2f}, {int_VS}, {int_VS_toA}",
-              flush=True)
+            A = sum([len(s)-1 for s in i1[0]])/2+sum([len(s)-1 for s in i2[0]])/2
+            print(f"{k}, {n}, {M}, {L}, {len(i1[0])+len(i2[0])}, {A}, " +
+                  f"{inst_type}, {linking}, " +
+                  f"{tMIP:.2f}, {tMIP_CPP:.2f}, {tDD_VS:.2f}, {tDD_toA:.2f}, {int_VS}, {int_VS_toA}",
+                  flush=True)
