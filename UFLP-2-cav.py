@@ -251,7 +251,7 @@ if __name__ == '__main__':
 
     k = 0
     for i in range(1, 100+1):
-        for M in [10, 12, 14]:
+        for M in [10, 12, 15]:
             k += 1
             i1, i2, jm = gen_special_jUFLP(n, M, L, linking, inst_type)
             # save_inst(i1, i2, jm, f"instances/jUFLP_cm/inst_wMIP_{i}.json")

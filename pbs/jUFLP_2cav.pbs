@@ -1,5 +1,5 @@
 #PBS -N FLP2c
-#PBS -l select=1:ncpus=4:mem=15gb:interconnect=any,walltime=09:00:00
+#PBS -l select=1:ncpus=1:mem=15gb:interconnect=any,walltime=09:00:00
 #PBS -j oe
 #PBS -M abochka@g.clemson.edu
 #PBS -m abe
