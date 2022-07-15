@@ -12,7 +12,7 @@ from time import time
 
 from experiments.softcover import generate_overlaps
 from jUFLP_cavemen import solve_cm_jUFLP_MIP, solve_cm_jUFLP_CPPMIP_fullDDs
-from jUFLP_cavemen import solve_cm_jUFLP_fullDDs
+from jUFLP_cavemen import solve_cm_jUFLP_fullDDs, save_inst
 from darkcloud import gen_caveman_inst
 
 # UFLP instance description structure
@@ -254,8 +254,7 @@ if __name__ == '__main__':
         for M in [10, 12, 15]:
             k += 1
             i1, i2, jm = gen_special_jUFLP(n, M, L, linking, inst_type)
-            # save_inst(i1, i2, jm, f"instances/jUFLP_cm/inst_wMIP_{i}.json")
-            # i2 = shuffle_inst(i2)
+            save_inst(i1, i2, jm, f"instances/jUFLP_cm/inst_{i}.json")
 
             print("---")
             t0 = time()
