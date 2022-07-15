@@ -1,5 +1,5 @@
-#PBS -N FLP2c
-#PBS -l select=1:ncpus=1:mem=15gb:interconnect=any,walltime=09:00:00
+#PBS -N DvsMiP
+#PBS -l select=1:ncpus=1:mem=15gb:interconnect=any,walltime=27:00:00
 #PBS -j oe
 #PBS -M abochka@g.clemson.edu
 #PBS -m abe
@@ -10,7 +10,7 @@ module add gurobi
 
 # run-command
 tgs -m "Experiment started: 2-cav-instances, n=2, M=10--14, L=0.35."
-fname="run_logs/2022-07-07_jUFLP_vs_MIPs_cavemen_n2.out"
-python -m UFLP-2-cav | tee $fname
+fname="run_logs/2022-07-15_DDs_vs_MiP.out"
+python -m UFLP_2_cav | tee $fname
 tgs -m "Experiment done."
 tgs -f $fname.csv

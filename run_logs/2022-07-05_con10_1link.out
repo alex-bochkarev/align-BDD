@@ -1,0 +1,23 @@
+experiment, n, M, L, N, A, inst_type, linking, tMIP, tMIP_CPP, tDD_VS, int_VS
+---
+Set parameter Username
+✅ MIP in 30.51 sec
+✅ CPP MIP in 20.48 sec
+✅ Full DDs VS in 19.26 sec
+✅ Full DDs toA VS in 16.68 sec
+1, 4, 11, 0.25, 94, 348.0, 1-link, consecutive, 30.51, 20.48, 16.68, 18233
+---
+✅ MIP in 15.60 sec
+✅ CPP MIP in 18.37 sec
+✅ Full DDs VS in 19.53 sec
+✅ Full DDs toA VS in 17.25 sec
+2, 4, 11, 0.25, 94, 348.0, 1-link, consecutive, 15.60, 18.37, 17.25, 12805
+---
+✅ MIP in 17.25 sec
+✅ CPP MIP in 21.67 sec
+✅ Full DDs VS in 18.49 sec
+✅ Full DDs toA VS in 16.27 sec
+3, 4, 11, 0.25, 94, 348.0, 1-link, consecutive, 17.25, 21.67, 16.27, 15175
+---
+✅ MIP in 8.81 sec
+✅ CPP MIP in 45.13 sec
