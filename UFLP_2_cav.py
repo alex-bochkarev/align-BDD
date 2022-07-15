@@ -14,6 +14,8 @@ from experiments.softcover import generate_overlaps
 from jUFLP_cavemen import solve_cm_jUFLP_MIP, solve_cm_jUFLP_CPPMIP_fullDDs
 from jUFLP_cavemen import solve_cm_jUFLP_fullDDs
 from darkcloud import gen_caveman_inst
+from jUFLP_utils import save_inst
+
 
 # UFLP instance description structure
 # UFLP_inst = (S, f, c, caves)
@@ -202,30 +204,6 @@ def gen_special_jUFLP(n, M, L, linking="consecutive", inst_type="cavemen"):
     return i1, i2, link
 
 
-def draw_jUFLP_inst(i1, i2, link, filename="tmp/jUFLP.dot"):
-    """Saves an instance to a ``.dot`` file."""
-    with open(filename, "w") as fout:
-        fout.write("graph G {\n")
-
-        for (inst, no, pref) in [(i1, 1, 'f'), (i2, 2, 's')]:
-            S, f, c, caves = inst
-            fout.write(f"    subgraph cluster_{no-1}" +
-                       " {\n")  # encoding a sub-instance
-            fout.write(f'        color=blue; label="sub-UFLP-{no}";')
-            added = set([])
-            for i in range(len(S)):
-                for j in S[i]:
-                    if ((i+1) != j) and not (((j, (i+1)) in added)
-                                             or ((i+1, j) in added)):
-
-                        fout.write(f"        {pref}{i+1}--{pref}{j};\n")
-                        added.add(((i+1), j))
-
-            fout.write("    };\n")  # end of sub-instance
-
-        for j in link:
-            fout.write(f"    f{j} -- s{link[j]}[color=red, style=dashed, penwidth=1];\n")
-        fout.write("}")
 
 
 def shuffle_inst(instance):
@@ -254,8 +232,7 @@ if __name__ == '__main__':
         for M in [10, 12, 15]:
             k += 1
             i1, i2, jm = gen_special_jUFLP(n, M, L, linking, inst_type)
-            # save_inst(i1, i2, jm, f"instances/jUFLP_cm/inst_wMIP_{i}.json")
-            # i2 = shuffle_inst(i2)
+            save_inst(i1, i2, jm, f"instances/jUFLP_cm/inst_{k}.json")
 
             print("---")
             t0 = time()

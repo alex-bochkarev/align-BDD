@@ -1,5 +1,6 @@
 """A simple illustration for the special instance type for joint UFLP."""
-from UFLP_2_cav import gen_special_jUFLP, draw_jUFLP_inst
+from UFLP_2_cav import gen_special_jUFLP
+from jUFLP_utils import draw_jUFLP_inst
 
 
 # if __name__ == '__main__':
