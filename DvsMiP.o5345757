@@ -1,0 +1,30 @@
+Traceback (most recent call last):
+  File "/software/spackages/linux-centos8-x86_64/gcc-8.4.1/python-3.10.3-lp3nt6bbn6eimnv76rdctfss56ugmyvh/lib/python3.10/runpy.py", line 196, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "/software/spackages/linux-centos8-x86_64/gcc-8.4.1/python-3.10.3-lp3nt6bbn6eimnv76rdctfss56ugmyvh/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "/home/abochka/BDD/align-BDD/UFLP_2_cav.py", line 257, in <module>
+    save_inst(i1, i2, jm, f"instances/jUFLP_cm/inst_{i}.json")
+  File "/home/abochka/BDD/align-BDD/jUFLP_cavemen.py", line 83, in save_inst
+    'ptsclouds': [i1[3][j].__dict__
+  File "/home/abochka/BDD/align-BDD/jUFLP_cavemen.py", line 83, in <listcomp>
+    'ptsclouds': [i1[3][j].__dict__
+AttributeError: 'list' object has no attribute '__dict__'. Did you mean: '__dir__'?
+experiment, n, M, L, N, A, inst_type, linking, tMIP, tMIP_CPP, tDD_VS, tDD_toA, int_VS, int_VS_toA
+[2022-07-15T09:45:29-0400]: run_logs/2022-07-15_DDs_vs_MiP.out.csv -- file not found
+ 
+ 
++------------------------------------------+ 
+| PALMETTO CLUSTER PBS RESOURCES REQUESTED | 
++------------------------------------------+ 
+ 
+mem=15gb,walltime=27:00:00,ncpus=1
+ 
+ 
++-------------------------------------+ 
+| PALMETTO CLUSTER PBS RESOURCES USED | 
++-------------------------------------+ 
+ 
+cput=00:00:05,mem=99616kb,walltime=00:00:07,ncpus=1,cpupercent=0,vmem=9660kb
+ 
+ 
