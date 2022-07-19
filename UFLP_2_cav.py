@@ -121,7 +121,7 @@ def gen_special_jUFLP(n, M, L, linking="consecutive", inst_type="cavemen"):
         caves1 = [ca.S for ca in i1[3]]
         caves2 = [ca.S for ca in i2[3]]
         i1 = [i1[0], i1[1], i1[2], caves1]
-        i2 = [i2[0], i2[1], i2[2], caves1]
+        i2 = [i2[0], i2[1], i2[2], caves2]
     else:
         raise ValueError(f"Wrong value of `inst_type`({inst_type})" +
                          "expected: '1-link' or 'cavemen'")

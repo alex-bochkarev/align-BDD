@@ -337,8 +337,8 @@ def solve_cm_jUFLP_CPPMIP_fullDDs(i1, i2, jmap):
     S, f, c, caves = i1
     S2, f2, c2, caves2 = i2
 
-    B1, _ = create_cover_DD(S, f, c, UFLP_greedy_order(S))
-    B2, _ = create_cover_DD(S2, f2, c2, UFLP_greedy_order(S2))
+    B1, _ = create_cover_DD(S, f, c, UFLP_greedy_order(S, True))
+    B2, _ = create_cover_DD(S2, f2, c2, UFLP_greedy_order(S2, False))
 
     B1.make_reduced()
     B2.make_reduced()
@@ -366,8 +366,8 @@ def solve_cm_jUFLP_fullDDs(i1, i2, jmap, intmode,
     S, f, c, caves = i1
     S2, f2, c2, caves2 = i2
 
-    o1 = UFLP_greedy_order(S)
-    o2 = UFLP_greedy_order(S2)
+    o1 = UFLP_greedy_order(S, True)
+    o2 = UFLP_greedy_order(S2, False)
 
     B1, _ = create_cover_DD(S, f, c, o1)
     B2, _ = create_cover_DD(S2, f2, c2, o2)

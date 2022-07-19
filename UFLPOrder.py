@@ -5,6 +5,7 @@ Assuming overlap costs and instance parameterization with S, f, c.
 from heapq import heappop, heappush
 import numpy as np
 from sys import maxsize
+from copy import copy
 
 REMOVED = maxsize
 
@@ -17,20 +18,23 @@ class N2RList:
         see `heapq docs <https://docs.python.org/3/library/heapq.html>`_
         for more info.
     """
-    def __init__(self, S):
+    def __init__(self, S, directSort=True):
         """Initializes the prio que structure."""
-        self.S = S
+        self.S = [copy(s) for s in S]
         self.N2 = []
         self.pq = []
         self.set_index = {}
         self.removed = []
 
-        for j in range(len(S)):
+        for j in range(len(self.S)):
             N2 = []
-            for i in S[j]:
-                N2 += [s for s in S[i-1] if s not in N2]
+            for i in self.S[j]:
+                N2 += [s for s in self.S[i-1] if s not in N2]
 
-            self.N2.append(N2)
+            if directSort:
+                self.N2.append(list(np.sort(N2)))
+            else:
+                self.N2.append([x for x in reversed((np.sort(N2)))])
 
             entry = [len(N2), (j+1)]
             self.set_index[j+1] = entry
@@ -75,7 +79,7 @@ class N2RList:
         return len(self.pq)
 
 
-def UFLP_greedy_order(S):
+def UFLP_greedy_order(S, directSort=True):
     """Finds a good order for BDD representing UFLP.
 
     Args:
@@ -89,7 +93,7 @@ def UFLP_greedy_order(S):
     Returns:
         A list of nodes to add to a BDD (according to a greedy algo).
     """
-    N2 = N2RList(S)
+    N2 = N2RList(S, directSort)
     order = []
     while (len(N2) > 0) and len(order) < len(S):
         order += N2.pop()
