@@ -7,7 +7,7 @@ from jUFLP_utils import load_inst, save_inst
 
 
 # if __name__ == '__main__':
-M = 5
+M = 6
 L = 0.35
 n = 2
 linking = "cluster-reverse"
@@ -27,4 +27,4 @@ N2s = N2RList(S)
 D, nl = create_cover_DD(S, f, c, opt_order)
 
 D.show(node_labels=nl)
-print(f"order={opt_order}")
+print(f"|B|={D.size()}\n order={opt_order}")

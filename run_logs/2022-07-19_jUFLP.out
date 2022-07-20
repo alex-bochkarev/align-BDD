@@ -1,0 +1,209 @@
+experiment, n, M, L, N, A, inst_type, linking, tMIP, tMIP_CPP, tDD_VS, tDD_toA, int_VS, int_VS_toA
+---
+Set parameter Username
+✅ MIP in 1.96 sec
+✅ CPP MIP in 3.52 sec
+✅ Full DDs VS in 2.26 sec
+✅ Full DDs toA in 3.00 sec
+1, 2, 10, 0.35, 40, 122.0, cavemen, cluster-reverse, 1.96, 3.52, 2.26, 3.00, 3155, 18235
+---
+✅ MIP in 6.65 sec
+✅ CPP MIP in 14.98 sec
+✅ Full DDs VS in 10.13 sec
+✅ Full DDs toA in 10.33 sec
+2, 2, 12, 0.35, 48, 174.0, cavemen, cluster-reverse, 6.65, 14.98, 10.13, 10.33, 12919, 18975
+---
+✅ MIP in 291.23 sec
+✅ CPP MIP in 1660.12 sec
+✅ Full DDs VS in 138.07 sec
+✅ Full DDs toA in 166.00 sec
+3, 2, 15, 0.35, 60, 278.0, cavemen, cluster-reverse, 291.23, 1660.12, 138.07, 166.00, 102606, 1081439
+---
+✅ MIP in 1.91 sec
+✅ CPP MIP in 3.38 sec
+✅ Full DDs VS in 2.31 sec
+✅ Full DDs toA in 2.64 sec
+4, 2, 10, 0.35, 40, 122.0, cavemen, cluster-reverse, 1.91, 3.38, 2.31, 2.64, 3671, 14547
+---
+✅ MIP in 17.61 sec
+✅ CPP MIP in 37.53 sec
+✅ Full DDs VS in 9.34 sec
+✅ Full DDs toA in 11.64 sec
+5, 2, 12, 0.35, 48, 174.0, cavemen, cluster-reverse, 17.61, 37.53, 9.34, 11.64, 9659, 15707
+---
+✅ MIP in 104.97 sec
+✅ CPP MIP in 813.31 sec
+✅ Full DDs VS in 104.11 sec
+✅ Full DDs toA in 105.83 sec
+6, 2, 15, 0.35, 60, 278.0, cavemen, cluster-reverse, 104.97, 813.31, 104.11, 105.83, 100599, 137335
+---
+✅ MIP in 1.48 sec
+✅ CPP MIP in 2.47 sec
+✅ Full DDs VS in 43.65 sec
+✅ Full DDs toA in 77.19 sec
+7, 2, 10, 0.35, 40, 122.0, cavemen, cluster-reverse, 1.48, 2.47, 43.65, 77.19, 17439, 3379
+---
+✅ MIP in 5.37 sec
+✅ CPP MIP in 19.33 sec
+✅ Full DDs VS in 9.58 sec
+✅ Full DDs toA in 10.58 sec
+8, 2, 12, 0.35, 48, 174.0, cavemen, cluster-reverse, 5.37, 19.33, 9.58, 10.58, 10951, 45151
+---
+✅ MIP in 204.27 sec
+✅ CPP MIP in 736.91 sec
+✅ Full DDs VS in 101.91 sec
+✅ Full DDs toA in 133.83 sec
+9, 2, 15, 0.35, 60, 278.0, cavemen, cluster-reverse, 204.27, 736.91, 101.91, 133.83, 82061, 753727
+---
+✅ MIP in 3.30 sec
+✅ CPP MIP in 2.87 sec
+✅ Full DDs VS in 2.20 sec
+✅ Full DDs toA in 2.29 sec
+10, 2, 10, 0.35, 40, 122.0, cavemen, cluster-reverse, 3.30, 2.87, 2.20, 2.29, 3388, 6868
+---
+✅ MIP in 17.46 sec
+✅ CPP MIP in 28.07 sec
+✅ Full DDs VS in 9.97 sec
+✅ Full DDs toA in 12.44 sec
+11, 2, 12, 0.35, 48, 174.0, cavemen, cluster-reverse, 17.46, 28.07, 9.97, 12.44, 11403, 72763
+---
+✅ MIP in 175.85 sec
+✅ CPP MIP in 1376.98 sec
+✅ Full DDs VS in 112.93 sec
+✅ Full DDs toA in 134.79 sec
+12, 2, 15, 0.35, 60, 278.0, cavemen, cluster-reverse, 175.85, 1376.98, 112.93, 134.79, 106707, 792313
+---
+✅ MIP in 1.58 sec
+✅ CPP MIP in 2.97 sec
+✅ Full DDs VS in 1.95 sec
+✅ Full DDs toA in 2.00 sec
+13, 2, 10, 0.35, 40, 122.0, cavemen, cluster-reverse, 1.58, 2.97, 1.95, 2.00, 2527, 4255
+---
+✅ MIP in 8.47 sec
+✅ CPP MIP in 24.63 sec
+✅ Full DDs VS in 10.76 sec
+✅ Full DDs toA in 11.80 sec
+14, 2, 12, 0.35, 48, 174.0, cavemen, cluster-reverse, 8.47, 24.63, 10.76, 11.80, 12871, 55799
+---
+✅ MIP in 388.31 sec
+✅ CPP MIP in 1773.06 sec
+✅ Full DDs VS in 103.45 sec
+✅ Full DDs toA in 136.95 sec
+15, 2, 15, 0.35, 60, 278.0, cavemen, cluster-reverse, 388.31, 1773.06, 103.45, 136.95, 75071, 772270
+---
+✅ MIP in 0.86 sec
+✅ CPP MIP in 2.57 sec
+✅ Full DDs VS in 2.11 sec
+✅ Full DDs toA in 2.71 sec
+16, 2, 10, 0.35, 40, 122.0, cavemen, cluster-reverse, 0.86, 2.57, 2.11, 2.71, 2583, 17839
+---
+✅ MIP in 4.09 sec
+✅ CPP MIP in 18.89 sec
+✅ Full DDs VS in 10.58 sec
+✅ Full DDs toA in 10.97 sec
+17, 2, 12, 0.35, 48, 174.0, cavemen, cluster-reverse, 4.09, 18.89, 10.58, 10.97, 13471, 27719
+---
+✅ MIP in 265.17 sec
+✅ CPP MIP in 1410.01 sec
+✅ Full DDs VS in 95.27 sec
+✅ Full DDs toA in 96.99 sec
+18, 2, 15, 0.35, 60, 278.0, cavemen, cluster-reverse, 265.17, 1410.01, 95.27, 96.99, 70779, 99339
+---
+✅ MIP in 0.55 sec
+✅ CPP MIP in 2.33 sec
+✅ Full DDs VS in 1.91 sec
+✅ Full DDs toA in 2.24 sec
+19, 2, 10, 0.35, 40, 122.0, cavemen, cluster-reverse, 0.55, 2.33, 1.91, 2.24, 2807, 13879
+---
+✅ MIP in 8.66 sec
+✅ CPP MIP in 19.03 sec
+✅ Full DDs VS in 11.01 sec
+✅ Full DDs toA in 12.72 sec
+20, 2, 12, 0.35, 48, 174.0, cavemen, cluster-reverse, 8.66, 19.03, 11.01, 12.72, 13511, 75325
+---
+✅ MIP in 213.13 sec
+✅ CPP MIP in 3799.03 sec
+✅ Full DDs VS in 110.48 sec
+✅ Full DDs toA in 136.24 sec
+21, 2, 15, 0.35, 60, 278.0, cavemen, cluster-reverse, 213.13, 3799.03, 110.48, 136.24, 106695, 651351
+---
+✅ MIP in 1.70 sec
+✅ CPP MIP in 2.82 sec
+✅ Full DDs VS in 2.23 sec
+✅ Full DDs toA in 2.55 sec
+22, 2, 10, 0.35, 40, 122.0, cavemen, cluster-reverse, 1.70, 2.82, 2.23, 2.55, 3271, 15109
+---
+✅ MIP in 8.88 sec
+✅ CPP MIP in 27.55 sec
+✅ Full DDs VS in 11.00 sec
+✅ Full DDs toA in 14.28 sec
+23, 2, 12, 0.35, 48, 174.0, cavemen, cluster-reverse, 8.88, 27.55, 11.00, 14.28, 14519, 85071
+---
+✅ MIP in 176.23 sec
+✅ CPP MIP in 467.19 sec
+✅ Full DDs VS in 111.25 sec
+✅ Full DDs toA in 147.71 sec
+24, 2, 15, 0.35, 60, 278.0, cavemen, cluster-reverse, 176.23, 467.19, 111.25, 147.71, 102667, 983145
+---
+✅ MIP in 1.52 sec
+✅ CPP MIP in 3.14 sec
+✅ Full DDs VS in 2.19 sec
+✅ Full DDs toA in 2.72 sec
+25, 2, 10, 0.35, 40, 122.0, cavemen, cluster-reverse, 1.52, 3.14, 2.19, 2.72, 2575, 16959
+---
+✅ MIP in 10.00 sec
+✅ CPP MIP in 23.69 sec
+✅ Full DDs VS in 10.40 sec
+✅ Full DDs toA in 10.77 sec
+26, 2, 12, 0.35, 48, 174.0, cavemen, cluster-reverse, 10.00, 23.69, 10.40, 10.77, 13535, 27759
+---
+✅ MIP in 310.03 sec
+✅ CPP MIP in 1164.51 sec
+✅ Full DDs VS in 99.20 sec
+✅ Full DDs toA in 102.21 sec
+27, 2, 15, 0.35, 60, 278.0, cavemen, cluster-reverse, 310.03, 1164.51, 99.20, 102.21, 86263, 159879
+---
+✅ MIP in 2.50 sec
+✅ CPP MIP in 3.04 sec
+✅ Full DDs VS in 2.31 sec
+✅ Full DDs toA in 2.63 sec
+28, 2, 10, 0.35, 40, 122.0, cavemen, cluster-reverse, 2.50, 3.04, 2.31, 2.63, 3687, 14697
+---
+✅ MIP in 13.49 sec
+✅ CPP MIP in 23.13 sec
+✅ Full DDs VS in 10.42 sec
+✅ Full DDs toA in 11.35 sec
+29, 2, 12, 0.35, 48, 174.0, cavemen, cluster-reverse, 13.49, 23.13, 10.42, 11.35, 14503, 43063
+---
+✅ MIP in 336.43 sec
+✅ CPP MIP in 1016.69 sec
+✅ Full DDs VS in 99.82 sec
+✅ Full DDs toA in 131.11 sec
+30, 2, 15, 0.35, 60, 278.0, cavemen, cluster-reverse, 336.43, 1016.69, 99.82, 131.11, 74559, 798899
+---
+✅ MIP in 1.30 sec
+✅ CPP MIP in 2.82 sec
+✅ Full DDs VS in 2.12 sec
+✅ Full DDs toA in 2.14 sec
+31, 2, 10, 0.35, 40, 122.0, cavemen, cluster-reverse, 1.30, 2.82, 2.12, 2.14, 3129, 4121
+---
+✅ MIP in 7.29 sec
+✅ CPP MIP in 15.94 sec
+✅ Full DDs VS in 10.12 sec
+✅ Full DDs toA in 12.33 sec
+32, 2, 12, 0.35, 48, 174.0, cavemen, cluster-reverse, 7.29, 15.94, 10.12, 12.33, 12727, 70487
+---
+✅ MIP in 676.45 sec
+✅ CPP MIP in 1928.51 sec
+✅ Full DDs VS in 99.86 sec
+✅ Full DDs toA in 121.68 sec
+33, 2, 15, 0.35, 60, 278.0, cavemen, cluster-reverse, 676.45, 1928.51, 99.86, 121.68, 74991, 470593
+---
+✅ MIP in 0.78 sec
+✅ CPP MIP in 3.05 sec
+✅ Full DDs VS in 2.17 sec
+✅ Full DDs toA in 2.39 sec
+34, 2, 10, 0.35, 40, 122.0, cavemen, cluster-reverse, 0.78, 3.05, 2.17, 2.39, 3315, 12751
+---
+✅ MIP in 8.07 sec
+✅ CPP MIP in 20.42 sec
