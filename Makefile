@@ -287,6 +287,14 @@ $(LOGS)/darkcloud_rnd_cover.csv: experiments/dclouds_rndcover.py
 $(LOGS)/dcloud_jUFLP_cavemen.csv: jUFLP_cavemen.py
 				python -m jUFLP_cavemen | tee $@
 
+
+# --- j-UFLP figures ---
+tMIP_tMIPCPP_tDD.eps, intDD_VS_vs_toA.eps, t_VS_vs_toA.eps:  $(LOGS)/2022-07-19_jUFLP.csv, $(PP)/fig_DDvsMIP.R
+				Rscript $(PP)/fig_DDvsMIP.R
+
+
+# --- end of j-UFLP figures ---
+
 ## clean-up
 # ######################################################################
 # # auxiliary recipes
