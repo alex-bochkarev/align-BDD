@@ -1,12 +1,12 @@
-.. module:: experiments.sample_BB_tree
-.. currentmodule:: experiments.sample_BB_tree
+.. module:: experiments.greedy_UFLP_sizes
+.. currentmodule:: experiments.greedy_UFLP_sizes
 
-experiments.sample\_BB\_tree
-============================
+experiments.greedy\_UFLP\_sizes
+===============================
 
 Module summary
 ---------------
-.. automodule:: experiments.sample_BB_tree
+.. automodule:: experiments.greedy_UFLP_sizes
    :no-members:
    :noindex:
 

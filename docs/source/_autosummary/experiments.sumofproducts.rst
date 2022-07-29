@@ -1,12 +1,12 @@
-.. module:: experiments.sample_BB_tree
-.. currentmodule:: experiments.sample_BB_tree
+.. module:: experiments.sumofproducts
+.. currentmodule:: experiments.sumofproducts
 
-experiments.sample\_BB\_tree
-============================
+experiments.sumofproducts
+=========================
 
 Module summary
 ---------------
-.. automodule:: experiments.sample_BB_tree
+.. automodule:: experiments.sumofproducts
    :no-members:
    :noindex:
 
@@ -21,7 +21,8 @@ Implements functions (outside the classes above):
 .. autosummary::
 
 
-   main
+   gen_instance
+   make_MIP
 
 
 
@@ -44,7 +45,8 @@ Functions
 ---------
 
 
-.. autofunction:: main
+.. autofunction:: gen_instance
+.. autofunction:: make_MIP
 
 
 

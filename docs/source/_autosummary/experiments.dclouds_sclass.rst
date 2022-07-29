@@ -1,12 +1,12 @@
-.. module:: experiments.sample_BB_tree
-.. currentmodule:: experiments.sample_BB_tree
+.. module:: experiments.dclouds_sclass
+.. currentmodule:: experiments.dclouds_sclass
 
-experiments.sample\_BB\_tree
-============================
+experiments.dclouds\_sclass
+===========================
 
 Module summary
 ---------------
-.. automodule:: experiments.sample_BB_tree
+.. automodule:: experiments.dclouds_sclass
    :no-members:
    :noindex:
 

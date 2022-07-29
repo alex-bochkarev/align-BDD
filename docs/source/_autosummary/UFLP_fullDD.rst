@@ -1,12 +1,12 @@
-.. module:: experiments.sample_BB_tree
-.. currentmodule:: experiments.sample_BB_tree
+﻿.. module:: UFLP_fullDD
+.. currentmodule:: UFLP_fullDD
 
-experiments.sample\_BB\_tree
-============================
+UFLP\_fullDD
+============
 
 Module summary
 ---------------
-.. automodule:: experiments.sample_BB_tree
+.. automodule:: UFLP_fullDD
    :no-members:
    :noindex:
 
@@ -21,7 +21,12 @@ Implements functions (outside the classes above):
 .. autosummary::
 
 
-   main
+   calc_cost
+   create_cover_DD
+   make_label
+   test_cost_calc
+   test_fullDD_simple
+   test_full_DD
 
 
 
@@ -44,7 +49,12 @@ Functions
 ---------
 
 
-.. autofunction:: main
+.. autofunction:: calc_cost
+.. autofunction:: create_cover_DD
+.. autofunction:: make_label
+.. autofunction:: test_cost_calc
+.. autofunction:: test_fullDD_simple
+.. autofunction:: test_full_DD
 
 
 

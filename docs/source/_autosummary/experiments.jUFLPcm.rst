@@ -1,12 +1,12 @@
-.. module:: experiments.sample_BB_tree
-.. currentmodule:: experiments.sample_BB_tree
+.. module:: experiments.jUFLPcm
+.. currentmodule:: experiments.jUFLPcm
 
-experiments.sample\_BB\_tree
-============================
+experiments.jUFLPcm
+===================
 
 Module summary
 ---------------
-.. automodule:: experiments.sample_BB_tree
+.. automodule:: experiments.jUFLPcm
    :no-members:
    :noindex:
 

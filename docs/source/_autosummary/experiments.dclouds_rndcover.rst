@@ -1,12 +1,12 @@
-.. module:: experiments.sample_BB_tree
-.. currentmodule:: experiments.sample_BB_tree
+.. module:: experiments.dclouds_rndcover
+.. currentmodule:: experiments.dclouds_rndcover
 
-experiments.sample\_BB\_tree
-============================
+experiments.dclouds\_rndcover
+=============================
 
 Module summary
 ---------------
-.. automodule:: experiments.sample_BB_tree
+.. automodule:: experiments.dclouds_rndcover
    :no-members:
    :noindex:
 

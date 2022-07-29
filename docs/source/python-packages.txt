@@ -1,0 +1,106 @@
+from copy import copy
+import pytest
+import numpy as np
+from UFLPOrder import UFLP_greedy_order
+import varseq as vs
+import matplotlib.pyplot as plt
+import pandas as pd
+import copy as copy
+import anytree as at
+from anytree.exporter import DotExporter
+import heapq as heap
+from experiments.misc import log
+import heuristics as heu
+import tUFLP
+import BDD as DD
+import BB_search as bb
+import gurobipy as gp
+from gurobipy import GRB
+import copy
+import itertools as iters
+import math
+from graphviz import Digraph
+import sys
+from time import time
+from heapq import heappop, heappush
+from sys import maxsize
+import json
+from jUFLP_cavemen import jUFLPEncoder
+from experiments.softcover import generate_overlaps
+from jUFLP_cavemen import solve_cm_jUFLP_MIP, solve_cm_jUFLP_CPPMIP_fullDDs
+from jUFLP_cavemen import solve_cm_jUFLP_fullDDs
+from darkcloud import gen_caveman_inst
+from jUFLP_utils import save_inst
+import timeit
+import cProfile
+import pstats
+import BDD as exact
+import BB_search as BB
+    SETUP_CODE = '''import varseq as vs
+import numpy as np'''
+SETUP_CODE = '''import varseq as vs
+import BB_search as BB'''
+import BDD
+from random import randint
+    from UFL import add_BDD_to_MIP
+import UFL
+import os
+from tUFLP import *
+import argparse as ap
+from copy import deepcopy
+import BDD as BDD
+from jUFL import *
+from UFLP_2_cav import gen_special_jUFLP
+from jUFLP_utils import draw_jUFLP_inst
+from UFLPOrder import UFLP_greedy_order, N2RList
+from UFLP_fullDD import create_cover_DD
+from jUFLP_utils import load_inst, save_inst
+from darkcloud import ptscloud, DDSolver, gen_caveman_inst
+from BDD import intersect
+from varseq import VarSeq
+from BB_search import BBSearch
+from UFL import add_BDD_to_MIP
+import varseq as simpl
+from UFL import add_BDD_to_MIP, generate_test_instance
+from copy import copy as cpy
+import heapq
+from graphviz import Graph
+from itertools import permutations
+import networkx as nx
+from gurobipy import GRB  # noqa
+from BDD import BDD
+from BDD import BDD, intersect
+from darkcloud import gen_typed_cavemen_inst, solve_typed_with_MIP
+from darkcloud import solve_with_MIP, DDSolver, DDTypedSolver
+from jUFLP_cavemen import gen_cavemen_jUFLP_inst, solve_cm_jUFLP_MIP
+from jUFLP_cavemen import solve_cm_jUFLP_CPPMIP_fullDDs
+from jUFLP_cavemen import save_inst, solve_cm_jUFLP_fullDDs
+from darkcloud import gen_typed_cavemen_inst
+from darkcloud import DDSolver, DDTypedSolver
+import seaborn as sns
+from math import factorial
+from copy import deepcopy,copy
+from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
+import BB_search as bbs
+import gc as garbage
+import jUFL
+from importlib import reload
+from math import comb
+# import timeit
+from jUFLP_cavemen import solve_cm_jUFLP_DDs, save_inst
+from dataclasses import dataclass
+from experiments.softcover import generate_overlaps, assert_instance
+from BDD import BDD, NTRUE, NFALSE, NROOT, intersect
+from UFL import create_NF
+from tUFLP import DegreeKeeper
+from tUFLP import add_BDD_to_MIP
+import itertools
+import re
+from varseq import *
+from numpy.random import random as rnd
+from random import choice as rnd_choose
+from collections import deque
+# import requests # needed for Telegram
+import opt_parser as als
+from glob import glob
+from copy import deepcopy, copy

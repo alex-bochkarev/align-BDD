@@ -21,7 +21,7 @@ sys.path.insert(0, os.path.abspath('../../tests/'))
 # -- Project information -----------------------------------------------------
 
 project = 'Align-BDD'
-copyright = '2021, Alexey Bochkarev, Clemson University'
+copyright = '2019--2022, Alexey Bochkarev, Clemson University'
 author = 'Alexey Bochkarev'
 
 
@@ -35,7 +35,7 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.viewcode',
     'sphinx.ext.autosummary',
-    'sphinxcontrib.napoleon'
+    'sphinx.ext.napoleon'
 ]
 
 numpydoc_show_class_members = False

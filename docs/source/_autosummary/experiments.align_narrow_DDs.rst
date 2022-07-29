@@ -1,12 +1,12 @@
-.. module:: experiments.sample_BB_tree
-.. currentmodule:: experiments.sample_BB_tree
+.. module:: experiments.align_narrow_DDs
+.. currentmodule:: experiments.align_narrow_DDs
 
-experiments.sample\_BB\_tree
-============================
+experiments.align\_narrow\_DDs
+==============================
 
 Module summary
 ---------------
-.. automodule:: experiments.sample_BB_tree
+.. automodule:: experiments.align_narrow_DDs
    :no-members:
    :noindex:
 

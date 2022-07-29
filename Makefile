@@ -50,7 +50,10 @@ figures: \
 	$(FIGS)/various_simpl_vs_min.eps \
 	$(FIGS)/orig_lwidth_stats.eps \
 	$(FIGS)/tUFLP_runtimes_breakdown.eps \
-	$(FIGS)/aux_hist_orig.eps
+	$(FIGS)/aux_hist_orig.eps \
+  $(FIGS)/tMIP_tMIPCPP_tDD.eps \
+  $(FIGS)/intDD_VS_vs_toA.eps \
+  $(FIGS)/t_VS_vs_toA.eps
 
 ######################################################################
 ## Calculated values

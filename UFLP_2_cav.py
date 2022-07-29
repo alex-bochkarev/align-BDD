@@ -204,21 +204,6 @@ def gen_special_jUFLP(n, M, L, linking="consecutive", inst_type="cavemen"):
     return i1, i2, link
 
 
-
-
-def shuffle_inst(instance):
-    """Shuffles the graph nodes randomly."""
-    S, f, c, caves = instance
-    inew = [j for j in range(len(S))]
-    np.random.shuffle(inew)
-    Sp = [[inew[j-1]+1 for j in S[inew[i]]] for i in range(len(S))]
-    fp = [f[inew[i]] for i in range(len(S))]
-    cp = [c[inew[i]] for i in range(len(S))]
-    cavesp = [[inew[j-1] for j in cave] for cave in caves]
-
-    return (Sp, fp, cp, cavesp)
-
-
 if __name__ == '__main__':
     print("experiment, n, M, L, N, A, inst_type, linking, tMIP, tMIP_CPP, tDD_VS, tDD_toA, int_VS, int_VS_toA")
     M = 15

@@ -1,12 +1,12 @@
-.. module:: experiments.sample_BB_tree
-.. currentmodule:: experiments.sample_BB_tree
+﻿.. module:: UFLP_2_cav
+.. currentmodule:: UFLP_2_cav
 
-experiments.sample\_BB\_tree
-============================
+UFLP\_2\_cav
+============
 
 Module summary
 ---------------
-.. automodule:: experiments.sample_BB_tree
+.. automodule:: UFLP_2_cav
    :no-members:
    :noindex:
 
@@ -21,7 +21,9 @@ Implements functions (outside the classes above):
 .. autosummary::
 
 
-   main
+   gen_nlinks_cavemen_inst
+   gen_special_jUFLP
+   shuffle_inst
 
 
 
@@ -44,7 +46,9 @@ Functions
 ---------
 
 
-.. autofunction:: main
+.. autofunction:: gen_nlinks_cavemen_inst
+.. autofunction:: gen_special_jUFLP
+.. autofunction:: shuffle_inst
 
 
 
