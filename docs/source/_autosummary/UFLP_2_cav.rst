@@ -23,7 +23,7 @@ Implements functions (outside the classes above):
 
    gen_nlinks_cavemen_inst
    gen_special_jUFLP
-   shuffle_inst
+   main
 
 
 
@@ -48,7 +48,7 @@ Functions
 
 .. autofunction:: gen_nlinks_cavemen_inst
 .. autofunction:: gen_special_jUFLP
-.. autofunction:: shuffle_inst
+.. autofunction:: main
 
 
 

@@ -1,10 +1,14 @@
-"""Generates cavemen-like instances with node-links.
+"""Generates and solves the special class j-UFLP instances.
 
-... -- [ ...-⊙-] -- ⊙ -- [-⊙-... ] -- ...
+Instances and the experiment as discussed in the paper, in Section 4.2 and
+Appendix F.2. Instances are generated using
+:py:func:`UFLP_2_cav.gen_special_jUFLP`, which is a wrapper for function
+:py:func:`darkcloud.gen_caveman_inst` for this class of instances. The
+experiment is implemented in :py:func:`UFLP_2_cav.main`.
 
-Therefore, after adding the first point of the next cluster, all the points of
-the previous clusters can be 'forgotten'. Theoretically, this should imply
-really compact BDD representations, somewhat of :math:`O(n 2^M)`.
+The rest of the code implemented alternative experiments (left out from the
+second revision of the paper).
+
 """
 import numpy as np
 from copy import copy
@@ -37,10 +41,10 @@ def gen_nlinks_cavemen_inst(n=10, M=5, L=0.5):
       S, f, c, caves: instance (S,f,c) and caves description.
 
     Note:
-      The parameter ``L`` is calculated as follows.
+      The parameter ``L`` assumed to be:
 
       .. math::
-          \\Lambda = 1 - 2\\frac{#\\textrm{existing arcs}}{N(N-1)}
+          L = 1 - 2\\frac{\\textrm{Number of existing arcs}}{N(N-1)}
 
       (See, e.g., Sefair and Smith 2016 on DSPI for a similar approach.)
 
@@ -204,7 +208,8 @@ def gen_special_jUFLP(n, M, L, linking="consecutive", inst_type="cavemen"):
     return i1, i2, link
 
 
-if __name__ == '__main__':
+def main():
+    """Implements the j-UFLP experiment discussed in Section 4.2."""
     print("experiment, n, M, L, N, A, inst_type, linking, tMIP, tMIP_CPP, tDD_VS, tDD_toA, int_VS, int_VS_toA")
     M = 15
     L = 0.35
@@ -250,3 +255,7 @@ if __name__ == '__main__':
                   f"{inst_type}, {linking}, " +
                   f"{tMIP:.2f}, {tMIP_CPP:.2f}, {tDD_VS:.2f}, {tDD_toA:.2f}, {int_VS}, {int_VS_toA}",
                   flush=True)
+
+
+if __name__ == '__main__':
+    main()

@@ -1,10 +1,6 @@
 """
 Implements the 'cloud' algorithm that builds a BDD for a UFL over a relaxed
 cavemen graph.
-
----
-(c) A. Bochkarev, Clemson University, 2022
-a@bochkarev.io
 """
 import numpy as np
 from dataclasses import dataclass
@@ -16,7 +12,6 @@ from time import time
 from copy import copy
 import varseq as vs
 import BB_search as bb
-from UFL import create_NF
 
 
 @dataclass

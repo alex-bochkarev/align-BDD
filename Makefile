@@ -295,6 +295,13 @@ $(LOGS)/dcloud_jUFLP_cavemen.csv: jUFLP_cavemen.py
 tMIP_tMIPCPP_tDD.eps, intDD_VS_vs_toA.eps, t_VS_vs_toA.eps:  $(LOGS)/2022-07-19_jUFLP.csv, $(PP)/fig_DDvsMIP.R
 				Rscript $(PP)/fig_DDvsMIP.R
 
+$(LOGS)/2022-07-19_jUFLP.csv: $(LOGS)/2022-07-19_jUFLP.out
+				head -1 $< > $@ && \
+				grep "^[0-9]*," $< >> $@
+
+
+$(LOGS)/2022-07-19_jUFLP.out: UFLP_2_cav.py
+				python -m UFLP_2_cav | tee $@
 
 # --- end of j-UFLP figures ---
 

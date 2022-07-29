@@ -48,14 +48,12 @@ Module summary
    experiments.align_narrow_DDs
    experiments.compare_simpl_LBs
    experiments.dclouds
-   experiments.dclouds_novs
    experiments.dclouds_rndcover
    experiments.dclouds_sclass
    experiments.exp_BDD_example
    experiments.gen_lsizes_stats
    experiments.greedy_UFLP_sizes
    experiments.heu_sol_struct
-   experiments.jUFLP-gen
    experiments.jUFLP_specins
    experiments.jUFLP_specins_smaller
    experiments.jUFLP_vsMIPs

@@ -1,6 +1,11 @@
-"""Proof-of-concept experiment: joint UFLP over special class of instances."""
+"""Proof-of-concept experiment: joint UFLP over special class of instances.
+
+Implements DD-based solution procedures for j-UFLP instances, along with the
+instance generation. Note that the up-to-date experiment corresponding to
+Section 4.2 of the paper is presented in :py:mod:`UFLP_2_cav`, but it calls
+solution procedures implemented in this module.
+"""
 import pytest
-from copy import deepcopy
 import numpy as np
 import gurobipy as gp
 import json
@@ -15,7 +20,10 @@ from UFLP_fullDD import create_cover_DD
 from UFLPOrder import UFLP_greedy_order
 
 
-def gen_cavemen_jUFLP_inst(n=10, M=7, L=0.25, verbose=False,
+def gen_cavemen_jUFLP_inst(n=10,
+                           M=7,
+                           L=0.25,
+                           verbose=False,
                            linking="default"):
     """Generates an instance with the related metadata (info on caves).
 
@@ -39,8 +47,10 @@ def gen_cavemen_jUFLP_inst(n=10, M=7, L=0.25, verbose=False,
     join_map = dict()
     if linking == "uniform":
         join_map = dict(
-            zip([j for j in range(1, len(S)+1)],
-                np.random.permutation([j for j in range(1, len(S)+1)])))
+            zip([j for j in range(1,
+                                  len(S) + 1)],
+                np.random.permutation([j for j in range(1,
+                                                        len(S) + 1)])))
     elif linking == "consecutive":
         ca1 = [ca.S for ca in caves]
         ca2 = [ca.S for ca in caves2]
@@ -59,10 +69,14 @@ def gen_cavemen_jUFLP_inst(n=10, M=7, L=0.25, verbose=False,
         print(f"S={S};\nf={f}\n;c={c}")
     return [[S, f, c, caves], [S2, f2, c2, caves2], join_map]
 
+
 # encoding numpy numbers
+
 
 # save and load instances
 class jUFLPEncoder(json.JSONEncoder):
+    """A technical implementation needed to save an instance as ``.json``"""
+
     def default(self, obj):
         if isinstance(obj, np.int64):
             return int(obj)
@@ -73,23 +87,29 @@ class jUFLPEncoder(json.JSONEncoder):
 
 
 def save_inst(i1, i2, join_map, filename):
-    """Saves the jUFLP instance to ``.json`` file."""
+    """Saves the jUFLP instance to ``.json`` file. (old instance format)."""
     with open(filename, "w") as fout:
-        fout.write(json.dumps({
-            'inst1':{
-                'S':i1[0],
-                'f':i1[1],
-                'c':i1[2],
-                'ptsclouds': [i1[3][j].__dict__
-                              for j in range(len(i1[3]))]},
-            'inst2':{
-                'S':i2[0],
-                'f':i2[1],
-                'c':i2[2],
-                'ptsclouds': [i2[3][j].__dict__
-                              for j in range(len(i2[3]))]},
-            'jmap':{int(j): join_map[j] for j in join_map}},
-                              cls=jUFLPEncoder))
+        fout.write(
+            json.dumps(
+                {
+                    'inst1': {
+                        'S': i1[0],
+                        'f': i1[1],
+                        'c': i1[2],
+                        'ptsclouds':
+                        [i1[3][j].__dict__ for j in range(len(i1[3]))]
+                    },
+                    'inst2': {
+                        'S': i2[0],
+                        'f': i2[1],
+                        'c': i2[2],
+                        'ptsclouds':
+                        [i2[3][j].__dict__ for j in range(len(i2[3]))]
+                    },
+                    'jmap': {int(j): join_map[j]
+                             for j in join_map}
+                },
+                cls=jUFLPEncoder))
 
 
 def load_inst(filename):
@@ -102,14 +122,16 @@ def load_inst(filename):
         json_inst = fin.read()
 
     json_dct = json.loads(json_inst)
-    return [[json_dct[f'inst{i}']['S'],
-            json_dct[f'inst{i}']['f'],
-            json_dct[f'inst{i}']['c'],
-            [ptscloud(ptc['e1'],
-                      ptc['e2'],
-                      ptc['S']) for ptc in json_dct[f'inst{i}']['ptsclouds']]]
-            for i in [1, 2]] + [{int(j1): json_dct['jmap'][j1]
-                                 for j1 in json_dct['jmap']}]
+    return [[
+        json_dct[f'inst{i}']['S'], json_dct[f'inst{i}']['f'],
+        json_dct[f'inst{i}']['c'],
+        [
+            ptscloud(ptc['e1'], ptc['e2'], ptc['S'])
+            for ptc in json_dct[f'inst{i}']['ptsclouds']
+        ]
+    ] for i in [1, 2]
+            ] + [{int(j1): json_dct['jmap'][j1]
+                  for j1 in json_dct['jmap']}]
 
 
 def show_inst(inst1, inst2, join_map, filename="./tmp/jUFLP.dot"):
@@ -128,10 +150,10 @@ def show_inst(inst1, inst2, join_map, filename="./tmp/jUFLP.dot"):
         join_pts = list(np.unique([j for j in join_pts if j is not None]))
         for i in range(len(S)):
             for j in S[i]:
-                if ((i+1) != j) and not (((j, (i+1)) in added)
-                                         or ((i+1, j) in added)):
+                if ((i + 1) != j) and not (((j, (i + 1)) in added) or
+                                           ((i + 1, j) in added)):
 
-                    if (i+1) in join_pts:
+                    if (i + 1) in join_pts:
                         pref_i = "j"
                     else:
                         pref_i = "f"
@@ -141,10 +163,11 @@ def show_inst(inst1, inst2, join_map, filename="./tmp/jUFLP.dot"):
                     else:
                         pref_j = "f"
 
-                    fout.write(f"    {pref_i}{i+1}--{pref_j}{j}[penwidth=3];\n")
-                    added.add(((i+1), j))
+                    fout.write(
+                        f"    {pref_i}{i+1}--{pref_j}{j}[penwidth=3];\n")
+                    added.add(((i + 1), j))
 
-            if (i+1) not in join_pts:
+            if (i + 1) not in join_pts:
                 fout.write(f"    f{i+1}[penwidth=3];\n")
         S, f, c, caves = inst1
         join_pts = sum([list(c.e1 + c.e2) for c in caves], [])
@@ -152,10 +175,10 @@ def show_inst(inst1, inst2, join_map, filename="./tmp/jUFLP.dot"):
         added = set([])
         for i in range(len(S)):
             for j in S[i]:
-                if ((i+1) != j) and not (((j, (i+1)) in added)
-                                         or ((i+1, j) in added)):
+                if ((i + 1) != j) and not (((j, (i + 1)) in added) or
+                                           ((i + 1, j) in added)):
 
-                    if (i+1) in join_pts:
+                    if (i + 1) in join_pts:
                         a = f"j{join_map[i+1]}"
                     else:
                         a = f"s{i+1}"
@@ -166,12 +189,14 @@ def show_inst(inst1, inst2, join_map, filename="./tmp/jUFLP.dot"):
                         b = f"s{j}"
 
                     fout.write(f"    {a}--{b}[color=red];\n")
-                    added.add(((i+1), j))
-            if (i+1) not in join_pts:
+                    added.add(((i + 1), j))
+            if (i + 1) not in join_pts:
                 fout.write(f"    s{i+1}[color=red, textcolor=red];\n")
 
         for j in join_pts:
-            fout.write(f"    j{join_map[j]}[style=filled, fillcolor=yellow, penwidth=5];\n")
+            fout.write(
+                f"    j{join_map[j]}[style=filled, fillcolor=yellow, penwidth=5];\n"
+            )
         fout.write("}")
 
 
@@ -186,40 +211,44 @@ def solve_cm_jUFLP_MIP(i1, i2, jmap):
     # add the first instance
     S, f, c, caves = i1
     # create variables
-    for j in range(1, len(S)+1):
-        x[(1, j)] = m.addVar(vtype=gp.GRB.BINARY, name=f"x1_{j}",
-                             obj=c[j-1])
+    for j in range(1, len(S) + 1):
+        x[(1, j)] = m.addVar(vtype=gp.GRB.BINARY, name=f"x1_{j}", obj=c[j - 1])
 
-        for a in range(1, len(S[j-1])+1):
-            y[(1, j, a)] = m.addVar(vtype=gp.GRB.BINARY, name=f"y1_{j}_{a}",
-                                    obj=f[j-1][a]-f[j-1][a-1])
+        for a in range(1, len(S[j - 1]) + 1):
+            y[(1, j, a)] = m.addVar(vtype=gp.GRB.BINARY,
+                                    name=f"y1_{j}_{a}",
+                                    obj=f[j - 1][a] - f[j - 1][a - 1])
 
     # create constraints
-    for j in range(1, len(S)+1):
-        m.addConstr(gp.quicksum(x[(1, k)] for k in S[j-1]) ==
-                    gp.quicksum(y[(1, j, a)] for a in range(1, len(S[j-1])+1)))
+    for j in range(1, len(S) + 1):
+        m.addConstr(
+            gp.quicksum(x[(1, k)] for k in S[j - 1]) == gp.quicksum(
+                y[(1, j, a)] for a in range(1,
+                                            len(S[j - 1]) + 1)))
 
-        for a in range(1, len(S[j-1])):
-            m.addConstr(y[(1, j, a)] >= y[(1, j, a+1)])
+        for a in range(1, len(S[j - 1])):
+            m.addConstr(y[(1, j, a)] >= y[(1, j, a + 1)])
 
     # add the second instance
     S, f, c, caves = i2
     # create variables
-    for j in range(1, len(S)+1):
-        x[(2, j)] = m.addVar(vtype=gp.GRB.BINARY, name=f"x2_{j}",
-                             obj=c[j-1])
+    for j in range(1, len(S) + 1):
+        x[(2, j)] = m.addVar(vtype=gp.GRB.BINARY, name=f"x2_{j}", obj=c[j - 1])
 
-        for a in range(1, len(S[j-1])+1):
-            y[(2, j, a)] = m.addVar(vtype=gp.GRB.BINARY, name=f"y2_{j}_{a}",
-                                    obj=f[j-1][a]-f[j-1][a-1])
+        for a in range(1, len(S[j - 1]) + 1):
+            y[(2, j, a)] = m.addVar(vtype=gp.GRB.BINARY,
+                                    name=f"y2_{j}_{a}",
+                                    obj=f[j - 1][a] - f[j - 1][a - 1])
 
     # create constraints
-    for j in range(1, len(S)+1):
-        m.addConstr(gp.quicksum(x[(2, k)] for k in S[j-1]) ==
-                    gp.quicksum(y[(2, j, a)] for a in range(1, len(S[j-1])+1)))
+    for j in range(1, len(S) + 1):
+        m.addConstr(
+            gp.quicksum(x[(2, k)] for k in S[j - 1]) == gp.quicksum(
+                y[(2, j, a)] for a in range(1,
+                                            len(S[j - 1]) + 1)))
 
-        for a in range(1, len(S[j-1])):
-            m.addConstr(y[(2, j, a)] >= y[(2, j, a+1)])
+        for a in range(1, len(S[j - 1])):
+            m.addConstr(y[(2, j, a)] >= y[(2, j, a + 1)])
 
     # link the two instances
     for j in jmap:
@@ -232,9 +261,7 @@ def solve_cm_jUFLP_MIP(i1, i2, jmap):
                            for fs in i1[1]]) + sum([fs[0] for fs in i2[1]])
 
 
-def solve_cm_jUFLP_DDs(i1, i2, jmap,
-                       intmode="toA",
-                       ret_int=False):
+def solve_cm_jUFLP_DDs(i1, i2, jmap, intmode="toA", ret_int=False):
     """Solves the jUFLP cavemen instance with DDs.
 
     Args:
@@ -353,8 +380,7 @@ def solve_cm_jUFLP_CPPMIP_fullDDs(i1, i2, jmap):
     return m.objVal
 
 
-def solve_cm_jUFLP_fullDDs(i1, i2, jmap, intmode,
-                           ret_int=False):
+def solve_cm_jUFLP_fullDDs(i1, i2, jmap, intmode, ret_int=False):
     """Solves the jUFLP cavemen instance with DDs.
 
     Args:
@@ -414,10 +440,10 @@ def dump_instance(S, caves, filename="tmp/S.dot"):
         fout.write("graph G {\n")
         for i in range(len(S)):
             for j in S[i]:
-                if ((i+1) != j) and not (((j, (i+1)) in added)
-                                         or ((i+1, j) in added)):
+                if ((i + 1) != j) and not (((j, (i + 1)) in added) or
+                                           ((i + 1, j) in added)):
                     fout.write(f"    n{i+1} -- n{j};\n")
-                    added.add(((i+1), j))
+                    added.add(((i + 1), j))
 
         fout.write("}")
 
@@ -437,45 +463,50 @@ def solve_with_MIP(S, S2, f, f2, c, caves):
     y2 = dict()
 
     # create variables
-    for j in range(1, len(S)+1):
-        x[j] = m.addVar(vtype=gp.GRB.BINARY, name=f"x_{j}",
-                        obj=c[j-1])
+    for j in range(1, len(S) + 1):
+        x[j] = m.addVar(vtype=gp.GRB.BINARY, name=f"x_{j}", obj=c[j - 1])
 
-        for a in range(1, len(S[j-1])+1):
-            y[(j, a)] = m.addVar(vtype=gp.GRB.BINARY, name=f"y_{j}_{a}",
-                                 obj=f[j-1][a]-f[j-1][a-1])
+        for a in range(1, len(S[j - 1]) + 1):
+            y[(j, a)] = m.addVar(vtype=gp.GRB.BINARY,
+                                 name=f"y_{j}_{a}",
+                                 obj=f[j - 1][a] - f[j - 1][a - 1])
 
-        for a in range(1, len(S2[j-1])+1):
-            y2[(j, a)] = m.addVar(vtype=gp.GRB.BINARY, name=f"y2_{j}_{a}",
-                                  obj=f2[j-1][a]-f2[j-1][a-1])
+        for a in range(1, len(S2[j - 1]) + 1):
+            y2[(j, a)] = m.addVar(vtype=gp.GRB.BINARY,
+                                  name=f"y2_{j}_{a}",
+                                  obj=f2[j - 1][a] - f2[j - 1][a - 1])
 
     # create constraints
-    for j in range(1, len(S)+1):
+    for j in range(1, len(S) + 1):
         # first-graph constraints
-        m.addConstr(gp.quicksum(x[k] for k in S[j-1]) ==
-                    gp.quicksum(y[(j, a)] for a in range(1, len(S[j-1])+1)))
+        m.addConstr(
+            gp.quicksum(x[k] for k in S[j - 1]) == gp.quicksum(
+                y[(j, a)] for a in range(1,
+                                         len(S[j - 1]) + 1)))
 
-        for a in range(1, len(S[j-1])):
-            m.addConstr(y[(j, a)] >= y[(j, a+1)])
+        for a in range(1, len(S[j - 1])):
+            m.addConstr(y[(j, a)] >= y[(j, a + 1)])
 
         # second-graph constraints
-        m.addConstr(gp.quicksum(x[k] for k in S2[j-1]) ==
-                    gp.quicksum(y2[(j, a)] for a in range(1, len(S2[j-1])+1)))
+        m.addConstr(
+            gp.quicksum(x[k] for k in S2[j - 1]) == gp.quicksum(
+                y2[(j, a)] for a in range(1,
+                                          len(S2[j - 1]) + 1)))
 
-        for a in range(1, len(S2[j-1])):
-            m.addConstr(y2[(j, a)] >= y2[(j, a+1)])
+        for a in range(1, len(S2[j - 1])):
+            m.addConstr(y2[(j, a)] >= y2[(j, a + 1)])
 
     m.update()
     print("Optimizing the model...", end="", flush=True)
     m.optimize()
     print("done.")
     assert m.status == gp.GRB.OPTIMAL
-    return m, (m.objVal + sum(fs[0] for fs in f) +
-               sum(fs2[0] for fs2 in f2)), x, y, y2
+    return m, (m.objVal + sum(fs[0]
+                              for fs in f) + sum(fs2[0]
+                                                 for fs2 in f2)), x, y, y2
 
 
-def solve_with_DDs(S, S2, f, f2, c, caves,
-                   intmode="toA"):
+def solve_with_DDs(S, S2, f, f2, c, caves, intmode="toA"):
     """Solves the jUFLP cavemen instance with DDs.
 
     Args:
@@ -518,9 +549,10 @@ def solve_with_DDs(S, S2, f, f2, c, caves,
     sp = int_DD.shortest_path()
     return sp[0]
 
+
 # Testing code ######################################################
-@pytest.mark.parametrize("test_inst", [gen_cavemen_jUFLP_inst(7, 7)
-                                       for _ in range(5)])
+@pytest.mark.parametrize("test_inst",
+                         [gen_cavemen_jUFLP_inst(7, 7) for _ in range(5)])
 def test_jUFL_DDs(test_inst):
     i1, i2, jmap = test_inst
     obj1 = solve_cm_jUFLP_DDs(i1, i2, jmap, 'toA')
@@ -530,8 +562,8 @@ def test_jUFL_DDs(test_inst):
     assert abs(obj1 - obj3) < 0.001
 
 
-@pytest.mark.parametrize("test_inst", [gen_cavemen_jUFLP_inst(7, 7)
-                                       for _ in range(5)])
+@pytest.mark.parametrize("test_inst",
+                         [gen_cavemen_jUFLP_inst(7, 7) for _ in range(5)])
 def test_cm_jUFL_DDvsMIP(test_inst):
     i1, i2, jmap = test_inst
     obj1 = solve_cm_jUFLP_MIP(i1, i2, jmap)
@@ -545,8 +577,8 @@ def test_cm_jUFL_DDvsMIP(test_inst):
     # tolerance to 0.01 (from 0.001)
 
 
-@pytest.mark.parametrize("test_inst", [gen_cavemen_jUFLP_inst(5, 5)
-                                       for _ in range(10)])
+@pytest.mark.parametrize("test_inst",
+                         [gen_cavemen_jUFLP_inst(5, 5) for _ in range(10)])
 def test_load_save(test_inst):
     i1, i2, jmap = test_inst
     save_inst(i1, i2, jmap, "./tmp/jUFLP-loadsave-test.json")
@@ -555,12 +587,12 @@ def test_load_save(test_inst):
     obj1 = solve_cm_jUFLP_DDs(i1, i2, jmap)
     obj2 = solve_cm_jUFLP_DDs(inst1, inst2, jm)
 
-    assert abs(obj1-obj2) < 0.001
+    assert abs(obj1 - obj2) < 0.001
 
 
 def compare_runtimes():
     """Performs a quick runtimes comparison (toA vs VS)."""
-    s,s2,f,f2,c,caves = gen_caveman_inst()
+    s, s2, f, f2, c, caves = gen_caveman_inst()
     sol = DDSolver(s, f, c, caves)
     B1 = sol.build_cover_DD()
 
@@ -604,6 +636,7 @@ def main():
     print("t_toA, intsize_toA, t_VS, intsize_VS")
     for _ in range(250):
         compare_runtimes()
+
 
 if __name__ == '__main__':
     main()

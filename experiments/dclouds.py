@@ -1,3 +1,9 @@
+"""Implements a MIP+DD approach experiment (left out from the paper).
+
+INTERMEDIATE RESEARCH CODE: there was an idea to build a BDD by solving
+MIPs corresponding to sub-problems. The up-to-date j-UFLP experiment
+is implemented in :py:mod:`UFLP_2_cav` module.
+"""
 from time import time
 from darkcloud import gen_typed_cavemen_inst, solve_typed_with_MIP
 from darkcloud import solve_with_MIP, DDSolver, DDTypedSolver

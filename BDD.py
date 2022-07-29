@@ -894,6 +894,12 @@ class BDD(object):
         """Checks if the BDD is quasi-reduced (no "redundant" nodes)."""
         checked_nodes = set()
 
+        # quasi-reduced BDD for weighted diagrams must also check the
+        # uniqueness of weights, not just uniqueness of (hi, lo) tuples.
+        # Not a big issue, just a separate procedure (need to take care
+        # of the precision, though).
+        assert (not self.weighted), "ERROR: not implemented for weighted BDDs."
+
         for layer in range(len(self.layers)-2, -1, -1):
             for n in self.layers[layer]:
                 if (n.hi.id, n.lo.id) in checked_nodes:

@@ -1,4 +1,10 @@
-"""Generates and solves FLP with ``soft cover'' constraints."""
+"""Generates and solves UFLP with 'soft cover' constraints.
+
+Implements the UFLP model when all solutions are feasible, but
+there are overlap costs (which can be thought of as "soft"
+covering constraints).
+"""
+
 import numpy as np
 import gurobipy as gp
 from gurobipy import GRB
@@ -9,6 +15,7 @@ import BDD as DD
 from copy import copy
 from tUFLP import add_BDD_to_MIP
 import pytest
+
 
 def make_MIP(S, c, f):
     """Creates a MIP model (for gurobi) from an instance specs.
@@ -29,20 +36,22 @@ def make_MIP(S, c, f):
 
     # create variables
     for j in range(len(S)):
-        x[j+1] = m.addVar(vtype=GRB.BINARY, name=f"x_{j+1}",
-                          obj=c[j])
+        x[j + 1] = m.addVar(vtype=GRB.BINARY, name=f"x_{j+1}", obj=c[j])
 
-        for a in range(1, len(S[j])+1):
-            y[(j+1, a)] = m.addVar(vtype=GRB.BINARY, name=f"y_{j+1}_{a}",
-                                   obj=f[j][a]-f[j][a-1])
+        for a in range(1, len(S[j]) + 1):
+            y[(j + 1, a)] = m.addVar(vtype=GRB.BINARY,
+                                     name=f"y_{j+1}_{a}",
+                                     obj=f[j][a] - f[j][a - 1])
 
     # create constraints
-    for j in range(1, len(S)+1):
-        m.addConstr(gp.quicksum(x[k] for k in S[j-1]) ==
-                    gp.quicksum(y[(j, a)] for a in range(1, len(S[j-1])+1)))
+    for j in range(1, len(S) + 1):
+        m.addConstr(
+            gp.quicksum(x[k] for k in S[j - 1]) == gp.quicksum(
+                y[(j, a)] for a in range(1,
+                                         len(S[j - 1]) + 1)))
 
-        for a in range(1, len(S[j-1])):
-            m.addConstr(y[(j, a)] >= y[(j, a+1)])
+        for a in range(1, len(S[j - 1])):
+            m.addConstr(y[(j, a)] >= y[(j, a + 1)])
 
     m.update()
     return m, x, y
@@ -58,12 +67,12 @@ def generate_S(n, p=0.25):
     Returns:
         S: list of lists.
     """
-    S = [[j+1] for j in range(n)]
+    S = [[j + 1] for j in range(n)]
     for i in range(n):
-        for j in range(i+1, n):
+        for j in range(i + 1, n):
             if np.random.uniform() <= p:
-                S[i].append(j+1)
-                S[j].append(i+1)
+                S[i].append(j + 1)
+                S[j].append(i + 1)
 
     return S
 
@@ -82,8 +91,8 @@ def generate_overlaps(S):
     f = [[] for _ in range(len(S))]
     for j in range(len(S)):
         f[j] = [F0 + Fw, 0.0]
-        for a in range(2, len(S[j])+1):
-            f[j].append(F0 + Fw * (np.random.uniform()-0.5))
+        for a in range(2, len(S[j]) + 1):
+            f[j].append(F0 + Fw * (np.random.uniform() - 0.5))
 
     return f
 
@@ -95,19 +104,20 @@ def dump_instance(S, filename="tmp/S.dot"):
         fout.write("graph G {\n")
         for i in range(len(S)):
             for j in S[i]:
-                if ((i+1) != j) and not (((j, (i+1)) in added)
-                                         or ((i+1, j) in added)):
+                if ((i + 1) != j) and not (((j, (i + 1)) in added) or
+                                           ((i + 1, j) in added)):
                     fout.write(f"n{i+1} -- n{j};\n")
-                    added.add(((i+1), j))
+                    added.add(((i + 1), j))
 
         fout.write("}")
+
 
 def make_instance(n, p=0.25, verbose=True):
     """Generates an instance of `n` points and connectivity `p`."""
     S = generate_S(n, p)
     f = generate_overlaps(S)
     Cmax = 5.0
-    c = [Cmax*np.random.uniform() for _ in range(len(S))]
+    c = [Cmax * np.random.uniform() for _ in range(len(S))]
     if verbose:
         print(f"S={S}, f={f}, c={c}")
     return S, f, c
@@ -115,17 +125,17 @@ def make_instance(n, p=0.25, verbose=True):
 
 def make_string_inst(n, verbose=True):
     """Generates a special-type instance ('string')."""
-    S = [[j+1] for j in range(n)]
-    for j in range(1, n-1):
+    S = [[j + 1] for j in range(n)]
+    for j in range(1, n - 1):
         S[j].append(j)
-        S[j].append(j+2)
+        S[j].append(j + 2)
 
-    S[-1].append(len(S)-1)
+    S[-1].append(len(S) - 1)
     S[0].append(2)
 
     f = generate_overlaps(S)
     Cmax = 5.0
-    c = [Cmax*np.random.uniform() for _ in range(len(S))]
+    c = [Cmax * np.random.uniform() for _ in range(len(S))]
     if verbose:
         print(f"S={S}, f={f}, c={c}")
     return S, f, c
@@ -138,33 +148,33 @@ def make_organic_inst(n, verbose=True):
     """
     good_inst = False
     while not good_inst:
-        groups = [np.random.randint(5) for _ in range(n-2)]
+        groups = [np.random.randint(5) for _ in range(n - 2)]
         N = 1
-        while (N+1) + sum(groups[:(N+1)]) < n:
+        while (N + 1) + sum(groups[:(N + 1)]) < n:
             N += 1
 
-        if N>2:
+        if N > 2:
             good_inst = True
 
-    S = [[j+1] for j in range(N)]
-    for j in range(1, N-1):
+    S = [[j + 1] for j in range(N)]
+    for j in range(1, N - 1):
         S[j].append(j)
-        S[j].append(j+2)
+        S[j].append(j + 2)
 
-    S[-1].append(len(S)-1)
+    S[-1].append(len(S) - 1)
     S[0].append(2)
 
-    newnode = N+1
-    for j in range(1, N-1):
-        for _ in range(groups[j-1]):
+    newnode = N + 1
+    for j in range(1, N - 1):
+        for _ in range(groups[j - 1]):
             S.append([newnode])
             S[j].append(newnode)
-            S[-1].append(j+1)
+            S[-1].append(j + 1)
             newnode += 1
 
     f = generate_overlaps(S)
     Cmax = 5.0
-    c = [Cmax*np.random.uniform() for _ in range(len(S))]
+    c = [Cmax * np.random.uniform() for _ in range(len(S))]
     if verbose:
         print(f"S={S}, f={f}, c={c}")
     return S, f, c
@@ -172,25 +182,25 @@ def make_organic_inst(n, verbose=True):
 
 def make_caveman_inst(n=10, M=5, pcave=0.8, verbose=True):
     """Generates a special type instance ('cavemen')."""
-    S = [[j+1] for j in range(n)]
-    for j in range(1, len(S)-1):
+    S = [[j + 1] for j in range(n)]
+    for j in range(1, len(S) - 1):
         S[j].append(j)
-        S[j].append(j+2)
+        S[j].append(j + 2)
 
-    S[-1].append(len(S)-1)
+    S[-1].append(len(S) - 1)
     S[0].append(2)
 
     ncaves = n // M
-    for k in range(1, ncaves+1):
-        for i in range((k-1)*M, min(k*M, n)):
-            for j in range(i+2, min(k*M, n)):
+    for k in range(1, ncaves + 1):
+        for i in range((k - 1) * M, min(k * M, n)):
+            for j in range(i + 2, min(k * M, n)):
                 if np.random.uniform() <= pcave:
-                    S[i].append(j+1)
-                    S[j].append(i+1)
+                    S[i].append(j + 1)
+                    S[j].append(i + 1)
 
     f = generate_overlaps(S)
     Cmax = 5.0
-    c = [Cmax*np.random.uniform() for _ in range(len(S))]
+    c = [Cmax * np.random.uniform() for _ in range(len(S))]
     if verbose:
         print(f"S={S};\nf={f}\n;c={c}")
     return S, f, c
@@ -206,12 +216,13 @@ def assert_instance(S, f, c):
     for Sj in S:
         assert len(Sj) == len(set(Sj))  # no repeats within each adj list
     for j in range(len(S)):
-        assert (j+1) in S[j]
+        assert (j + 1) in S[j]
 
         for k in S[j]:
-            assert (j+1) in S[k-1]
+            assert (j + 1) in S[k - 1]
 
-        assert len(f[j]) == len(S[j])+1
+        assert len(f[j]) == len(S[j]) + 1
+
 
 # generating a Cover BDD for the problem ######################################
 
@@ -231,8 +242,8 @@ def mknode(state, freedoms):
     Returns:
         String label.
     """
-    return ";".join([f"{j+1}:{freedoms[j+1]}" for j in range(len(state))
-                     if state[j] > 0])
+    return ";".join(
+        [f"{j+1}:{freedoms[j+1]}" for j in range(len(state)) if state[j] > 0])
 
 
 def build_soft_cover_DD(S, f, c, next_node_type='min'):
@@ -254,13 +265,12 @@ def build_soft_cover_DD(S, f, c, next_node_type='min'):
 
     """
     N = len(S)
-    B = DD.BDD(N=N, vars=[f"stub{i}" for i in range(1, N+1)],
-               weighted=True)
+    B = DD.BDD(N=N, vars=[f"stub{i}" for i in range(1, N + 1)], weighted=True)
 
     freedoms = DegreeKeeper(S, next_node_type)  # node degrees
 
     root_state = tuple(0 for _ in range(len(S)))
-    pts = [j for j in range(1, len(S)+1) if freedoms.has_freedom(j)]
+    pts = [j for j in range(1, len(S) + 1) if freedoms.has_freedom(j)]
     assert len(pts) == len(root_state)
     node_labels = dict({DD.NROOT: make_label(root_state, pts)})
 
@@ -268,55 +278,60 @@ def build_soft_cover_DD(S, f, c, next_node_type='min'):
 
     k = 0  # created layers counter
 
-    while k < N-1:
+    while k < N - 1:
         # we take node `i` and try to add it and all its neighbors
         # to the diagram (unless they are already added)
         i = freedoms.get_next()  # current 'central' node to process
-        for j in S[i-1]:
-            if f"x{j}" in B.vars or k == N-1:
+        for j in S[i - 1]:
+            if f"x{j}" in B.vars or k == N - 1:
                 continue
 
             # adding j-th point (of the original graph)
             current_layer = copy(next_layer)
             next_layer = dict()
 
-            for q in S[j-1]:
+            for q in S[j - 1]:
                 if freedoms.has_freedom(q):
                     freedoms.decrement(q)
 
             for state in current_layer:
                 node = current_layer[state]
 
-                next_state = tuple([state[k] for k in range(len(state))
-                                    if freedoms.has_freedom(pts[k])])
+                next_state = tuple([
+                    state[k] for k in range(len(state))
+                    if freedoms.has_freedom(pts[k])
+                ])
 
                 if next_state in next_layer:
                     B.llink(node, next_layer[next_state], "lo")
                 else:
                     newnode = B.addnode(node, "lo")
                     next_layer.update({next_state: newnode})
-                    node_labels.update({newnode.id: make_label(next_state,
-                                                               pts)})
+                    node_labels.update(
+                        {newnode.id: make_label(next_state, pts)})
 
-                next_state = tuple(state[k] + (pts[k] in S[j-1])
+                next_state = tuple(state[k] + (pts[k] in S[j - 1])
                                    for k in range(len(state))
                                    if freedoms.has_freedom(pts[k]))
 
                 a = {pts[j]: state[j] for j in range(len(pts))}
                 overlap_cost = 0
 
-                for q in S[j-1]:
-                    overlap_cost += f[q - 1][a[q]+1] - f[q - 1][a[q]]
+                for q in S[j - 1]:
+                    overlap_cost += f[q - 1][a[q] + 1] - f[q - 1][a[q]]
 
                 if next_state in next_layer:
-                    B.llink(node, next_layer[next_state],
-                            "hi", edge_weight=c[j-1] + overlap_cost)
+                    B.llink(node,
+                            next_layer[next_state],
+                            "hi",
+                            edge_weight=c[j - 1] + overlap_cost)
                 else:
-                    newnode = B.addnode(node, "hi",
-                                        edge_weight=c[j-1]+overlap_cost)
+                    newnode = B.addnode(node,
+                                        "hi",
+                                        edge_weight=c[j - 1] + overlap_cost)
                     next_layer.update({next_state: newnode})
-                    node_labels.update({newnode.id: make_label(next_state,
-                                                               pts)})
+                    node_labels.update(
+                        {newnode.id: make_label(next_state, pts)})
 
             ptsp = [j for j in pts if freedoms.has_freedom(j)]
             pts = ptsp
@@ -330,7 +345,6 @@ def build_soft_cover_DD(S, f, c, next_node_type='min'):
     while ((f"x{i}" in B.vars) or (i == -1)):
         i, _ = freedoms.pop()
 
-
     current_layer = copy(next_layer)
 
     const_cost = sum(fj[0] for fj in f)
@@ -342,11 +356,10 @@ def build_soft_cover_DD(S, f, c, next_node_type='min'):
         a = {pts[j]: state[j] for j in range(len(pts))}
         overlap_cost = 0
 
-        for q in S[i-1]:
-            overlap_cost += f[q - 1][a[q]+1] - f[q - 1][a[q]]
+        for q in S[i - 1]:
+            overlap_cost += f[q - 1][a[q] + 1] - f[q - 1][a[q]]
 
-        B.link(node.id, DD.NTRUE, "hi", c[i-1] +
-               overlap_cost + const_cost)
+        B.link(node.id, DD.NTRUE, "hi", c[i - 1] + overlap_cost + const_cost)
 
     B.rename_vars({f"stub{N}": f"x{i}"})
 
@@ -356,9 +369,11 @@ def build_soft_cover_DD(S, f, c, next_node_type='min'):
 # experiments code ############################################################
 def dia_sizes(n1=5, n2=10, K=5, igen=make_instance):
     """Prints random diagram sizes for different instance size."""
-    print("experiment, N, Bsize_nonred, Bsize_reduced, naive_MIP_vars, t_MIP, t_BDD")
+    print(
+        "experiment, N, Bsize_nonred, Bsize_reduced, naive_MIP_vars, t_MIP, t_BDD"
+    )
     expn = 1
-    for n in range (n1, n2+1):
+    for n in range(n1, n2 + 1):
         for _ in range(K):
             S, f, c = igen(n, verbose=False)
             assert_instance(S, f, c)
@@ -367,10 +382,10 @@ def dia_sizes(n1=5, n2=10, K=5, igen=make_instance):
             m, x, y = make_MIP(S, c, f)
             m.optimize()
             t1 = time()
-            t_MIP = t1-t0
+            t_MIP = t1 - t0
             assert m.status == GRB.OPTIMAL
             aobj = m.objVal + sum(fs[0] for fs in f)
-            nvars = len(x.keys())+len(y.keys())
+            nvars = len(x.keys()) + len(y.keys())
 
             # BDD approach
             t0 = time()
@@ -382,7 +397,7 @@ def dia_sizes(n1=5, n2=10, K=5, igen=make_instance):
             m.update()
             m.optimize()
             t1 = time()
-            t_BDD = t1-t0
+            t_BDD = t1 - t0
             assert m.status == GRB.OPTIMAL
             assert (abs(aobj - m.objVal) < 1e-2)
             print(
@@ -390,7 +405,9 @@ def dia_sizes(n1=5, n2=10, K=5, igen=make_instance):
                 flush=True)
             expn += 1
 
+
 # testing the code ############################################################
+
 
 def try_softcover_inst(S, c, f):
     """Solves a softcover inst with naive MIP and BDD MIP (both w/Gurobi)."""
@@ -403,7 +420,7 @@ def try_softcover_inst(S, c, f):
     print(f"(Adjusted) Objective is: {aobj}")
     print(f"Decisions are: {[x[j].x for j in range(1, len(S)+1)]}")
 
-    x1 = [x[j].x for j in range(1, len(S)+1)]
+    x1 = [x[j].x for j in range(1, len(S) + 1)]
     print("Alternative approach: building a BDD...")
     B, _ = build_soft_cover_DD(S, f, c)
     B.make_reduced()
@@ -432,30 +449,20 @@ def test_build_soft_cover_DD_simple1():
 
 def test_build_soft_cover_DD_simple2():
     """Tests the softcover DD construction procedure."""
-    S = [[1, 2, 4, 5, 6],
-         [2, 1, 3],
-         [3, 2, 7, 8, 9],
-         [4, 1], [5, 1], [6, 1],
+    S = [[1, 2, 4, 5, 6], [2, 1, 3], [3, 2, 7, 8, 9], [4, 1], [5, 1], [6, 1],
          [7, 3], [8, 3], [9, 3]]
 
     c = [4, 1, 4, 1, 1, 1, 1, 1, 1]
 
-    f = [[10, 0, 0, 0, 0, 0],
-         [10, 0, 0, 0],
-         [10, 0, 0, 0, 0, 0],
-         [10, 0, 0],
-         [10, 0, 0],
-         [10, 0, 0],
-         [10, 0, 0],
-         [10, 0, 0],
-         [10, 0, 0]]
+    f = [[10, 0, 0, 0, 0, 0], [10, 0, 0, 0], [10, 0, 0, 0, 0, 0], [10, 0, 0],
+         [10, 0, 0], [10, 0, 0], [10, 0, 0], [10, 0, 0], [10, 0, 0]]
 
     assert try_softcover_inst(S, c, f)
 
 
-@pytest.mark.parametrize("test_inst", [make_instance(np.random.randint(5, 10),
-                                                     verbose=False)
-                                       for _ in range(1000)])
+@pytest.mark.parametrize("test_inst", [
+    make_instance(np.random.randint(5, 10), verbose=False) for _ in range(1000)
+])
 def test_build_soft_cover_DD(test_inst):
     """Asserts naive MIP ~ BDD MIP."""
     S, f, c = test_inst
@@ -476,7 +483,7 @@ def test_make_MIP():
     aobj = m.objVal + sum(fs[0] for fs in f)
     print(f"(Adjusted) Objective is: {aobj}")
     print(f"Decisions are: {[x[j].x for j in range(1, len(S)+1)]}")
-    assert abs(aobj - 4.0)<1e-5
+    assert abs(aobj - 4.0) < 1e-5
 
     f = [[10, 0, 0], [10, 0, 10, 0], [10, 0, 0]]
     m, x, y = make_MIP(S, c, f)
@@ -491,23 +498,13 @@ def test_make_MIP():
 
 def test_MIP_example():
     """Tries a specific, simple instance."""
-    S = [[1, 4, 5, 6],
-         [2, 1, 3],
-         [3, 2, 7, 8, 9],
-         [4, 1], [5, 1], [6, 1],
+    S = [[1, 4, 5, 6], [2, 1, 3], [3, 2, 7, 8, 9], [4, 1], [5, 1], [6, 1],
          [7, 3], [8, 3], [9, 3]]
 
     c = [4, 1, 4, 1, 1, 1, 1, 1, 1]
 
-    f = [[10, 0, 0, 0, 0, 0],
-         [10, 0, 0, 0],
-         [10, 0, 0, 0, 0, 0],
-         [10, 0, 0],
-         [10, 0, 0],
-         [10, 0, 0],
-         [10, 0, 0],
-         [10, 0, 0],
-         [10, 0, 0]]
+    f = [[10, 0, 0, 0, 0, 0], [10, 0, 0, 0], [10, 0, 0, 0, 0, 0], [10, 0, 0],
+         [10, 0, 0], [10, 0, 0], [10, 0, 0], [10, 0, 0], [10, 0, 0]]
 
     m, x, y = make_MIP(S, c, f)
     m.optimize()
@@ -543,12 +540,17 @@ def test_MIP_example():
 
 # main run (if module is started by itself) ###################################
 if __name__ == '__main__':
-    parser = ap.ArgumentParser(description="''Soft overlap'' experiments. (c) A. Bochkarev, 2022",
-                               formatter_class=ap.ArgumentDefaultsHelpFormatter)
+    parser = ap.ArgumentParser(
+        description="''Soft overlap'' experiments. (c) A. Bochkarev, 2022",
+        formatter_class=ap.ArgumentDefaultsHelpFormatter)
 
-    parser.add_argument("EXPERIMENT", action="store",
+    parser.add_argument("EXPERIMENT",
+                        action="store",
                         help="experiment name (rnd_inst, dia_sizes)")
-    parser.add_argument('-N', dest="N", action="store", default="-1",
+    parser.add_argument('-N',
+                        dest="N",
+                        action="store",
+                        default="-1",
                         help="number of points in the network")
     args = parser.parse_args()
 

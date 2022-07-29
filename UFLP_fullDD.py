@@ -1,4 +1,11 @@
-"""Solves UFLP over cavemen instances using a full-DD approach."""
+"""Solves UFLP using a DD-based approach.
+
+The core function, :py:func:`create_cover_DD`, implements
+the BDD-building procedure to encode a j-UFLP sub-instance
+(i.e., a UFLP problem with overlap costs).
+
+Related: a good order of variables is found with :py:mod:`UFLPOrder` module.
+"""
 from BDD import BDD, NROOT, NTRUE
 from darkcloud import solve_with_MIP, gen_caveman_inst
 from copy import copy
@@ -6,10 +13,11 @@ import pytest
 import numpy as np
 from UFLPOrder import UFLP_greedy_order
 
+
 def make_label(state):
     """Helper: formats a node label according to the ``state``."""
     return "\n"+"\n".join([f"{j+1}:{state[j]}" for j in range(len(state))
-                      if (state[j])])
+                           if (state[j])])
 
 
 def calc_cost(pts_list, state, prev_state, last_decision, S, f, c):
@@ -190,7 +198,8 @@ def test_cost_calc():
     assert calc_cost(forget, state, prev_state, ld, S, f, c) == 2.1
 
 
-def test_fullDD_simple():
+def run_fullDD_simple():
+    """Creates a diagram for a simple UFLP instance."""
     S = [[1, 2,3,4,5], [2, 1,3], [3, 1,2,6], [4, 1], [5, 1,6], [6, 5,3]]
     f = []
     for k in range(len(S)):

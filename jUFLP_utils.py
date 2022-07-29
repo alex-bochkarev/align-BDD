@@ -1,4 +1,4 @@
-"""Utility / helper functions for jUFLP."""
+"""Utility / helper functions for j-UFLP: used save / load / draw instances."""
 import json
 from jUFLP_cavemen import jUFLPEncoder
 

@@ -2,427 +2,24 @@
 #+CATEGORY: a-BDD
 #+STARTUP: show2levels
 
-* Immediate TODOs
-  - [X] 1: soft cover constraints (general type) -- see the revision notes
-  - [X] idea 2a (cross-terms, x1x2, etc.)
-  - [ ] idea 2b (function of cross-terms) -- ?
-  - [X] =build_cover_DD=: make single overlap version
-  - [X] =build_type_DD=: fix the procedure (linear DD growth is doable!)
-  - [X] =build_tUFLP_MIP=: revise to single overlap version
-  - [X] cross-check DDs with the MIP (simple)
-  - [X] fix the bug in cover DD generation (infinite loop?..)
-  - [X] cross-check DDs with the MIP (random set)
-  - [X] test the align-BDD version.
-  - [X] implement type ordering / fix the type-DD order
-  - [X] test the new problem (against Gurobi) -- runtimes.
-  - [X] special case instance (string): diagram sizes
-  - [X] special case (organic thing): dia sizes. Is it max degree?
-  - [X] example of 'arbitrarily poor' heuristic.
-  - [X] randomized cover-DD builder (random order of nodes)
-  - [X] randomized type-DD builder
-  - [X] num test
-  - [ ] check out if the costs are correct for =build_type_DD=.
-    I thought it was not assume to include costs at all. How does it pass the tests?..
-  - [ ] maybe generate t-UFLP differently?
-    distribute the first facility into every bin, and then sort them randomly?
-
 * Current project TODOs
-** TODO Adjust =is_reduced= for weighted BDDs
-[2022-07-06 Wed 13:11]
-** TODO fix =check_src= makefile target
-[2022-06-01 Wed 13:06]
-[[file:~/projects/align-BDD/Makefile::egrep -nr --color 'TODO|FIXME|BUG|NOTE']]
-
-Need to fine-tune the files to check (ignore =.venv=, etc.)
-** j-UFLP implementation
-:PROPERTIES:
-:CATEGORY: a-BDD/jUFLP
-:END:
-*** WIP Figure a good instance type?
-:LOGBOOK:
-CLOCK: [2022-07-06 Wed 17:03]--[2022-07-06 Wed 17:04] =>  0:01
-CLOCK: [2022-07-06 Wed 16:39]--[2022-07-06 Wed 16:49] =>  0:10
-CLOCK: [2022-07-06 Wed 12:28]--[2022-07-06 Wed 15:56] =>  3:28
-CLOCK: [2022-07-05 Tue 20:02]--[2022-07-05 Tue 20:54] =>  0:52
-CLOCK: [2022-07-05 Tue 14:56]--[2022-07-05 Tue 15:17] =>  0:21
-CLOCK: [2022-06-23 Thu 13:27]--[2022-06-23 Thu 14:04] =>  0:37
-CLOCK: [2022-06-23 Thu 12:49]--[2022-06-23 Thu 13:24] =>  0:35
-CLOCK: [2022-06-21 Tue 12:41]--[2022-06-21 Tue 13:00] =>  0:19
-CLOCK: [2022-06-20 Mon 15:46]--[2022-06-20 Mon 15:48] =>  0:02
-CLOCK: [2022-06-20 Mon 15:19]--[2022-06-20 Mon 15:36] =>  0:17
-CLOCK: [2022-06-20 Mon 14:30]--[2022-06-20 Mon 15:04] =>  0:34
-CLOCK: [2022-06-20 Mon 12:58]--[2022-06-20 Mon 13:37] =>  0:39
-:END:
-Note: this gives CPP MIP (and sometimes naive MiP as well) slower than Full DDs,
-generally:
-#+begin_src python
-  M = 11
-  L = 0.35
-  n = 2
-  # ...
-  i1, i2, jm = gen_cavemen_jUFLP_inst(n, M, L)
-#+end_src
-see [[file:experiments/jUFLP_vsMIPs.py::L = 0.35][jUFLP_vsMIPs]].
-
-
-Also, this one gives t VS << t toA:
-#+begin_src  python
-    M = 5
-    L = 0.15
-    n = 5
-    linking = "by-cluster"
-    inst_type = "1-link"
-#+end_src
-
-This seems to work really well, except toA:
-#+begin_src python
-    M = 10
-    L = 0.35
-    n = 5
-    linking = "cluster-reverse"
-    inst_type = "cavemen"
-#+end_src
-
-That's what works:
-#+begin_src python
-    M = 15
-    L = 0.35
-    n = 3
-    linking = "cluster-reverse"
-    inst_type = "cavemen"
-#+end_src
-
-where I have:
-#+begin_src python
-  # linking code:
-  elif linking == "cluster-reverse":
-      ca1 = [S for S in i1[COL_caves]]
-      ca2 = [S for S in i2[COL_caves]]
-
-      link = dict()
-      # clusters = [k for k in np.random.permutation(range(len(ca2)))]
-      # clusters = [k for k in reversed(range(len(ca2)))]
-      clusters = [k for k in range(len(ca2))]
-      for k in range(len(ca1)):
-          # link.update(dict(zip(ca1[k],
-          #                      np.random.permutation(ca2[clusters[k]]))))
-          link.update(dict(zip(ca1[k],
-                               reversed(ca2[clusters[k]]))))
-
-      in_clusters1 = np.unique(sum([], ca1))
-      in_clusters2 = np.unique(sum([], ca2))
-
-      origins = [j for j in range(1, len(i1[0])+1)
-                 if j not in in_clusters1]
-
-      targets = [j for j in range(1, len(i2[0])+1)
-                 if j not in in_clusters2]
-
-      link.update(dict(zip(origins, targets)))
-#+end_src
-
-
-and gives:
-#+begin_example
-experiment, n, M, L, N, A, inst_type, linking, tMIP, tMIP_CPP, tDD_VS, tDD_toA, int_VS, int_VS_toA
-1, 3, 15, 0.35, 90, 418.0, cavemen, cluster-reverse, 6835.82, 8703.79, 639.00, 655.28, 174199, 413959
----
-✅ MIP in 6835.82 sec
->✅ CPP MIP in 8703.79 sec
-✅ Full DDs VS in 639.00 sec
-✅ Full DDs toA in 655.28 sec
----
-#+end_example
-**** DONE node-connected clouds
-CLOSED: [2022-06-24 Fri 13:09]
-- State "DONE"       from "TODO"       [2022-06-24 Fri 13:09]
-:LOGBOOK:
-CLOCK: [2022-06-24 Fri 12:16]--[2022-06-24 Fri 12:50] =>  0:34
-CLOCK: [2022-06-24 Fri 11:35]--[2022-06-24 Fri 12:16] =>  0:41
-CLOCK: [2022-06-24 Fri 11:00]--[2022-06-24 Fri 11:35] =>  0:35
-CLOCK: [2022-06-24 Fri 09:51]--[2022-06-24 Fri 10:32] =>  0:41
-:END:
-#+begin_src python
-    M = 15
-    L = 0.55
-    n = 5
-    linking = "consecutive"
-    inst_type = "1-link"
-#+end_src
-(gives tens of seconds for Gurobi.)
-**** TODO experiment with linking
-:LOGBOOK:
-CLOCK: [2022-06-24 Fri 13:53]--[2022-06-24 Fri 14:33] =>  0:40
-CLOCK: [2022-06-24 Fri 13:11]--[2022-06-24 Fri 13:41] =>  0:30
-:END:
-**** TODO double-check that a-to-A is still not better than VS
-**** DONE adjust costs (1--5 ➡ 100--105)
-CLOSED: [2022-06-24 Fri 13:10]
-- State "DONE"       from "TODO"       [2022-06-24 Fri 13:10]
-**** TODO single-cloud instance -- would it work?
-**** TODO experiment with grids.
-*** TODO Derive the sensitivity info from the SP.
-*** DONE Implement the full-BDD approach for the problem.
-CLOSED: [2022-06-20 Mon 12:57]
-- State "DONE"       from "WIP"        [2022-06-20 Mon 12:57]
-:LOGBOOK:
-CLOCK: [2022-06-13 Mon 14:54]--[2022-06-13 Mon 15:07] =>  0:13
-:END:
-**** DONE Design a good order to encode full-BDD j-UFLP?
-CLOSED: [2022-06-20 Mon 12:57]
-- State "DONE"       from "WIP"        [2022-06-20 Mon 12:57]
-:LOGBOOK:
-CLOCK: [2022-06-19 Sun 15:00]--[2022-06-19 Sun 15:42] =>  0:42
-CLOCK: [2022-06-19 Sun 14:49]--[2022-06-19 Sun 14:56] =>  0:07
-CLOCK: [2022-06-19 Sun 01:00]--[2022-06-19 Sun 01:07] =>  0:07
-CLOCK: [2022-06-18 Sat 23:20]--[2022-06-19 Sun 00:54] =>  1:34
-CLOCK: [2022-06-18 Sat 14:45]--[2022-06-18 Sat 14:47] =>  0:02
-CLOCK: [2022-06-18 Sat 14:36]--[2022-06-18 Sat 14:45] =>  0:09
-CLOCK: [2022-06-17 Fri 22:46]--[2022-06-17 Fri 23:12] =>  0:26
-CLOCK: [2022-06-15 Wed 23:18]--[2022-06-15 Wed 23:57] =>  0:39
-CLOCK: [2022-06-15 Wed 22:34]--[2022-06-15 Wed 22:58] =>  0:24
-CLOCK: [2022-06-15 Wed 15:49]--[2022-06-15 Wed 16:11] =>  0:22
-CLOCK: [2022-06-15 Wed 15:27]--[2022-06-15 Wed 15:46] =>  0:19
-CLOCK: [2022-06-15 Wed 14:47]--[2022-06-15 Wed 15:21] =>  0:34
-CLOCK: [2022-06-15 Wed 14:20]--[2022-06-15 Wed 14:31] =>  0:11
-CLOCK: [2022-06-15 Wed 13:31]--[2022-06-15 Wed 13:33] =>  0:02
-CLOCK: [2022-06-13 Mon 18:27]--[2022-06-13 Mon 18:28] =>  0:01
-CLOCK: [2022-06-13 Mon 18:21]--[2022-06-13 Mon 18:22] =>  0:01
-CLOCK: [2022-06-13 Mon 18:18]--[2022-06-13 Mon 18:20] =>  0:02
-CLOCK: [2022-06-13 Mon 17:57]--[2022-06-13 Mon 17:58] =>  0:01
-CLOCK: [2022-06-13 Mon 17:17]--[2022-06-13 Mon 17:26] =>  0:09
-CLOCK: [2022-06-13 Mon 16:49]--[2022-06-13 Mon 17:11] =>  0:22
-CLOCK: [2022-06-13 Mon 16:34]--[2022-06-13 Mon 16:44] =>  0:10
-CLOCK: [2022-06-13 Mon 16:29]--[2022-06-13 Mon 16:30] =>  0:01
-CLOCK: [2022-06-13 Mon 15:53]--[2022-06-13 Mon 16:19] =>  0:26
-CLOCK: [2022-06-13 Mon 15:07]--[2022-06-13 Mon 15:45] =>  0:38
-:END:
-I guess I'll implement a greedy algo first.
-**** DONE Full-DD algo
-CLOSED: [2022-06-15 Wed 13:10]
-- State "DONE"       from "TODO"       [2022-06-15 Wed 13:10]
-:LOGBOOK:
-CLOCK: [2022-06-15 Wed 13:10]--[2022-06-15 Wed 13:23] =>  0:13
-CLOCK: [2022-06-15 Wed 12:43]--[2022-06-15 Wed 13:09] =>  0:26
-CLOCK: [2022-06-15 Wed 11:57]--[2022-06-15 Wed 12:13] =>  0:16
-CLOCK: [2022-06-15 Wed 11:25]--[2022-06-15 Wed 11:44] =>  0:19
-CLOCK: [2022-06-14 Tue 15:46]--[2022-06-14 Tue 16:22] =>  0:36
-CLOCK: [2022-06-14 Tue 15:18]--[2022-06-14 Tue 15:31] =>  0:13
-CLOCK: [2022-06-14 Tue 14:21]--[2022-06-14 Tue 14:43] =>  0:22
-CLOCK: [2022-06-14 Tue 13:52]--[2022-06-14 Tue 14:05] =>  0:13
-CLOCK: [2022-06-14 Tue 13:43]--[2022-06-14 Tue 13:48] =>  0:05
-CLOCK: [2022-06-14 Tue 12:56]--[2022-06-14 Tue 13:14] =>  0:18
-CLOCK: [2022-06-14 Tue 12:41]--[2022-06-14 Tue 12:42] =>  0:01
-CLOCK: [2022-06-14 Tue 12:35]--[2022-06-14 Tue 12:40] =>  0:05
-CLOCK: [2022-06-14 Tue 10:56]--[2022-06-14 Tue 12:10] =>  1:14
-:END:
-  [[file:UFLP_fullDD.py][UFLP_fullDD]] file
-*** DONE Write-up the UFLP-encoding procedure.
-CLOSED: [2022-06-23 Thu 12:47]
-- State "DONE"       from "TODO"       [2022-06-22 Wed 12:47]
-:LOGBOOK:
-CLOCK: [2022-06-21 Tue 22:15]--[2022-06-21 Tue 23:01] =>  0:46
-CLOCK: [2022-06-21 Tue 20:25]--[2022-06-21 Tue 20:47] =>  0:22
-CLOCK: [2022-06-21 Tue 18:29]--[2022-06-21 Tue 18:31] =>  0:02
-CLOCK: [2022-06-21 Tue 16:40]--[2022-06-21 Tue 18:29] =>  1:49
-CLOCK: [2022-06-21 Tue 15:57]--[2022-06-21 Tue 16:07] =>  0:10
-CLOCK: [2022-06-21 Tue 15:21]--[2022-06-21 Tue 15:34] =>  0:13
-CLOCK: [2022-06-21 Tue 14:20]--[2022-06-21 Tue 15:21] =>  1:01
-CLOCK: [2022-06-21 Tue 13:00]--[2022-06-21 Tue 14:16] =>  1:16
-:END:
-*** DONE fixing: naive MIP vs DD-based for jUFLP
-CLOSED: [2022-06-20 Mon 15:55]
-- State "DONE"       from "TODO"       [2022-06-20 Mon 15:55]
-:LOGBOOK:
-CLOCK: [2022-06-20 Mon 15:48]--[2022-06-20 Mon 15:55] =>  0:07
-:END:
-*** DONE numerical experiment: MIP vs a2A vs VS.
-CLOSED: [2022-06-02 Thu 17:45]
-- State "DONE"       from "WIP"        [2022-06-02 Thu 17:45]
-:LOGBOOK:
-CLOCK: [2022-06-02 Thu 16:36]--[2022-06-02 Thu 17:32] =>  0:56
-CLOCK: [2022-06-02 Thu 15:00]--[2022-06-02 Thu 15:53] =>  0:53
-CLOCK: [2022-06-02 Thu 14:28]--[2022-06-02 Thu 14:47] =>  0:19
-CLOCK: [2022-06-02 Thu 13:20]--[2022-06-02 Thu 14:24] =>  1:04
-CLOCK: [2022-06-01 Wed 23:21]--[2022-06-01 Wed 23:46] =>  0:25
-:END:
-*** DONE description
-CLOSED: [2022-06-04 Sat 10:14]
-- State "DONE"       from "TODO"       [2022-06-04 Sat 10:14]
-:LOGBOOK:
-CLOCK: [2022-06-04 Sat 09:24]--[2022-06-04 Sat 10:04] =>  0:40
-CLOCK: [2022-06-04 Sat 08:39]--[2022-06-04 Sat 09:09] =>  0:30
-CLOCK: [2022-06-03 Fri 22:11]--[2022-06-03 Fri 22:26] =>  0:15
-CLOCK: [2022-06-03 Fri 21:55]--[2022-06-03 Fri 21:59] =>  0:04
-CLOCK: [2022-06-03 Fri 21:29]--[2022-06-03 Fri 21:33] =>  0:04
-CLOCK: [2022-06-03 Fri 20:55]--[2022-06-03 Fri 21:09] =>  0:14
-CLOCK: [2022-06-03 Fri 14:40]--[2022-06-03 Fri 15:12] =>  0:32
-CLOCK: [2022-06-03 Fri 13:56]--[2022-06-03 Fri 14:31] =>  0:35
-CLOCK: [2022-06-03 Fri 12:54]--[2022-06-03 Fri 13:43] =>  0:49
-CLOCK: [2022-06-03 Fri 12:48]--[2022-06-03 Fri 12:53] =>  0:05
-CLOCK: [2022-06-03 Fri 12:41]--[2022-06-03 Fri 12:48] =>  0:07
-CLOCK: [2022-06-03 Fri 12:29]--[2022-06-03 Fri 12:39] =>  0:10
-CLOCK: [2022-06-03 Fri 11:26]--[2022-06-03 Fri 11:42] =>  0:16
-CLOCK: [2022-06-02 Thu 22:01]--[2022-06-02 Thu 23:30] =>  1:29
-CLOCK: [2022-06-02 Thu 20:03]--[2022-06-02 Thu 20:06] =>  0:03
-CLOCK: [2022-06-02 Thu 17:54]--[2022-06-02 Thu 17:57] =>  0:03
-CLOCK: [2022-06-02 Thu 17:46]--[2022-06-02 Thu 17:52] =>  0:06
-:END:
-*** DONE instance load/save
-CLOSED: [2022-06-01 Wed 22:59]
-- State "DONE"       from "TODO"       [2022-06-01 Wed 22:59]
-:LOGBOOK:
-CLOCK: [2022-06-01 Wed 22:48]--[2022-06-01 Wed 22:59] =>  0:11
-CLOCK: [2022-06-01 Wed 22:19]--[2022-06-01 Wed 22:27] =>  0:08
-CLOCK: [2022-06-01 Wed 21:52]--[2022-06-01 Wed 21:56] =>  0:04
-CLOCK: [2022-06-01 Wed 16:01]--[2022-06-01 Wed 16:08] =>  0:07
-:END:
-*** DONE instance generation + cross-check
-CLOSED: [2022-06-01 Wed 15:53]
-- State "DONE"       from "TODO"       [2022-06-01 Wed 15:53]
-:LOGBOOK:
-CLOCK: [2022-06-01 Wed 15:27]--[2022-06-01 Wed 15:53] =>  0:26
-CLOCK: [2022-06-01 Wed 14:43]--[2022-06-01 Wed 14:48] =>  0:05
-CLOCK: [2022-06-01 Wed 14:12]--[2022-06-01 Wed 14:23] =>  0:11
-CLOCK: [2022-06-01 Wed 13:55]--[2022-06-01 Wed 14:02] =>  0:07
-CLOCK: [2022-06-01 Wed 13:09]--[2022-06-01 Wed 13:52] =>  0:43
-:END:
-*** LATER What's with CPP/MIP?
-:LOGBOOK:
-CLOCK: [2022-06-02 Thu 19:58]--[2022-06-02 Thu 20:02] =>  0:04
-CLOCK: [2022-06-02 Thu 18:10]--[2022-06-02 Thu 18:22] =>  0:12
-CLOCK: [2022-06-02 Thu 17:57]--[2022-06-02 Thu 18:04] =>  0:07
-:END:
-So, it seems still faster than the VS-SP. We'd need to look into another problem
-formulation, I assume.
-** TODO Rndcover: fix =inplace= parameter! 
-[2022-05-23 Mon 22:43]
-[[file:~/projects/align-BDD/experiments/dclouds_rndcover.py::Tpp = T.align_to(C.vars, inplace=True)]]
-** TODO Check if =L= parameter works correctly
-[2022-05-23 Mon 11:18]
-[[file:~/projects/align-BDD/jUFLP_cavemen.py::while (1 - 2*n_edges / (M*(M-1))) > L:]]
-
-i.e., produces the necessary number of edges.
-** TODO Move instance gallery and other experiments to a separate file from darkcloud
-[2022-05-10 Tue 18:24]
-[[file:~/projects/align-BDD/darkcloud.py::M = 10]]
-** TODO Rewrite comments
-[2022-05-09 Mon 15:46]
-[[file:~/projects/align-BDD/darkcloud.py::def build_type_DD(self)]]
-** TODO Add assertion to the instance type
-[2022-05-03 Tue 14:10]
-[[file:~/projects/align-BDD/darkcloud.py]]
-
-'string' shape only.
-** Softcover: design instances with types
-:LOGBOOK:
-CLOCK: [2022-01-24 Mon 12:16]--[2022-01-24 Mon 12:40] =>  0:24
-:END:
-*** DONE Design cover DDs (Bool -> Int)
-CLOSED: [2022-01-27 Thu 15:11]
-- State "DONE"       from "TODO"       [2022-01-27 Thu 15:11]
-:LOGBOOK:
-CLOCK: [2022-01-27 Thu 14:31]--[2022-01-27 Thu 14:58] =>  0:27
-CLOCK: [2022-01-27 Thu 13:36]--[2022-01-27 Thu 14:18] =>  0:42
-CLOCK: [2022-01-26 Wed 19:46]--[2022-01-26 Wed 19:47] =>  0:01
-CLOCK: [2022-01-26 Wed 17:42]--[2022-01-26 Wed 18:11] =>  0:29
-CLOCK: [2022-01-26 Wed 17:20]--[2022-01-26 Wed 17:41] =>  0:21
-CLOCK: [2022-01-26 Wed 17:12]--[2022-01-26 Wed 17:20] =>  0:08
-CLOCK: [2022-01-26 Wed 16:21]--[2022-01-26 Wed 16:33] =>  0:12
-CLOCK: [2022-01-26 Wed 14:40]--[2022-01-26 Wed 16:21] =>  1:41
-CLOCK: [2022-01-26 Wed 14:04]--[2022-01-26 Wed 14:18] =>  0:14
-CLOCK: [2022-01-26 Wed 13:45]--[2022-01-26 Wed 13:57] =>  0:12
-CLOCK: [2022-01-26 Wed 13:08]--[2022-01-26 Wed 13:43] =>  0:35
-CLOCK: [2022-01-24 Mon 15:13]--[2022-01-24 Mon 15:32] =>  0:19
-CLOCK: [2022-01-24 Mon 13:16]--[2022-01-24 Mon 14:23] =>  1:07
-CLOCK: [2022-01-24 Mon 12:59]--[2022-01-24 Mon 13:10] =>  0:11
-CLOCK: [2022-01-24 Mon 12:55]--[2022-01-24 Mon 12:56] =>  0:01
-:END:
-Check it is correct, technically.
-*** DONE Check dia sizes scaling (with and w/o reduction) vs. no of vars in MIP
-CLOSED: [2022-01-28 Fri 17:21]
-- State "DONE"       from "TODO"       [2022-01-28 Fri 17:21]
-:LOGBOOK:
-CLOCK: [2022-01-28 Fri 15:30]--[2022-01-28 Fri 16:24] =>  0:54
-CLOCK: [2022-01-28 Fri 14:05]--[2022-01-28 Fri 14:42] =>  0:37
-CLOCK: [2022-01-28 Fri 13:59]--[2022-01-28 Fri 14:03] =>  0:04
-CLOCK: [2022-01-27 Thu 18:57]--[2022-01-27 Thu 19:17] =>  0:20
-CLOCK: [2022-01-27 Thu 15:16]--[2022-01-27 Thu 15:26] =>  0:10
-CLOCK: [2022-01-27 Thu 15:11]--[2022-01-27 Thu 15:14] =>  0:03
-:END:
-So, without reduction, I basically create an exponentially sized diagrams. This
-makes sense, if I am not smart with this ``forgetting'' nodes (after they have zero
-``degrees of freedom'').
-
-However, it is not really bright even in theoretical case of writing down a
-reduced dia as well...
-
-*** DONE Repeat the experiment for a more narrow graph type (cavemen?)
-CLOSED: [2022-01-28 Fri 20:12]
-- State "DONE"       from "TODO"       [2022-01-28 Fri 20:12]
-:LOGBOOK:
-CLOCK: [2022-01-28 Fri 19:17]--[2022-01-28 Fri 20:12] =>  0:55
-CLOCK: [2022-01-28 Fri 18:34]--[2022-01-28 Fri 18:55] =>  0:21
-CLOCK: [2022-01-28 Fri 17:21]--[2022-01-28 Fri 17:59] =>  0:38
-:END:
-
-*** DONE make improved cover-building algo
-CLOSED: [2022-03-11 Fri 13:21]
-- State "DONE"       from "TODO"       [2022-03-11 Fri 13:21]
-:LOGBOOK:
-CLOCK: [2022-02-15 Tue 15:09]--[2022-02-15 Tue 15:28] =>  0:19
-CLOCK: [2022-02-15 Tue 14:14]--[2022-02-15 Tue 15:05] =>  0:51
-CLOCK: [2022-02-15 Tue 13:20]--[2022-02-15 Tue 13:28] =>  0:08
-CLOCK: [2022-02-15 Tue 12:09]--[2022-02-15 Tue 12:17] =>  0:08
-CLOCK: [2022-02-15 Tue 10:51]--[2022-02-15 Tue 11:54] =>  1:03
-CLOCK: [2022-02-14 Mon 18:49]--[2022-02-14 Mon 18:55] =>  0:06
-CLOCK: [2022-02-01 Tue 13:36]--[2022-02-01 Tue 13:58] =>  0:22
-CLOCK: [2022-01-31 Mon 15:18]--[2022-01-31 Mon 15:29] =>  0:11
-CLOCK: [2022-01-31 Mon 14:40]--[2022-01-31 Mon 15:11] =>  0:31
-CLOCK: [2022-01-31 Mon 14:12]--[2022-01-31 Mon 14:16] =>  0:04
-CLOCK: [2022-01-31 Mon 13:16]--[2022-01-31 Mon 13:35] =>  0:19
-:END:
-*** DONE Compare runtimes w/o types: BDDs vs naive MIP
-CLOSED: [2022-03-11 Fri 13:21]
-- State "DONE"       from "TODO"       [2022-03-11 Fri 13:21]
-:LOGBOOK:
-CLOCK: [2022-02-23 Wed 15:41]--[2022-02-23 Wed 16:08] =>  0:27
-CLOCK: [2022-02-23 Wed 15:31]--[2022-02-23 Wed 15:37] =>  0:06
-:END:
-*** LATER Add types -- generate CPP instances 
-*** LATER Compare runtime: naive MIP vs CPP MIP vs Align-BDD CPP
-*** LATER Add reduction step -- check time
-** TODO Kill already merged branches
+** TODO Kill already merged branches?
  [2020-07-11 Sat 09:49]
 
 - minor_fixes (figures, labels, etc.)
 - scal_update (major scal update)
 
 As of beginning of the day <2020-07-11> all of these are merged into =master=
-** TODO Clean-up testing code (remove unnecessary, add separate testing)
- [2021-02-19 Fri 12:47]
-** TODO add diagram generation tests :UFL:
-** TODO Revise tests for key functions
-** TODO Requires =gurobi= to run examples :doc:
- [2021-02-06 Sat 17:40]
- [[file:~/projects/align-BDD/UFL.py][file:~/projects/align-BDD/UFL.py]]
-** TODO implement =BDD.save()= for a weighted BDD
- [2021-02-22 Mon 12:29]
-** TODO Perhaps, =is_equivalent= is a bad name?
- [2021-02-22 Mon 13:48]
- [[file:~/projects/align-BDD/BDD.py]]
+** TODO fix =check_src= makefile target?
+[2022-06-01 Wed 13:06]
+[[file:~/projects/align-BDD/Makefile::egrep -nr --color 'TODO|FIXME|BUG|NOTE']]
 
- Like, maybe rename to =test_equivalence=. And then =is_equivalent <- test_equivalence()[0]=
-** TODO rename =VarSeq.layer_var= into =vars=, I suppose...
- [2021-02-22 Mon 17:52]
-** TODO rename =?UFL= (streamlining names)
-** TODO let S NOT contain the node itself -- amended later :tUFL:
- [2021-03-22 Mon 18:34]
-** TODO figure (1) the order of types and (2) order of nodes within a type
- [2021-03-30 Tue 13:32]
-** TODO Technical description :doc:
-   - makefile
-   - pytest and testing framework
+Need to fine-tune the files to check (ignore =.venv=, etc.)
+** TODO Clean-up testing code?
+[2021-02-19 Fri 12:47]
+- remove unnecessary,
+- add separate testing?
+- add diagram generation tests :UFL:
 
 ** Organization
 :LOGBOOK:
@@ -706,6 +303,425 @@ CLOSED: [2022-01-19 Wed 14:16]
 ** DONE Maybe look into Sphinx?.. Or what is the best practice?         :doc:
 CLOSED: [2022-01-19 Wed 14:15]
 - State "DONE"       from "TODO"       [2022-01-19 Wed 14:15]
+
+** DONE Requires =gurobi= to run examples                               :doc:
+CLOSED: [2022-07-29 Fri 15:37]
+- State "DONE"       from "TODO"       [2022-07-29 Fri 15:37]
+ [2021-02-06 Sat 17:40]
+ [[file:~/projects/align-BDD/UFL.py][file:~/projects/align-BDD/UFL.py]]
+** DONE What's with CPP/MIP?
+CLOSED: [2022-07-29 Fri 15:40]
+- State "DONE"       from "LATER"      [2022-07-29 Fri 15:40]
+:LOGBOOK:
+CLOCK: [2022-06-02 Thu 19:58]--[2022-06-02 Thu 20:02] =>  0:04
+CLOCK: [2022-06-02 Thu 18:10]--[2022-06-02 Thu 18:22] =>  0:12
+CLOCK: [2022-06-02 Thu 17:57]--[2022-06-02 Thu 18:04] =>  0:07
+:END:
+So, it seems still faster than the VS-SP. We'd need to look into another problem
+formulation, I assume. (Found a good balance in the instance structure.)
+** DONE Figure a good instance type?
+CLOSED: [2022-07-29 Fri 15:37]
+- State "DONE"       from "WIP"        [2022-07-29 Fri 15:37]
+:LOGBOOK:
+CLOCK: [2022-07-06 Wed 17:03]--[2022-07-06 Wed 17:04] =>  0:01
+CLOCK: [2022-07-06 Wed 16:39]--[2022-07-06 Wed 16:49] =>  0:10
+CLOCK: [2022-07-06 Wed 12:28]--[2022-07-06 Wed 15:56] =>  3:28
+CLOCK: [2022-07-05 Tue 20:02]--[2022-07-05 Tue 20:54] =>  0:52
+CLOCK: [2022-07-05 Tue 14:56]--[2022-07-05 Tue 15:17] =>  0:21
+CLOCK: [2022-06-23 Thu 13:27]--[2022-06-23 Thu 14:04] =>  0:37
+CLOCK: [2022-06-23 Thu 12:49]--[2022-06-23 Thu 13:24] =>  0:35
+CLOCK: [2022-06-21 Tue 12:41]--[2022-06-21 Tue 13:00] =>  0:19
+CLOCK: [2022-06-20 Mon 15:46]--[2022-06-20 Mon 15:48] =>  0:02
+CLOCK: [2022-06-20 Mon 15:19]--[2022-06-20 Mon 15:36] =>  0:17
+CLOCK: [2022-06-20 Mon 14:30]--[2022-06-20 Mon 15:04] =>  0:34
+CLOCK: [2022-06-20 Mon 12:58]--[2022-06-20 Mon 13:37] =>  0:39
+:END:
+Note: this gives CPP MIP (and sometimes naive MiP as well) slower than Full DDs,
+generally:
+#+begin_src python
+  M = 11
+  L = 0.35
+  n = 2
+  # ...
+  i1, i2, jm = gen_cavemen_jUFLP_inst(n, M, L)
+#+end_src
+see [[file:experiments/jUFLP_vsMIPs.py::L = 0.35][jUFLP_vsMIPs]].
+
+
+Also, this one gives t VS << t toA:
+#+begin_src  python
+    M = 5
+    L = 0.15
+    n = 5
+    linking = "by-cluster"
+    inst_type = "1-link"
+#+end_src
+
+This seems to work really well, except toA:
+#+begin_src python
+    M = 10
+    L = 0.35
+    n = 5
+    linking = "cluster-reverse"
+    inst_type = "cavemen"
+#+end_src
+
+That's what works:
+#+begin_src python
+    M = 15
+    L = 0.35
+    n = 3
+    linking = "cluster-reverse"
+    inst_type = "cavemen"
+#+end_src
+
+where I have:
+#+begin_src python
+  # linking code:
+  elif linking == "cluster-reverse":
+      ca1 = [S for S in i1[COL_caves]]
+      ca2 = [S for S in i2[COL_caves]]
+
+      link = dict()
+      # clusters = [k for k in np.random.permutation(range(len(ca2)))]
+      # clusters = [k for k in reversed(range(len(ca2)))]
+      clusters = [k for k in range(len(ca2))]
+      for k in range(len(ca1)):
+          # link.update(dict(zip(ca1[k],
+          #                      np.random.permutation(ca2[clusters[k]]))))
+          link.update(dict(zip(ca1[k],
+                               reversed(ca2[clusters[k]]))))
+
+      in_clusters1 = np.unique(sum([], ca1))
+      in_clusters2 = np.unique(sum([], ca2))
+
+      origins = [j for j in range(1, len(i1[0])+1)
+                 if j not in in_clusters1]
+
+      targets = [j for j in range(1, len(i2[0])+1)
+                 if j not in in_clusters2]
+
+      link.update(dict(zip(origins, targets)))
+#+end_src
+
+
+and gives:
+#+begin_example
+experiment, n, M, L, N, A, inst_type, linking, tMIP, tMIP_CPP, tDD_VS, tDD_toA, int_VS, int_VS_toA
+1, 3, 15, 0.35, 90, 418.0, cavemen, cluster-reverse, 6835.82, 8703.79, 639.00, 655.28, 174199, 413959
+---
+✅ MIP in 6835.82 sec
+>✅ CPP MIP in 8703.79 sec
+✅ Full DDs VS in 639.00 sec
+✅ Full DDs toA in 655.28 sec
+---
+#+end_example
+*** DONE node-connected clouds
+CLOSED: [2022-06-24 Fri 13:09]
+- State "DONE"       from "TODO"       [2022-06-24 Fri 13:09]
+:LOGBOOK:
+CLOCK: [2022-06-24 Fri 12:16]--[2022-06-24 Fri 12:50] =>  0:34
+CLOCK: [2022-06-24 Fri 11:35]--[2022-06-24 Fri 12:16] =>  0:41
+CLOCK: [2022-06-24 Fri 11:00]--[2022-06-24 Fri 11:35] =>  0:35
+CLOCK: [2022-06-24 Fri 09:51]--[2022-06-24 Fri 10:32] =>  0:41
+:END:
+#+begin_src python
+    M = 15
+    L = 0.55
+    n = 5
+    linking = "consecutive"
+    inst_type = "1-link"
+#+end_src
+(gives tens of seconds for Gurobi.)
+*** TODO experiment with linking
+:LOGBOOK:
+CLOCK: [2022-06-24 Fri 13:53]--[2022-06-24 Fri 14:33] =>  0:40
+CLOCK: [2022-06-24 Fri 13:11]--[2022-06-24 Fri 13:41] =>  0:30
+:END:
+*** TODO double-check that a-to-A is still not better than VS
+*** DONE adjust costs (1--5 ➡ 100--105)
+CLOSED: [2022-06-24 Fri 13:10]
+- State "DONE"       from "TODO"       [2022-06-24 Fri 13:10]
+*** TODO single-cloud instance -- would it work?
+*** TODO experiment with grids.
+** DONE Implement the full-BDD approach for the problem.
+CLOSED: [2022-06-20 Mon 12:57]
+- State "DONE"       from "WIP"        [2022-06-20 Mon 12:57]
+:LOGBOOK:
+CLOCK: [2022-06-13 Mon 14:54]--[2022-06-13 Mon 15:07] =>  0:13
+:END:
+*** DONE Design a good order to encode full-BDD j-UFLP?
+CLOSED: [2022-06-20 Mon 12:57]
+- State "DONE"       from "WIP"        [2022-06-20 Mon 12:57]
+:LOGBOOK:
+CLOCK: [2022-06-19 Sun 15:00]--[2022-06-19 Sun 15:42] =>  0:42
+CLOCK: [2022-06-19 Sun 14:49]--[2022-06-19 Sun 14:56] =>  0:07
+CLOCK: [2022-06-19 Sun 01:00]--[2022-06-19 Sun 01:07] =>  0:07
+CLOCK: [2022-06-18 Sat 23:20]--[2022-06-19 Sun 00:54] =>  1:34
+CLOCK: [2022-06-18 Sat 14:45]--[2022-06-18 Sat 14:47] =>  0:02
+CLOCK: [2022-06-18 Sat 14:36]--[2022-06-18 Sat 14:45] =>  0:09
+CLOCK: [2022-06-17 Fri 22:46]--[2022-06-17 Fri 23:12] =>  0:26
+CLOCK: [2022-06-15 Wed 23:18]--[2022-06-15 Wed 23:57] =>  0:39
+CLOCK: [2022-06-15 Wed 22:34]--[2022-06-15 Wed 22:58] =>  0:24
+CLOCK: [2022-06-15 Wed 15:49]--[2022-06-15 Wed 16:11] =>  0:22
+CLOCK: [2022-06-15 Wed 15:27]--[2022-06-15 Wed 15:46] =>  0:19
+CLOCK: [2022-06-15 Wed 14:47]--[2022-06-15 Wed 15:21] =>  0:34
+CLOCK: [2022-06-15 Wed 14:20]--[2022-06-15 Wed 14:31] =>  0:11
+CLOCK: [2022-06-15 Wed 13:31]--[2022-06-15 Wed 13:33] =>  0:02
+CLOCK: [2022-06-13 Mon 18:27]--[2022-06-13 Mon 18:28] =>  0:01
+CLOCK: [2022-06-13 Mon 18:21]--[2022-06-13 Mon 18:22] =>  0:01
+CLOCK: [2022-06-13 Mon 18:18]--[2022-06-13 Mon 18:20] =>  0:02
+CLOCK: [2022-06-13 Mon 17:57]--[2022-06-13 Mon 17:58] =>  0:01
+CLOCK: [2022-06-13 Mon 17:17]--[2022-06-13 Mon 17:26] =>  0:09
+CLOCK: [2022-06-13 Mon 16:49]--[2022-06-13 Mon 17:11] =>  0:22
+CLOCK: [2022-06-13 Mon 16:34]--[2022-06-13 Mon 16:44] =>  0:10
+CLOCK: [2022-06-13 Mon 16:29]--[2022-06-13 Mon 16:30] =>  0:01
+CLOCK: [2022-06-13 Mon 15:53]--[2022-06-13 Mon 16:19] =>  0:26
+CLOCK: [2022-06-13 Mon 15:07]--[2022-06-13 Mon 15:45] =>  0:38
+:END:
+I guess I'll implement a greedy algo first.
+*** DONE Full-DD algo
+CLOSED: [2022-06-15 Wed 13:10]
+- State "DONE"       from "TODO"       [2022-06-15 Wed 13:10]
+:LOGBOOK:
+CLOCK: [2022-06-15 Wed 13:10]--[2022-06-15 Wed 13:23] =>  0:13
+CLOCK: [2022-06-15 Wed 12:43]--[2022-06-15 Wed 13:09] =>  0:26
+CLOCK: [2022-06-15 Wed 11:57]--[2022-06-15 Wed 12:13] =>  0:16
+CLOCK: [2022-06-15 Wed 11:25]--[2022-06-15 Wed 11:44] =>  0:19
+CLOCK: [2022-06-14 Tue 15:46]--[2022-06-14 Tue 16:22] =>  0:36
+CLOCK: [2022-06-14 Tue 15:18]--[2022-06-14 Tue 15:31] =>  0:13
+CLOCK: [2022-06-14 Tue 14:21]--[2022-06-14 Tue 14:43] =>  0:22
+CLOCK: [2022-06-14 Tue 13:52]--[2022-06-14 Tue 14:05] =>  0:13
+CLOCK: [2022-06-14 Tue 13:43]--[2022-06-14 Tue 13:48] =>  0:05
+CLOCK: [2022-06-14 Tue 12:56]--[2022-06-14 Tue 13:14] =>  0:18
+CLOCK: [2022-06-14 Tue 12:41]--[2022-06-14 Tue 12:42] =>  0:01
+CLOCK: [2022-06-14 Tue 12:35]--[2022-06-14 Tue 12:40] =>  0:05
+CLOCK: [2022-06-14 Tue 10:56]--[2022-06-14 Tue 12:10] =>  1:14
+:END:
+  [[file:UFLP_fullDD.py][UFLP_fullDD]] file
+** DONE Write-up the UFLP-encoding procedure.
+CLOSED: [2022-06-23 Thu 12:47]
+- State "DONE"       from "TODO"       [2022-06-22 Wed 12:47]
+:LOGBOOK:
+CLOCK: [2022-06-21 Tue 22:15]--[2022-06-21 Tue 23:01] =>  0:46
+CLOCK: [2022-06-21 Tue 20:25]--[2022-06-21 Tue 20:47] =>  0:22
+CLOCK: [2022-06-21 Tue 18:29]--[2022-06-21 Tue 18:31] =>  0:02
+CLOCK: [2022-06-21 Tue 16:40]--[2022-06-21 Tue 18:29] =>  1:49
+CLOCK: [2022-06-21 Tue 15:57]--[2022-06-21 Tue 16:07] =>  0:10
+CLOCK: [2022-06-21 Tue 15:21]--[2022-06-21 Tue 15:34] =>  0:13
+CLOCK: [2022-06-21 Tue 14:20]--[2022-06-21 Tue 15:21] =>  1:01
+CLOCK: [2022-06-21 Tue 13:00]--[2022-06-21 Tue 14:16] =>  1:16
+:END:
+** DONE fixing: naive MIP vs DD-based for jUFLP
+CLOSED: [2022-06-20 Mon 15:55]
+- State "DONE"       from "TODO"       [2022-06-20 Mon 15:55]
+:LOGBOOK:
+CLOCK: [2022-06-20 Mon 15:48]--[2022-06-20 Mon 15:55] =>  0:07
+:END:
+** DONE numerical experiment: MIP vs a2A vs VS.
+CLOSED: [2022-06-02 Thu 17:45]
+- State "DONE"       from "WIP"        [2022-06-02 Thu 17:45]
+:LOGBOOK:
+CLOCK: [2022-06-02 Thu 16:36]--[2022-06-02 Thu 17:32] =>  0:56
+CLOCK: [2022-06-02 Thu 15:00]--[2022-06-02 Thu 15:53] =>  0:53
+CLOCK: [2022-06-02 Thu 14:28]--[2022-06-02 Thu 14:47] =>  0:19
+CLOCK: [2022-06-02 Thu 13:20]--[2022-06-02 Thu 14:24] =>  1:04
+CLOCK: [2022-06-01 Wed 23:21]--[2022-06-01 Wed 23:46] =>  0:25
+:END:
+** DONE description
+CLOSED: [2022-06-04 Sat 10:14]
+- State "DONE"       from "TODO"       [2022-06-04 Sat 10:14]
+:LOGBOOK:
+CLOCK: [2022-06-04 Sat 09:24]--[2022-06-04 Sat 10:04] =>  0:40
+CLOCK: [2022-06-04 Sat 08:39]--[2022-06-04 Sat 09:09] =>  0:30
+CLOCK: [2022-06-03 Fri 22:11]--[2022-06-03 Fri 22:26] =>  0:15
+CLOCK: [2022-06-03 Fri 21:55]--[2022-06-03 Fri 21:59] =>  0:04
+CLOCK: [2022-06-03 Fri 21:29]--[2022-06-03 Fri 21:33] =>  0:04
+CLOCK: [2022-06-03 Fri 20:55]--[2022-06-03 Fri 21:09] =>  0:14
+CLOCK: [2022-06-03 Fri 14:40]--[2022-06-03 Fri 15:12] =>  0:32
+CLOCK: [2022-06-03 Fri 13:56]--[2022-06-03 Fri 14:31] =>  0:35
+CLOCK: [2022-06-03 Fri 12:54]--[2022-06-03 Fri 13:43] =>  0:49
+CLOCK: [2022-06-03 Fri 12:48]--[2022-06-03 Fri 12:53] =>  0:05
+CLOCK: [2022-06-03 Fri 12:41]--[2022-06-03 Fri 12:48] =>  0:07
+CLOCK: [2022-06-03 Fri 12:29]--[2022-06-03 Fri 12:39] =>  0:10
+CLOCK: [2022-06-03 Fri 11:26]--[2022-06-03 Fri 11:42] =>  0:16
+CLOCK: [2022-06-02 Thu 22:01]--[2022-06-02 Thu 23:30] =>  1:29
+CLOCK: [2022-06-02 Thu 20:03]--[2022-06-02 Thu 20:06] =>  0:03
+CLOCK: [2022-06-02 Thu 17:54]--[2022-06-02 Thu 17:57] =>  0:03
+CLOCK: [2022-06-02 Thu 17:46]--[2022-06-02 Thu 17:52] =>  0:06
+:END:
+** DONE instance load/save
+CLOSED: [2022-06-01 Wed 22:59]
+- State "DONE"       from "TODO"       [2022-06-01 Wed 22:59]
+:LOGBOOK:
+CLOCK: [2022-06-01 Wed 22:48]--[2022-06-01 Wed 22:59] =>  0:11
+CLOCK: [2022-06-01 Wed 22:19]--[2022-06-01 Wed 22:27] =>  0:08
+CLOCK: [2022-06-01 Wed 21:52]--[2022-06-01 Wed 21:56] =>  0:04
+CLOCK: [2022-06-01 Wed 16:01]--[2022-06-01 Wed 16:08] =>  0:07
+:END:
+** DONE instance generation + cross-check
+CLOSED: [2022-06-01 Wed 15:53]
+- State "DONE"       from "TODO"       [2022-06-01 Wed 15:53]
+:LOGBOOK:
+CLOCK: [2022-06-01 Wed 15:27]--[2022-06-01 Wed 15:53] =>  0:26
+CLOCK: [2022-06-01 Wed 14:43]--[2022-06-01 Wed 14:48] =>  0:05
+CLOCK: [2022-06-01 Wed 14:12]--[2022-06-01 Wed 14:23] =>  0:11
+CLOCK: [2022-06-01 Wed 13:55]--[2022-06-01 Wed 14:02] =>  0:07
+CLOCK: [2022-06-01 Wed 13:09]--[2022-06-01 Wed 13:52] =>  0:43
+:END:
+** DONE Check if =L= parameter works correctly
+CLOSED: [2022-07-29 Fri 15:42]
+- State "DONE"       from "TODO"       [2022-07-29 Fri 15:42]
+[2022-05-23 Mon 11:18]
+[[file:~/projects/align-BDD/jUFLP_cavemen.py::while (1 - 2*n_edges / (M*(M-1))) > L:]]
+
+i.e., produces the necessary number of edges.
+** CANCELED Move instance gallery and other experiments to a separate file from darkcloud
+[2022-05-10 Tue 18:24]
+[[file:~/projects/align-BDD/darkcloud.py::M = 10]]
+
+(this was a technical, one-off code.)
+** CANCELED figure (1) the order of types and (2) order of nodes within a type
+CLOSED: [2022-07-29 Fri 15:43]
+ [2021-03-30 Tue 13:32]
+ (Switched to another application.)
+ 
+** DONE Adjust =is_reduced= for weighted BDDs
+CLOSED: [2022-07-29 Fri 15:47]
+- State "DONE"       from "TODO"       [2022-07-29 Fri 15:47]
+[2022-07-06 Wed 13:11]
+(Added an =assert= in the function.)
+
+** CANCELED Rndcover: fix =inplace= parameter! 
+CLOSED: [2022-07-29 Fri 15:47]
+[2022-05-23 Mon 22:43]
+[[file:~/projects/align-BDD/experiments/dclouds_rndcover.py::Tpp = T.align_to(C.vars, inplace=True)]]
+
+(This turned out to be a one-off experiment.)
+** LATER implement =BDD.save()= for a weighted BDD
+ [2021-02-22 Mon 12:29]
+ Turned out to be unnecessary for the given application.
+ 
+** DONE rename =?UFL= (streamlining names)
+CLOSED: [2022-07-29 Fri 15:48]
+- State "DONE"       from "TODO"       [2022-07-29 Fri 15:48]
+** j-UFLP implementation
+:PROPERTIES:
+:CATEGORY: a-BDD/jUFLP
+:END:
+*** LATER Derive the sensitivity info from the SP.
+(Sketched a brief note in the response).
+
+** CANCELED Add assertion to the instance type
+CLOSED: [2022-07-29 Fri 15:50]
+[2022-05-03 Tue 14:10]
+[[file:~/projects/align-BDD/darkcloud.py]]
+
+'string' shape only.
+
+(The experiment left out from the main paper.)
+** LATER Perhaps, =is_equivalent= is a bad name?
+ [2021-02-22 Mon 13:48]
+ [[file:~/projects/align-BDD/BDD.py]]
+
+ Like, maybe rename to =test_equivalence=. And then =is_equivalent <- test_equivalence()[0]=
+** Softcover: design instances with types
+:LOGBOOK:
+CLOCK: [2022-01-24 Mon 12:16]--[2022-01-24 Mon 12:40] =>  0:24
+:END:
+(Left out from the main paper.)
+*** DONE Design cover DDs (Bool -> Int)
+CLOSED: [2022-01-27 Thu 15:11]
+- State "DONE"       from "TODO"       [2022-01-27 Thu 15:11]
+:LOGBOOK:
+CLOCK: [2022-01-27 Thu 14:31]--[2022-01-27 Thu 14:58] =>  0:27
+CLOCK: [2022-01-27 Thu 13:36]--[2022-01-27 Thu 14:18] =>  0:42
+CLOCK: [2022-01-26 Wed 19:46]--[2022-01-26 Wed 19:47] =>  0:01
+CLOCK: [2022-01-26 Wed 17:42]--[2022-01-26 Wed 18:11] =>  0:29
+CLOCK: [2022-01-26 Wed 17:20]--[2022-01-26 Wed 17:41] =>  0:21
+CLOCK: [2022-01-26 Wed 17:12]--[2022-01-26 Wed 17:20] =>  0:08
+CLOCK: [2022-01-26 Wed 16:21]--[2022-01-26 Wed 16:33] =>  0:12
+CLOCK: [2022-01-26 Wed 14:40]--[2022-01-26 Wed 16:21] =>  1:41
+CLOCK: [2022-01-26 Wed 14:04]--[2022-01-26 Wed 14:18] =>  0:14
+CLOCK: [2022-01-26 Wed 13:45]--[2022-01-26 Wed 13:57] =>  0:12
+CLOCK: [2022-01-26 Wed 13:08]--[2022-01-26 Wed 13:43] =>  0:35
+CLOCK: [2022-01-24 Mon 15:13]--[2022-01-24 Mon 15:32] =>  0:19
+CLOCK: [2022-01-24 Mon 13:16]--[2022-01-24 Mon 14:23] =>  1:07
+CLOCK: [2022-01-24 Mon 12:59]--[2022-01-24 Mon 13:10] =>  0:11
+CLOCK: [2022-01-24 Mon 12:55]--[2022-01-24 Mon 12:56] =>  0:01
+:END:
+Check it is correct, technically.
+*** DONE Check dia sizes scaling (with and w/o reduction) vs. no of vars in MIP
+CLOSED: [2022-01-28 Fri 17:21]
+- State "DONE"       from "TODO"       [2022-01-28 Fri 17:21]
+:LOGBOOK:
+CLOCK: [2022-01-28 Fri 15:30]--[2022-01-28 Fri 16:24] =>  0:54
+CLOCK: [2022-01-28 Fri 14:05]--[2022-01-28 Fri 14:42] =>  0:37
+CLOCK: [2022-01-28 Fri 13:59]--[2022-01-28 Fri 14:03] =>  0:04
+CLOCK: [2022-01-27 Thu 18:57]--[2022-01-27 Thu 19:17] =>  0:20
+CLOCK: [2022-01-27 Thu 15:16]--[2022-01-27 Thu 15:26] =>  0:10
+CLOCK: [2022-01-27 Thu 15:11]--[2022-01-27 Thu 15:14] =>  0:03
+:END:
+So, without reduction, I basically create an exponentially sized diagrams. This
+makes sense, if I am not smart with this ``forgetting'' nodes (after they have zero
+``degrees of freedom'').
+
+However, it is not really bright even in theoretical case of writing down a
+reduced dia as well...
+
+*** DONE Repeat the experiment for a more narrow graph type (cavemen?)
+CLOSED: [2022-01-28 Fri 20:12]
+- State "DONE"       from "TODO"       [2022-01-28 Fri 20:12]
+:LOGBOOK:
+CLOCK: [2022-01-28 Fri 19:17]--[2022-01-28 Fri 20:12] =>  0:55
+CLOCK: [2022-01-28 Fri 18:34]--[2022-01-28 Fri 18:55] =>  0:21
+CLOCK: [2022-01-28 Fri 17:21]--[2022-01-28 Fri 17:59] =>  0:38
+:END:
+
+*** DONE make improved cover-building algo
+CLOSED: [2022-03-11 Fri 13:21]
+- State "DONE"       from "TODO"       [2022-03-11 Fri 13:21]
+:LOGBOOK:
+CLOCK: [2022-02-15 Tue 15:09]--[2022-02-15 Tue 15:28] =>  0:19
+CLOCK: [2022-02-15 Tue 14:14]--[2022-02-15 Tue 15:05] =>  0:51
+CLOCK: [2022-02-15 Tue 13:20]--[2022-02-15 Tue 13:28] =>  0:08
+CLOCK: [2022-02-15 Tue 12:09]--[2022-02-15 Tue 12:17] =>  0:08
+CLOCK: [2022-02-15 Tue 10:51]--[2022-02-15 Tue 11:54] =>  1:03
+CLOCK: [2022-02-14 Mon 18:49]--[2022-02-14 Mon 18:55] =>  0:06
+CLOCK: [2022-02-01 Tue 13:36]--[2022-02-01 Tue 13:58] =>  0:22
+CLOCK: [2022-01-31 Mon 15:18]--[2022-01-31 Mon 15:29] =>  0:11
+CLOCK: [2022-01-31 Mon 14:40]--[2022-01-31 Mon 15:11] =>  0:31
+CLOCK: [2022-01-31 Mon 14:12]--[2022-01-31 Mon 14:16] =>  0:04
+CLOCK: [2022-01-31 Mon 13:16]--[2022-01-31 Mon 13:35] =>  0:19
+:END:
+*** DONE Compare runtimes w/o types: BDDs vs naive MIP
+CLOSED: [2022-03-11 Fri 13:21]
+- State "DONE"       from "TODO"       [2022-03-11 Fri 13:21]
+:LOGBOOK:
+CLOCK: [2022-02-23 Wed 15:41]--[2022-02-23 Wed 16:08] =>  0:27
+CLOCK: [2022-02-23 Wed 15:31]--[2022-02-23 Wed 15:37] =>  0:06
+:END:
+*** LATER Add types -- generate CPP instances 
+*** LATER Compare runtime: naive MIP vs CPP MIP vs Align-BDD CPP
+*** LATER Add reduction step -- check time
+** CANCELED rename =VarSeq.layer_var= into =vars=, I suppose...
+CLOSED: [2022-07-29 Fri 15:51]
+ [2021-02-22 Mon 17:52]
+** CANCELED let S NOT contain the node itself? -- amended later        :tUFL:
+CLOSED: [2022-07-29 Fri 15:52]
+ [2021-03-22 Mon 18:34]
+** DONE Rewrite comments
+CLOSED: [2022-07-29 Fri 20:44]
+- State "DONE"       from "TODO"       [2022-07-29 Fri 20:44]
+[2022-05-09 Mon 15:46]
+[[file:~/projects/align-BDD/darkcloud.py::def build_type_DD(self)]]
+
+** DONE Finalize the code docs
+CLOSED: [2022-07-29 Fri 20:44]
+- State "DONE"       from "TODO"       [2022-07-29 Fri 20:44]
+   Among other things, technical description:
+   - [ ] makefile
+   - [ ] pytest and testing framework
 
 * Notes
   - revision notes:  [[mu4e:msgid:CO1PR01MB658375A8FEDC337330803037DE609@CO1PR01MB6583.prod.exchangelabs.com][Two ideas]] from JCS.

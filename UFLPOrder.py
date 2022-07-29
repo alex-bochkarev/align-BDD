@@ -88,7 +88,10 @@ def UFLP_greedy_order(S, directSort=True):
         c (list): location costs.
 
     Note:
-        As usual, point  numbers are 1-based.
+        As usual, point  numbers are 1-based. Uses a simple
+        greedy algorithm that adds fewest possible points
+        to 'forget' the next distance-two neighborhood.
+        (See Example 5 in Appendix H.)
 
     Returns:
         A list of nodes to add to a BDD (according to a greedy algo).

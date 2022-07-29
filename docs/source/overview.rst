@@ -1,17 +1,26 @@
 Implementation: overview
 ------------------------
 
-These pages document the implementation of the numerical experiments for "Align-BDD" working paper by Bochkarev and Smith. These notes along with the accompanying source code and data are assumed to provide enough information to:
+These pages document the implementation of the numerical experiments for
+"Align-BDD" working paper by Bochkarev and Smith. The notes along with the
+accompanying `source code and data <https://github.com/alex-bochkarev/align-BDD>`_
+are assumed to provide enough information to:
 
 (1) inspect the raw data,
-(2) reproduce and adjust/inspect the figures from the paper (given the experiment log files) as necessary, and
-(3) completely reproduce the paper results from scratch, including instance generation, with minimal efforts.
+(2) reproduce / adjust / inspect the figures from the paper (given the experiment log files) as necessary, and
+(3) completely reproduce the paper results from scratch, including instance generation, with reasonable efforts.
 
-All technical questions can be addressed to `Alexey Bochkarev <https://www.bochkarev.io/contact>`_.
+It is our special interest to help the reader build upon our results, so please
+do not hesitate to address any technical questions to `Alexey
+Bochkarev <https://www.bochkarev.io/contact>`_.
 
 Computational infrastructure
 ----------------------------
-To run the experiments we used machines running GNU/Linux system (remote computational resources provided by `Clemson Palmetto cluster <https://www.palmetto.clemson.edu/palmetto/about/>`_ and laptops), running the following software:
+
+To run the experiments we used machines running GNU/Linux system (remote
+computational resources provided by `Clemson Palmetto cluster
+<https://www.palmetto.clemson.edu/palmetto/about/>`_ and laptops), running the
+following software:
 
 * experiments implementation: python3. :download:`packages list <requirements.txt>`, the usual way should work::
 
@@ -29,7 +38,24 @@ To run the experiments we used machines running GNU/Linux system (remote computa
 * experiments pipeline: GNU make and PBS (for job scheduling on the cluster).
 * (we also used a separate `tool <https://github.com/alex-bochkarev/tgs-curl>`_ to receive the results promptly via `Telegram <https://telegram.org>`_, but this can be safely removed)
 * numerical experiments require `Gurobi <https://www.gurobi.com>`_ solver.
-* most graphs were visualized used a stand-alone program called `Graphviz <https://graphviz.org/>`_.
+* most graphs were visualized used a stand-alone program called `Graphviz <https://graphviz.org/>`_
+  Note that before ``pip install pygraphviz`` you might need to install the program
+  and the header files as well. On my Debian distribution I needed to do
+  ``sudo apt install graphviz graphviz-dev``.
+
+Note that for the (python) environment management we used the recommended
+`venv-way <https://docs.python.org/3/library/venv.html>`_. For example, the
+virtual environment can be created and activated with:
+
+.. code-block:: bash
+
+                python -m venv .venv
+                source .venv/bin/activate
+
+                # so that we can install the necessary packages there with:
+                pip install -r requirements.txt
+
+(``conda`` would work just as well.)
 
 General reproducibility
 -----------------------
@@ -244,6 +270,7 @@ The code relevant to j-UFLP application (Section 4.2) is here:
    UFLP_fullDD
    UFLPOrder
    jUFLP_cavemen
+   jUFLP_utils
 
 Numerical experiments
 ^^^^^^^^^^^^^^^^^^^^^
@@ -267,9 +294,10 @@ Testing framework
 
 Key implementations are covered with tests, mostly using `pytest
 <https://pytest.org>`_ framework. On top of the testing code in the files
-mentioned above, some tests are in ``📁 tests``:
+mentioned above (testing functions have ``test_`` prefix in the name), some
+tests are in ``📁 tests``:
 
-.. autosummary:: 
+.. autosummary::
    :toctree: _autosummary
    :recursive:
 

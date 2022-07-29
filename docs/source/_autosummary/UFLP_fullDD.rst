@@ -24,8 +24,8 @@ Implements functions (outside the classes above):
    calc_cost
    create_cover_DD
    make_label
+   run_fullDD_simple
    test_cost_calc
-   test_fullDD_simple
    test_full_DD
 
 
@@ -52,8 +52,8 @@ Functions
 .. autofunction:: calc_cost
 .. autofunction:: create_cover_DD
 .. autofunction:: make_label
+.. autofunction:: run_fullDD_simple
 .. autofunction:: test_cost_calc
-.. autofunction:: test_fullDD_simple
 .. autofunction:: test_full_DD
 
 
