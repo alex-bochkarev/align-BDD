@@ -1,6 +1,8 @@
 """
-Implements the 'cloud' algorithm that builds a BDD for a UFL over a relaxed
-cavemen graph.
+Contains the j-UFLP instance generation code (along with some legacy experiments).
+
+Implements the 'cloud' algorithm that builds a BDD for a UFLP (using separate MIPs)
+over a relaxed cavemen graph. Generates the 'points-cluster' sturcutred instances.
 """
 import numpy as np
 from dataclasses import dataclass
@@ -40,10 +42,10 @@ def gen_caveman_inst(n=10, M=5, L=0.5, verbose=False):
       S, f, c, caves: instance (S,f,c) and caves description.
 
     Note:
-      The parameter ``L`` is calculated as follows.
+      The parameter ``L`` is assumed to be:
 
       .. math::
-          \\Lambda = 1 - 2\\frac{#\\textrm{existing arcs}}{N(N-1)}
+          L = 1 - 2\\frac{\\textrm{Number of existing arcs}}{N(N-1)}
 
       (See, e.g., Sefair and Smith 2016 on DSPI for a similar approach.)
     """
