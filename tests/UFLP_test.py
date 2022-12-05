@@ -6,8 +6,10 @@ Note:
 import pytest
 import numpy as np
 from gurobipy import GRB
+from BDD import simscore
 
 import UFL
+from UFLP_2_cav import gen_special_jUFLP
 
 
 def gen_UFL_instance(n, m):
@@ -106,3 +108,19 @@ def test_DPs(test_inst):
 
     assert model.status == GRB.OPTIMAL
     assert abs(model.objVal - plain_MIP_obj) < 1e-3
+
+
+@pytest.mark.parametrize("param", [np.random.rand()
+                                   for _ in range(100)])
+def test_cluster_reverse_custom(param):
+    """Tests the jUFLP-instance-generation procedure
+    (for the given number of inversions)."""
+    i1, i2, jm = gen_special_jUFLP(2, 12, 0.35, "cluster-reverse-custom",
+                                   "cavemen", param)
+    _, _, _, ca1 = i1
+    _, _, _, ca2 = i2
+
+    for c in range(len(ca1)):
+        assert abs(simscore(ca1[c],
+                            [jm[j]
+                              for j in ca1[c]]) - param) < 0.025

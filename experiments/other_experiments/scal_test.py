@@ -39,44 +39,44 @@ if __name__ == "__main__":
     inst_profiles = set()
     inst_id = 0
 
-with open(args.inst_list,"r") as inst_list:
-    for inst_id in inst_list:
-        inst_id = int(inst_id.rstrip())
-        A = exact.BDD(); B = exact.BDD()
-        A.load(args.inst_dir+"/A{}.bdd".format(inst_id))
-        B.load(args.inst_dir+"/B{}.bdd".format(inst_id))
+    with open(args.inst_list,"r") as inst_list:
+        for inst_id in inst_list:
+            inst_id = int(inst_id.rstrip())
+            A = exact.BDD(); B = exact.BDD()
+            A.load(args.inst_dir+"/A{}.bdd".format(inst_id))
+            B.load(args.inst_dir+"/B{}.bdd".format(inst_id))
 
-        N = len(A.vars)
+            N = len(A.vars)
 
-        # generate corresponding varseq-instances
-        t0 = time()
-        vsA = simpl.VarSeq(A.vars, [len(l) for l in A.layers[:-1]])
-        vsB = simpl.VarSeq(B.vars, [len(l) for l in B.layers[:-1]])
-        t1 = time()
-        log(inst_id, N, "vs_gen_time",t1 - t0)
+            # generate corresponding varseq-instances
+            t0 = time()
+            vsA = simpl.VarSeq(A.vars, [len(l) for l in A.layers[:-1]])
+            vsB = simpl.VarSeq(B.vars, [len(l) for l in B.layers[:-1]])
+            t1 = time()
+            log(inst_id, N, "vs_gen_time",t1 - t0)
 
-        t0 = time()
-        bb = bbs.BBSearch(vsA,vsB)
-        bb.search()
-        t1 = time()
-        log(inst_id, N, "BBsearch_time", t1-t0)
+            t0 = time()
+            bb = bbs.BBSearch(vsA,vsB)
+            bb.search()
+            t1 = time()
+            log(inst_id, N, "BBsearch_time", t1-t0)
 
-        t0 = time()
-        order = bb.Ap_cand.layer_var
-        simpl_obj = A.align_to(order).size() + B.align_to(order).size()
-        t1 = time()
-        log(inst_id, N, "alig_to_order_time", t1-t0)
-        log(inst_id, N, "orig_aux_obj", simpl_obj)
+            t0 = time()
+            order = bb.Ap_cand.layer_var
+            simpl_obj = A.align_to(order).size() + B.align_to(order).size()
+            t1 = time()
+            log(inst_id, N, "alig_to_order_time", t1-t0)
+            log(inst_id, N, "orig_aux_obj", simpl_obj)
 
-        ## solve with exact sifts (with and without preliminary reduction)
-        t0 = time()
-        if A.align_to(B.vars).size() + B.size() <= A.size()+B.align_to(A.vars).size():
-            A.gsifts(B)
-        else:
-            B.gsifts(A)
+            ## solve with exact sifts (with and without preliminary reduction)
+            t0 = time()
+            if A.align_to(B.vars).size() + B.size() <= A.size()+B.align_to(A.vars).size():
+                A.gsifts(B)
+            else:
+                B.gsifts(A)
 
-        t1 = time()
+            t1 = time()
 
-        log(inst_id, N, "orig_sifts_red_time", t1-t0)
-        log(inst_id, N, "orig_sifts_red_obj", A.size()+B.size())
-        inst_id += 1
+            log(inst_id, N, "orig_sifts_red_time", t1-t0)
+            log(inst_id, N, "orig_sifts_red_obj", A.size()+B.size())
+            inst_id += 1

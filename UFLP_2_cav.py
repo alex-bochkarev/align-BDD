@@ -20,6 +20,7 @@ from jUFLP_cavemen import solve_cm_jUFLP_fullDDs
 from darkcloud import gen_caveman_inst
 from jUFLP_utils import save_inst
 
+from BDD import simscore
 
 # UFLP instance description structure
 # UFLP_inst = (S, f, c, caves)
@@ -94,7 +95,8 @@ def gen_nlinks_cavemen_inst(n=10, M=5, L=0.5):
     return S, f, c, caves
 
 
-def gen_special_jUFLP(n, M, L, linking="consecutive", inst_type="cavemen"):
+def gen_special_jUFLP(n, M, L, linking="consecutive", inst_type="cavemen",
+                      param=None):
     """Generate a special instance of jUFLP.
 
     Args:
@@ -107,11 +109,18 @@ def gen_special_jUFLP(n, M, L, linking="consecutive", inst_type="cavemen"):
             - "by-cluster": link randomly, but cluster-to-cluster.
             - "cluster-reverse": consecutive clusters, in reverse order
               within each pair of clusters.
+            - "cluster-reverse-custom": consecutive clusters, in the orders
+              with a given similarity score (up to an error caused by the
+              integer number of possible inversions).
             - "literal": trivial linking, 1-to-1.
 
         inst_type (str): instance topology, one of:
             - "1-link": ... (cluster) - (node) -(cluster) ...
             - "cavemen": ... (cluster) - (cluster) ...
+
+        param (float): instance generation parameter for
+        "cluster-reverse-custom" linking, simscore tier number.
+        (1.0 corresponds to 100% simscore, 0.0 -- to 0%)
 
     Returns:
       i1, i2, link: two instances (S,f,c, caves) and linking dict.
@@ -179,12 +188,8 @@ def gen_special_jUFLP(n, M, L, linking="consecutive", inst_type="cavemen"):
         ca2 = [S for S in i2[COL_caves]]
 
         link = dict()
-        # clusters = [k for k in np.random.permutation(range(len(ca2)))]
-        # clusters = [k for k in reversed(range(len(ca2)))]
         clusters = [k for k in range(len(ca2))]
         for k in range(len(ca1)):
-            # link.update(dict(zip(ca1[k],
-            #                      np.random.permutation(ca2[clusters[k]]))))
             link.update(dict(zip(ca1[k],
                                  reversed(ca2[clusters[k]]))))
 
@@ -198,6 +203,33 @@ def gen_special_jUFLP(n, M, L, linking="consecutive", inst_type="cavemen"):
                    if j not in in_clusters2]
 
         link.update(dict(zip(origins, targets)))
+    elif linking == "cluster-reverse-custom":
+        ca1 = [S for S in i1[COL_caves]]
+        ca2 = [S for S in i2[COL_caves]]
+
+        link = dict()
+        clusters = [k for k in range(len(ca2))]  # cluster-to-cluster matching
+
+        for k in range(len(ca1)):
+            # within-cluster matching
+            assert len(ca1[k]) == len(ca2[clusters[k]])
+
+            src_order = [j for j in range(len(ca1[k]))]
+            dest_order = copy(src_order)
+
+            while simscore(src_order, dest_order) > param:
+                # Make a random swap: introduce a single inversion
+                swapped = False
+                while not swapped:
+                    swap_pos = np.random.randint(1, len(dest_order))
+                    if dest_order[swap_pos] > dest_order[swap_pos-1]:
+                        s1, s2 = dest_order[swap_pos], dest_order[swap_pos-1]
+                        dest_order[swap_pos] = s2
+                        dest_order[swap_pos-1] = s1
+                        swapped = True
+
+            link.update(dict(zip(ca1[k],
+                                 [ca2[clusters[k]][j] for j in dest_order])))
     elif linking == "literal":
         link = dict(zip([j for j in range(1, len(i1[0])+1)],
                         [j for j in range(1, len(i2[0])+1)]))
