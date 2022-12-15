@@ -5,7 +5,8 @@
 * Current project TODOs
 ** TODO Experiment: various linking settings                           :rev3:
 :LOGBOOK:
-CLOCK: [2022-12-05 Mon 11:19]--[2022-12-05 Mon 11:59] =>  0:40
+CLOCK: [2022-12-05 Mon 12:05]--[2022-12-05 Mon 13:13] =>  1:08
+CLOCK: [2022-12-05 Mon 11:20]--[2022-12-05 Mon 11:59] =>  0:39
 CLOCK: [2022-12-05 Mon 10:26]--[2022-12-05 Mon 10:49] =>  0:23
 :END:
 ** TODO Kill already merged branches?

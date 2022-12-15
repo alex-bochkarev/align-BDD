@@ -95,6 +95,35 @@ def gen_nlinks_cavemen_inst(n=10, M=5, L=0.5):
     return S, f, c, caves
 
 
+def make_cluster_reverse_custom_matching(ca1, ca2, ss):
+    """Makes clusters matching given simscore parameter `ss`."""
+    link = dict()
+    clusters = [k for k in range(len(ca2))]  # cluster-to-cluster matching
+
+    for k in range(len(ca1)):
+        # within-cluster matching
+        assert len(ca1[k]) == len(ca2[clusters[k]])
+
+        src_order = [j for j in range(len(ca1[k]))]
+        dest_order = copy(src_order)
+
+        while simscore(src_order, dest_order) > ss:
+            # Make a random swap: introduce a single inversion
+            swapped = False
+            while not swapped:
+                swap_pos = np.random.randint(1, len(dest_order))
+                if dest_order[swap_pos] > dest_order[swap_pos-1]:
+                    s1, s2 = dest_order[swap_pos], dest_order[swap_pos-1]
+                    dest_order[swap_pos] = s2
+                    dest_order[swap_pos-1] = s1
+                    swapped = True
+
+        link.update(dict(zip(ca1[k],
+                                [ca2[clusters[k]][j] for j in dest_order])))
+
+    return link
+
+
 def gen_special_jUFLP(n, M, L, linking="consecutive", inst_type="cavemen",
                       param=None):
     """Generate a special instance of jUFLP.
@@ -207,29 +236,7 @@ def gen_special_jUFLP(n, M, L, linking="consecutive", inst_type="cavemen",
         ca1 = [S for S in i1[COL_caves]]
         ca2 = [S for S in i2[COL_caves]]
 
-        link = dict()
-        clusters = [k for k in range(len(ca2))]  # cluster-to-cluster matching
-
-        for k in range(len(ca1)):
-            # within-cluster matching
-            assert len(ca1[k]) == len(ca2[clusters[k]])
-
-            src_order = [j for j in range(len(ca1[k]))]
-            dest_order = copy(src_order)
-
-            while simscore(src_order, dest_order) > param:
-                # Make a random swap: introduce a single inversion
-                swapped = False
-                while not swapped:
-                    swap_pos = np.random.randint(1, len(dest_order))
-                    if dest_order[swap_pos] > dest_order[swap_pos-1]:
-                        s1, s2 = dest_order[swap_pos], dest_order[swap_pos-1]
-                        dest_order[swap_pos] = s2
-                        dest_order[swap_pos-1] = s1
-                        swapped = True
-
-            link.update(dict(zip(ca1[k],
-                                 [ca2[clusters[k]][j] for j in dest_order])))
+        link = make_cluster_reverse_custom_matching(ca1, ca2, param)
     elif linking == "literal":
         link = dict(zip([j for j in range(1, len(i1[0])+1)],
                         [j for j in range(1, len(i2[0])+1)]))
