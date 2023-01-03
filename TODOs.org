@@ -1,5 +1,5 @@
 #+TITLE: Align-BDD project
-#+CATEGORY: a-BDD
+#+CATEGORY: a-BDD-r
 #+STARTUP: show2levels
 
 * Current project TODOs

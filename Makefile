@@ -303,6 +303,19 @@ $(LOGS)/2022-07-19_jUFLP.csv: $(LOGS)/2022-07-19_jUFLP.out
 $(LOGS)/2022-07-19_jUFLP.out: UFLP_2_cav.py
 				python -m UFLP_2_cav | tee $@
 
+
+$(LOGS)/2022-12-06_jUFLP_simscores.csv: $(LOGS)/2022-12-06_jUFLP_simscores.out
+				head -1 $< > $@ && \
+				grep "^[0-9]*," $< >> $@
+
+
+$(LOGS)/2023-01-03_jUFLP_simscores.out: experiments/jUFLP_simscores_M.py
+				python -m experiments.jUFLP_simscores_M | tee $@
+
+$(LOGS)/2023-01-03_jUFLP_simscores.csv: $(LOGS)/2023-01-03_jUFLP_simscores.out
+				head -1 $< > $@ && \
+				grep "^[0-9]*," $< >> $@
+
 # --- end of j-UFLP figures ---
 
 ## clean-up
