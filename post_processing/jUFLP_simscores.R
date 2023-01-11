@@ -1,10 +1,10 @@
 library(ggplot2)
 
-df = read.csv("./run_logs/2023-01-03_jUFLP_simscores.csv",
-              stringsAsFactors = FALSE)
-
-## df = read.csv("./run_logs/2022-12-06_jUFLP_simscores.csv",
+## df = read.csv("./run_logs/2023-01-03_jUFLP_simscores.csv",
 ##               stringsAsFactors = FALSE)
+
+df = read.csv("./run_logs/2022-12-06_jUFLP_simscores.csv",
+              stringsAsFactors = FALSE)
 
 ggplot(df)+
   geom_jitter(aes(x = param, y = tDD_VS / tDD_toA), width=0.05, size=3)+
