@@ -90,6 +90,9 @@ ggplot(df) +
   )+
   ylab("t(DD with 'align-to-A'), sec")+
   xlab("t(DD with VS), sec")+
-  guides(shape=guide_legend("M, points / cluster"))
+  guides(shape=guide_legend("M, points / cluster"))+
+  scale_x_log10()+
+  scale_y_log10()+
+  annotation_logticks()
 
 ggsave("figures/t_VS_vs_toA.eps", width = 10, height = 10)

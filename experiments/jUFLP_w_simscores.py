@@ -1,15 +1,16 @@
-"""Generates and solves the special class j-UFLP instances.
+"""Generates and solves the special class of j-UFLP instances.
 
-Instances and the experiment as discussed in the paper, in Section 4.2 and
-Appendix F.2. Instances are generated using
-:py:func:`UFLP_2_cav.gen_special_jUFLP`, which is a wrapper for function
-:py:func:`darkcloud.gen_caveman_inst` for this class of instances. The
-experiment is implemented in :py:func:`UFLP_2_cav.main`.
+Instances and the experiment as discussed in the paper, in Section 4.2
+(for Figure 11): investigating the effects of different linking methods
+on the proposed heuristic efficiency (vs. the align-to-A baseline).
 
-The rest of the code implemented alternative experiments (left out from the
-second revision of the paper).
+Instances are generated using :py:func:`UFLP_2_cav.gen_special_jUFLP`,
+the code for different linking methods during instance generation
+is implemented in :py:func:`UFLP_2_cav.make_cluster_reverse_custom_matching`.
 
+The experiment itself is implemented in :py:func:`experiments.jUFLP_w_simscores.main`.
 """
+
 import numpy as np
 from time import time
 

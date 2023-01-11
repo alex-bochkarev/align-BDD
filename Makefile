@@ -309,6 +309,10 @@ $(LOGS)/2022-12-06_jUFLP_simscores.csv: $(LOGS)/2022-12-06_jUFLP_simscores.out
 				grep "^[0-9]*," $< >> $@
 
 
+$(LOGS)/2022-12-06_jUFLP_simscores.out: experiments/jUFLP_w_simscores.py
+				python -m experiments.jUFLP_w_simscores | tee $@
+
+
 $(LOGS)/2023-01-03_jUFLP_simscores.out: experiments/jUFLP_simscores_M.py
 				python -m experiments.jUFLP_simscores_M | tee $@
 
