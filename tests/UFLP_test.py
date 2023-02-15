@@ -1,4 +1,4 @@
-"""Tests the UFLP-related machinery (:py:mod:`tUFLP`).
+"""Tests the UFLP-related machinery (:py:mod:`UFLP_2_cav` and :py:mod:`UFL`).
 
 Note:
     The module requires Gurobi solver.

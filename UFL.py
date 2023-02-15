@@ -1,7 +1,5 @@
 """Implements basic functions for UFL -- Uncapacitated Facility Location.
 
-Used as a basis for :py:mod:`tUFLP` (some foundational UFLP-related code).
-
 Tests coverage: :py:mod:`UFLP_test`
 """
 from graphviz import Digraph

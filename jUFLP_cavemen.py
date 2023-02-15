@@ -269,7 +269,7 @@ def solve_cm_jUFLP_DDs(i1, i2, jmap, intmode="toA", ret_int=False):
       intmode (str): alignment mode, 'toA', 'toB', or 'VS'
 
     Notes:
-      Instance is parameterized as per :py:func:`gen_caveman_inst`,
+      Instance is parameterized as per :py:func:`darkcloud.gen_caveman_inst`,
       The diagrams are built with :py:class:`darkcloud.DDSolver`.
     """
     S, f, c, caves = i1
@@ -322,7 +322,7 @@ def solve_cm_jUFLP_CPPMIP(i1, i2, jmap):
       jmap (dict): joining dict.
 
     Notes:
-      Instance is parameterized as per :py:func:`gen_caveman_inst`,
+      Instance is parameterized as per :py:func:`darkcloud.gen_caveman_inst`,
       The diagrams are built with :py:class:`darkcloud.DDSolver`.
     Returns:
         objective (float)
@@ -356,7 +356,7 @@ def solve_cm_jUFLP_CPPMIP_fullDDs(i1, i2, jmap):
       jmap (dict): joining dict.
 
     Notes:
-      Instance is parameterized as per :py:func:`gen_caveman_inst`,
+      Instance is parameterized as per :py:func:`darkcloud.gen_caveman_inst`,
       The diagrams are built with :py:func:`UFLP_fullDD.create_cover_DD`.
     Returns:
         objective (float)
@@ -387,7 +387,7 @@ def solve_cm_jUFLP_fullDDs(i1, i2, jmap, intmode, ret_int=False):
       i1, i2 (list): instances
 
     Notes:
-      Instance is parameterized as per :py:func:`gen_caveman_inst`.
+      Instance is parameterized as per :py:func:`darkcloud.gen_caveman_inst`.
     """
     S, f, c, caves = i1
     S2, f2, c2, caves2 = i2
@@ -452,7 +452,7 @@ def solve_with_MIP(S, S2, f, f2, c, caves):
     """Generates and solves a MIP for the supplied jUFL cavemen instance.
 
     Note:
-      The instance is parameterized as per :py:func:`gen_caveman_inst`.
+      The instance is parameterized as per :py:func:`darkcloud.gen_caveman_inst`.
       Most of the code is adapted form :py:func:`darkcloud.solve_with_MIP`.
     """
     m = gp.Model()
@@ -513,7 +513,7 @@ def solve_with_DDs(S, S2, f, f2, c, caves, intmode="toA"):
       intmode (str): intersection mode, 'toA' or 'VS'
 
     Notes:
-      Instance is parameterized as per :py:func:`gen_caveman_inst`,
+      Instance is parameterized as per :py:func:`darkcloud.gen_caveman_inst`,
       The diagrams are built with :py:class:`darkcloud.DDSolver`.
     """
     print("Building the first DD...", end="", flush=True)

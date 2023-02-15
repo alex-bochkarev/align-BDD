@@ -4,7 +4,20 @@ from jUFLP_cavemen import jUFLPEncoder
 
 
 def save_inst(i1, i2, join_map, filename):
-    """Saves the jUFLP instance to ``.json`` file."""
+    """Saves the jUFLP instance to ``.json`` file.
+
+    The file contains the following objects
+
+    - ``inst1`` and ``inst2`` -- description of the two
+      sub-instances, with identical structure containing
+      the following records:
+
+       - `S`: a list of neighborhood lists,
+       - `f`: a list of lists of overlap costs,
+       - `c`: a list of facility location costs.
+       - `caves`: a parameter describing the points allocated to each "cave"
+         (was used in legacy experiments)
+    """
     with open(filename, "w") as fout:
         fout.write(json.dumps({
             'inst1':{
